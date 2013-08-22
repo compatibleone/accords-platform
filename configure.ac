@@ -642,7 +642,6 @@ AM_CONDITIONAL([ENABLE_PYACCORDS], [test "$enable_pyaccords" = "yes"])
 dnl files to generate with automake
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([scripts/Makefile])
-AC_CONFIG_FILES([tools/Makefile tools/strukt/Makefile])
 AC_CONFIG_FILES([manifests/Makefile])
 AC_CONFIG_FILES([manpages/Makefile])
 AC_CONFIG_FILES([coxml/Makefile])

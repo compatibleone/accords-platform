@@ -11,7 +11,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = scripts
-SUBDIRS += tools
 SUBDIRS += manifests
 SUBDIRS += manpages
 
