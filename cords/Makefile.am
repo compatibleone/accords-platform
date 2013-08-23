@@ -24,6 +24,8 @@ model_h_files = azconfig.h paconfig.h publication.h placement.h account.h instru
 		ec2config.h gw.h intercloudGW.h linkgw.h packet.h penalty.h release.h volume.h \
 		xlink.h
 
+common_c_files = backend_common.c
+
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
 libcords_la_SOURCES = cords2occi.c cordsbase.c backend_common.c
