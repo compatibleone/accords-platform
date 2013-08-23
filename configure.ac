@@ -16,7 +16,7 @@ AC_CANONICAL_TARGET
 
 # tar-pax is needed for having paths with more than 99 chars
 # which happens for java paprocci
-AM_INIT_AUTOMAKE([1.9 -Wno-portability tar-pax])
+AM_INIT_AUTOMAKE([1.9 -Wno-portability tar-pax -Wall foreign])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES(yes)])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -105,6 +105,15 @@ AC_ARG_ENABLE([cords],
 AM_CONDITIONAL([ENABLE_CORDS], [test "$enable_cords" = "yes"])
 AC_SUBST([CFLAGS_CORDS], ["-I\${abs_top_srcdir}/cords -I\${abs_top_builddir}/cords"])
 AC_SUBST([LD_CORDS], ["-L\${abs_top_builddir}/cords -lcords"])
+
+AC_ARG_ENABLE([backend],
+      [AS_HELP_STRING([--disable-backend],
+		      [Disable backend @<:@default=enable@:>@])],
+      [],
+      [enable_backend=yes])
+AM_CONDITIONAL([ENABLE_BACKEND], [test "$enable_backend" = "yes"])
+AC_SUBST([CFLAGS_BACKEND], ["-I\${abs_top_srcdir}/backend"])
+AC_SUBST([LD_BACKEND], ["-L\${abs_top_builddir}/backend -lbackend"])
 
 AC_ARG_ENABLE([corest],
       [AS_HELP_STRING([--disable-corest],
@@ -646,6 +655,7 @@ AC_CONFIG_FILES([manifests/Makefile])
 AC_CONFIG_FILES([manpages/Makefile])
 AC_CONFIG_FILES([coxml/Makefile])
 AC_CONFIG_FILES([occi/Makefile])
+AC_CONFIG_FILES([backend/Makefile])
 AC_CONFIG_FILES([cords/Makefile])
 AC_CONFIG_FILES([corest/Makefile])
 AC_CONFIG_FILES([cocci/Makefile])
@@ -719,6 +729,7 @@ echo "********************************************************************"
 echo ""
 echo "    - coxml                    : $enable_coxml"
 echo "    - occi                     : $enable_occi"
+echo "    - backend                  : $enable_backend"
 echo "    - cords                    : $enable_cords"
 echo "    - corest                   : $enable_corest"
 echo "    - cocci                    : $enable_cocci"

@@ -17,6 +17,9 @@ SUBDIRS += manpages
 if ENABLE_COXML
 SUBDIRS += coxml
 endif
+if ENABLE_BACKEND
+SUBDIRS += backend
+endif
 if ENABLE_CORDS
 SUBDIRS += cords
 endif
