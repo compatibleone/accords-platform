@@ -5,9 +5,9 @@ from xml.etree import ElementTree as ET
 from testfixtures import LogCapture
 from hamcrest import assert_that, is_, is_not, has_key, same_instance, has_item
 
-from Uses import Uses
-from ConfigParser import UsesParser
-from Component import Component
+from codegen.OCCI.Uses import Uses
+from codegen.OCCI.ConfigParser import UsesParser
+from codegen.OCCI.Component import Component
 from ParserMocks import MockCategory
 
 def _dump_xml_as_file(root, filename):

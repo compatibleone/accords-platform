@@ -5,6 +5,9 @@ Created on 28 Mar 2013
 '''
 
 import logging
+import Scope
+import Cardinality
+from codegen.codegen_types import ctypes
 
 class CategoriesBase(object):
     '''
@@ -244,12 +247,20 @@ class Category(object):
     def struct_name(self):        
         return "cords_" + self.term if self.structName is None else self.structName
 
-    def backend_type_list(self):
+    def backend_type_list(self, include_id = True, skip_legacy_types = False):
         '''
         List of all types needed to be stored in the backend representation of this category
         '''
-        yield('id', 'string')   # All backends store an id for each category
+        if include_id:
+            yield('id', 'char *')   # All backends store an id for each category
         for name, attr in self.attrs.items():
-            yield(name, attr.attrtype)            
-        for name in self.colls.keys():
-            yield(name, 'string')
+            if attr.scope is Scope.All:
+                type = ctypes.from_platform_type(attr.attrtype) if attr.legacytype == None else attr.legacytype
+                if not skip_legacy_types or attr.legacytype == None:
+                    yield(name, type)
+        for name, coll in self.colls.items():
+            if coll.scope is Scope.All:
+                type = 'int' if coll.multiplicity.max is Cardinality.Unbounded else 'char *'
+                if (coll.legacytype != None):
+                    type = coll.legacytype
+                yield(name, type)

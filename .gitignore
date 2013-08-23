@@ -220,3 +220,5 @@ build
 .project
 .pydevproject
 .settings
+*.pyc
+

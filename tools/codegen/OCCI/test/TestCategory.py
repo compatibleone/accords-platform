@@ -2,16 +2,41 @@ import unittest
 
 from hamcrest import is_, assert_that
 
-from Category import  Category
+from codegen.OCCI.Category import Category 
+from codegen.OCCI.Scope import All
+from codegen.OCCI.Cardinality import Unbounded
+from codegen.OCCI.Collection import Multiplicity
 
 class MockAttribute(object):
-    def __init__(self, name, type_name):
+    def __init__(self, name, type_name, scope = All):
         self.name = name
         self.type_name = type_name
+        self._scope = scope
         
     @property
     def attrtype(self):
         return self.type_name
+    
+    @property
+    def scope(self):
+        return self._scope
+    
+    @property
+    def legacytype(self):
+        return None
+    
+class MockCollection(object):
+    def __init__(self, scope = All):
+        self.multiplicity = Multiplicity("[0..1]")
+        self._scope = scope
+    
+    @property
+    def scope(self):
+        return self._scope
+    
+    @property
+    def legacytype(self):
+        return None
 
 class TestCategory(unittest.TestCase):
     
@@ -50,14 +75,14 @@ class TestCategory(unittest.TestCase):
         
         name, type_name = cat.backend_type_list().next()
         assert_that(name, is_('id'))
-        assert_that(type_name, is_('string'))
+        assert_that(type_name, is_('char *'))
         
 
     def _mock_attributes(self):
-        return dict((name, MockAttribute(name, type_name)) for (name, type_name) in enumerate(range(4)))
+        return dict((name, MockAttribute(name, "int")) for name in range(4))
     
     def _mock_collections(self):
-        return dict((name, None) for name in range(3))
+        return dict((name, MockCollection()) for name in range(3))
 
     def test_backend_type_list_yields_all_attributes_after_id(self):
         cat = Category(None, None, None, None, None, None)        
@@ -94,5 +119,30 @@ class TestCategory(unittest.TestCase):
             except StopIteration:
                 self.fail('Not enough results returned from backend_type_list')            
             assert_that(name, is_(coll))
-            assert_that(type_name, is_('string'))
+            assert_that(type_name, is_('char *'))
             
+    def test_backend_type_list_does_not_return_attributes_with_scope_not_equal_to_all(self):
+        cat = Category(None, None, None, None, None, None)                
+        attrs = { "anything" : MockAttribute("anything", "int", 0) }   
+        cat.attrs = attrs   # This is a bit abusive, could add each attr via the public interface
+        cat.colls = {}
+                 
+        results = cat.backend_type_list()
+        
+        results.next() # Skip id
+        self.assertRaises(StopIteration, results.next)
+        
+    
+    def test_backend_type_list_does_not_return_collections_with_scope_not_equal_to_all(self):
+        cat = Category(None, None, None, None, None, None)                
+        colls = { "anything" : MockCollection(0) }   
+        cat.attrs = {}   
+        cat.colls = colls
+                 
+        results = cat.backend_type_list()
+        
+        results.next() # Skip id
+        self.assertRaises(StopIteration, results.next)
+            
+if __name__ == '__main__':
+    unittest.main()            

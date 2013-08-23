@@ -2,7 +2,7 @@ import unittest
 
 from hamcrest import assert_that, is_, same_instance
 
-from ParserCollection import ParserCollection
+from codegen.OCCI.ParserCollection import ParserCollection
 from ParserMocks import MockCategory
 
 class MockParser(object):

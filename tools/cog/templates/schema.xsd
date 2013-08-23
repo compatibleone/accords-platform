@@ -1,7 +1,7 @@
 
 <xsd:sxhema xmlns:xsd="http://www.w3c.org/2001/XMLSchema">
 
-[[[cog import codegen.cog_common as t; t.init_models(model_dir); t.category_xsd(cog_category_file) ]]]
+[[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file); t.category_xsd() ]]]
 [[[end]]]
 </xsd:complexType>
 
