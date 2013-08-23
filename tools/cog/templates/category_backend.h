@@ -9,11 +9,17 @@ _backend_h
 [[[end]]] 
 _backend_h
 
-typedef struct id_list_t
+typedef struct  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_id_list_t
 {
 	int count;
 	char **ids;
-} id_list;
+}  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_id_list;
 
 typedef struct 
 [[[cog t.filename_root()]]]
@@ -60,7 +66,7 @@ _backend_interface
 _list (*retrieve_from_filter)(struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *filter);
+_occi_filter *filter);
 	void (*update)  (char *id, struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -72,20 +78,29 @@ _list (*retrieve_from_filter)(struct
 	void (*delete_all_matching_filter) (struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *filter);	// Delete all 
+_occi_filter *filter);	// Delete all 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 s matching filter
-	id_list (*list) (struct 
+	 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *filter); // Return all ids of 
+_id_list (*list) (struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter *filter); // Return all ids of 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 s matching filter
 };
 
-void free_id_list(id_list *list);
+void 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_free_id_list( 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_id_list *list);
 void free_
 [[[cog t.filename_root()]]]
 [[[end]]] 

@@ -35,6 +35,10 @@ _c_
 #include "
 [[[cog t.filename_root()]]]
 [[[end]]] 
+_occi_filter.h"
+#include "
+[[[cog t.filename_root()]]]
+[[[end]]] 
 .h"
 #include "
 [[[cog t.filename_root()]]]
@@ -45,6 +49,7 @@ _backend.h"
 [[[end]]] 
 _node_backend.h"
 
+#include "occi_common.c" // Given the restrictions on the make system, this is the easiest way to get access to common functions
 
 /*	--------------------------------------------	*/
 /*	o c c i _ 
@@ -77,45 +82,71 @@ struct
 private struct 
 [[[cog t.filename_root()]]]
 [[[end]]] 
-_backend_interface *backend;
-
-private struct rest_response *bad_request_html_response(struct rest_response *aptr) {
-	return rest_html_response( aptr, 400, "Bad Request");
-}
-
-private struct rest_response *not_found_html_response(struct rest_response *aptr) {
-	return rest_html_response( aptr, 404, "Not Found");
-}
-
-typedef int (*callback_func)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
-
-private void execute_callback(callback_func func, struct 
+_backend_interface * 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *pub, struct occi_category * optr, struct rest_request * rptr) {
+_backend;
+
+private void 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(callback_func func, struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ *target, struct occi_category * optr, struct rest_request * rptr) {
 	if (func) {
 		struct occi_kind_node dummy;
-		dummy.contents = pub; // TODO Update callback functions to expect contents, not occi_kind_node
+		dummy.contents = target; // TODO Update callback functions to expect contents, not occi_kind_node
 		(*func)(optr,&dummy,rptr);
 	}
 }
 
 
-private struct rest_response *bad_request_response(struct rest_response * aptr, char *id) {
+private struct rest_response *
+[[[cog t.category_name()]]]
+[[[end]]] 
+_bad_request_response(struct rest_response * aptr, char *id) {
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *pub;
-	if (!(pub = backend->retrieve_from_id(id))) {
+ *target;
+	if (!(target =  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->retrieve_from_id(id))) {
 		return( not_found_html_response(aptr) );
 	}
 	else {
 		liberate_
 [[[cog t.category_name()]]]
 [[[end]]] 
-(pub);
+(target);
 		return( bad_request_html_response(aptr));
 	}
+}
+
+/*	------------------------------------------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a c t i v a t e   f i l t e r 	*/
+/*	------------------------------------------------------------------------------------------------------	*/
+private void activate_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_filter_on_field(
+	struct occi_category * cptr,void * target_void, char * field_name)
+{
+	struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter * target;
+	char prefix[1024];
+	if (!( target = target_void )) return;
+	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
+	if (!( strncmp( field_name, prefix, strlen(prefix) ) )) {
+		field_name += strlen(prefix);
+		[[[cog t.activate_filter()]]]
+		[[[end]]]
+		}
+	return;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
@@ -237,15 +268,15 @@ private struct rest_response* make_response_and_liberate_
 		struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
-* pub) {
+* target) {
 	struct rest_response* retVal = 
 [[[cog t.category_name()]]]
 [[[end]]] 
-_occi_response(optr, cptr, rptr, aptr, pub);
+_occi_response(optr, cptr, rptr, aptr, target);
 	liberate_
 [[[cog t.category_name()]]]
 [[[end]]] 
-(pub);
+(target);
 	return retVal;
 }
 
@@ -272,14 +303,23 @@ _get_item(
 	if (!( 
 [[[cog t.filename_root()]]]
 [[[end]]] 
- = backend->retrieve_from_id(id)))
+ =  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->retrieve_from_id(id)))
 		return( not_found_html_response(aptr) );
 	if (iptr) {
-		execute_callback(iptr->retrieve, 
+		
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->retrieve, 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr);
-		execute_callback(iptr->pre_retrieve, 
+		
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->pre_retrieve, 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr);
@@ -303,7 +343,10 @@ _post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
-	return (bad_request_response(aptr, id));
+	return (
+[[[cog t.category_name()]]]
+[[[end]]] 
+_bad_request_response(aptr, id));
 }
 
 [[[cog t.post_mixin_and_action()]]]
@@ -354,11 +397,17 @@ _post_item(
 _field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (iptr) {
-		execute_callback(iptr->pre_create, initial_
+		
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->pre_create, initial_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr);
-		execute_callback(iptr->create, initial_
+		
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->create, initial_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr);
@@ -366,7 +415,10 @@ _field ) ))
 	if (!( new_
 [[[cog t.filename_root()]]]
 [[[end]]] 
- = backend->create(1, initial_
+ =  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->create(1, initial_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ))) {
@@ -386,7 +438,10 @@ _field ) ))
 [[[cog t.filename_root()]]]
 [[[end]]] 
 );
-	if (iptr) {	execute_callback(iptr->post_create, new_
+	if (iptr) {	
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->post_create, new_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr); }
@@ -424,7 +479,10 @@ _put_item(
 	if (!( 
 [[[cog t.filename_root()]]]
 [[[end]]] 
- = backend->retrieve_from_id(id) ))
+ =  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->retrieve_from_id(id) ))
 		return( not_found_html_response(aptr) );
 	if (!( occi_process_atributs(optr,rptr,aptr, 
 [[[cog t.filename_root()]]]
@@ -434,21 +492,33 @@ _put_item(
 [[[end]]] 
 _field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (iptr) {	execute_callback(iptr->pre_update, 
+	if (iptr) {	
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->pre_update, 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr); }
 	if (iptr) {
-		execute_callback(iptr->update, 
+		
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->update, 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr);
 	}
-	backend->update(id, 
+	 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->update(id, 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 );
-	if (iptr) {	execute_callback(iptr->pre_update, 
+	if (iptr) {	
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->pre_update, 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr); }
@@ -471,7 +541,10 @@ _head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
-	bad_request_response(aptr, id);
+	
+[[[cog t.category_name()]]]
+[[[end]]] 
+_bad_request_response(aptr, id);
 }
 
 /*	----------------------------------------------------------------------------------------------	*/
@@ -494,19 +567,34 @@ _delete_item(
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *pub;
-	if (!( pub = backend->retrieve_from_id(id)))
+ *target;
+	if (!( target =  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->retrieve_from_id(id)))
 		return( not_found_html_response(aptr) );
-	if (iptr) {	execute_callback(iptr->pre_delete, pub, optr, rptr); }
+	if (iptr) {	
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->pre_delete, target, optr, rptr); }
 	if (iptr) {
-		execute_callback(iptr->delete, pub, optr, rptr);
+		
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->delete, target, optr, rptr);
 	}
 	liberate_
 [[[cog t.category_name()]]]
 [[[end]]] 
-(pub);
-	backend->del(id);
-	if (iptr) {	execute_callback(iptr->post_delete, NULL, optr, rptr); }
+(target);
+	 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->del(id);
+	if (iptr) {	
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->post_delete, NULL, optr, rptr); }
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -537,7 +625,13 @@ _occi_filter filter;
 [[[end]]] 
 _info(&filter, optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	id_list ids = backend->list(filter);
+	
+[[[cog t.category_name()]]]
+[[[end]]] 
+_id_list ids =  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->list(&filter);
 	int id;
 	int failed = 0;
 	for(id = 0; id < ids.count; id++) {
@@ -545,7 +639,9 @@ _info(&filter, optr, rptr, aptr ) ))
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			failed = 1;
 	}
-	free_id_list(&ids);
+	[[[cog t.category_name()]]]
+	[[[end]]] 
+_free_id_list(&ids);
 	liberate_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -583,22 +679,37 @@ _info(&filter, optr, rptr, aptr ) ))
 	
 [[[cog t.filename_root()]]]
 [[[end]]] 
-_list pub_list = backend->retrieve_from_filter(filter);
-	int pub;
-	for(pub = 0; pub < pub_list.count; pub++) {
+_list item_list =  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->retrieve_from_filter(&filter);
+	int index;
+	for(index = 0; index < item_list.count; index++) {
 		if (iptr) {
-			execute_callback(iptr->delete, pub_list.
+			
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->delete, item_list.
 [[[cog t.filename_root()]]]
 [[[end]]] 
-s[pub], optr, rptr);
+s[index], optr, rptr);
 		}
-		if (iptr) {	execute_callback(iptr->pre_delete, pub, optr, rptr); }
+		if (iptr) {	
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->pre_delete, item_list.
+[[[cog t.filename_root()]]]
+[[[end]]] 
+s[index], optr, rptr); }
 	}
 	free_
 [[[cog t.filename_root()]]]
 [[[end]]] 
-_list(&pub_list);
-	backend->delete_all_matching_filter(filter);
+_list(&item_list);
+	 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->delete_all_matching_filter(&filter);
 	liberate_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -822,7 +933,13 @@ _builder(char * a,char * b) {
 [[[cog t.category_name()]]]
 [[[end]]] 
 ";
-	backend = node_interface_func();	// TODO There's no obvious place to delete this pointer on completion.  Find somewhere!
+	 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend = 
+[[[cog t.category_name()]]]
+[[[end]]]
+_node_interface_func();	// TODO There's no obvious place to delete this pointer on completion.  Find somewhere!
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
@@ -832,7 +949,10 @@ _builder(char * a,char * b) {
 _mt(optr->interface);
 		[[[cog t.occi_builder()]]]
 		[[[end]]]
-		backend->init();
+		 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend->init();
 		return(optr);
 	}
 

@@ -4,31 +4,80 @@
 #include "
 [[[cog t.filename_root()]]]
 [[[end]]] 
+_occi_filter.h"
+#include "
+[[[cog t.filename_root()]]]
+[[[end]]] 
 _backend.h"
 #include "
 [[[cog t.filename_root()]]]
 [[[end]]] 
 _node_backend.h"
+#include "backend_common.h"
 
+/*	--------------------------------------------------------------------	*/
+/*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
+/*	--------------------------------------------------------------------	*/
 private pthread_mutex_t list_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _control=PTHREAD_MUTEX_INITIALIZER;
-private struct occi_kind_node * 
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * 
 [[[cog t.category_name()]]]
 [[[end]]] 
-_first = (struct occi_kind_node *) 0;
-private struct occi_kind_node * 
+_first = (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * 
 [[[cog t.category_name()]]]
 [[[end]]] 
-_last  = (struct occi_kind_node *) 0;
+_last  = (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
+public struct  occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * occi_first_
+[[[cog t.node_category()]]]
+[[[end]]] 
+_node() { return( 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_first ); }
+public struct  occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * occi_last_
+[[[cog t.node_category()]]]
+[[[end]]] 
+_node() { return( 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_last ); }
 
-private void init();
-private void finalise();
+private void  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_init();
+private void 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_finalise();
 private struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *create  (int allocate_uuid, struct 
+ * 
+ [[[cog t.category_name()]]]
+ [[[end]]] 
+_create  (int allocate_uuid, struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
  *initial_
@@ -38,40 +87,91 @@ private struct
 private struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *retrieve_from_id(char *id);
+ * 
+ [[[cog t.category_name()]]]
+ [[[end]]] 
+_retrieve_from_id(char *id);
 private 
 [[[cog t.filename_root()]]]
 [[[end]]] 
-_list retrieve_from_filter(struct 
+_list  
 [[[cog t.category_name()]]]
 [[[end]]] 
- *filter);
-private void update (char *id, struct 
+_retrieve_from_filter(struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter *filter);
+private void  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_update (char *id, struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
  *updated_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 );
-private void del    (char *id);
-private void delete_all_matching_filter (struct 
+private void  
 [[[cog t.category_name()]]]
 [[[end]]] 
- *filter);
-private id_list list (struct 
+_del    (char *id);
+private void  
 [[[cog t.category_name()]]]
 [[[end]]] 
- *filter);
+_delete_all_matching_filter (struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter *filter);
+private  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_id_list  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_list_ids (struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter *filter);
 
 struct 
 [[[cog t.filename_root()]]]
 [[[end]]] 
-_backend_interface *node_interface_func() {
+_backend_interface *  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_node_interface_func() {
 	struct 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 _backend_interface node_interface =
-	   {init, finalise, create, retrieve_from_id, retrieve_from_filter, update, del, delete_all_matching_filter, list};
+	   {  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_init,   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_finalise,   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_create,   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_retrieve_from_id,   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_retrieve_from_filter,   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_update,   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_del,   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_delete_all_matching_filter,   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_list_ids};
 	struct 
 [[[cog t.filename_root()]]]
 [[[end]]] 
@@ -98,10 +198,16 @@ _backend_interface));
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
 /*	----------------------------------------------	*/
-private struct occi_kind_node * ll_drop_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * ll_drop_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_node(struct occi_kind_node * nptr) {
+_node(struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
 		
@@ -115,14 +221,26 @@ _first = nptr->next;
 [[[end]]] 
 _last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
-		liberate_occi_kind_node( nptr );
+		liberate_occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node( nptr );
 		}
-	return((struct occi_kind_node *)0);
+	return((struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *)0);
 }
-private struct occi_kind_node * drop_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * drop_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_node(struct occi_kind_node * nptr) {
+_node(struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr) {
 	pthread_mutex_lock( &list_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -141,11 +259,17 @@ _control );
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   l o c a t e   n o d e 	*/
 /*	--------------------------------------------------	*/
-private struct occi_kind_node * ll_locate_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * ll_locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(char * id) {
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -154,7 +278,10 @@ _node(char * id) {
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-		nptr != (struct occi_kind_node *) 0;
+		nptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
 		else if (!( pptr->id )) continue;
@@ -163,11 +290,17 @@ _first;
 	return( nptr );
 }
 
-private struct occi_kind_node * locate_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(char * id) {
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	pthread_mutex_lock( &list_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -187,7 +320,10 @@ _control );
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
-private struct occi_kind_node * ll_add_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * ll_add_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(int mode, struct 
@@ -197,8 +333,14 @@ _node(int mode, struct
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ) {
-	struct occi_kind_node * nptr;
-	if (!( nptr = allocate_occi_kind_node() ))
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
+	if (!( nptr = allocate_occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node() ))
 		return( nptr );
 	else	{
 		nptr->contents = 
@@ -209,7 +351,10 @@ _node(int mode, struct
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ->id = occi_allocate_uuid())))
-			return( liberate_occi_kind_node(nptr) );
+			return( liberate_occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node(nptr) );
 		else	{
 			if (!( nptr->previous = 
 [[[cog t.category_name()]]]
@@ -228,7 +373,10 @@ _last = nptr;
 			}
 		}
 }
-private struct occi_kind_node * add_
+private struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * add_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(int mode, struct 
@@ -238,7 +386,10 @@ _node(int mode, struct
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ) {
-	struct occi_kind_node * nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	pthread_mutex_lock( &list_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -351,6 +502,15 @@ _node(0,
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
+public  void set_autosave_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_name(char * fn) {
+	autosave_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_name = fn;	return;
+}
 public  void autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -358,7 +518,10 @@ _nodes() {
 	char * fn=autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_name;	struct occi_kind_node * nptr;
+_name;	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * nptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -377,7 +540,10 @@ s>\n");
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-		nptr != (struct occi_kind_node *) 0;
+		nptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
 		fprintf(h,"<
@@ -440,8 +606,14 @@ private struct
 private struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *retrieve_from_id(char *id) {
-	struct occi_kind_node *node = locate_
+ *  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_retrieve_from_id(char *id) {
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *node = locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(id);
@@ -464,7 +636,10 @@ _copy;
 private struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
- *create(int allocate_uuid, struct 
+ *  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_create(int allocate_uuid, struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
  *initial_
@@ -501,8 +676,14 @@ _nodes();
 ;
 }
 
-private void del(char *id) {
-	struct occi_kind_node *node = locate_
+private void   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_del(char *id) {
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *node = locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(id);
@@ -518,7 +699,13 @@ _node( node );
 _nodes();
 }
 
-void rebase_node_contents(struct occi_kind_node* node, struct 
+void   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_rebase_node_contents(struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node* node, struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
 * updated_
@@ -545,19 +732,28 @@ _control );
 _control );
 }
 
-private void update(char *id, struct 
+private void   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_update(char *id, struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
  *updated_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ) {
-	struct occi_kind_node *node = locate_
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *node = locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(id);
 	if(node) {
-		rebase_node_contents(node, updated_
+		
+[[[cog t.category_name()]]]
+[[[end]]]
+_rebase_node_contents(node, updated_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 );
@@ -568,21 +764,30 @@ _node(id);
 _nodes();
 }
 
-int count_filter_matches(struct 
+int   
 [[[cog t.category_name()]]]
 [[[end]]] 
-* filter) {
+_count_filter_matches(struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter* filter) {
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
  * pptr;
-	struct occi_kind_node * sptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * sptr;
 	// First pass counts the size of the list
 	int id_count = 0;
 	for (sptr = 
 [[[cog t.category_name()]]]
 [[[end]]] 
-_first; sptr != (struct occi_kind_node*) 0;
+_first; sptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node*) 0;
 			sptr = sptr->next) {
 		if (!(pptr = sptr->contents))
 			continue;
@@ -597,20 +802,31 @@ _filter(pptr, filter)) {
 	return id_count;
 }
 
-void *allocate_pointer_array(int id_count) {
-	return allocate(sizeof(char*) * id_count);
-}
-
-private id_list list(struct 
+private  
 [[[cog t.category_name()]]]
 [[[end]]] 
- *filter) {
-	id_list ids;
+_id_list   
+[[[cog t.category_name()]]]
+[[[end]]] 
+_list_ids(struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter *filter) {
+	 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_id_list ids;
 	ids.count = 0;
 
-	int id_count = count_filter_matches(filter);
+	int id_count = 
+[[[cog t.category_name()]]]
+[[[end]]]
+_count_filter_matches(filter);
 
-	struct occi_kind_node * sptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * sptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -622,7 +838,10 @@ private id_list list(struct
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-			sptr != (struct occi_kind_node *) 0;
+			sptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
 			sptr = sptr->next ) {
 			if (!( pptr = sptr->contents ))
 				continue;
@@ -631,7 +850,10 @@ _first;
 [[[end]]] 
 _filter( pptr, filter ) ) {
 				if(!(ids.ids[ids.count++] = allocate_string(pptr->id))) {
-					free_id_list(&ids);
+					 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_free_id_list(&ids);
 					return ids;
 				}
 			}
@@ -642,10 +864,13 @@ _filter( pptr, filter ) ) {
 private 
 [[[cog t.filename_root()]]]
 [[[end]]] 
-_list retrieve_from_filter(struct 
+_list   
 [[[cog t.category_name()]]]
 [[[end]]] 
- *filter) {
+_retrieve_from_filter(struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_occi_filter *filter) {
 	
 [[[cog t.filename_root()]]]
 [[[end]]] 
@@ -658,9 +883,15 @@ s;
 [[[end]]] 
 s.count = 0;
 
-	int pub_count = count_filter_matches(filter);
+	int pub_count = 
+[[[cog t.category_name()]]]
+[[[end]]]
+_count_filter_matches(filter);
 
-	struct occi_kind_node * sptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node * sptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -681,7 +912,10 @@ s;
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-			sptr != (struct occi_kind_node *) 0;
+			sptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node *) 0;
 			sptr = sptr->next ) {
 			if (!( pptr = sptr->contents ))
 				continue;
@@ -719,7 +953,13 @@ s;
 s;
 }
 
-void free_id_list(id_list *list) {
+void  
+[[[cog t.category_name()]]]
+[[[end]]] 
+_free_id_list(
+[[[cog t.category_name()]]]
+[[[end]]] 
+_id_list *list) {
 	int i;
 	for(i = 0; i < list->count; i++) {
 		liberate(list->ids[i]);
@@ -728,7 +968,8 @@ void free_id_list(id_list *list) {
 	list->count = 0;
 }
 
-void free_
+void 
+free_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 _list(
@@ -742,12 +983,21 @@ s);
 	list->count = 0;
 }
 
-void delete_all_matching_filter(struct 
+void  
+[[[cog t.category_name()]]]
+[[[end]]]
+_delete_all_matching_filter(struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
-* filter) {
-	struct occi_kind_node* nptr;
-	struct occi_kind_node* sptr;
+_occi_filter *filter) {
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node* nptr;
+	struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node* sptr;
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -756,7 +1006,10 @@ void delete_all_matching_filter(struct
 [[[cog t.category_name()]]]
 [[[end]]] 
 _first;
-	while (nptr != (struct occi_kind_node*) 0) {
+	while (nptr != (struct occi_
+[[[cog t.node_type()]]]
+[[[end]]] 
+_node*) 0) {
 		if ((!(pptr = nptr->contents))
 				|| (!(pass_
 [[[cog t.category_name()]]]
@@ -779,11 +1032,17 @@ _node(nptr);
 _nodes();
 }
 
-void init() {
+void  
+[[[cog t.category_name()]]]
+[[[end]]]
+_init() {
 	autoload_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _nodes();
 }
 
-void finalise() {}
+void  
+[[[cog t.category_name()]]]
+[[[end]]]
+_finalise() {}

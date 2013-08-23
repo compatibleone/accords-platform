@@ -106,11 +106,6 @@ def category_filters():
     for name, _ in category.backend_type_list():
         cog.outl('int {0};'.format(name))
     
-
-def node_interface_declaration():
-    name = _category_name()
-    cog.outl("struct {0}_backend_interface *{1}_node_interface_func();".format(name, name))
-    
 def h_include():
     cog.outl("#include \"{0}\"".format(category_file))
     
@@ -354,7 +349,7 @@ private struct rest_response * {0}_post_mixin(
     struct occi_category * optr, struct rest_client * cptr,
     struct rest_request * rptr, struct rest_response * aptr,char * id)
 {{
-    return (bad_request_response(aptr, id));
+    return ({0}_bad_request_response(aptr, id));
 }}
 
 /*    ----------------------------------------------------------------------------------------------    */
@@ -370,7 +365,7 @@ private struct rest_response * {0}_post_action(
     struct {0} * {1};
     char * reqhost;
     char * mptr;
-    if (!( {1} = backend->retrieve_from_id(id) ))
+    if (!( {1} = {0}_backend->retrieve_from_id(id) ))
         return( not_found_html_response(aptr) );
     mptr = (rptr->parameters+strlen("action="));
     for ( fptr=optr->firstact;

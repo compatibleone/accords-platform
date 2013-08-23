@@ -9,10 +9,6 @@
 lib_LTLIBRARIES = libcords.la
 EXTRA_DIST = operation.c cordselements.h cords.h cordspublic.h
 
-libcords_la_SOURCES = cords2occi.c cordsbase.c
-libcords_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI) 
-libcords_la_LDFLAGS = $(LD_COXML)
-
 # Build the model files
 model_h_files = azconfig.h paconfig.h publication.h placement.h account.h instruction.h		\
 		node.h package.h tarif.h carrier.h report.h action.h invoice.h onconfig.h 			\
@@ -29,5 +25,9 @@ model_h_files = azconfig.h paconfig.h publication.h placement.h account.h instru
 		xlink.h
 
 include $(top_srcdir)/tools/Makefile_generate_model.am
+
+libcords_la_SOURCES = cords2occi.c cordsbase.c backend_common.c
+libcords_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI) 
+libcords_la_LDFLAGS = $(LD_COXML)
 
 cords2occi.c cordsbase.c: $(model_c_files)
