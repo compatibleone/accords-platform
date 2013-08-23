@@ -3,11 +3,11 @@
 #ifndef _
 [[[cog t.filename_root()]]]
 [[[end]]] 
-_backend_h
+_backend_interface_h
 #define _
 [[[cog t.filename_root()]]]
 [[[end]]] 
-_backend_h
+_backend_interface_h
 
 typedef struct  
 [[[cog t.category_name()]]]
