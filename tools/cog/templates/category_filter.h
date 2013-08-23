@@ -1,0 +1,22 @@
+[[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file) ]]]
+[[[end]]]
+
+#ifndef _
+ [[[cog t.category_name()]]]
+ [[[end]]]
+_occi_filter_h
+#define _
+ [[[cog t.category_name()]]]
+ [[[end]]]
+_occi_filter_h
+
+struct 
+[[[cog t.category_name()]]]
+[[[end]]]
+_occi_filter
+{
+	[[[cog t.category_filters() ]]]
+	[[[end]]]
+};
+
+#endif
