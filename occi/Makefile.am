@@ -14,4 +14,4 @@ EXTRA_DIST = occiatb.c occiatb.h linknode.c linknode.h kindnode.c kindnode.h \
 
 libocci_la_SOURCES = occi.c cordsocci.c pubocci.c osonocci.c 
 libocci_la_CFLAGS = $(CFLAGS_BACKEND) $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_CORDS)
-libocci_la_LDFLAGS =
+libocci_la_LDFLAGS = $(LD_BACKEND)
