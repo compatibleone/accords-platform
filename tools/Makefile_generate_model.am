@@ -2,7 +2,7 @@
 # the model files. The special variable 'model_h_files' must be defined before including this file.
 
 MODEL_CODEGEN = $(top_srcdir)/tools/codegen/codegen.py
-MODEL_COG = python -m $(abspath $(top_srcdir)/tools/cog/3rdParty/cogapp/__main__) -ed
+MODEL_COG = python $(abspath $(top_srcdir)/tools/cog/3rdParty/cogapp/__main__.py) -ed
 COG_TEMPLATES = $(top_srcdir)/tools/cog/templates/
 
 COG_COMMON = $(top_srcdir)/tools/codegen/cog_common.py 
