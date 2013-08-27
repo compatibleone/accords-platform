@@ -7,7 +7,7 @@
 from __future__ import absolute_import, print_function
 
 import copy, getopt, hashlib, imp, os, re, shlex, sys, traceback
-from .backward import PY3, StringIO, string_types, to_bytes
+from backward import PY3, StringIO, string_types, to_bytes
 
 __all__ = ['Cog', 'CogUsageError']
 
@@ -41,7 +41,7 @@ OPTIONS:
 """
 
 # Other package modules
-from .whiteutils import *
+from whiteutils import *
 
 class CogError(Exception):
     """ Any exception raised by Cog.
