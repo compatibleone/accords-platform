@@ -8,28 +8,28 @@ from codegen import category_for_file
 import codegen_types.ctypes as ctypes
 
 # Example invocations from tools directiory:
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir="../model" -o tmp/output.xsd cog/templates/schema.xsd
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication.h cog/templates/category.h 
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.h cog/templates/node_backend.h
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.c cog/templates/node_backend.c
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occi_publication_rest.c cog/templates/occi.c  
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_backend.h cog/templates/category_backend.h
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_occi_filter.h cog/templates/category_filter.h
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication.c cog/templates/category.c      
-# python -m cogapp -ed -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occipublication.c cog/templates/occicategory_unsplit.c
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir="../model" -o tmp/output.xsd cog/templates/schema.xsd
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication.h cog/templates/category.h 
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.h cog/templates/node_backend.h
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.c cog/templates/node_backend.c
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occi_publication_rest.c cog/templates/occi.c  
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_backend.h cog/templates/category_backend.h
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_occi_filter.h cog/templates/category_filter.h
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication.c cog/templates/category.c      
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occipublication.c cog/templates/occicategory_unsplit.c
 
 
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occi.c  
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir="../model" -o tmp/authitem.xsd cog/templates/schema.xsd
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem.h cog/templates/category.h 
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_node_backend.h cog/templates/node_backend.h
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_node_backend.c cog/templates/node_backend.c
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_backend.h cog/templates/category_backend.h
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_occi_filter.h cog/templates/category_filter.h
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occicategory_unsplit.c 
-# python -m cogapp -ed -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem.c cog/templates/category.c
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occi.c  
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir="../model" -o tmp/authitem.xsd cog/templates/schema.xsd
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem.h cog/templates/category.h 
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_node_backend.h cog/templates/node_backend.h
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_node_backend.c cog/templates/node_backend.c
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authiftem_backend.h cog/templates/category_backend.h
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem_occi_filter.h cog/templates/category_filter.h
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/occiauthitem.c cog/templates/occicategory_unsplit.c 
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=authitem.h -D model_dir='../model' -o tmp/authitem.c cog/templates/category.c
 
-# python -m cogapp -ed -D cog_category_file=xlink.h -D model_dir='../model' -o tmp/occixlink.c cog/templates/occicategory_unsplit.c
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=xlink.h -D model_dir='../model' -o tmp/occixlink.c cog/templates/occicategory_unsplit.c
 
 def _link_special_case():
     return _category_name() == "cords_xlink"
