@@ -404,13 +404,6 @@ _execute_callback(iptr->pre_create, initial_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr);
-		
-[[[cog t.category_name()]]]
-[[[end]]] 
-_execute_callback(iptr->create, initial_
-[[[cog t.filename_root()]]]
-[[[end]]] 
-, optr, rptr);
 	}
 	if (!( new_
 [[[cog t.filename_root()]]]
@@ -438,13 +431,22 @@ _backend->create(1, initial_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 );
-	if (iptr) {	
+	if (iptr) {
+	    
+[[[cog t.category_name()]]]
+[[[end]]] 
+_execute_callback(iptr->create, new_
+[[[cog t.filename_root()]]]
+[[[end]]] 
+, optr, rptr);
+        
 [[[cog t.category_name()]]]
 [[[end]]] 
 _execute_callback(iptr->post_create, new_
 [[[cog t.filename_root()]]]
 [[[end]]] 
-, optr, rptr); }
+, optr, rptr);
+	}
 	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,new_
 [[[cog t.filename_root()]]]
 [[[end]]] 
