@@ -1053,7 +1053,7 @@ public	int	delete_onapp_contract(
   }
 
   pptr->state = _OCCI_IDLE;
-  pptr->build_state = "deleted";
+  pptr->build_state = allocate_string("deleted");
 
 	return result;
 }
@@ -1421,7 +1421,7 @@ private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr )
 		if (oaptr != NULL && oaptr->response != NULL && oaptr->response->status < 400)
 		{
 			pptr->state = _OCCI_IDLE;
-			pptr->build_state = "deleted";
+			pptr->build_state = allocate_string("deleted");
 		}
 	}
 
