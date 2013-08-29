@@ -13,7 +13,7 @@ import codegen_types.ctypes as ctypes
 # python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.h cog/templates/node_backend.h
 # python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_node_backend.c cog/templates/node_backend.c
 # python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occi_publication_rest.c cog/templates/occi.c  
-# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_backend.h cog/templates/category_backend.h
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_backend_interface.h cog/templates/category_backend_interface.h
 # python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication_occi_filter.h cog/templates/category_filter.h
 # python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/publication.c cog/templates/category.c      
 # python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=publication.h -D model_dir='../model' -o tmp/occipublication.c cog/templates/occicategory_unsplit.c

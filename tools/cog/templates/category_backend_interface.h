@@ -94,6 +94,14 @@ _occi_filter *filter); // Return all ids of
 s matching filter
 };
 
+extern struct 
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_backend_interface * 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend;
+
 void 
 [[[cog t.category_name()]]]
 [[[end]]] 
