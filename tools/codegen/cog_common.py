@@ -31,6 +31,9 @@ import codegen_types.ctypes as ctypes
 
 # python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=xlink.h -D model_dir='../model' -o tmp/occixlink.c cog/templates/occicategory_unsplit.c
 
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=azconfig.h -D model_dir='../model' -o tmp/azconfig.h cog/templates/category.h 
+# python cog/3rdParty/cogapp/__main__.py -ed -I . -D cog_category_file=azconfig.h -D model_dir='../model' -o tmp/azconfig_node_backend.c cog/templates/node_backend.c
+
 def _link_special_case():
     return _category_name() == "cords_xlink"
 
@@ -38,9 +41,15 @@ def init_models(model_dir, filename):
     global models
     global category_file
     global category
+    global _has_name
     category_file = filename
     models = parse([model_dir], None, None, None)
     category = category_for_file(category_file, models)
+    _has_name = False
+    for name, _ in category.backend_type_list():
+        if name == "name":
+            _has_name = True
+            break
 
 def _type_conversion(type_name):
     if type_name == "char *":
@@ -380,3 +389,52 @@ private struct rest_response * {0}_post_action(
     return( rest_html_response( aptr, 400, "Incorrect Action Request"));
 }}
 """.format(_category_name(), _filename_root()))
+        
+def filter_by_name_header():
+    if _has_name:
+        cog.outl("struct {0} *(*retrieve_from_name)(const char *name);".format(_category_name()))
+        
+def retrieve_from_name_declaration():
+    if _has_name:
+        cog.outl("private struct {0} * {0}_retrieve_from_name(const char *name);".format(_category_name()))
+        
+def retrieve_from_name_add_to_struct():
+    if _has_name:
+        cog.outl("{0}_retrieve_from_name }};".format(_category_name()))
+    else:
+        cog.outl("};")
+        
+def retrieve_from_name_locate_funcs():
+    if _has_name:
+        cog.out(
+"""private struct {0}* ll_locate_{0}_by_name(const char *name) {{
+    struct occi_kind_node * nptr;
+    struct {0} * current;
+    for ( nptr = {0}_first;
+        nptr != (struct occi_kind_node *) 0;
+        nptr = nptr->next ) {{
+        if ((current = nptr->contents) && current->name && 0 == strcmp(name, current->name)) {{
+            return current;
+        }}
+    }}
+    return NULL;
+}}
+
+private struct {0}* locate_{0}_by_name(const char *name) {{
+    struct {0} *retVal;
+    pthread_mutex_lock( &list_{0}_control );
+    retVal = ll_locate_{0}_by_name(name);
+    pthread_mutex_unlock( &list_{0}_control );
+    return( retVal );
+}}""".format(_category_name()))
+        
+def retrieve_from_name_definition():
+    if _has_name:
+        cog.out(
+"""private struct {0} *  {0}_retrieve_from_name(const char *name) {{
+    struct {0} *found = locate_{0}_by_name(name);
+    if (found) {{
+        return clone_{0}(found);
+    }}
+    return NULL;
+}}""".format(_category_name()))             

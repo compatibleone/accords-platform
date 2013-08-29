@@ -132,6 +132,8 @@ _list_ids (struct
 [[[cog t.category_name()]]]
 [[[end]]] 
 _occi_filter *filter);
+[[[cog t.retrieve_from_name_declaration()]]]
+[[[end]]]
 
 struct 
 [[[cog t.filename_root()]]]
@@ -144,34 +146,44 @@ _node_interface_func() {
 [[[cog t.filename_root()]]]
 [[[end]]] 
 _backend_interface node_interface =
-	   {  
+	   { 
 [[[cog t.category_name()]]]
 [[[end]]] 
-_init,   
+_init,
+         
 [[[cog t.category_name()]]]
 [[[end]]] 
-_finalise,   
+_finalise,
+         
 [[[cog t.category_name()]]]
 [[[end]]] 
-_create,   
+_create,
+         
 [[[cog t.category_name()]]]
 [[[end]]] 
-_retrieve_from_id,   
+_retrieve_from_id,
+         
 [[[cog t.category_name()]]]
 [[[end]]] 
-_retrieve_from_filter,   
+_retrieve_from_filter,
+         
 [[[cog t.category_name()]]]
 [[[end]]] 
-_update,   
+_update,
+         
 [[[cog t.category_name()]]]
 [[[end]]] 
-_del,   
+_del,
+         
 [[[cog t.category_name()]]]
 [[[end]]] 
-_delete_all_matching_filter,   
+_delete_all_matching_filter,
+         
 [[[cog t.category_name()]]]
 [[[end]]] 
-_list_ids};
+_list_ids,
+         [[[cog t.retrieve_from_name_add_to_struct()]]]
+         [[[end]]]
 	struct 
 [[[cog t.filename_root()]]]
 [[[end]]] 
@@ -316,6 +328,8 @@ _control );
 	return( nptr );
 }
 
+[[[cog t.retrieve_from_name_locate_funcs()]]]
+[[[end]]]
 
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
@@ -572,7 +586,7 @@ private struct
 [[[cog t.category_name()]]]
 [[[end]]] 
  *clone_
-[[[cog t.filename_root()]]]
+[[[cog t.category_name()]]]
 [[[end]]] 
 (struct 
 [[[cog t.category_name()]]]
@@ -617,21 +631,17 @@ _node *node = locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(id);
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- *
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_copy;
 	if (node) {
 		return clone_
-[[[cog t.filename_root()]]]
+[[[cog t.category_name()]]]
 [[[end]]] 
 (node->contents);
 	}
 	return NULL;
 }
+
+[[[cog t.retrieve_from_name_definition()]]]
+[[[end]]]
 
 private struct 
 [[[cog t.category_name()]]]
@@ -653,7 +663,7 @@ _create(int allocate_uuid, struct
 [[[cog t.filename_root()]]]
 [[[end]]] 
  = clone_
-[[[cog t.filename_root()]]]
+[[[cog t.category_name()]]]
 [[[end]]] 
 (initial_
 [[[cog t.filename_root()]]]
