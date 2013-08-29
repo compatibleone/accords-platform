@@ -18,6 +18,8 @@
 #ifndef	_broker_plan_c
 #define	_broker_plan_c
 
+#define TEMP_NO_AUTOSTART
+
 #include "cb.h"
 #include "cordslang.h"
 
@@ -52,6 +54,7 @@ private	struct	rest_response * instance_plan(
 	 	return( rest_html_response( aptr, get_provisioning_status(), "PROVISIONING FAILURE" ) );
 	}
 
+#ifndef TEMP_NO_AUTOSTART
 	/* -------------------------------------------------------- */
 	/* invoke the start action for the new service of this plan */
 	/* -------------------------------------------------------- */
@@ -66,12 +69,15 @@ private	struct	rest_response * instance_plan(
 		service = liberate( service );
 	 	return( rest_html_response( aptr, aptr->status, aptr->message ) );
 	}
+#endif
 	else
 	{
 		/* ------------------------------------------------ */
 		/* TODO: need to link the service to the plan still */
 		/* ------------------------------------------------ */
+#ifndef TEMP_NO_AUTOSTART
 		zptr = occi_remove_response( zptr );
+#endif
 		service = liberate( service );
 		pptr->services++;
 		return( rest_html_response( aptr, 200, "OK" ) );
