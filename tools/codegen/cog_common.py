@@ -420,21 +420,10 @@ def retrieve_from_name_locate_funcs():
     return NULL;
 }}
 
-private struct {0}* locate_{0}_by_name(const char *name) {{
+private struct {0}* {0}_retrieve_from_name(const char *name) {{
     struct {0} *retVal;
     pthread_mutex_lock( &list_{0}_control );
     retVal = ll_locate_{0}_by_name(name);
     pthread_mutex_unlock( &list_{0}_control );
     return( retVal );
-}}""".format(_category_name()))
-        
-def retrieve_from_name_definition():
-    if _has_name:
-        cog.out(
-"""private struct {0} *  {0}_retrieve_from_name(const char *name) {{
-    struct {0} *found = locate_{0}_by_name(name);
-    if (found) {{
-        return clone_{0}(found);
-    }}
-    return NULL;
-}}""".format(_category_name()))             
+}}""".format(_category_name()))           

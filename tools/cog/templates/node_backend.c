@@ -640,9 +640,6 @@ _node(id);
 	return NULL;
 }
 
-[[[cog t.retrieve_from_name_definition()]]]
-[[[end]]]
-
 private struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
