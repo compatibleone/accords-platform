@@ -610,7 +610,7 @@ int dump_onapp_data( struct oa_config * pptr
   return 0;
 }
 
-int dump_onapp_data_stdout( struct  oa_config * pptr
+int dump_onapp_data_stdout(const struct  oa_config * pptr
     , struct onapp *ponapp
   )
 {

@@ -18,6 +18,8 @@
 #ifndef	_oacontract_c	
 #define	_oacontract_c
 
+#include <assert.h>
+
 #include "standard.h"
 #include "broker.h"
 #include "rest.h"
@@ -31,6 +33,8 @@
 #include "oaclient.h"
 #include "cb.h"
 #include "onapp_helpers.h"
+#include "oaconfig_backend_interface.h"
+#include "oaconfig_occi_filter.h"
 
 #define _USE_OCCI_ONAPPEXTRAS
 
@@ -42,7 +46,7 @@ struct	cords_vector
 
 struct	cords_oa_contract
 {
-	struct	oa_config *	config;
+	const struct oa_config *config;
 	struct	cords_vector	node;
 	struct	cords_vector	infrastructure;
 	struct	cords_vector	compute;
@@ -477,7 +481,7 @@ public	struct	rest_response * do_onapp_action(
 /*	--------------------------------------------------------	*/
 /*	     r e t r i e v e _ o n a p p _ d a t a                  */
 /*	--------------------------------------------------------	*/
-int	retrieve_onapp_data( struct	oa_config * pptr, struct cords_oa_contract * cptr
+int	retrieve_onapp_data(const struct oa_config * pptr, struct cords_oa_contract * cptr
 		, struct onapp *ponapp)
 {
 	char *			vptr;
@@ -626,7 +630,7 @@ public	struct	rest_response * create_onapp_vm(
 	int generate_alert)
 {
 	struct	onapp * pptr;
-	struct  oa_config * config;
+	const struct  oa_config * config;
 	struct  oa_response * oaptr;
 	struct rest_request *old_rest_request;
 	struct	data_element * json_vm;
@@ -859,7 +863,7 @@ public	int	create_onapp_contract(
 		char * tls )
 {
 	
-	struct	oa_config *                config = (struct oa_config *) 0;
+	const struct	oa_config *                config = (struct oa_config *) 0;
 	//struct	cords_onapp_extras const * onapp_extras = (struct cords_onapp_extras const *)0;
 	struct cords_onapp_extras_handle   onapp_extras_handle = { 0 };
 	struct	cords_oa_contract          contract;
@@ -1072,9 +1076,9 @@ public	int	delete_onapp_contract(
 //	else 	return( resolve_oa_configuration( nptr ) );
 //}
 
-private	struct oa_config * use_onapp_configuration( char * nptr )
+const struct oa_config * use_onapp_configuration( char * nptr )
 {
-	struct	oa_config * sptr;
+	const struct	oa_config * sptr;
 	struct onapp * ponapp;
 	struct oa_contract *poacontract;
 	char * operatorProfileName = NULL;
@@ -1092,53 +1096,36 @@ private	struct oa_config * use_onapp_configuration( char * nptr )
 /*  -----------------------------------------------------------------  */
 /* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n               */
 /*  -----------------------------------------------------------------  */
-struct oa_config * resolve_oa_configuration( char * sptr )
+const struct oa_config * resolve_oa_configuration( char * sptr )
 {
-	struct	occi_kind_node * nptr;
-	struct	oa_config * pptr=(struct oa_config *) 0;
-	struct	occi_kind_node  * occi_first_oa_config_node();
-
-	for (	nptr = occi_first_oa_config_node();
-		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( pptr = nptr->contents ))
-		{
-			rest_log_message("oa_config contents not set");
-			continue;
-		}
-		else if (!( pptr->name ))
-		{
-			rest_log_message("oa_config name not set");
-			continue;
-		}
-		else if (!( strcmp( pptr->name, sptr ) ))
-		{
-			if (pptr->is_active == 0)
-			{
-				rest_log_message("Found oa_config with matching name but is_active == 0");
-				continue;
-			}
-			else if (pptr->deleted != 0)
-			{
-				rest_log_message("Found oa_config with matching name but deleted != 0");
-				continue;
-			}
-			else
-			{
-				// Some proccis have data over and above that contained in their config
-				// typically stored in a struct which contains a config pointer (e.g. xxx_subscription).
-				// OnApp have everything they need in the loaded config already,
-				// so rather than creating a new instance of some config containing struct,
-				// we'll just return the config directly.
-				return pptr;
-	//			return( oa_initialise_client(
-	//				pptr->user, pptr->password, pptr->host,
-	//				_CORDS_OA_AGENT, pptr->version, pptr->tls ));
-			}
-		}
+    assert(oa_config_backend);
+    assert(oa_config_backend->retrieve_from_filter);
+    
+	// Some proccis have data over and above that contained in their config
+    // typically stored in a struct which contains a config pointer (e.g. xxx_subscription).
+    // OnApp have everything they need in the loaded config already,
+    // so rather than creating a new instance of some config containing struct,
+    // we'll just return the config directly.
+	
+	struct oa_config_occi_filter filter;
+	memset(&filter, 0, sizeof(struct oa_config_occi_filter));
+	filter.attributes = allocate_oa_config();
+	filter.attributes->name = allocate_string(sptr);
+	filter.name = 1;
+	filter.attributes->is_active = 1;
+	filter.is_active = 1;
+	filter.attributes->deleted = 0;
+	filter.deleted = 1;
+	
+	oaconfig_list matches = oa_config_backend->retrieve_from_filter(&filter); 
+	
+	liberate_oa_config(filter.attributes);
+	const struct oa_config *retVal = NULL;
+	if (matches.count > 0) {
+	    retVal = matches.oaconfigs[0];
 	}
-	return((struct oa_config *) 0);
+	free_oaconfig_list(&matches);	
+	return (retVal);
 }
 
 
@@ -1189,7 +1176,7 @@ void extract_onapp_extras_from_occi_response(struct cords_onapp_extras *ponapp_e
 /*  -----------------------------------------------------------------  */
 /* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n               */
 /*  -----------------------------------------------------------------  */
-struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr, char *agent, char *tls )
+const struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr, char *agent, char *tls )
 {
   struct cords_onapp_extras_handle handle = { 0 };
 #ifdef _USE_OCCI_ONAPPEXTRAS
@@ -1241,33 +1228,8 @@ struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr,
 
   return handle;
 #else // !_USE_OCCI_ONAPPEXTRAS
-	struct	occi_kind_node * nptr;
-	struct	cords_onapp_extras * pptr=(struct cords_onapp_extras *) 0;
-	struct	occi_kind_node  * occi_first_cords_onapp_extras_node();
-
-	for (nptr = occi_first_cords_onapp_extras_node();
-		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( pptr = nptr->contents ))
-		{
-			rest_log_message("onapp_extras contents not set");
-			continue;
-		}
-		else if (!( pptr->name ))
-		{
-			rest_log_message("onapp_extras name not set");
-			continue;
-		}
-		else if ( strcmp( pptr->name, sptr ) == 0 )
-		{
-		  handle.owner = 0; // This pointer is owned by someone else.
-			handle.ponapp_extras = pptr;
-		}
-	}
-
-
-	return handle;
+  Fail to build
+  // This functionality was out of date.  If required, update to match resolve_oa_configuration for backend access
 #endif // _USE_OCCI_ONAPPEXTRAS
 }
 
@@ -1278,7 +1240,7 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr )
 {
 	int	   status;
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 	struct	data_element * fptr;
 	char   reference[512];
 	char *	vptr;
@@ -1322,7 +1284,7 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr )
 private	struct oa_response * start_onapp_provisioning( struct onapp * pptr )
 {
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 
 	if (!( config = use_onapp_configuration( pptr->profile )))
 	{
@@ -1348,7 +1310,7 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr )
 {
 	int	   status;
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 	struct	data_element * fptr;
 	char   reference[512];
 	char *	vptr;
@@ -1386,7 +1348,7 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr )
 private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr )
 {
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 
 	if (!( config = use_onapp_configuration( pptr->profile )))
 	{
@@ -1408,7 +1370,7 @@ private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr )
 private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr )
 {
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 
 	if (!( config = use_onapp_configuration( pptr->profile )))
 	{

@@ -104,7 +104,7 @@ extern int dump_onapp_data( struct oa_config * pptr, struct onapp *ponapp, FILE 
 /// @param ponapp onapp to dump.
 /// @param h File to dump to.
 /// @return 0 if successful.
-extern int dump_onapp_data_stdout( struct  oa_config * pptr, struct onapp *ponapp);
+extern int dump_onapp_data_stdout(const struct oa_config * pptr, struct onapp *ponapp);
 
 /// @brief Dump url to FILE.
 /// @param purl url to dump.

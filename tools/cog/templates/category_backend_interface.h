@@ -82,7 +82,7 @@ _occi_filter *filter);	// Delete all
 [[[cog t.filename_root()]]]
 [[[end]]] 
 s matching filter
-	 
+    
 [[[cog t.category_name()]]]
 [[[end]]] 
 _id_list (*list) (struct 
@@ -92,7 +92,17 @@ _occi_filter *filter); // Return all ids of
 [[[cog t.filename_root()]]]
 [[[end]]] 
 s matching filter
+    [[[cog t.filter_by_name_header()]]]
+    [[[end]]]
 };
+
+extern struct 
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_backend_interface * 
+[[[cog t.category_name()]]]
+[[[end]]] 
+_backend;
 
 void 
 [[[cog t.category_name()]]]

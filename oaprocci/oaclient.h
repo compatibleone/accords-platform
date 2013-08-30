@@ -26,12 +26,12 @@ struct  oa_response
 
 #define	_CORDS_OA_AGENT "OnAppProcci/1.0"
 
-struct oa_response * oa_create_server(struct oa_config * poaconfig, char * filename );
+struct oa_response * oa_create_server(const struct oa_config * poaconfig, char * filename );
 char * oa_create_server_request(
-  struct oa_config * poaconfig
+  const struct oa_config * poaconfig
 , struct onapp *ponapp);
 
-struct oa_response * oa_stop_server(struct oa_config * poaconfig, struct onapp *ponapp);
+struct oa_response * oa_stop_server(const struct oa_config * poaconfig, struct onapp *ponapp);
 
 public struct oa_response * liberate_oa_response( struct oa_response * rptr );
 
