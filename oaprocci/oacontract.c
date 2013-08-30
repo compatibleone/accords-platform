@@ -42,7 +42,7 @@ struct	cords_vector
 
 struct	cords_oa_contract
 {
-	struct	oa_config *	config;
+	const struct oa_config *config;
 	struct	cords_vector	node;
 	struct	cords_vector	infrastructure;
 	struct	cords_vector	compute;
@@ -477,7 +477,7 @@ public	struct	rest_response * do_onapp_action(
 /*	--------------------------------------------------------	*/
 /*	     r e t r i e v e _ o n a p p _ d a t a                  */
 /*	--------------------------------------------------------	*/
-int	retrieve_onapp_data( struct	oa_config * pptr, struct cords_oa_contract * cptr
+int	retrieve_onapp_data(const struct oa_config * pptr, struct cords_oa_contract * cptr
 		, struct onapp *ponapp)
 {
 	char *			vptr;
@@ -626,7 +626,7 @@ public	struct	rest_response * create_onapp_vm(
 	int generate_alert)
 {
 	struct	onapp * pptr;
-	struct  oa_config * config;
+	const struct  oa_config * config;
 	struct  oa_response * oaptr;
 	struct rest_request *old_rest_request;
 	struct	data_element * json_vm;
@@ -859,7 +859,7 @@ public	int	create_onapp_contract(
 		char * tls )
 {
 	
-	struct	oa_config *                config = (struct oa_config *) 0;
+	const struct	oa_config *                config = (struct oa_config *) 0;
 	//struct	cords_onapp_extras const * onapp_extras = (struct cords_onapp_extras const *)0;
 	struct cords_onapp_extras_handle   onapp_extras_handle = { 0 };
 	struct	cords_oa_contract          contract;
@@ -1072,9 +1072,9 @@ public	int	delete_onapp_contract(
 //	else 	return( resolve_oa_configuration( nptr ) );
 //}
 
-private	struct oa_config * use_onapp_configuration( char * nptr )
+const struct oa_config * use_onapp_configuration( char * nptr )
 {
-	struct	oa_config * sptr;
+	const struct	oa_config * sptr;
 	struct onapp * ponapp;
 	struct oa_contract *poacontract;
 	char * operatorProfileName = NULL;
@@ -1092,7 +1092,7 @@ private	struct oa_config * use_onapp_configuration( char * nptr )
 /*  -----------------------------------------------------------------  */
 /* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n               */
 /*  -----------------------------------------------------------------  */
-struct oa_config * resolve_oa_configuration( char * sptr )
+const struct oa_config * resolve_oa_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
 	struct	oa_config * pptr=(struct oa_config *) 0;
@@ -1189,7 +1189,7 @@ void extract_onapp_extras_from_occi_response(struct cords_onapp_extras *ponapp_e
 /*  -----------------------------------------------------------------  */
 /* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n               */
 /*  -----------------------------------------------------------------  */
-struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr, char *agent, char *tls )
+const struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr, char *agent, char *tls )
 {
   struct cords_onapp_extras_handle handle = { 0 };
 #ifdef _USE_OCCI_ONAPPEXTRAS
@@ -1278,7 +1278,7 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr )
 {
 	int	   status;
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 	struct	data_element * fptr;
 	char   reference[512];
 	char *	vptr;
@@ -1322,7 +1322,7 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr )
 private	struct oa_response * start_onapp_provisioning( struct onapp * pptr )
 {
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 
 	if (!( config = use_onapp_configuration( pptr->profile )))
 	{
@@ -1348,7 +1348,7 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr )
 {
 	int	   status;
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 	struct	data_element * fptr;
 	char   reference[512];
 	char *	vptr;
@@ -1386,7 +1386,7 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr )
 private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr )
 {
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 
 	if (!( config = use_onapp_configuration( pptr->profile )))
 	{
@@ -1408,7 +1408,7 @@ private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr )
 private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr )
 {
 	struct oa_response * oaptr;
-	struct oa_config * config=(struct oa_config *) 0;
+	const struct oa_config * config=(struct oa_config *) 0;
 
 	if (!( config = use_onapp_configuration( pptr->profile )))
 	{

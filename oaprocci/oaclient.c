@@ -9,7 +9,7 @@ private	int	rate_recovery=120;	/* time to wait for rate limiting recovery */
 
 #define BASE64_ENCODE_ONAPP_AUTHORIZATION
 
-char * create_onapp_authentication(char * user, char * password)
+char * create_onapp_authentication(const char * user, const char * password)
 {
 	static size_t const buffersize = 1024;
 	char buffer[buffersize];
@@ -52,7 +52,7 @@ char * create_onapp_authentication(char * user, char * password)
 /*	------------------------------------------------------------ */
 /*			o a _ a u t h e n t i c a t e ()	 */
 /*	------------------------------------------------------------ */
-public	struct	rest_header   *	oa_authenticate	(struct oa_config *poaconfig)
+public	struct	rest_header   *	oa_authenticate	(const struct oa_config *poaconfig)
 {
 	struct rest_header * hptr=(struct rest_header * ) 0;
 	struct os_response * rptr;
@@ -329,7 +329,7 @@ public	struct	oa_response *
 /*	------------------------------------------------------------ */
 /*			o a _ c r e a t e _  o p e r a t i o n	 */
 /*	------------------------------------------------------------ */
-private	struct	oa_response *	oa_create_operation(struct oa_config * poaconfig, char * buffer, char * filename )
+private	struct	oa_response *	oa_create_operation(const struct oa_config * poaconfig, char * buffer, char * filename )
 {
 	struct	oa_response	*	rptr=(struct oa_response *) 0;
 	struct	url		*	uptr;
@@ -359,7 +359,7 @@ private	struct	oa_response *	oa_create_operation(struct oa_config * poaconfig, c
 /*	------------------------------------------------------------ */
 /*			o a _ d e l e t e _  o p e r a t i o n	 */
 /*	------------------------------------------------------------ */
-private	struct	oa_response * oa_delete_operation(struct oa_config * poaconfig, char * buffer)
+private	struct	oa_response * oa_delete_operation(const struct oa_config * poaconfig, char * buffer)
 {
 	struct	oa_response	*	rptr=(struct oa_response *) 0;
 	struct	url		*	uptr;
@@ -389,7 +389,7 @@ private	struct	oa_response * oa_delete_operation(struct oa_config * poaconfig, c
 /*	------------------------------------------------------------ */
 /*			o a _ c r e a t e _  s e r v e r                     */
 /*	------------------------------------------------------------ */
-struct	oa_response * oa_create_server(struct oa_config * poaconfig, char * filename )
+struct	oa_response * oa_create_server(const struct oa_config * poaconfig, char * filename )
 {
 	char	buffer[1024];
 	sprintf(buffer,"/virtual_machines.json");
@@ -399,7 +399,7 @@ struct	oa_response * oa_create_server(struct oa_config * poaconfig, char * filen
 /*	------------------------------------------------------------ */
 /*	        o a _ s t a r t _ s e r v e r                        */
 /*	------------------------------------------------------------ */
-struct oa_response * oa_start_server(struct oa_config * poaconfig, struct onapp *ponapp)
+struct oa_response * oa_start_server(const struct oa_config * poaconfig, struct onapp *ponapp)
 {
 	char buffer[1024];
 	struct oa_response *response = (struct oa_response *)NULL;
@@ -416,7 +416,7 @@ struct oa_response * oa_start_server(struct oa_config * poaconfig, struct onapp 
 /*	------------------------------------------------------------ */
 /*			o a _ s t o p _ s e r v e r                          */
 /*	------------------------------------------------------------ */
-struct oa_response * oa_stop_server(struct oa_config * poaconfig, struct onapp *ponapp)
+struct oa_response * oa_stop_server(const struct oa_config * poaconfig, struct onapp *ponapp)
 {
 	char buffer[1024];
 	struct oa_response *response = (struct oa_response *)NULL;
@@ -433,7 +433,7 @@ struct oa_response * oa_stop_server(struct oa_config * poaconfig, struct onapp *
 /*	------------------------------------------------------------ */
 /*	        o a _ s h u t d o w n _ s e r v e r                  */
 /*	------------------------------------------------------------ */
-struct oa_response * oa_shutdown_server(struct oa_config * poaconfig, struct onapp *ponapp)
+struct oa_response * oa_shutdown_server(const struct oa_config * poaconfig, struct onapp *ponapp)
 {
 	char buffer[1024];
 	struct oa_response *response = (struct oa_response *)NULL;
@@ -450,7 +450,7 @@ struct oa_response * oa_shutdown_server(struct oa_config * poaconfig, struct ona
 /*	------------------------------------------------------------ */
 /*	        o a _ r e s t a r t _ s e r v e r                    */
 /*	------------------------------------------------------------ */
-struct oa_response * oa_restart_server(struct oa_config * poaconfig, struct onapp *ponapp)
+struct oa_response * oa_restart_server(const struct oa_config * poaconfig, struct onapp *ponapp)
 {
 	char buffer[1024];
 	struct oa_response *response = (struct oa_response *)NULL;
@@ -467,7 +467,7 @@ struct oa_response * oa_restart_server(struct oa_config * poaconfig, struct onap
 /*	------------------------------------------------------------ */
 /*	        o a _ d e s t r o y _ s e r v e r                      */
 /*	------------------------------------------------------------ */
-struct oa_response * oa_destroy_server(struct oa_config * poaconfig, struct onapp *ponapp)
+struct oa_response * oa_destroy_server(const struct oa_config * poaconfig, struct onapp *ponapp)
 {
 	char buffer[1024];
 	struct oa_response *response = (struct oa_response *)NULL;
@@ -502,7 +502,7 @@ public	struct oa_response * liberate_oa_response( struct oa_response * rptr )
 }
 
 char * oa_create_server_json_request(
-		  struct oa_config * poaconfig
+        const struct oa_config * poaconfig
 		, struct onapp *ponapp
 		)
 {
@@ -713,7 +713,7 @@ char * oa_create_server_json_request(
 }
 
 char * oa_create_server_request(
-		  struct oa_config * poaconfig
+		  const struct oa_config * poaconfig
 		, struct onapp *ponapp)
 {
 	return oa_create_server_json_request(poaconfig, ponapp);
