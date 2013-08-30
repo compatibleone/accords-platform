@@ -1110,7 +1110,7 @@ const struct oa_config * resolve_oa_configuration( char * sptr )
 	struct oa_config_occi_filter filter;
 	memset(&filter, 0, sizeof(struct oa_config_occi_filter));
 	filter.attributes = allocate_oa_config();
-	filter.attributes->name = sptr;
+	filter.attributes->name = allocate_string(sptr);
 	filter.name = 1;
 	filter.attributes->is_active = 1;
 	filter.is_active = 1;
