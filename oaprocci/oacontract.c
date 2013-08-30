@@ -18,6 +18,8 @@
 #ifndef	_oacontract_c	
 #define	_oacontract_c
 
+#include <assert.h>
+
 #include "standard.h"
 #include "broker.h"
 #include "rest.h"
@@ -31,6 +33,8 @@
 #include "oaclient.h"
 #include "cb.h"
 #include "onapp_helpers.h"
+#include "oaconfig_backend_interface.h"
+#include "oaconfig_occi_filter.h"
 
 #define _USE_OCCI_ONAPPEXTRAS
 
@@ -1094,51 +1098,34 @@ const struct oa_config * use_onapp_configuration( char * nptr )
 /*  -----------------------------------------------------------------  */
 const struct oa_config * resolve_oa_configuration( char * sptr )
 {
-	struct	occi_kind_node * nptr;
-	struct	oa_config * pptr=(struct oa_config *) 0;
-	struct	occi_kind_node  * occi_first_oa_config_node();
-
-	for (	nptr = occi_first_oa_config_node();
-		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( pptr = nptr->contents ))
-		{
-			rest_log_message("oa_config contents not set");
-			continue;
-		}
-		else if (!( pptr->name ))
-		{
-			rest_log_message("oa_config name not set");
-			continue;
-		}
-		else if (!( strcmp( pptr->name, sptr ) ))
-		{
-			if (pptr->is_active == 0)
-			{
-				rest_log_message("Found oa_config with matching name but is_active == 0");
-				continue;
-			}
-			else if (pptr->deleted != 0)
-			{
-				rest_log_message("Found oa_config with matching name but deleted != 0");
-				continue;
-			}
-			else
-			{
-				// Some proccis have data over and above that contained in their config
-				// typically stored in a struct which contains a config pointer (e.g. xxx_subscription).
-				// OnApp have everything they need in the loaded config already,
-				// so rather than creating a new instance of some config containing struct,
-				// we'll just return the config directly.
-				return pptr;
-	//			return( oa_initialise_client(
-	//				pptr->user, pptr->password, pptr->host,
-	//				_CORDS_OA_AGENT, pptr->version, pptr->tls ));
-			}
-		}
+    assert(oa_config_backend);
+    assert(oa_config_backend->retrieve_from_filter);
+    
+	// Some proccis have data over and above that contained in their config
+    // typically stored in a struct which contains a config pointer (e.g. xxx_subscription).
+    // OnApp have everything they need in the loaded config already,
+    // so rather than creating a new instance of some config containing struct,
+    // we'll just return the config directly.
+	
+	struct oa_config_occi_filter filter;
+	memset(&filter, 0, sizeof(struct oa_config_occi_filter));
+	filter.attributes = allocate_oa_config();
+	filter.attributes->name = sptr;
+	filter.name = 1;
+	filter.attributes->is_active = 1;
+	filter.is_active = 1;
+	filter.attributes->deleted = 0;
+	filter.deleted = 1;
+	
+	oaconfig_list matches = oa_config_backend->retrieve_from_filter(&filter); 
+	
+	liberate_oa_config(filter.attributes);
+	const struct oa_config *retVal = NULL;
+	if (matches.count > 0) {
+	    retVal = matches.oaconfigs[0];
 	}
-	return((struct oa_config *) 0);
+	free_oaconfig_list(&matches);	
+	return (retVal);
 }
 
 
@@ -1241,33 +1228,8 @@ const struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char *
 
   return handle;
 #else // !_USE_OCCI_ONAPPEXTRAS
-	struct	occi_kind_node * nptr;
-	struct	cords_onapp_extras * pptr=(struct cords_onapp_extras *) 0;
-	struct	occi_kind_node  * occi_first_cords_onapp_extras_node();
-
-	for (nptr = occi_first_cords_onapp_extras_node();
-		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( pptr = nptr->contents ))
-		{
-			rest_log_message("onapp_extras contents not set");
-			continue;
-		}
-		else if (!( pptr->name ))
-		{
-			rest_log_message("onapp_extras name not set");
-			continue;
-		}
-		else if ( strcmp( pptr->name, sptr ) == 0 )
-		{
-		  handle.owner = 0; // This pointer is owned by someone else.
-			handle.ponapp_extras = pptr;
-		}
-	}
-
-
-	return handle;
+  Fail to build
+  // This functionality was out of date.  If required, update to match resolve_oa_configuration for backend access
 #endif // _USE_OCCI_ONAPPEXTRAS
 }
 
