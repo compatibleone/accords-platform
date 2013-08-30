@@ -79,7 +79,7 @@ struct
 [[[end]]] 
  * optr);
 
-private struct 
+struct 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 _backend_interface * 

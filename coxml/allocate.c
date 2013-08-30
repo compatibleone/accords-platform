@@ -57,11 +57,11 @@ public	void *	liberate( void * v)
 /*	-----------------------------------	*/
 /*	centralised string allocation.		*/
 /*	-----------------------------------	*/
-public	char *	allocate_string( char *s )
+public	char *	allocate_string(const char *s )
 {
 	char *	r;
 	if (!( s ))
-		return( s );
+		return( NULL );
 	else if (!( r = allocate(strlen(s)+1) ))
 		return(r);
 	else	return(strcpy(r,s));

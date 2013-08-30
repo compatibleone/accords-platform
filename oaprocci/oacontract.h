@@ -20,9 +20,9 @@ struct rest_response *  oaprocci_alert_relay(
 		char * nature,
 		char * agent, char * tls);
 
-private	struct	oa_config * resolve_oa_configuration( char * sptr );
-private	struct oa_config * use_onapp_configuration( char * nptr );
-struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr, char *agent, char *tls );
+const struct	oa_config * resolve_oa_configuration( char * sptr );
+const struct oa_config * use_onapp_configuration( char * nptr );
+const struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr, char *agent, char *tls );
 struct cords_onapp_extras_handle use_cords_onapp_extras_handle( char * sptr, char *agent, char *tls );
 void close_cords_onapp_extras_handle(struct cords_onapp_extras_handle *handle);
 
