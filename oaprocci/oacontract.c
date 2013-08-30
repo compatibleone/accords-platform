@@ -60,12 +60,17 @@ struct	cords_oa_contract
 	struct	oa_response *	images;
 };
 
+struct onapp_action_context
+{
+	OnAppBool onapp_dirty;
+};
+
 private	int	terminate_onapp_contract( int status, struct cords_oa_contract * cptr );
-private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr );
-private	struct oa_response * start_onapp_provisioning( struct onapp * pptr );
-private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr );
-private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr );
-private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr );
+private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context );
+private	struct oa_response * start_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context );
+private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context );
+private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context );
+private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context );
 
 /*  --------------------------------------------------- */
 /*  OCCI attribute handling                             */
@@ -189,22 +194,6 @@ struct rest_response *  oaprocci_alert_relay(
 }
 
 /*	--------------------------------------------------------	*/
-/*	     o n a p p _ b u i l d _ f a i l u r e		*/
-/*	--------------------------------------------------------	*/
-private	int	onapp_build_failure( struct onapp * pptr, int status, char * message )
-{
-	// TODO: Clear up ongoing OnApp activity.
-//	struct	os_response * zptr;
-	rest_log_message( message );
-//	if ((zptr = stop_openstack_provisioning( pptr )) != (struct os_response *) 0)
-//		zptr = liberate_os_response( zptr );
-//	reset_openstack_server( pptr );
-	pptr->build_state = allocate_string("failed");
-	return( status );
-}
-
-
-/*	--------------------------------------------------------	*/
 /*   OnApp action boilerplate handling                          */
 /*	--------------------------------------------------------	*/
 
@@ -236,7 +225,7 @@ struct onapp_action_input_data
 	struct onapp *ponapp;
 };
 
-typedef struct oa_response * (*action_fn)( struct onapp * );
+typedef struct oa_response * (*action_fn)( struct onapp *, struct onapp_action_context * );
 
 struct onapp_action_data
 {
@@ -244,6 +233,7 @@ struct onapp_action_data
 	struct rest_response *prest_response_result;
 	action_fn action;
 	struct action_errors_data action_errors;
+	struct onapp_action_context context;
 };
 
 void allocate_action_error_data_message(struct error_data *perror_data, char const action[], char const *format)
@@ -300,6 +290,16 @@ void liberate_onapp_action_error_data(struct action_errors_data *paction_errors)
 	liberate_error_data_message(&paction_errors->happy_response);
 }
 
+int	onapp_build_failure( struct onapp * pptr, int status, char * message, struct onapp_action_context *context )
+{
+	// TODO: Clear up ongoing OnApp activity.
+	rest_log_message( message );
+	pptr->build_state = allocate_string("failed");
+	context->onapp_dirty = OABOOL_TRUE;
+
+	return( status );
+}
+
 struct onapp_action_input_data const initialise_onapp_action_input_data (
 		struct occi_category * pocci_category,
 		struct rest_client * prest_client,
@@ -332,6 +332,18 @@ struct onapp_action_data create_onapp_action_data_default_errors(char const acti
 		, action_fn paction)
 {
 	return create_onapp_action_data(action, onapp_action_input, paction, NULL);
+}
+
+void handle_onapp_action_context(struct onapp *ponapp, struct onapp_action_context *context)
+{
+	if (context != NULL && ponapp != NULL && ponapp->id != NULL && ponapp->id[0] != '\0')
+	{
+		if (context->onapp_dirty != OABOOL_FALSE)
+		{
+			onapp_update(ponapp->id, ponapp);
+
+		}
+	}
 }
 
 typedef enum GenerateAlert_
@@ -413,7 +425,7 @@ public struct rest_response * do_onapp_action_alert(
 	{
 		if ( ponapp_action->input.ponapp->state != forbidden_occi_state )
 		{
-			if ((poa_response = ponapp_action->action( ponapp_action->input.ponapp )) == (struct oa_response *) 0)
+			if ((poa_response = ponapp_action->action( ponapp_action->input.ponapp, &ponapp_action->context )) == (struct oa_response *) 0)
 			{
 				prest_response_result = rest_html_response (ponapp_action->input.prest_response,
 					action_errors->null_response.status, action_errors->null_response.error_message);
@@ -423,7 +435,8 @@ public struct rest_response * do_onapp_action_alert(
 				if (!( poa_response->response ))
 				{
 					onapp_build_failure( ponapp_action->input.ponapp,
-							action_errors->null_nested_response_build_failure.status, action_errors->null_nested_response_build_failure.error_message );
+							action_errors->null_nested_response_build_failure.status, action_errors->null_nested_response_build_failure.error_message,
+							&ponapp_action->context );
 					prest_response_result = rest_html_response( ponapp_action->input.prest_response,
 						action_errors->null_nested_response.status, action_errors->null_nested_response.error_message );
 				}
@@ -432,7 +445,8 @@ public struct rest_response * do_onapp_action_alert(
 					prest_response_result = handle_alert(generate_alert, ponapp_action->input.pocci_category, ponapp_action->input.prest_client, poa_response, ponapp_action->input.prest_request, prest_response_result, ponapp_action->input.ponapp);
 
 					onapp_build_failure( ponapp_action->input.ponapp,
-						action_errors->unhappy_response_build_failure.status, action_errors->unhappy_response_build_failure.error_message );
+						action_errors->unhappy_response_build_failure.status, action_errors->unhappy_response_build_failure.error_message,
+						&ponapp_action->context );
 				}
 				else
 				{
@@ -460,6 +474,8 @@ public struct rest_response * do_onapp_action_alert(
 	}
 
 	ponapp_action->prest_response_result = prest_response_result;
+
+	handle_onapp_action_context(ponapp_action->input.ponapp, &ponapp_action->context);
 
 	return prest_response_result;
 }
@@ -627,6 +643,7 @@ public	struct	rest_response * create_onapp_vm(
 	struct rest_request * rptr,
 	struct rest_response * aptr,
 	void * vptr,
+	struct onapp_action_context *context,
 	int generate_alert)
 {
 	struct	onapp * pptr;
@@ -666,18 +683,18 @@ public	struct	rest_response * create_onapp_vm(
 		occi_send_transaction( _CORDS_ONAPP, pptr->price, "action=start", pptr->account, reference );
 
 	if (!( filename = oa_create_server_request(config, pptr) )) {
-		onapp_build_failure (pptr, 911, "Failure Creating Server Message" );
+		onapp_build_failure (pptr, 911, "Failure Creating Server Message", context );
 	 	return( rest_html_response( aptr, 4004, "Server Failure : Create Server Message" ) );
 	}
 	else if (!( oaptr = oa_create_server( config, filename )))
 	{
-		onapp_build_failure( pptr, 911, "Failure Creating Server" );
+		onapp_build_failure( pptr, 911, "Failure Creating Server", context );
 	 	return( rest_html_response( aptr, 4008, "Server Failure : Create Server Request" ) );
 	}
 	else if (!( oaptr->response ))
 	{
 		oaptr = liberate_oa_response( oaptr );
-		onapp_build_failure( pptr, 911, "OA Failure : No Response" );
+		onapp_build_failure( pptr, 911, "OA Failure : No Response", context );
 	 	return( rest_html_response( aptr, 4010, "Bad Request : Create Server No Response" ) );
 	}
 	else if ( oaptr->response->status >= 400 )
@@ -685,7 +702,7 @@ public	struct	rest_response * create_onapp_vm(
 		aptr = handle_alert(generate_alert, optr, cptr, oaptr, rptr, aptr, pptr);
 
 		oaptr = liberate_oa_response( oaptr );
-		onapp_build_failure( pptr, 911, "OA Failure : Bad Request" );
+		onapp_build_failure( pptr, 911, "OA Failure : Bad Request", context );
 		// This response pointer will ultimately end up being used to populate an alert, as well as being returned as the response.
 		return( aptr );
 	}
@@ -752,46 +769,49 @@ public	struct	rest_response * stop_onapp(
 	struct rest_response *prest_response_result = NULL;
 	int status;
 	struct onapp * ponapp;
+	struct onapp_action_context context = { 0 };
 	if (!( ponapp = vptr ))
 	{
 		prest_response_result = rest_html_response( prest_response, 404, "Invalid Action" );
 	}
-  else if ((poa_response = stop_onapp_provisioning( ponapp )) == (struct oa_response *) 0)
-  {
-    prest_response_result = rest_html_response (prest_response, 500, "Unexpected error stopping OnApp VM");
-  }
-  else
-  {
-    if (!( poa_response->response ))
-    {
-      onapp_build_failure( ponapp, 911, "OA Failure : No Response" );
-      prest_response_result = rest_html_response( prest_response, 4010, "Bad Request : Stop Server No Response" );
-    }
-    else if ( poa_response->response->status >= 400 )
-    {
-      // This response pointer will ultimately end up being used to populate an alert, as well as being returned as the response.
-      prest_response_result = poa_response->response;
-      poa_response->response = NULL;
+	else if ((poa_response = stop_onapp_provisioning( ponapp, &context )) == (struct oa_response *) 0)
+	{
+		prest_response_result = rest_html_response (prest_response, 500, "Unexpected error stopping OnApp VM");
+	}
+	else
+	{
+		if (!( poa_response->response ))
+		{
+			onapp_build_failure( ponapp, 911, "OA Failure : No Response", &context );
+			prest_response_result = rest_html_response( prest_response, 4010, "Bad Request : Stop Server No Response" );
+		}
+		else if ( poa_response->response->status >= 400 )
+		{
+			// This response pointer will ultimately end up being used to populate an alert, as well as being returned as the response.
+			prest_response_result = poa_response->response;
+			poa_response->response = NULL;
 
-      onapp_build_failure( ponapp, 911, "OA Failure : Bad Request (stop VM HTTP status >= 400)" );
-    }
-    else
-    {
-      // CompatibleOne price handling.
-      sprintf(reference,"%s/%s/%s",OnAppConfiguration.identity,_CORDS_ONAPP,ponapp->id);
-      if ( rest_valid_string( ponapp->price ) )
-      {
-        occi_send_transaction( _CORDS_ONAPP, ponapp->price, "action=stop", ponapp->id, reference );
-      }
-    }
+			onapp_build_failure( ponapp, 911, "OA Failure : Bad Request (stop VM HTTP status >= 400)", &context );
+		}
+		else
+		{
+			// CompatibleOne price handling.
+			sprintf(reference,"%s/%s/%s",OnAppConfiguration.identity,_CORDS_ONAPP,ponapp->id);
+			if ( rest_valid_string( ponapp->price ) )
+			{
+				occi_send_transaction( _CORDS_ONAPP, ponapp->price, "action=stop", ponapp->id, reference );
+			}
+		}
 
-    poa_response = liberate_oa_response( poa_response );
+		poa_response = liberate_oa_response( poa_response );
 
-  }
+	}
 	if (prest_response_result == NULL)
 	{
 		prest_response_result = rest_html_response( prest_response, 200, "OK" );
 	}
+
+	handle_onapp_action_context(ponapp, &context);
 
 	return prest_response_result;
 }
@@ -1047,17 +1067,18 @@ public	int	delete_onapp_contract(
 {
 	struct	oa_response * oaptr;
 	int result = 0;
+	struct onapp_action_context context = { 0 };
 
-  oaptr = stop_onapp_provisioning( pptr );
+	oaptr = stop_onapp_provisioning( pptr, &context );
 
-  if (oaptr != NULL && oaptr->response != NULL && oaptr->response->status < 400)
-  {
-    oaptr = liberate_oa_response( oaptr );
-    result = 1;
-  }
+	if (oaptr != NULL && oaptr->response != NULL && oaptr->response->status < 400)
+	{
+		oaptr = liberate_oa_response( oaptr );
+		result = 1;
+	}
 
-  pptr->state = _OCCI_IDLE;
-  pptr->build_state = allocate_string("deleted");
+	pptr->state = _OCCI_IDLE;
+	pptr->build_state = allocate_string("deleted");
 
 	return result;
 }
@@ -1236,7 +1257,7 @@ const struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char *
 /*  -----------------------------------------------------------------  */
 /*      	s t o p  _ o n a p p _ p r o v i s i o n i n g         */
 /*  -----------------------------------------------------------------  */
-private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr )
+private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context )
 {
 	int	   status;
 	struct oa_response * oaptr;
@@ -1268,7 +1289,11 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr )
 
 		if (oaptr != NULL && oaptr->response != NULL && oaptr->response->status < 400)
 		{
-			pptr->state = _OCCI_IDLE;
+			if (pptr->state != _OCCI_IDLE)
+			{
+				pptr->state = _OCCI_IDLE;
+				context->onapp_dirty = OABOOL_TRUE;
+			}
 		}
 //		if ( pptr->hostname )
 //			pptr->hostname = liberate(pptr->hostname);
@@ -1281,7 +1306,7 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr )
 /*  -----------------------------------------------------------------  */
 /*      s t a r t _ o n a p p _ p r o v i s i o n i n g                */
 /*  -----------------------------------------------------------------  */
-private	struct oa_response * start_onapp_provisioning( struct onapp * pptr )
+private	struct oa_response * start_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context )
 {
 	struct oa_response * oaptr;
 	const struct oa_config * config=(struct oa_config *) 0;
@@ -1296,7 +1321,11 @@ private	struct oa_response * start_onapp_provisioning( struct onapp * pptr )
 
 		if (oaptr != NULL && oaptr->response != NULL && oaptr->response->status < 400)
 		{
-			pptr->state = _OCCI_ACTIVE;
+			if (pptr->state != _OCCI_ACTIVE)
+			{
+				pptr->state = _OCCI_ACTIVE;
+				context->onapp_dirty = OABOOL_TRUE;
+			}
 		}
 	}
 
@@ -1306,7 +1335,7 @@ private	struct oa_response * start_onapp_provisioning( struct onapp * pptr )
 /*  -----------------------------------------------------------------  */
 /*      s h u t d o w n _ o n a p p _ p r o v i s i o n i n g          */
 /*  -----------------------------------------------------------------  */
-private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr )
+private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context )
 {
 	int	   status;
 	struct oa_response * oaptr;
@@ -1336,7 +1365,11 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr )
 
 		oaptr = oa_shutdown_server(config, pptr);
 
-		pptr->state = _OCCI_IDLE;
+		if (pptr->state != _OCCI_IDLE)
+		{
+			pptr->state = _OCCI_IDLE;
+			context->onapp_dirty = OABOOL_TRUE;
+		}
 
 		return( oaptr );
 	}
@@ -1345,7 +1378,7 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr )
 /*  -----------------------------------------------------------------  */
 /*      r e s t a r t _ o n a p p _ p r o v i s i o n i n g            */
 /*  -----------------------------------------------------------------  */
-private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr )
+private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context )
 {
 	struct oa_response * oaptr;
 	const struct oa_config * config=(struct oa_config *) 0;
@@ -1358,7 +1391,11 @@ private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr )
 	{
 		oaptr = oa_restart_server(config, pptr);
 
-		pptr->state = _OCCI_ACTIVE;
+		if (pptr->state != _OCCI_ACTIVE)
+		{
+			pptr->state = _OCCI_ACTIVE;
+			context->onapp_dirty = OABOOL_TRUE;
+		}
 	}
 
 	return( oaptr );
@@ -1367,7 +1404,7 @@ private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr )
 /*  -----------------------------------------------------------------  */
 /*      d e s t r o y _ o n a p p _ p r o v i s i o n i n g            */
 /*  -----------------------------------------------------------------  */
-private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr )
+private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr, struct onapp_action_context *context )
 {
 	struct oa_response * oaptr;
 	const struct oa_config * config=(struct oa_config *) 0;
@@ -1384,6 +1421,7 @@ private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr )
 		{
 			pptr->state = _OCCI_IDLE;
 			pptr->build_state = allocate_string("deleted");
+			context->onapp_dirty = OABOOL_TRUE;
 		}
 	}
 
