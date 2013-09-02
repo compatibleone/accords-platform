@@ -1,0 +1,4 @@
+ip.addr == 127.0.0.1 and ip
+ip.addr == 127.0.0.1 and ip and (http.user_agent == "CO-RDS-PARSER/1.0" or http.user_agent == "CO-PARSER/1.0" or http.user_agent == "python-requests/1.2.0 CPython/2.7.3 Linux/3.5.0-28-generic" or http.response.code)
+ip.addr == 127.0.0.1 and ip and (http.user_agent == "CO-RDS-PARSER/1.0" or http.user_agent == "CO-PARSER/1.0" or http.user_agent == "Ruby" or http.response.code or http.user_agent == "CO-BROKER/1.0")
+

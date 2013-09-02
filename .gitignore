@@ -211,6 +211,9 @@ tools/codegen/OCCI/test/*.pyc
 tools/codegen/system_test/*.pyc
 tools/codegen/codegen_types/*.pyc
 tools/codegen/codegen_types/test/*.pyc
+python/*.pyc
+python/parsing/*.pyc
+python/test/*.pyc
 paasprocci/src/paasprocci
 pyaccords/pysrc/pypacksrc/build/
 pyaccordsSDK/pycompdev/build/
