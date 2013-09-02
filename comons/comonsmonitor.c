@@ -12,46 +12,24 @@ private	struct rest_response * start_monitor(
 		void * vptr )
 {
 	struct	cords_monitor * pptr;
-	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
-	char *	wptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
 	else if ( pptr->state )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
-		for (	nptr=occi_first_link_node();
-			nptr != (struct occi_link_node *) 0;
-			nptr = nptr->next )
-		{
-			if (!( lptr = nptr->contents ))
-				continue;
-			else if (!( lptr->source ))
-				continue;
-			else if (!( lptr->target ))
-				continue;
-			else if (!( wptr = occi_category_id( lptr->source ) ))
-				continue;
-			else if ( strcmp( wptr, pptr->id ) != 0)
-			{
-				liberate( wptr );
-				continue;
-			}
-			else
-			{	
-				liberate( wptr );
-				if (!(zptr = cords_invoke_action( lptr->target, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
-					return( rest_html_response( aptr, 801, "Control Start Failure" ) );
-				else if ( cords_check_invocation( zptr, aptr ) != 0 )
-				{
-					zptr = occi_remove_response( zptr );
-					return( rest_html_response( aptr, aptr->status, aptr->message ) );
-				}
-				else 	zptr = occi_remove_response( zptr );
-			}
+	    for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+            if (!(zptr = cords_invoke_action( lptr->target, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
+                return( rest_html_response( aptr, 801, "Control Start Failure" ) );
+            else if ( cords_check_invocation( zptr, aptr ) != 0 )
+            {
+                zptr = occi_remove_response( zptr );
+                return( rest_html_response( aptr, aptr->status, aptr->message ) );
+            }
+            else 	zptr = occi_remove_response( zptr );
 		}
 		pptr->state = 1;
 		autosave_cords_monitor_nodes();

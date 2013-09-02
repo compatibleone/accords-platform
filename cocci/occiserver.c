@@ -384,31 +384,14 @@ struct rest_extension * xptr)
 /*	---------------------------------------------------	*/
 public	int	occi_render_links( struct rest_response * aptr, char * id )
 {
-	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	struct	rest_header 	* hptr;
 	char			* mptr;
-	char 			* wptr;
 	if (!( aptr ))
 		return(0);
 	else if (!( id ))
 		return(0);
-	for (	nptr=occi_first_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-		else	liberate( wptr );
+	for (lptr = initialise_links_list(id); NULL != lptr; lptr = next_link(id)) {
 		if (!( mptr = occi_http_link( OcciServerLinkManager, lptr->target, lptr->id ) ))
 			continue;
 		else if (!( hptr = rest_response_header( aptr, _OCCI_LINKHEAD, mptr )))
