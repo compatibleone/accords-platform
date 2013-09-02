@@ -33,6 +33,7 @@ _c_
 _c_
 
 #include "element.h"
+#include "standard.h"
 
 #include "
 [[[cog t.filename_root()]]]

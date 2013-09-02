@@ -1,6 +1,14 @@
-[[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file); t.h_include() ]]]
+[[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file) ]]]
 [[[end]]]
 
+#include "standard.h"
+#include "occi.h"
+#include "document.h"
+
+#include "
+[[[cog t.filename_root()]]]
+[[[end]]]
+.h"
 #include "
 [[[cog t.filename_root()]]]
 [[[end]]] 

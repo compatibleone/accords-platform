@@ -32,6 +32,12 @@ _c_
 [[[end]]] 
 _c_
 
+#include "standard.h"
+#include "rest.h"
+#include "occi.h"
+#include "document.h"
+#include "cordspublic.h"
+
 #include "
 [[[cog t.filename_root()]]]
 [[[end]]] 
@@ -57,27 +63,6 @@ _node_backend.h"
 [[[end]]] 
 	*/
 /*	--------------------------------------------	*/
-
-/*	--------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
-/*	--------------------------------------------------------------------	*/
-struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * allocate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-();
-struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * liberate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-(struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * optr);
 
 struct 
 [[[cog t.filename_root()]]]
