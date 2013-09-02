@@ -370,6 +370,55 @@ int onapp_normalise_value( char * sptr, int normal, char **ppzeroed_string )
 }
 #endif
 
+/// HTTP functions.
+char * get_http_body_length_string(char *buffer, size_t buffer_size, int type, char const *body)
+{
+	char * body_length = NULL;
+
+	if (buffer_size > 0 && body != NULL)
+	{
+		if (type == _FILE_BODY)
+		{
+			struct	stat info;
+			struct	rest_header * hptr;
+			if ( stat( body,&info ) >= 0 )
+			{
+				if (snprintf(buffer, buffer_size, "%lu", info.st_size) < buffer_size)
+				{
+					body_length = buffer;
+				}
+			}
+		}
+		else if (type == _TEXT_BODY)
+		{
+			// Take strlen() of body as Content-Length.
+			if (body == NULL)
+			{
+				buffer[0] = '0';
+
+				if (buffer_size > 1)
+				{
+					buffer[1] = '\0';
+				}
+
+				body_length = buffer;
+			}
+			else
+			{
+				buffer[0] = '\0';
+				if (snprintf(buffer, buffer_size, "%lu", strlen(body)) < buffer_size)
+				{
+					body_length = buffer;
+
+				}
+			}
+		}
+	}
+
+	return body_length;
+}
+
+
 /// File handling.
 size_t write_filecontent_to_filehandle(char const * const filename, FILE* h, char const * const prefix, char const * const suffix)
 {
@@ -444,7 +493,7 @@ size_t write_filecontent_to_filename(char const * const filename, char const * c
 /// @param pptr oa_config to dump.
 /// @param ponapp onapp to dump.
 /// @return 0 if successful.
-int dump_onapp_data( struct oa_config * pptr
+int dump_onapp_data( struct oa_config const * pptr
     , struct onapp *ponapp
     , FILE *h)
 {
@@ -610,14 +659,14 @@ int dump_onapp_data( struct oa_config * pptr
   return 0;
 }
 
-int dump_onapp_data_stdout(const struct  oa_config * pptr
+int dump_onapp_data_stdout(struct oa_config const * pptr
     , struct onapp *ponapp
   )
 {
   return dump_onapp_data(pptr, ponapp, stdout);
 }
 
-void dump_url(struct url *purl, FILE *hOutput)
+void dump_url(struct url const *purl, FILE *hOutput)
 {
   fwrite("Url: '", 1, 5, hOutput);
   fwrite(purl->host, 1, strlen(purl->host), hOutput);
@@ -658,7 +707,7 @@ struct  occi_attribute
   int       immutable;
 };
 */
-void dump_occi_attribute(struct occi_attribute *pocci_attribute, FILE *hOutput)
+void dump_occi_attribute(struct occi_attribute const *pocci_attribute, FILE *hOutput)
 {
   if (pocci_attribute == NULL)
   {
@@ -713,7 +762,7 @@ struct  occi_category
 
 };
  */
-void test_dump_occi_category(struct occi_category *pocci_category, FILE *hOutput)
+void test_dump_occi_category(struct occi_category const *pocci_category, FILE *hOutput)
 {
   struct occi_attribute *pocci_attribute_iter = NULL;
 
@@ -781,7 +830,7 @@ struct  rest_response
   char      * body;
 };
 */
-void dump_rest_response(struct rest_response *prest_response, FILE *hOutput)
+void dump_rest_response(struct rest_response const *prest_response, FILE *hOutput)
 {
   struct rest_header *prest_header;
   fprintf(hOutput, "rest_response status=%d version='%s' message='%s' type=%d body='%s'\n"
@@ -810,7 +859,7 @@ struct  occi_response
   struct  rest_response * response;
 };
  */
-void dump_occi_response(struct occi_response* pocci_response, FILE* hOutput)
+void dump_occi_response(struct occi_response const * pocci_response, FILE* hOutput)
 {
   struct occi_element* pocci_element_iter = (struct occi_element *) NULL;
   char* psz = NULL;
@@ -862,7 +911,7 @@ struct occi_response * dump_occi_response_liberate(struct occi_response * pocci_
   return occi_remove_response(pocci_response);
 }
 
-void dump_occi_client(struct occi_client *pocci_client, FILE *hOutput)
+void dump_occi_client(struct occi_client const *pocci_client, FILE *hOutput)
 {
   fwrite("===Occi Client===\n", 1, 18, hOutput);
   fwrite("Target ", 1, 7, hOutput);
@@ -924,7 +973,7 @@ void dump_onapp_extras_occi(struct occi_response *pocci_response, FILE *hOutput)
   fputc('\n', hOutput);
 }
 
-void dump_onapp_extras(struct cords_onapp_extras *ponapp_extras, FILE *hOutput)
+void dump_onapp_extras(struct cords_onapp_extras const *ponapp_extras, FILE *hOutput)
 {
   fprintf(hOutput, "  id = %s\n"
     "  initial_root_password = %s\n"

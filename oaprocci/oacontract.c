@@ -340,7 +340,7 @@ void handle_onapp_action_context(struct onapp *ponapp, struct onapp_action_conte
 	{
 		if (context->onapp_dirty != OABOOL_FALSE)
 		{
-			onapp_update(ponapp->id, ponapp);
+			onapp_backend->update(ponapp->id, ponapp);
 
 		}
 	}
@@ -361,14 +361,16 @@ struct rest_response * handle_alert(int generate_alert,
 	struct rest_response *prest_response_result,
 	struct onapp *ponapp)
 {
-	struct rest_request *old_rest_request;
+	struct rest_request *rest_request_local;
+	struct rest_response *rest_response_local;
+	struct rest_header *rest_header;
 	char *name = NULL;
 	char buffer[1024];
 
 	if ((generate_alert & GA_OWN) == GA_OWN)
 	{
 		// Skip the alert_relay, we'll do it ourselves.
-		old_rest_request = poa_response->response->request;
+		rest_request_local = poa_response->response->request;
 		poa_response->response->request = prest_request;
 
 		if (prest_client != NULL && prest_client->server->method.alert != NULL)
@@ -385,7 +387,8 @@ struct rest_response * handle_alert(int generate_alert,
 			oaprocci_alert_relay_name(poa_response, prest_client, poa_response->response, buffer, poa_response->response->status, poa_response->response->message,
 				"ALERT", "REST", default_tls());
 		}
-		poa_response->response->request = old_rest_request;
+		poa_response->response->request = rest_request_local;
+		rest_request_local = NULL;
 	}
 
 	if ((generate_alert & GA_RELAY) == GA_RELAY)
@@ -393,9 +396,51 @@ struct rest_response * handle_alert(int generate_alert,
 		// ALTERNATIVELY pass the response back up the call stack, but then there's no guarantee the data won't have been altered
 		// before it reaches the alert_relay.
 		// This response pointer will ultimately end up being used to populate an alert, as well as being returned as the response.
-		prest_response_result = poa_response->response;
 
-		poa_response->response = NULL;
+		// Create a response based on the oa_response, duplicating only the useful fields.
+		if (prest_client != NULL)
+		{
+			rest_response_local = rest_allocate_response(prest_client);
+		}
+		else
+		{
+			rest_response_local = allocate_rest_response();
+		}
+
+		if (rest_response_local != NULL)
+		{
+			// Pass over body ownership.
+			rest_response_body(rest_response_local, poa_response->response->body, poa_response->response->type);
+			rest_response_body(poa_response->response, NULL, poa_response->response->type);
+
+			// If set status
+			if ((rest_response_local = rest_response_status(rest_response_local, poa_response->response->status, poa_response->response->message)))
+			{
+				// Set Content-Type
+				if ((rest_header = rest_resolve_header(poa_response->response->first, _HTTP_CONTENT_TYPE)))
+				{
+					rest_header = rest_response_header(rest_response_local, rest_header->name, rest_header->value);
+
+				}
+
+				// Set Content-Length
+				if (get_http_body_length_string(buffer, 1024, rest_response_local->type, rest_response_local->body))
+				{
+					rest_response_header(rest_response_local, _HTTP_CONTENT_LENGTH, buffer);
+
+				}
+
+				prest_response_result = rest_response_local;
+
+			} // Ends if set status
+			else // Else failed to set status
+			{
+				liberate_rest_response(rest_response_local);
+
+			} // Ends else failed to set status
+
+			rest_response_local = NULL;
+		}
 	}
 
 	return prest_response_result;
