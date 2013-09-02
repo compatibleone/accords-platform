@@ -112,7 +112,7 @@ AC_ARG_ENABLE([backend],
       [],
       [enable_backend=yes])
 AM_CONDITIONAL([ENABLE_BACKEND], [test "$enable_backend" = "yes"])
-AC_SUBST([CFLAGS_BACKEND], ["-I\${abs_top_srcdir}/backend"])
+AC_SUBST([CFLAGS_BACKEND], ["-I\${abs_top_srcdir}/backend -I\${abs_top_builddir}/backend"])
 AC_SUBST([LD_BACKEND], ["-L\${abs_top_builddir}/backend -lbackend"])
 
 AC_ARG_ENABLE([corest],

@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include "link_backend.h"
+
 private	int	purge_packets=0;
 
 /*	---------------------------------------------------	*/
@@ -94,37 +96,14 @@ private	int	connection_worker( struct cords_connection * pptr )
 {
 	int	inner=2;
 	int	outer=5;
-	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
-	char *	wptr;
 	char	packets[1024];
 	sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
 	while (!( rest_server_signal()))
 	{
-		for (	nptr=occi_first_link_node();
-			nptr != (struct occi_link_node *) 0;
-			nptr = nptr->next )
-		{
-			if (!( lptr = nptr->contents ))
-				continue;
-			else if (!( lptr->source ))
-				continue;
-			else if (!( lptr->target ))
-				continue;
-			else if (!( wptr = occi_category_id( lptr->source ) ))
-				continue;
-			else if ( strcmp( wptr, pptr->id ) != 0)
-			{
-				liberate( wptr );
-				continue;
-			}
-			else 
-			{	
-				liberate( wptr );
-				purge_connection_packets( pptr, packets, lptr->target );
-				sleep(inner);
-				continue;
-			}
+		for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+            purge_connection_packets( pptr, packets, lptr->target );
+            sleep(inner);
 		}
 		sleep(outer);
 	}
@@ -223,51 +202,29 @@ private	struct rest_response * start_connection(
 		void * vptr )
 {
 	struct	cords_connection * pptr;
-	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
-	char *	wptr;
 	if (!( pptr = vptr ))
 		return( rest_html_response( aptr, 400, "Failure" ) );
 	else if ( pptr->state )
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
-		for (	pptr->probes=0,
-			nptr=occi_first_link_node();
-			nptr != (struct occi_link_node *) 0;
-			nptr = nptr->next )
-		{
-			if (!( lptr = nptr->contents ))
-				continue;
-			else if (!( lptr->source ))
-				continue;
-			else if (!( lptr->target ))
-				continue;
-			else if (!( wptr = occi_category_id( lptr->source ) ))
-				continue;
-			else if ( strcmp( wptr, pptr->id ) != 0)
-			{
-				liberate( wptr );
-				continue;
-			}
-			else
-			{	
-				liberate( wptr );
-				if (!(zptr = cords_invoke_action( lptr->target, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
-					return( rest_html_response( aptr, 801, "Probe Start Failure" ) );
-				else if ( cords_check_invocation( zptr, aptr ) != 0 )
-				{
-					zptr = occi_remove_response( zptr );
-					return( rest_html_response( aptr, aptr->status, aptr->message ) );
-				}
-				else
-				{
-					zptr = occi_remove_response( zptr );
-					pptr->probes++;
-				}
-			}
+	    pptr->probes=0;
+	    for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+            if (!(zptr = cords_invoke_action( lptr->target, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
+                return( rest_html_response( aptr, 801, "Probe Start Failure" ) );
+            else if ( cords_check_invocation( zptr, aptr ) != 0 )
+            {
+                zptr = occi_remove_response( zptr );
+                return( rest_html_response( aptr, aptr->status, aptr->message ) );
+            }
+            else
+            {
+                zptr = occi_remove_response( zptr );
+                pptr->probes++;
+            }
 		}
 		pptr->state = 1;
 		autosave_cords_connection_nodes();

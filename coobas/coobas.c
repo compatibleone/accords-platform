@@ -33,6 +33,8 @@
 #include "cspi.h"
 #include <time.h>
 
+#include "link_backend.h"
+
 struct	accords_configuration CooBas = {
 	0,0,
 	0,0,0,0,
@@ -910,9 +912,7 @@ private	struct rest_response * process_invoice(
 /*	------------------------------------------------------------------	*/
 private	int	close_invoice_transactions( struct cords_invoice * pptr )
 {
-    struct	occi_link_node	* nptr;
     struct	cords_xlink	* lptr;
-    char 			* wptr;
     struct	occi_element 	* gptr;
     struct	occi_response 	* zptr;
     struct	occi_response 	* yptr;
@@ -920,50 +920,31 @@ private	int	close_invoice_transactions( struct cords_invoice * pptr )
     /* ----------------------------------------------------- */
     /* for all defined contract nodes of the current service */
     /* ----------------------------------------------------- */
-    for (	nptr=occi_first_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
-    {
-	if (!( lptr = nptr->contents ))
-	    continue;
-	else if (!( lptr->source ))
-	    continue;
-	else if (!( lptr->target ))
-	    continue;
-	else if (!( wptr = occi_category_id( lptr->source ) ))
-	    continue;
-	else if ( strcmp( wptr, pptr->id ) != 0)
-	{
-	    liberate( wptr );
-	    continue;
-	}
-	else	liberate( wptr );
-	
-	/* --------------------------------------------------- */
-	/* launch / invoke the required action on the contract */
-	/* --------------------------------------------------- */
-	if (!( zptr = occi_simple_get( lptr->target, _CORDS_SERVICE_AGENT, default_tls() ) ))
-	    continue;
-	/* --------------------------------------- */
-	/* retrieve the instruction value property */
-	/* --------------------------------------- */
-	else if (!(gptr = occi_locate_element(zptr->first,"occi.transaction.state" )))
-	    zptr = occi_remove_response ( zptr );
-	else
-	{
-	    
-	    if (gptr->value)
-		gptr->value = liberate(gptr->value);
-	    
-	    gptr->value = allocate_string(_CORDS_CLOSED_TRANSACTION_STATE);
-	    
-	    if (!( yptr = occi_simple_put( lptr->target, zptr->first, _CORDS_SERVICE_AGENT, default_tls() ) ))
-		continue;
-	    else	
-		yptr = occi_remove_response( yptr );
-	    
-	    zptr = occi_remove_response( zptr );
-	}
+    for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {        
+        /* --------------------------------------------------- */
+        /* launch / invoke the required action on the contract */
+        /* --------------------------------------------------- */
+        if (!( zptr = occi_simple_get( lptr->target, _CORDS_SERVICE_AGENT, default_tls() ) ))
+            continue;
+        /* --------------------------------------- */
+        /* retrieve the instruction value property */
+        /* --------------------------------------- */
+        else if (!(gptr = occi_locate_element(zptr->first,"occi.transaction.state" )))
+            zptr = occi_remove_response ( zptr );
+        else
+        {            
+            if (gptr->value)
+            gptr->value = liberate(gptr->value);
+            
+            gptr->value = allocate_string(_CORDS_CLOSED_TRANSACTION_STATE);
+            
+            if (!( yptr = occi_simple_put( lptr->target, zptr->first, _CORDS_SERVICE_AGENT, default_tls() ) ))
+            continue;
+            else	
+            yptr = occi_remove_response( yptr );
+            
+            zptr = occi_remove_response( zptr );
+        }
     }
     
 }

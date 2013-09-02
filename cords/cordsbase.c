@@ -74,7 +74,6 @@
 #include "vm.c"
 #include "manifest.c"
 #include "plan.c"
-#include "xlink.c"
 
 #include "agency.c"
 #include "enquiry.c"

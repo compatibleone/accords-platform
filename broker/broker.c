@@ -27,6 +27,8 @@
 #include "occipublisher.h"
 #include "occibuilder.h"
 
+#include "xlink.h"
+
 struct	accords_configuration Broker = {
 	0,0,
 	0,0,0,0,

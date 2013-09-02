@@ -23,6 +23,8 @@
 #include "cb.h"
 #include "cordslang.h"
 
+#include "link_backend.h"
+
 					/* ---------------------------------------------------- */
 private	int generate_service_report=1;	/* controls the generation of the service report 	*/
 					/* this report contains the current values of the state */
@@ -188,10 +190,8 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	int	flags=0;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
-	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	char			* mptr;
-	char 			* wptr;
 	int			status=0;
 	FILE *			  h;
 	char			buffer[1024];
@@ -213,25 +213,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		nptr=occi_first_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( lptr->target ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-		else	liberate( wptr );
-
+		lptr = initialise_links_list(id); NULL != lptr; lptr = next_link(id)) {
 		/* --------------------------------------------------- */
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
@@ -679,39 +661,17 @@ private	struct	rest_response * stop_service(
 private	int	delete_service_contract( struct occi_category * optr, struct cords_service * pptr )
 {
 	struct	occi_response 	* zptr;
-	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	char 			  buffer[2048];
-	char 			* wptr;
 	/* ----------------------------------------------------- */
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	buffer[0] = 0;
-	for (	nptr=occi_first_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( lptr->target ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, pptr->id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-		else
-		{
-			liberate( wptr );
-			if (!( buffer[0] ))
-				strcpy( buffer, lptr->source );
-			if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
-				zptr = occi_remove_response ( zptr );
-		}
+	for ( lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+        if (!( buffer[0] ))
+            strcpy( buffer, lptr->source );
+        if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+            zptr = occi_remove_response ( zptr );
 	}
 
 	/* ----------------------------- */

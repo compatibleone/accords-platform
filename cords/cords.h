@@ -97,6 +97,4 @@
 #include "guarantee.h" 
 #include "business.h"
 
-#include "xlink.h"
-
 #endif

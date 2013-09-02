@@ -43,6 +43,8 @@
 #include "json.h"
 #include "restclient.h"
 
+#include "link_backend.h"
+
 struct	accords_authorization
 {
 	struct	accords_authorization * previous;

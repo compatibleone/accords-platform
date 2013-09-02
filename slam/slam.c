@@ -29,6 +29,8 @@
 #include "occiresolver.h"
 #include "cordslang.h"
 
+#include "link_backend.h"
+
 struct	accords_configuration Slam = {
 	0,0,
 	0,0,0,0,
@@ -158,13 +160,11 @@ private	struct rest_response * instance_agreement(
 	struct	occi_element  	* eptr;
 	struct	occi_client 	* kptr;
 	struct	cords_xlink	* lptr;
-	struct	occi_link_node  * nptr;
 	struct	cords_agreement * pptr;
 	struct	occi_request 	* qptr;
 	struct	occi_response 	* xptr;
 	struct	occi_response 	* yptr;
 	char *	manifest;
-	char *	wptr;
 	char *	ihost;
 	char	buffer[2048];
 	char	self[2048];
@@ -183,24 +183,7 @@ private	struct rest_response * instance_agreement(
 	/* ----------------------------- */
 	/* retrieve manifest description */
 	/* ----------------------------- */
-	for (	nptr=occi_first_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( lptr->target ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, pptr->id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-
+	for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
 		/* ------------------------- */
 		/* retrieve the terms record */
 		/* ------------------------- */

@@ -20,6 +20,9 @@
 
 #include "occibody.h"
 #include "xlink.h"
+
+#include "link_backend.h"
+
 /*	------------------------------------------------------------	*/
 /*		o c c i _ c o n s u m e _ h e a d e r 			*/
 /*	------------------------------------------------------------	*/
@@ -472,7 +475,6 @@ public	char *	occi_html_body(
 	char *	vptr;
 	char *	xptr;
 	char *	name;
-	char *	wptr;
 	int	attributs=0;
 	int	locations=0;
 	int	formactions=0;
@@ -480,7 +482,6 @@ public	char *	occi_html_body(
 	char *	publisher;
 	struct	occi_action * aptr;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
-	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
 	int	linkto=0;
 	int	allow_methods=1;
@@ -615,21 +616,8 @@ public	char *	occi_html_body(
 			/* generate the list of links if available */
 			/* --------------------------------------- */
 			fprintf(h,"<tr><th>Links</th><td><div align=center><table>\n");
-			for (	nptr=occi_first_link_node();
-				nptr != (struct occi_link_node *) 0;
-				nptr = nptr->next )
-			{
-				if (!( lptr = nptr->contents ))
-					continue;
-				else if (!( lptr->source ))
-					continue;
-				else if (!( lptr->target ))
-					continue;
-				else if (!( wptr = occi_category_id( lptr->source ) ))
-					continue;
-				else if ( strcmp( wptr, id ) != 0)
-					continue;
-				else	fprintf(h,"<tr><td><a href='%s'>%s</a>",lptr->target,lptr->target);
+			for ( lptr = initialise_links_list(id);	NULL != lptr; lptr = next_link(id)) {
+				fprintf(h,"<tr><td><a href='%s'>%s</a>",lptr->target,lptr->target);
 			}
 			fprintf(h,"</table></div></td></tr>\n");
 

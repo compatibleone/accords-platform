@@ -22,6 +22,9 @@
 #include "occiresolver.h"
 #include "cp.h"
 
+#include "xlink.h"
+#include "link_backend.h"
+
 /*	---------------------------------------------------------	*/
 /*	r e t r i e v e _ p r o v i d e r _ i n f o r m a t i o n	*/
 /*	---------------------------------------------------------	*/
@@ -870,9 +873,7 @@ private	struct	rest_response * snapshot_contract(
 private	int	delete_generic_contract( struct occi_category * optr, struct cords_contract * pptr )
 {
 	struct	occi_response 	* zptr = NULL;
-	struct	occi_link_node  * nptr = NULL;
 	struct	cords_xlink	* lptr = NULL;
-	char 			* wptr = NULL;
 	char			buffer[2048];
 
 	buffer[0] = 0;
@@ -894,32 +895,12 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	/* ----------------------------------------------------- */
 	/* for all defined instructions of the current contract  */
 	/* ----------------------------------------------------- */
-	for (	nptr=occi_first_link_node(); 
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( lptr->target ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, pptr->id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-		else
-		{
-			liberate( wptr );
-			if (!( buffer[0] ))
-				strcpy(buffer, lptr->source );
-			if (!( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )))
-				continue;
-			else	zptr = occi_remove_response( zptr );
-		}
+	for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+        if (!( buffer[0] ))
+            strcpy(buffer, lptr->source );
+        if (!( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )))
+            continue;
+        else	zptr = occi_remove_response( zptr );
 	}
 
 	/* -------------------------------------------- */

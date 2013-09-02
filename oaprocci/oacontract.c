@@ -32,6 +32,7 @@
 #include "onapp_extras.h"
 #include "oaclient.h"
 #include "cb.h"
+#include "oaconfig_occi_filter.h"
 #include "onapp_helpers.h"
 #include "oaconfig_backend_interface.h"
 #include "oaconfig_occi_filter.h"
