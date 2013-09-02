@@ -115,9 +115,6 @@ def category_filters():
     for name, _ in category.backend_type_list():
         cog.outl('int {0};'.format(name))
     
-def h_include():
-    cog.outl("#include \"{0}\"".format(category_file))
-    
 def pass_category_filter():
     category_name = _category_name()
     _format_category(None,                      

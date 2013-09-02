@@ -8,4 +8,22 @@
 	[[[end]]]
 };
 
+struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ * allocate_
+[[[cog t.category_name()]]]
+[[[end]]] 
+();
+struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ * liberate_
+[[[cog t.category_name()]]]
+[[[end]]] 
+(struct 
+[[[cog t.category_name()]]]
+[[[end]]] 
+ * optr);
+
 #endif
