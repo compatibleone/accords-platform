@@ -1,5 +1,8 @@
 [[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file) ]]]
 [[[end]]]
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
 
 #include "standard.h"
 #include "occi.h"
@@ -22,6 +25,22 @@ _backend_interface.h"
 [[[end]]] 
 _node_backend.h"
 #include "backend_common.h"
+
+#include "backend_profiling.h"
+
+#ifdef BACKEND_PROFILING
+static struct backend_profile 
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_backend_profile;
+static void 
+[[[cog t.category_name()]]]
+[[[end]]]
+_count_filters(struct 
+[[[cog t.category_name()]]]
+[[[end]]]
+_occi_filter *filter, filter_count *counts);
+#endif
 
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
@@ -537,6 +556,20 @@ public  void autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _nodes() {
+#ifdef BACKEND_PROFILING
+    char filename_buffer[256];
+    strcpy(filename_buffer, autosave_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_name);
+    char *last_dot = strrchr(filename_buffer, '.');
+    assert(last_dot);
+    strcpy(last_dot, ".csv");
+    save_backend_profile(filename_buffer, &
+[[[cog t.filename_root()]]]
+[[[end]]] 
+_backend_profile);
+#endif
 	char * fn=autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -632,6 +665,8 @@ private struct
 [[[cog t.category_name()]]]
 [[[end]]] 
 _retrieve_from_id(char *id) {
+[[[cog t.profile('retrieve_from_ids')]]]
+[[[end]]]
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
@@ -661,6 +696,8 @@ _create(int allocate_uuid, struct
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ) {
+[[[cog t.profile('creates')]]]
+[[[end]]]
 	struct 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -695,6 +732,8 @@ private void
 [[[cog t.category_name()]]]
 [[[end]]] 
 _del(char *id) {
+[[[cog t.profile('deletes')]]]
+[[[end]]]
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
@@ -757,6 +796,8 @@ _update(char *id, struct
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ) {
+[[[cog t.profile('updates')]]]
+[[[end]]]
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
@@ -827,6 +868,8 @@ _list_ids(struct
 [[[cog t.category_name()]]]
 [[[end]]] 
 _occi_filter *filter) {
+[[[cog t.profile('lists', 'list_counts')]]]
+[[[end]]]
 	 
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -886,6 +929,8 @@ _retrieve_from_filter(struct
 [[[cog t.category_name()]]]
 [[[end]]] 
 _occi_filter *filter) {
+[[[cog t.profile('retrieve_from_filters', 'retrieve_from_counts')]]]
+[[[end]]]
 	
 [[[cog t.filename_root()]]]
 [[[end]]] 
@@ -983,8 +1028,7 @@ _id_list *list) {
 	list->count = 0;
 }
 
-void 
-free_
+void free_
 [[[cog t.filename_root()]]]
 [[[end]]] 
 _list(
@@ -1005,6 +1049,8 @@ _delete_all_matching_filter(struct
 [[[cog t.category_name()]]]
 [[[end]]] 
 _occi_filter *filter) {
+[[[cog t.profile('delete_from_filters', 'delete_from_counts')]]]
+[[[end]]]
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
@@ -1057,7 +1103,28 @@ _init() {
 _nodes();
 }
 
-void  
+void 
 [[[cog t.category_name()]]]
 [[[end]]]
 _finalise() {}
+
+#ifdef BACKEND_PROFILING
+[[[cog t.count_filters()]]]
+[[[end]]]
+    switch (count) {
+    case 0:
+        counts->zeros++;
+        break;
+    case 1:
+        counts->ones++;
+        break;
+    case 2:
+        counts->twos++;
+        break;
+    default:
+        counts->mores++;
+        break;
+    }
+}
+#endif
+       

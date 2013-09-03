@@ -424,3 +424,22 @@ private struct {0}* {0}_retrieve_from_name(const char *name) {{
     pthread_mutex_unlock( &list_{0}_control );
     return( retVal );
 }}""".format(_category_name()))           
+        
+def profile(function_name, filter_name = None):
+    cog.outl(
+"""#ifdef BACKEND_PROFILING
+    {0}_backend_profile.{1}++;""".format(_filename_root(), function_name))
+    if filter_name:
+        cog.outl("    {2}_count_filters(filter, &{0}_backend_profile.{1});".format(
+            _filename_root(), filter_name, _category_name()))
+    cog.outl("#endif")
+    
+def count_filters():
+    cog.outl(
+"""void {0}_count_filters(struct {0}_occi_filter *filter, filter_count *counts) {{
+    int count = 0;""".format(_category_name()))
+    _format_category(None,
+                     "    if (filter->{0}) count++;",
+                     "    if (filter->{0}) count++;") 
+                      
+    
