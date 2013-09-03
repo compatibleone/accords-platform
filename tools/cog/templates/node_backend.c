@@ -557,15 +557,10 @@ public  void autosave_
 [[[end]]] 
 _nodes() {
 #ifdef BACKEND_PROFILING
-    char filename_buffer[256];
-    strcpy(filename_buffer, autosave_
+    save_backend_profile(autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_name);
-    char *last_dot = strrchr(filename_buffer, '.');
-    assert(last_dot);
-    strcpy(last_dot, ".csv");
-    save_backend_profile(filename_buffer, &
+_name, &
 [[[cog t.filename_root()]]]
 [[[end]]] 
 _backend_profile);

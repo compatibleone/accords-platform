@@ -10,9 +10,14 @@ static void print_filter_count_counts(FILE *file, const filter_count *counts) {
     fprintf(file, ",%u,%u,%u,%u", counts->zeros, counts->ones, counts->twos, counts->mores);    
 }
 
-void save_backend_profile(const char *filename, const struct backend_profile *profile) {
-    printf("\n\n\n************** HELLO World! **********************\n\n\n");
-    FILE *f = fopen(filename, "w+");
+void save_backend_profile(const char *xml_filename, const struct backend_profile *profile) {
+    char filename_buffer[256];
+    strcpy(filename_buffer, xml_filename);
+    char *last_dot = strrchr(filename_buffer, '.');
+    assert(last_dot);
+    strcpy(last_dot, ".csv");
+    
+    FILE *f = fopen(filename_buffer, "w+");
     if (!f) {
         printf("\n\n******************** Unable to open file %s for writing ***************\n\n", filename);
         return;
