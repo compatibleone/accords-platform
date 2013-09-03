@@ -519,6 +519,8 @@ private	struct	rest_response * start_service(
 			case	2	:
 				return( rest_html_response( aptr, 410, "After Service Expiration" ) );
 			case	0	:
+				pptr->state = _OCCI_RUNNING;
+				autosave_cords_service_nodes();
 				service_action( pptr, pptr->id, _CORDS_START );
 				pptr->when  = time((long*) 0);
 				pptr->state = _OCCI_RUNNING;
