@@ -265,68 +265,6 @@ private	int	occi_standard_security(
 	return(1);
 }
 
-/*	---------------------------------------------	*/
-/*	o c c i _ n e x t _ c a t e g o r y _ l i n k	*/
-/*	---------------------------------------------	*/
-/*	category link filtering to select a specific	*/
-/*	category instance collection of links.		*/
-/*	---------------------------------------------	*/
-public struct  occi_link_node * occi_next_category_link( 
-		struct occi_link_node * nptr, 
-		char * category, 
-		char * id )
-{
-	struct	cords_xlink	* lptr;
-	struct	url * uptr;
-	char	buffer[1024];
-	/* -------------------- */
-	/* check the parameters */
-	/* -------------------- */
-	if (!( nptr ))
-		return( nptr );
-	else if (!( category ))
-		return( nptr );
-	else if (!( id ))
-		return( nptr );
-	{
-		/* --------------------------------------------- */
-		/* build the source category instance identifier */
-		/* --------------------------------------------- */
-		sprintf(buffer,"/%s/%s",category,id);
-
-		/* ---------------------------------------- */
-		/* scan the list of category instance links */
-		/* ---------------------------------------- */
-		while ( nptr )
-		{
-			if (( lptr = nptr->contents ) != (struct cords_xlink *) 0)
-			{
-				if (( uptr = analyse_url( lptr->source ) ) != (struct url *) 0)
-				{
-					if (!( strcmp( uptr->object, buffer ) ))
-						break;
-					uptr = liberate_url( uptr );
-				}
-			}
-			nptr = nptr->next;
-		}
-		if ( uptr )
-			uptr = liberate_url( uptr );
-
-		return( nptr );
-	}
-}
-
-/*	-----------------------------------------------		*/
-/*	o c c i _ f i r s t _ c a t e g o r y _ l i n k		*/
-/*	-----------------------------------------------		*/
-public struct  occi_link_node * occi_first_category_link( 
-		char * category, 
-		char * id )
-{
-	return( occi_next_category_link( occi_first_link_node(), category, id ) );
-}
-
 /*	---------------------------------------------------------	*/
 /*			o c c i _ s e c u r i t y			*/
 /*	---------------------------------------------------------	*/
