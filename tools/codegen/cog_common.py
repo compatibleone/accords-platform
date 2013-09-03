@@ -432,6 +432,7 @@ def profile(function_name, filter_name = None):
     if filter_name:
         cog.outl("    {2}_count_filters(filter, &{0}_backend_profile.{1});".format(
             _filename_root(), filter_name, _category_name()))
+    cog.outl("    save_backend_profile(autosave_{0}_name, &{1}_backend_profile);".format(_category_name(), _filename_root()))
     cog.outl("#endif")
     
 def count_filters():

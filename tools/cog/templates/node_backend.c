@@ -556,15 +556,6 @@ public  void autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _nodes() {
-#ifdef BACKEND_PROFILING
-    save_backend_profile(autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_name, &
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_backend_profile);
-#endif
 	char * fn=autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 

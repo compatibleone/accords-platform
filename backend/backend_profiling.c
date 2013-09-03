@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include <assert.h>
 
 #include "backend_profiling.h"
 
@@ -19,7 +21,7 @@ void save_backend_profile(const char *xml_filename, const struct backend_profile
     
     FILE *f = fopen(filename_buffer, "w+");
     if (!f) {
-        printf("\n\n******************** Unable to open file %s for writing ***************\n\n", filename);
+        printf("\n\n******************** Unable to open file %s for writing ***************\n\n", filename_buffer);
         return;
     }
     
