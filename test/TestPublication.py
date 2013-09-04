@@ -35,7 +35,7 @@ class TestPublication(unittest.TestCase):
         pass
     
     def test_that_get_all_returns_status_okay(self):
-        r = requests.get(_request_root)
+        r = self._get(_request_root)
         
         assert_that(r.status_code, is_(requests.codes.ok))
 
@@ -46,7 +46,7 @@ class TestPublication(unittest.TestCase):
         return None
     
     def test_that_post_creates_new_entry_and_returns_id(self):        
-        r = requests.post(_request_root)
+        r = self._post(_request_root)
         
         response = r.text
         id = self._find_id_of_entry(response) 
@@ -55,54 +55,54 @@ class TestPublication(unittest.TestCase):
         assert_that(id, is_not(None))
         
     def test_that_get_returns_not_found_if_id_invalid(self):
-        r = requests.get(_request_root + "arbitrary_id")
+        r = self._get(_request_root + "arbitrary_id")
         
         assert_that(r.status_code, is_(requests.codes.not_found))
         
     def test_that_delete_returns_not_found_if_id_invalid(self):
-        r = requests.delete(_request_root + "arbitrary_id")
+        r = self._delete(_request_root + "arbitrary_id")
         
         assert_that(r.status_code, is_(requests.codes.not_found))
         
     def test_that_delete_returns_ok_if_id_is_valid(self):
-        r = requests.post(_request_root)
+        r = self._post(_request_root)
         id = self._find_id_of_entry(r.text)
         
-        r = requests.delete(_request_root + id) 
+        r = self._delete(_request_root + id) 
         
         assert_that(r.status_code, is_(requests.codes.ok))
         
     def test_that_delete_deletes_entry(self):
-        r = requests.post(_request_root)
+        r = self._post(_request_root)
         id = self._find_id_of_entry(r.text)
         
-        requests.delete(_request_root + id) 
-        r = requests.get(_request_root + id)
+        self._delete(_request_root + id) 
+        r = self._get(_request_root + id)
         
         assert_that(r.status_code, is_(requests.codes.not_found))
         
     def test_that_delete_all_deletes_all_entries(self):
-        requests.post(_request_root)
+        self._post(_request_root)
         
-        requests.delete(_request_root)
-        r = requests.get(_request_root)   
+        self._delete(_request_root)
+        r = self._get(_request_root)   
         responses = self._find_ids_of_all_entries(r.text)
         
         assert_that(len(responses), is_(0))
         
     def test_that_delete_responds_ok(self):
-        requests.post(_request_root)
+        self._post(_request_root)
         
-        r = requests.delete(_request_root)
+        r = self._delete(_request_root)
         
         assert_that(r.status_code, is_(requests.codes.ok))
         
          
     def test_that_get_returns_ok_if_id_is_valid(self):
-        r = requests.post(_request_root)
+        r = self._post(_request_root)
         id = self._find_id_of_entry(r.text)
         
-        r = requests.get(_request_root + id) 
+        r = self._get(_request_root + id) 
         
         assert_that(r.status_code, is_(requests.codes.ok))        
         
@@ -112,10 +112,10 @@ class TestPublication(unittest.TestCase):
     
     def test_that_get_all_returns_list_of_ids(self):
         # Ensure that at least two entries exist      
-        requests.post(_request_root)   
-        requests.post(_request_root)
+        self._post(_request_root)   
+        self._post(_request_root)
         
-        r = requests.get(_request_root)
+        r = self._get(_request_root)
     
         responses = self._find_ids_of_all_entries(r.text)
         
@@ -131,7 +131,7 @@ class TestPublication(unittest.TestCase):
         return None
     
     def test_that_put_on_invalid_id_returns_not_found(self):
-        r = requests.put(_request_root + "arbitrary_id_string")
+        r = self._put(_request_root + "arbitrary_id_string")
         
         assert_that(r.status_code, is_(requests.codes.not_found))
         
@@ -146,7 +146,7 @@ class TestPublication(unittest.TestCase):
         operator = u"Bob"        
         put_headers = self._headers_with_attribute(attr_name, operator)
         
-        r = requests.put(_request_root + id, None, headers = put_headers)
+        r = self._put(_request_root + id, headers = put_headers)
         response = r.text
         
         assert_that(r.status_code, is_(requests.codes.ok))
@@ -158,8 +158,8 @@ class TestPublication(unittest.TestCase):
         operator = u"Bob"        
         put_headers = self._headers_with_attribute(attr_name, operator)
         
-        requests.put(_request_root + id, None, headers = put_headers)
-        r = requests.get(_request_root + id)
+        self._put(_request_root + id, headers = put_headers)
+        r = self._get(_request_root + id)
         response = r.text        
         
         assert_that(self._find_attribute(response, attr_name), is_(operator))
@@ -169,10 +169,10 @@ class TestPublication(unittest.TestCase):
         operator = u"Bob"        
         post_headers = self._headers_with_attribute(attr_name, operator)
         
-        r = requests.post(_request_root, None, headers = post_headers)
+        r = self._post(_request_root, None, headers = post_headers)
         id = self._find_id_of_entry(r.text)
         
-        r = requests.get(_request_root + id)
+        r = self._get(_request_root + id)
         response = r.text
         assert_that(self._find_attribute(response, attr_name), is_(operator))
         
@@ -181,24 +181,24 @@ class TestPublication(unittest.TestCase):
         operator = u"Bob"       
         post_headers = self._headers_with_attribute(attr_name, operator)
         put_headers = self._headers_with_attribute('identity', 'anything')        
-        r = requests.post(_request_root, None, headers = post_headers)
+        r = self._post(_request_root, None, headers = post_headers)
         id = self._find_id_of_entry(r.text)
                 
-        requests.put(_request_root + id, None, headers = put_headers)
+        self._put(_request_root + id, headers = put_headers)
         
-        r = requests.get(_request_root + id)
+        r = self._get(_request_root + id)
         response = r.text        
         assert_that(self._find_attribute(response, attr_name), is_(operator))        
         
     def _create_entry(self):
-        r = requests.post(_request_root)
+        r = self._post(_request_root)
         return self._find_id_of_entry(r.text)
 
     def test_suspend_action_returns_okay_status(self):
         id = self._create_entry()        
         post_data = {'action':'suspend'}
         
-        r = requests.post(_request_root + id, params = post_data)
+        r = self._post(_request_root + id, params = post_data)
         
         assert_that(r.status_code, is_(requests.codes.ok))
 
@@ -206,7 +206,7 @@ class TestPublication(unittest.TestCase):
         id = self._create_entry()        
         post_data = {'action':'restart'}
         
-        r = requests.post(_request_root + id, params = post_data)
+        r = self._post(_request_root + id, params = post_data)
         
         assert_that(r.status_code, is_(requests.codes.ok))
         
@@ -214,13 +214,38 @@ class TestPublication(unittest.TestCase):
         id = self._create_entry()        
         post_data = {'action':'restart'}        
         
-        requests.post(_request_root + id, params = post_data)        
-        response = requests.get(_request_root + id).text
+        self._post(_request_root + id, params = post_data)        
+        response = self._get(_request_root + id).text
         
         assert_that(self._find_attribute(response, 'uptime'), is_("0"))
         time_now = calendar.timegm(time.gmtime())
         self.assertAlmostEqual(int(self._find_attribute(response, 'when')), time_now, delta = 2)
         assert_that(self._find_attribute(response, 'state'), is_("1"))
+        
+    def _post(self, url, params = None, headers = None):
+        if headers:
+            headers['accept'] = 'text'
+        else:
+            headers = {'accept' : 'text'}
+        if params:
+            return requests.post(url, params=params, headers=headers)
+        else:
+            return requests.post(url, None, headers=headers)
+        
+    def _get(self, url):
+        headers = {'accept' : 'text'}
+        return requests.get(url, headers=headers)
+    
+    def _delete(self, url):
+        headers = {'accept' : 'text'}
+        return requests.delete(url, headers=headers)
+    
+    def _put(self, url, headers = None):
+        if headers:
+            headers['accept'] = 'text'
+        else:
+            headers = {'accept' : 'text'}
+        return requests.put(url, None, headers=headers)
         
         
 
