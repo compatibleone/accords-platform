@@ -349,7 +349,7 @@ private void   CATEGORY_NAME_update(char *id, struct CATEGORY_NAME *updated_FILE
 [[[end]]] 
 _node *node = ll_locate_CATEGORY_NAME_node(id);
 	if(node) {
-		ll_CATEGORY_NAME_rebase_node_contents(node, updated_FILENAME_ROOT);
+		ll_CATEGORY_NAME_rebase_node_contents(node, clone_CATEGORY_NAME(updated_FILENAME_ROOT));
 	}
     pthread_mutex_unlock( &list_CATEGORY_NAME_control );
 	autosave_CATEGORY_NAME_nodes();

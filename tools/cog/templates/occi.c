@@ -257,9 +257,11 @@ private struct rest_response * CATEGORY_NAME_put_item(
 	if (iptr) {
 		CATEGORY_NAME_execute_callback(iptr->update, FILENAME_ROOT, optr, rptr);
 	}
-	 CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
-	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_update, FILENAME_ROOT, optr, rptr); }
-	return CATEGORY_NAME_occi_response(optr, cptr, rptr, aptr, FILENAME_ROOT);
+	CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
+	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->post_update, FILENAME_ROOT, optr, rptr); }
+	struct CATEGORY_NAME *retVal = CATEGORY_NAME_occi_response(optr, cptr, rptr, aptr, FILENAME_ROOT);
+	liberate_CATEGORY_NAME(FILENAME_ROOT);
+	return retVal;
 }
 
 /*	------------------------------------------------------------------------------------------	*/
