@@ -17,7 +17,7 @@ function AgreementList( $selector )
 		$termss   = $agreement["occi.agreement.termss"];
 
 		$url = $baseurl#"?action=compile&script=csp-agreement.txt&output=HTML&option="#$name;
-		$m = "<tr><td><a href='"#$url#"'>"#$name#"</a>";
+		$m = "<tr><td><a href='"#$url#"'>Inspect Agreement<br>"#$name#"</a>";
 		$m.display();
 
 		$a        = $agreement["occi.agreement.initiator"];
@@ -38,7 +38,7 @@ function AgreementList( $selector )
 		
 		$m = "<td>"#$expires#"<td>"#$termss#"</td>";
 		$m.display();
-		$m = "<td><a href='"#$baseurl#"?action=createservice&upload=plan_sla-"#$name#".xml'><img width=64 height=64 src='images/service.png'></a>";
+		$m = "<td><a href='"#$baseurl#"?action=createservice&upload=plan_sla-"#$name#".xml'>Create Service Instance<br><img width=64 height=64 src='images/service.png'></a>";
 		$m.display();
 	}
 	"</table>".display();
