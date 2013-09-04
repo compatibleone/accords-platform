@@ -666,6 +666,8 @@ private	struct	rest_response * stop_service(
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
+			pptr->state = _OCCI_IDLE;
+			autosave_cords_service_nodes();
 			reverse_service_action( pptr, pptr->id, _CORDS_STOP );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_IDLE;
