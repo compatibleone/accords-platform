@@ -1152,6 +1152,7 @@ public	int	delete_onapp_contract(
 	struct	oa_response * oaptr;
 	int result = 0;
 	struct onapp_action_context context = onapp_action_context_crud_default;
+	context.onapp_clone = OABOOL_TRUE; // Delete CRUD operations liberate onapp *.
 
 	if (1)
 	{
@@ -1170,7 +1171,6 @@ public	int	delete_onapp_contract(
 	pptr->state = _OCCI_IDLE;
 	pptr->build_state = allocate_string("deleted");
 	context.onapp_dirty = OABOOL_TRUE;
-	context.onapp_clone = OABOOL_TRUE; // Delete CRUD operations liberate onapp *.
 	handle_onapp_action_context(pptr, &context);
 
 	return result;
