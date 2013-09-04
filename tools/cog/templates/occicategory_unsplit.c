@@ -23,23 +23,11 @@
 /* ---------------------------------------------------------------------------- */
 
 /* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _occi
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_c_
-#define _occi
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_c_
+#ifndef _occiFILENAME_ROOT_c_
+#define _occiFILENAME_ROOT_c_
 
-#include "
-[[[cog t.filename_root()]]]
-[[[end]]] 
-.h"
-#include "
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_occi_filter.h"
+#include "FILENAME_ROOT.h"
+#include "FILENAME_ROOT_occi_filter.h"
 
 /*	--------------------------------------------	*/
 /*	o c c i _ 
@@ -51,44 +39,20 @@ _occi_filter.h"
 /*	--------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/
 /*	--------------------------------------------------------------------	*/
-struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * allocate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-();
-struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * liberate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-(struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * optr);
-private pthread_mutex_t list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control=PTHREAD_MUTEX_INITIALIZER;
+struct CATEGORY_NAME * allocate_CATEGORY_NAME();
+struct CATEGORY_NAME * liberate_CATEGORY_NAME(struct CATEGORY_NAME * optr);
+private pthread_mutex_t list_CATEGORY_NAME_control=PTHREAD_MUTEX_INITIALIZER;
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_first = (struct occi_
+_node * CATEGORY_NAME_first = (struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node *) 0;
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_last  = (struct occi_
+_node * CATEGORY_NAME_last  = (struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node *) 0;
@@ -98,20 +62,14 @@ public struct  occi_
 _node * occi_first_
 [[[cog t.node_category()]]]
 [[[end]]] 
-_node() { return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_first ); }
+_node() { return( CATEGORY_NAME_first ); }
 public struct  occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * occi_last_
 [[[cog t.node_category()]]]
 [[[end]]] 
-_node() { return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_last ); }
+_node() { return( CATEGORY_NAME_last ); }
 
 /*	----------------------------------------------	*/
 /*	o c c i   c a t e g o r y   d r o p   n o d e 	*/
@@ -119,25 +77,16 @@ _last ); }
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * ll_drop_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(struct occi_
+_node * ll_drop_CATEGORY_NAME_node(struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr) {
 	if ( nptr ) {
 	if (!( nptr->previous ))
-		
-[[[cog t.category_name()]]]
-[[[end]]] 
-_first = nptr->next;
+		CATEGORY_NAME_first = nptr->next;
 	else	nptr->previous->next = nptr->next;
 	if (!( nptr->next ))
-		
-[[[cog t.category_name()]]]
-[[[end]]] 
-_last = nptr->previous;
+		CATEGORY_NAME_last = nptr->previous;
 	else	nptr->next->previous = nptr->previous;
 		liberate_occi_
 [[[cog t.node_type()]]]
@@ -152,25 +101,13 @@ _node *)0);
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * drop_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(struct occi_
+_node * drop_CATEGORY_NAME_node(struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr) {
-	pthread_mutex_lock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
-	nptr = ll_drop_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node( nptr );
-	pthread_mutex_unlock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
+	pthread_mutex_lock( &list_CATEGORY_NAME_control );
+	nptr = ll_drop_CATEGORY_NAME_node( nptr );
+	pthread_mutex_unlock( &list_CATEGORY_NAME_control );
 	return(nptr);
 }
 
@@ -180,22 +117,13 @@ _control );
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * ll_locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(char * id) {
+_node * ll_locate_CATEGORY_NAME_node(char * id) {
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
-	for ( nptr = 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_first;
+	struct CATEGORY_NAME * pptr;
+	for ( nptr = CATEGORY_NAME_first;
 		nptr != (struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
@@ -210,26 +138,14 @@ _node *) 0;
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(char * id) {
+_node * locate_CATEGORY_NAME_node(char * id) {
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	pthread_mutex_lock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
-	nptr = ll_locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id);
-	pthread_mutex_unlock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
+	pthread_mutex_lock( &list_CATEGORY_NAME_control );
+	nptr = ll_locate_CATEGORY_NAME_node(id);
+	pthread_mutex_unlock( &list_CATEGORY_NAME_control );
 	return( nptr );
 }
 
@@ -239,28 +155,19 @@ _control );
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * ll_add_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(int mode) {
+_node * ll_add_CATEGORY_NAME_node(int mode) {
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	if (!( nptr = allocate_occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node() ))
 		return( nptr );
 	else	{
-		if (!( nptr->contents = allocate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-()))
+		if (!( nptr->contents = allocate_CATEGORY_NAME()))
 			return( liberate_occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
@@ -276,19 +183,10 @@ _node(nptr) );
 [[[end]]] 
 _node(nptr) );
 		else	{
-			if (!( nptr->previous = 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_last ))
-				
-[[[cog t.category_name()]]]
-[[[end]]] 
-_first = nptr;
+			if (!( nptr->previous = CATEGORY_NAME_last ))
+				CATEGORY_NAME_first = nptr;
 			else	nptr->previous->next = nptr;
-			
-[[[cog t.category_name()]]]
-[[[end]]] 
-_last = nptr;
+			CATEGORY_NAME_last = nptr;
 			return( nptr );
 			}
 		}
@@ -296,74 +194,38 @@ _last = nptr;
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * add_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(int mode) {
+_node * add_CATEGORY_NAME_node(int mode) {
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	pthread_mutex_lock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
-	nptr = ll_add_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node( mode );
-	pthread_mutex_unlock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
+	pthread_mutex_lock( &list_CATEGORY_NAME_control );
+	nptr = ll_add_CATEGORY_NAME_node( mode );
+	pthread_mutex_unlock( &list_CATEGORY_NAME_control );
 	return(nptr);
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private char*autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_name="
-[[[cog t.category_name()]]]
-[[[end]]] 
-.xml";
-private void autoload_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_nodes() {
-	char * fn=autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_name;	struct occi_
+private char*autosave_CATEGORY_NAME_name="CATEGORY_NAME.xml";
+private void autoload_CATEGORY_NAME_nodes() {
+	char * fn=autosave_CATEGORY_NAME_name;	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	struct xml_element * document;
 	struct xml_element * eptr;
 	struct xml_element * vptr;
 	struct xml_atribut  * aptr;
 	if (!( document = document_parse_file(fn)))
 		return;
-	if ((eptr = document_element(document,"
-[[[cog t.category_name()]]]
-[[[end]]] 
-s")) != (struct xml_element *) 0) {
+	if ((eptr = document_element(document,"CATEGORY_NAMEs")) != (struct xml_element *) 0) {
 		for (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {
 			if (!( vptr->name )) continue;
-			else if ( strcmp( vptr->name, "
-[[[cog t.category_name()]]]
-[[[end]]] 
-" ) ) continue;
-			else if (!( nptr = add_
-[[[cog t.category_name()]]]
-[[[end]]] 					
-_node(0))) break;
+			else if ( strcmp( vptr->name, "CATEGORY_NAME" ) ) continue;
+			else if (!( nptr = add_CATEGORY_NAME_node(0))) break;
 			else if (!( pptr = nptr->contents )) break;
 			[[[cog t.load_attributes()]]]
 			[[[end]]]
@@ -376,84 +238,45 @@ _node(0))) break;
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/
 /*	------------------------------------------------------------------------------------------	*/
-public  void set_autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_name(char * fn) {
-	autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_name = fn;	return;
+public  void set_autosave_CATEGORY_NAME_name(char * fn) {
+	autosave_CATEGORY_NAME_name = fn;	return;
 }
-public  void autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_nodes() {
-	char * fn=autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_name;	struct occi_
+public  void autosave_CATEGORY_NAME_nodes() {
+	char * fn=autosave_CATEGORY_NAME_name;	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	FILE * h;
-	pthread_mutex_lock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
+	pthread_mutex_lock( &list_CATEGORY_NAME_control );
 	if (( h = fopen(fn,"w")) != (FILE *) 0) {
-	fprintf(h,"<
-[[[cog t.category_name()]]]
-[[[end]]] 
-s>\n");
-	for ( nptr = 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_first;
+	fprintf(h,"<CATEGORY_NAMEs>\n");
+	for ( nptr = CATEGORY_NAME_first;
 		nptr != (struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node *) 0;
 		nptr = nptr->next ) {
 		if (!( pptr = nptr->contents )) continue;
-		fprintf(h,"<
-[[[cog t.category_name()]]]
-[[[end]]] 
-\n");
+		fprintf(h,"<CATEGORY_NAME\n");
 		[[[cog t.save_attributes()]]]
 		[[[end]]]
 		fprintf(h," />\n");
 		}
-	fprintf(h,"</
-[[[cog t.category_name()]]]
-[[[end]]] 
-s>\n");
+	fprintf(h,"</CATEGORY_NAMEs>\n");
 	fclose(h);
 	}
-	pthread_mutex_unlock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
+	pthread_mutex_unlock( &list_CATEGORY_NAME_control );
 	return;
 }
 
 /*	------------------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a c t i v a t e   f i l t e r 	*/
 /*	------------------------------------------------------------------------------------------------------	*/
-private void activate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_filter_on_field(
+private void activate_CATEGORY_NAME_filter_on_field(
 	struct occi_category * cptr,void * target_void, char * field_name)
 {
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter * target;
+	struct CATEGORY_NAME_occi_filter * target;
 	char prefix[1024];
 	if (!( target = target_void )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
@@ -468,16 +291,10 @@ _occi_filter * target;
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private void set_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_field(
+private void set_CATEGORY_NAME_field(
 	struct occi_category * cptr,void * target_void, char * field_name, char * value)
 {
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	char prefix[1024];
 	if (!( pptr = target_void )) return;
 	sprintf(prefix,"%s.%s.",cptr->domain,cptr->id);
@@ -492,57 +309,27 @@ _field(
 /*	--------------------------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i l t e r   o n   f i e l d 	*/
 /*	--------------------------------------------------------------------------------------------------------------	*/
-private void set_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_filter_on_field(
+private void set_CATEGORY_NAME_filter_on_field(
 	struct occi_category * category, void * target_void, char * field_name, char * value)
 {
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter *filter = target_void;
-	set_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_field(category, filter->attributes, field_name, value);
-	activate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_filter_on_field(category, filter, field_name);
+	struct CATEGORY_NAME_occi_filter *filter = target_void;
+	set_CATEGORY_NAME_field(category, filter->attributes, field_name, value);
+	activate_CATEGORY_NAME_filter_on_field(category, filter, field_name);
 }
 
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/
 /*	--------------------------------------------------	*/
-private int filter_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_info(
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter *filter,
+private int filter_CATEGORY_NAME_info(
+	struct CATEGORY_NAME_occi_filter *filter,
 	struct occi_category * optr,
 	struct rest_request  * rptr,
 	struct rest_response * aptr) {
-	*filter = (const struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter) {0};
-	if (!( filter->attributes = allocate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-()))
+	*filter = (const struct CATEGORY_NAME_occi_filter) {0};
+	if (!( filter->attributes = allocate_CATEGORY_NAME()))
 		return 0;
-	else if (!( occi_process_atributs(optr, rptr, aptr, filter, set_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_filter_on_field) )) {
-		liberate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-(filter->attributes);
+	else if (!( occi_process_atributs(optr, rptr, aptr, filter, set_CATEGORY_NAME_filter_on_field) )) {
+		liberate_CATEGORY_NAME(filter->attributes);
 		return 0;
 	}
 	else	return( 1 );
@@ -551,17 +338,8 @@ _filter_on_field) )) {
 /*	--------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/
 /*	--------------------------------------------------	*/
-private int pass_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_filter(
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr, struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter *filter) {
+private int pass_CATEGORY_NAME_filter(
+	struct CATEGORY_NAME * pptr, struct CATEGORY_NAME_occi_filter *filter) {
 	[[[cog t.pass_category_filter()]]]
 	[[[end]]]
 	return(1);
@@ -570,16 +348,10 @@ _occi_filter *filter) {
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_response(
+private struct rest_response * CATEGORY_NAME_occi_response(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr)
+	struct CATEGORY_NAME * pptr)
 {
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
@@ -597,10 +369,7 @@ _occi_response(
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_get_item(
+private struct rest_response * CATEGORY_NAME_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
@@ -610,36 +379,21 @@ _get_item(
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id)))
+	if (!( nptr = locate_CATEGORY_NAME_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);
-	autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_nodes();
-	return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_CATEGORY_NAME_nodes();
+	return( CATEGORY_NAME_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post_link(
+private struct rest_response * CATEGORY_NAME_post_link(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -649,15 +403,9 @@ _post_link(
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	char * reqhost;
-	if (!( nptr = locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id)))
+	if (!( nptr = locate_CATEGORY_NAME_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -670,10 +418,7 @@ _node(id)))
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post_item(
+private struct rest_response * CATEGORY_NAME_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -683,33 +428,21 @@ _post_item(
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	char * reqhost;
 	int    reqport=0;
 	iptr = optr->callback;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else reqport = rptr->port;
-	if (!( nptr = add_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(1)))
+	if (!( nptr = add_CATEGORY_NAME_node(1)))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
-	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_field ) ))
+	if (!( occi_process_atributs( optr, rptr,aptr, pptr, set_CATEGORY_NAME_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);
-	autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_nodes();
+	autosave_CATEGORY_NAME_nodes();
 	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -721,10 +454,7 @@ _nodes();
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_put_item(
+private struct rest_response * CATEGORY_NAME_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -734,41 +464,23 @@ _put_item(
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id)))
+	if (!( nptr = locate_CATEGORY_NAME_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
-	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_field ) ))
+	if (!( occi_process_atributs(optr,rptr,aptr, pptr, set_CATEGORY_NAME_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);
-	autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_nodes();
-	return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_response(optr,cptr,rptr,aptr,pptr));
+	autosave_CATEGORY_NAME_nodes();
+	return( CATEGORY_NAME_occi_response(optr,cptr,rptr,aptr,pptr));
 }
 
 /*	------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/
 /*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_head_item(
+private struct rest_response * CATEGORY_NAME_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
@@ -777,14 +489,8 @@ _head_item(
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
-	if (!( nptr = locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id)))
+	struct CATEGORY_NAME * pptr;
+	if (!( nptr = locate_CATEGORY_NAME_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	else if (!( pptr = nptr->contents ))
 		return( rest_html_response( aptr, 404, "Not Found") );
@@ -794,10 +500,7 @@ _node(id)))
 /*	----------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/
 /*	----------------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_delete_item(
+private struct rest_response * CATEGORY_NAME_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
@@ -807,25 +510,13 @@ _delete_item(
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
+	struct CATEGORY_NAME * pptr;
 	iptr = optr->callback;
-	if (!( nptr = locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id)))
+	if (!( nptr = locate_CATEGORY_NAME_node(id)))
 		return( rest_html_response( aptr, 404, "Not Found") );
 	if (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);
-	drop_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node( nptr );
-	autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_nodes();
+	drop_CATEGORY_NAME_node( nptr );
+	autosave_CATEGORY_NAME_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -834,10 +525,7 @@ _nodes();
 /*	----------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/
 /*	----------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_get_list(
+private struct rest_response * CATEGORY_NAME_get_list(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -846,28 +534,16 @@ _get_list(
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * sptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter filter;
+	struct CATEGORY_NAME * pptr;
+	struct CATEGORY_NAME_occi_filter filter;
 	char * reqhost;
 	int reqport=0;
 	if (!( reqhost = rest_request_host( rptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else reqport = rptr->port;
-	if (!( filter_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_info(&filter, optr, rptr, aptr ) ))
+	if (!( filter_CATEGORY_NAME_info(&filter, optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	for ( sptr = 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_first;
+	for ( sptr = CATEGORY_NAME_first;
 		sptr != (struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
@@ -875,24 +551,15 @@ _node *) 0;
 		sptr = sptr->next ) {
 		if (!( pptr = sptr->contents ))
 			continue;
-		if (!( pass_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_filter( pptr, &filter) ))
+		if (!( pass_CATEGORY_NAME_filter( pptr, &filter) ))
 			continue;
 		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,pptr->id);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) )) {
-			liberate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-(filter.attributes);
+			liberate_CATEGORY_NAME(filter.attributes);
 			return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
 	}
-	liberate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-(filter.attributes);
+	liberate_CATEGORY_NAME(filter.attributes);
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -901,10 +568,7 @@ _filter( pptr, &filter) ))
 /*	--------------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/
 /*	--------------------------------------------------------------------------------------------	*/
-private struct rest_response * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_delete_all(
+private struct rest_response * CATEGORY_NAME_delete_all(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
@@ -918,54 +582,30 @@ _node * nptr;
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * sptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * pptr;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter filter;
+	struct CATEGORY_NAME * pptr;
+	struct CATEGORY_NAME_occi_filter filter;
 	iptr = optr->callback;
-	if (!( filter_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_info(&filter, optr, rptr, aptr ) ))
+	if (!( filter_CATEGORY_NAME_info(&filter, optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	nptr=
-[[[cog t.category_name()]]]
-[[[end]]] 
-_first;
+	nptr=CATEGORY_NAME_first;
 	while (nptr != (struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node *) 0) {
 		if ((!( pptr = nptr->contents ))
-		||  (!( pass_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_filter( pptr, &filter) ))) {
+		||  (!( pass_CATEGORY_NAME_filter( pptr, &filter) ))) {
 			nptr = nptr->next;
 			continue;
 			}
 		else	{
 			if (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }
 			sptr = nptr->next;
-			drop_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node( nptr );
+			drop_CATEGORY_NAME_node( nptr );
 			nptr = sptr;
 		}
 	}
-	liberate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-(filter.attributes);
-	autosave_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_nodes();
+	liberate_CATEGORY_NAME(filter.attributes);
+	autosave_CATEGORY_NAME_nodes();
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
@@ -974,10 +614,7 @@ _nodes();
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_CATEGORY_NAME_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -992,25 +629,16 @@ _get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_get_list( optr, cptr, rptr, aptr ) );
+		return( CATEGORY_NAME_get_list( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( CATEGORY_NAME_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_CATEGORY_NAME_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -1025,20 +653,14 @@ _head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( CATEGORY_NAME_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/
 /*	--------------------------------------------------------------------------------	*/
-private struct rest_response * occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_CATEGORY_NAME_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -1053,10 +675,7 @@ _post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( strcmp( rptr->object, optr->location ) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post_item( optr, cptr, rptr, aptr ) );
+		return( CATEGORY_NAME_post_item( optr, cptr, rptr, aptr ) );
 	else if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( rptr->parameters ))
@@ -1069,10 +688,7 @@ _post_item( optr, cptr, rptr, aptr ) );
 /*	------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/
 /*	------------------------------------------------------------------------------	*/
-private struct rest_response * occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_CATEGORY_NAME_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -1087,20 +703,14 @@ _put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( CATEGORY_NAME_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	------------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/
 /*	------------------------------------------------------------------------------------	*/
-private struct rest_response * occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+private struct rest_response * occi_CATEGORY_NAME_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
 	struct rest_header   * hptr;
@@ -1115,46 +725,22 @@ _delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 	if(!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!(strcmp( rptr->object, optr->location ) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_delete_all( optr, cptr, rptr, aptr ) );
+		return( CATEGORY_NAME_delete_all( optr, cptr, rptr, aptr ) );
 	else if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))
-		return( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
+		return( CATEGORY_NAME_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );
 	else	return( rest_html_response( aptr, 400, "Bad Request") );
 }
 
 /*	--------------------------------------------------------------------------------	*/
 /*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n 	*/
 /*	--------------------------------------------------------------------------------	*/
-private void	redirect_occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_mt( struct rest_interface * iptr )
+private void	redirect_occi_CATEGORY_NAME_mt( struct rest_interface * iptr )
 {
-	iptr->get = occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_get;
-	iptr->post = occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_post;
-	iptr->put = occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_put;
-	iptr->delete = occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_delete;
-	iptr->head = occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_head;
+	iptr->get = occi_CATEGORY_NAME_get;
+	iptr->post = occi_CATEGORY_NAME_post;
+	iptr->put = occi_CATEGORY_NAME_put;
+	iptr->delete = occi_CATEGORY_NAME_delete;
+	iptr->head = occi_CATEGORY_NAME_head;
 	return;
 }
 
@@ -1164,14 +750,8 @@ _head;
 /*	------------------------------------------	*/
 /*	o c c i   c a t e g o r y   b u i l d e r 	*/
 /*	------------------------------------------	*/
-/* occi category rest instance builder for : occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
- */
-public struct occi_category * occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_builder(char * a,char * b) {
+/* occi category rest instance builder for : occi_CATEGORY_NAME */
+public struct occi_category * occi_CATEGORY_NAME_builder(char * a,char * b) {
 	char * c="http://scheme.compatibleone.fr/scheme/compatible#";
 	char * d="
 [[[cog t.node_type()]]]
@@ -1181,23 +761,14 @@ _builder(char * a,char * b) {
 [[[cog t.scheme_kind()]]]
 [[[end]]]
 #";
-	char * f="CompatibleOne OCCI resource 
-[[[cog t.category_name()]]]
-[[[end]]] 
-";
+	char * f="CompatibleOne OCCI resource CATEGORY_NAME";
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
-		redirect_occi_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_mt(optr->interface);
+		redirect_occi_CATEGORY_NAME_mt(optr->interface);
 		[[[cog t.occi_builder()]]]
 		[[[end]]]		
-		autoload_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_nodes();
+		autoload_CATEGORY_NAME_nodes();
 		return(optr);
 	}
 
@@ -1209,13 +780,7 @@ _nodes();
 [[[end]]] 
 _ o c c i _ h e a d e r s 	*/
 /*	------------------------------------------------------------	*/
-public struct rest_header *  
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_headers(struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * sptr)
+public struct rest_header *  CATEGORY_NAME_occi_headers(struct CATEGORY_NAME * sptr)
 {
 	struct rest_header * first=(struct rest_header *) 0;
 	struct rest_header * last=(struct rest_header *) 0;
@@ -1230,10 +795,7 @@ _occi_headers(struct
 		last = hptr;
 	if (!( hptr->name = allocate_string("Category")))
 		return(first);
-	sprintf(buffer,"
-[[[cog t.category_name()]]]
-[[[end]]] 
-; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='
+	sprintf(buffer,"CATEGORY_NAME; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='
 [[[cog t.node_type()]]]
 [[[end]]] 
 ';\r\n");
@@ -1245,7 +807,4 @@ _occi_headers(struct
 
 }
 
-#endif	/* _occi
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_c_ */
+#endif	/* _occiFILENAME_ROOT_c_ */

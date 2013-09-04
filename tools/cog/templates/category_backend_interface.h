@@ -1,122 +1,38 @@
 [[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file) ]]]
 [[[end]]]
-#ifndef _
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_backend_interface_h
-#define _
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_backend_interface_h
+#ifndef _FILENAME_ROOT_backend_interface_h
+#define _FILENAME_ROOT_backend_interface_h
 
-typedef struct  
-[[[cog t.category_name()]]]
-[[[end]]] 
-_id_list_t
+typedef struct  CATEGORY_NAME_id_list_t
 {
 	int count;
 	char **ids;
-}  
-[[[cog t.category_name()]]]
-[[[end]]] 
-_id_list;
+}  CATEGORY_NAME_id_list;
 
-typedef struct 
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_list_t
+typedef struct FILENAME_ROOT_list_t
 {
 	int count;
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- **
-[[[cog t.filename_root()]]]
-[[[end]]] 
-s;
-} 
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_list;
+	struct CATEGORY_NAME **FILENAME_ROOTs;
+} FILENAME_ROOT_list;
 
-struct	
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_backend_interface
+struct	FILENAME_ROOT_backend_interface
 {
 	void (*init)();
 	void (*finalise)();
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- *(*create)  (int allocate_uuid, struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- *initial_
-[[[cog t.filename_root()]]]
-[[[end]]] 
-);
-	struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- *(*retrieve_from_id)(char *id);
-	
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_list (*retrieve_from_filter)(struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter *filter);
-	void (*update)  (char *id, struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- *updated_
-[[[cog t.filename_root()]]]
-[[[end]]] 
-);
+	struct CATEGORY_NAME *(*create)  (int allocate_uuid, struct CATEGORY_NAME *initial_FILENAME_ROOT);
+	struct CATEGORY_NAME *(*retrieve_from_id)(char *id);
+	FILENAME_ROOT_list (*retrieve_from_filter)(struct CATEGORY_NAME_occi_filter *filter);
+	void (*update)  (char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT);
 	void (*del)     (char *id);
-	void (*delete_all_matching_filter) (struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter *filter);	// Delete all 
-[[[cog t.filename_root()]]]
-[[[end]]] 
-s matching filter
-    
-[[[cog t.category_name()]]]
-[[[end]]] 
-_id_list (*list) (struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_occi_filter *filter); // Return all ids of 
-[[[cog t.filename_root()]]]
-[[[end]]] 
-s matching filter
+	void (*delete_all_matching_filter) (struct CATEGORY_NAME_occi_filter *filter);	// Delete all FILENAME_ROOTs matching filter
+    CATEGORY_NAME_id_list (*list) (struct CATEGORY_NAME_occi_filter *filter); // Return all ids of FILENAME_ROOTs matching filter
     [[[cog t.filter_by_name_header()]]]
     [[[end]]]
 };
 
-extern struct 
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_backend_interface * 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_backend;
+extern struct FILENAME_ROOT_backend_interface * CATEGORY_NAME_backend;
 
-void 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_free_id_list( 
-[[[cog t.category_name()]]]
-[[[end]]] 
-_id_list *list);
-void free_
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_list(
-[[[cog t.filename_root()]]]
-[[[end]]] 
-_list *list);
+void CATEGORY_NAME_free_id_list( CATEGORY_NAME_id_list *list);
+void free_FILENAME_ROOT_list(FILENAME_ROOT_list *list);
 
 #endif

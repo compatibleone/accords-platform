@@ -3,7 +3,9 @@
 
 MODEL_CODEGEN = $(top_srcdir)/tools/codegen/codegen.py
 MODEL_COG = python $(abspath $(top_srcdir)/tools/cog/3rdParty/cogapp/__main__.py) -ed
-COG_TEMPLATES = $(top_srcdir)/tools/cog/templates/
+COG_CONVERT = python $(abspath $(top_srcdir)/tools/codegen/cog_convert.py)
+TEMPLATE_DIR = $(top_srcdir)/tools/cog/templates/
+COG_TEMPLATES = $(TEMPLATE_DIR)template_
 
 COG_COMMON = $(top_srcdir)/tools/codegen/cog_common.py 
 
@@ -17,7 +19,7 @@ occi_filter_files = $(patsubst %.h, %_occi_filter.h,$(model_h_files))
 
 model_c_files = $(patsubst %.h,%.c,$(model_h_files))
 
-model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) occi_common.c
+model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) occi_common.c 
 
 occi_common.c : $(COG_TEMPLATES)occi_common.c
 	$(MODEL_COG) -I $(top_srcdir)/tools/ -o $@ $(COG_TEMPLATES)occi_common.c
@@ -51,4 +53,5 @@ $(model_c_files) : %.c : %.h %.xsd occi%.c %_occi_filter.h occi_%_rest.c occi_co
 
 CLEANFILES = $(model_all_files)
 
-
+$(COG_TEMPLATES)% : $(TEMPLATE_DIR)%
+	$(COG_CONVERT) $(subst template_,, $@) $@ 

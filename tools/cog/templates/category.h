@@ -8,22 +8,7 @@
 	[[[end]]]
 };
 
-struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * allocate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-();
-struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * liberate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-(struct 
-[[[cog t.category_name()]]]
-[[[end]]] 
- * optr);
+struct CATEGORY_NAME * allocate_CATEGORY_NAME();
+struct CATEGORY_NAME * liberate_CATEGORY_NAME(struct CATEGORY_NAME * optr);
 
 #endif

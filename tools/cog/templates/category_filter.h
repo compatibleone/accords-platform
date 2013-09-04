@@ -10,10 +10,7 @@ _occi_filter_h
  [[[end]]]
 _occi_filter_h
 
-struct 
-[[[cog t.category_name()]]]
-[[[end]]]
-_occi_filter
+struct CATEGORY_NAME_occi_filter
 {
 	[[[cog t.category_filters() ]]]
 	[[[end]]]

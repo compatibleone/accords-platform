@@ -221,4 +221,4 @@ build
 .pydevproject
 .settings
 *.pyc
-
+tools/cog/templates/template_*
