@@ -477,8 +477,16 @@ _backend->retrieve_from_id(id) ))
 , set_
 [[[cog t.category_name()]]]
 [[[end]]] 
-_field ) ))
+_field ) )) {
+	    liberate_
+[[[cog t.category_name()]]]
+[[[end]]]
+(
+[[[cog t.filename_root()]]]
+[[[end]]] 
+);
 		return( rest_html_response( aptr, 500, "Server Failure") );
+	}
 	if (iptr) {	
 [[[cog t.category_name()]]]
 [[[end]]] 
@@ -626,6 +634,7 @@ _backend->list(&filter);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			failed = 1;
 	}
+	
 	[[[cog t.category_name()]]]
 	[[[end]]] 
 _free_id_list(&ids);
