@@ -32,6 +32,7 @@
 #include "onapp_extras.h"
 #include "oaclient.h"
 #include "cb.h"
+#include "oaconfig_occi_filter.h"
 #include "onapp_helpers.h"
 #include "oaconfig_backend_interface.h"
 #include "oaconfig_occi_filter.h"
@@ -63,6 +64,14 @@ struct	cords_oa_contract
 struct onapp_action_context
 {
 	OnAppBool onapp_dirty;
+	OnAppBool onapp_clone;
+};
+
+static struct onapp_action_context const onapp_action_context_action_default = { OABOOL_FALSE // onapp_dirty
+	, OABOOL_TRUE // onapp_clone (actions typically need to clone their onapp * since it is liberated at end of POST action)
+};
+static struct onapp_action_context const onapp_action_context_crud_default = { OABOOL_FALSE // onapp_dirty
+	, OABOOL_FALSE // onapp_clone
 };
 
 private	int	terminate_onapp_contract( int status, struct cords_oa_contract * cptr );
@@ -336,13 +345,32 @@ struct onapp_action_data create_onapp_action_data_default_errors(char const acti
 
 void handle_onapp_action_context(struct onapp *ponapp, struct onapp_action_context *context)
 {
+	struct onapp *ponapp_update = ponapp;
+
 	if (context != NULL && ponapp != NULL && ponapp->id != NULL && ponapp->id[0] != '\0')
 	{
-		if (context->onapp_dirty != OABOOL_FALSE)
+		if (context->onapp_dirty != OABOOL_FALSE) // If onapp has changed
 		{
-			onapp_backend->update(ponapp->id, ponapp);
+			if (context->onapp_clone != OABOOL_FALSE) // If need to clone onapp
+			{
+				// Poor man's clone.
+				ponapp_update = onapp_backend->retrieve_from_id(ponapp->id);
 
-		}
+				if (ponapp_update == NULL && ponapp != NULL)
+				{
+					// TODO: Error
+				}
+
+			} // Ends if need to clone onapp
+
+			if (ponapp_update != NULL) // If got an onapp to update with
+			{
+				// Update takes ownership of onapp * parameter.
+				onapp_backend->update(ponapp_update->id, ponapp_update);
+
+			} // Ends if got an onapp to update with
+
+		} // Ends if onapp has changed
 	}
 }
 
@@ -461,6 +489,11 @@ public struct rest_response * do_onapp_action_alert(
 	struct rest_request *old_rest_request;
 	int status;
 
+	if (1)
+	{
+		dump_rest_request(stdout, ponapp_action->input.prest_request);
+	}
+
 	if (ponapp_action->input.ponapp == NULL)
 	{
 		prest_response_result = rest_html_response( ponapp_action->input.prest_response,
@@ -468,6 +501,11 @@ public struct rest_response * do_onapp_action_alert(
 	}
 	else if (ponapp_action->prest_response_result == NULL)
 	{
+		if (1)
+		{
+			dump_onapp_data(stdout, ponapp_action->input.ponapp);
+		}
+
 		if ( ponapp_action->input.ponapp->state != forbidden_occi_state )
 		{
 			if ((poa_response = ponapp_action->action( ponapp_action->input.ponapp, &ponapp_action->context )) == (struct oa_response *) 0)
@@ -481,7 +519,7 @@ public struct rest_response * do_onapp_action_alert(
 				{
 					onapp_build_failure( ponapp_action->input.ponapp,
 							action_errors->null_nested_response_build_failure.status, action_errors->null_nested_response_build_failure.error_message,
-							&ponapp_action->context );
+							&ponapp_action->context);
 					prest_response_result = rest_html_response( ponapp_action->input.prest_response,
 						action_errors->null_nested_response.status, action_errors->null_nested_response.error_message );
 				}
@@ -491,7 +529,7 @@ public struct rest_response * do_onapp_action_alert(
 
 					onapp_build_failure( ponapp_action->input.ponapp,
 						action_errors->unhappy_response_build_failure.status, action_errors->unhappy_response_build_failure.error_message,
-						&ponapp_action->context );
+						&ponapp_action->context);
 				}
 				else
 				{
@@ -721,7 +759,7 @@ public	struct	rest_response * create_onapp_vm(
 	/* ------------------------------------- */
 	else if ( pptr->profile == NULL )
 		return ( rest_html_response ( aptr, 500, "No Onapp Profile supplied" ) );
-	else if (!( config = use_onapp_configuration( pptr->profile ) ))
+	else if (!( config = use_onapp_configuration_crud( pptr->profile ) ))
 		return( rest_html_response( aptr, status, "Configuration Not Found" ) );
 		
 	if ( rest_valid_string( pptr->price ) )
@@ -814,43 +852,43 @@ public	struct	rest_response * stop_onapp(
 	struct rest_response *prest_response_result = NULL;
 	int status;
 	struct onapp * ponapp;
-	struct onapp_action_context context = { 0 };
+	struct onapp_action_context context = onapp_action_context_action_default;
 	if (!( ponapp = vptr ))
 	{
 		prest_response_result = rest_html_response( prest_response, 404, "Invalid Action" );
 	}
-	else if ((poa_response = stop_onapp_provisioning( ponapp, &context )) == (struct oa_response *) 0)
-	{
-		prest_response_result = rest_html_response (prest_response, 500, "Unexpected error stopping OnApp VM");
-	}
-	else
-	{
-		if (!( poa_response->response ))
-		{
-			onapp_build_failure( ponapp, 911, "OA Failure : No Response", &context );
-			prest_response_result = rest_html_response( prest_response, 4010, "Bad Request : Stop Server No Response" );
-		}
-		else if ( poa_response->response->status >= 400 )
-		{
-			// This response pointer will ultimately end up being used to populate an alert, as well as being returned as the response.
-			prest_response_result = poa_response->response;
-			poa_response->response = NULL;
+  else if ((poa_response = stop_onapp_provisioning( ponapp, &context )) == (struct oa_response *) 0)
+  {
+    prest_response_result = rest_html_response (prest_response, 500, "Unexpected error stopping OnApp VM");
+  }
+  else
+  {
+    if (!( poa_response->response ))
+    {
+      onapp_build_failure( ponapp, 911, "OA Failure : No Response", &context  );
+      prest_response_result = rest_html_response( prest_response, 4010, "Bad Request : Stop Server No Response" );
+    }
+    else if ( poa_response->response->status >= 400 )
+    {
+      // This response pointer will ultimately end up being used to populate an alert, as well as being returned as the response.
+      prest_response_result = poa_response->response;
+      poa_response->response = NULL;
 
-			onapp_build_failure( ponapp, 911, "OA Failure : Bad Request (stop VM HTTP status >= 400)", &context );
-		}
-		else
-		{
-			// CompatibleOne price handling.
-			sprintf(reference,"%s/%s/%s",OnAppConfiguration.identity,_CORDS_ONAPP,ponapp->id);
-			if ( rest_valid_string( ponapp->price ) )
-			{
-				occi_send_transaction( _CORDS_ONAPP, ponapp->price, "action=stop", ponapp->id, reference );
-			}
-		}
+      onapp_build_failure( ponapp, 911, "OA Failure : Bad Request (stop VM HTTP status >= 400)", &context  );
+    }
+    else
+    {
+      // CompatibleOne price handling.
+      sprintf(reference,"%s/%s/%s",OnAppConfiguration.identity,_CORDS_ONAPP,ponapp->id);
+      if ( rest_valid_string( ponapp->price ) )
+      {
+        occi_send_transaction( _CORDS_ONAPP, ponapp->price, "action=stop", ponapp->id, reference );
+      }
+    }
 
-		poa_response = liberate_oa_response( poa_response );
+    poa_response = liberate_oa_response( poa_response );
 
-	}
+  }
 	if (prest_response_result == NULL)
 	{
 		prest_response_result = rest_html_response( prest_response, 200, "OK" );
@@ -941,7 +979,7 @@ public	int	create_onapp_contract(
 
 	status = 404;
 
-	if (!(config = use_onapp_configuration( pptr->profile )))
+	if (!(config = use_onapp_configuration_crud( pptr->profile )))
 	{
 		rest_log_message("Could Not Find Configuration");
 		return( status );
@@ -973,7 +1011,7 @@ public	int	create_onapp_contract(
 				if (1)
 				{
 					fputs("===onapp_extras===\n", stdout);
-					dump_onapp_extras(onapp_extras_handle.ponapp_extras, stdout);
+					dump_onapp_extras(stdout, onapp_extras_handle.ponapp_extras);
 					fputc('\n', stdout);
 				}
 			}
@@ -1097,7 +1135,8 @@ public	int	create_onapp_contract(
 	result = retrieve_onapp_extras_data(onapp_extras_handle.ponapp_extras, pptr);
 	close_cords_onapp_extras_handle(&onapp_extras_handle);
 
-	dump_onapp_data_stdout(config, pptr);
+	dump_oa_config_data_stdout(config);
+	dump_onapp_data_stdout(pptr);
 
 	return( terminate_onapp_contract( 0, &contract ) );
 }
@@ -1112,7 +1151,13 @@ public	int	delete_onapp_contract(
 {
 	struct	oa_response * oaptr;
 	int result = 0;
-	struct onapp_action_context context = { 0 };
+	struct onapp_action_context context = onapp_action_context_crud_default;
+
+	if (1)
+	{
+		dump_rest_request(stdout, rptr);
+		dump_onapp_data(stdout, pptr);
+	}
 
 	oaptr = stop_onapp_provisioning( pptr, &context );
 
@@ -1124,6 +1169,9 @@ public	int	delete_onapp_contract(
 
 	pptr->state = _OCCI_IDLE;
 	pptr->build_state = allocate_string("deleted");
+	context.onapp_dirty = OABOOL_TRUE;
+	context.onapp_clone = OABOOL_TRUE; // Delete CRUD operations liberate onapp *.
+	handle_onapp_action_context(pptr, &context);
 
 	return result;
 }
@@ -1142,13 +1190,13 @@ public	int	delete_onapp_contract(
 //	else 	return( resolve_oa_configuration( nptr ) );
 //}
 
-const struct oa_config * use_onapp_configuration( char * nptr )
+const struct oa_config * use_onapp_configuration( char * nptr, int is_active, int check_is_active )
 {
 	const struct	oa_config * sptr;
 	struct onapp * ponapp;
 	struct oa_contract *poacontract;
 	char * operatorProfileName = NULL;
-	if (( sptr = resolve_oa_configuration( nptr )) != (struct oa_config *) 0)
+	if (( sptr = resolve_oa_configuration( nptr, is_active, check_is_active )) != (struct oa_config *) 0)
 		return( sptr );
 	else if (!( operatorProfileName = get_operator_profile() ))
 		return( sptr );
@@ -1156,13 +1204,23 @@ const struct oa_config * use_onapp_configuration( char * nptr )
 		return( sptr );
 	else if ( strcmp( nptr, operatorProfileName ) == 0 )
 		return( sptr );
-	else 	return( resolve_oa_configuration( operatorProfileName ) );
+	else 	return( resolve_oa_configuration( operatorProfileName, is_active, check_is_active ) );
+}
+
+const struct oa_config * use_onapp_configuration_action( char * nptr )
+{
+	return use_onapp_configuration(nptr, 0, 0);
+}
+
+const struct oa_config * use_onapp_configuration_crud( char * nptr )
+{
+	return use_onapp_configuration(nptr, 1, 1);
 }
 
 /*  -----------------------------------------------------------------  */
 /* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n               */
 /*  -----------------------------------------------------------------  */
-const struct oa_config * resolve_oa_configuration( char * sptr )
+const struct oa_config * resolve_oa_configuration( char * sptr, int is_active, int check_is_active )
 {
     assert(oa_config_backend);
     assert(oa_config_backend->retrieve_from_filter);
@@ -1178,8 +1236,8 @@ const struct oa_config * resolve_oa_configuration( char * sptr )
 	filter.attributes = allocate_oa_config();
 	filter.attributes->name = allocate_string(sptr);
 	filter.name = 1;
-	filter.attributes->is_active = 1;
-	filter.is_active = 1;
+	filter.attributes->is_active = check_is_active;
+	filter.is_active = is_active;
 	filter.attributes->deleted = 0;
 	filter.deleted = 1;
 	
@@ -1311,7 +1369,7 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr, struc
 	char   reference[512];
 	char *	vptr;
 
-	if (!( config = use_onapp_configuration( pptr->profile )))
+	if (!( config = use_onapp_configuration_action( pptr->profile )))
 		return((struct oa_response *) 0);
 	else
 	{
@@ -1356,7 +1414,7 @@ private	struct oa_response * start_onapp_provisioning( struct onapp * pptr, stru
 	struct oa_response * oaptr;
 	const struct oa_config * config=(struct oa_config *) 0;
 
-	if (!( config = use_onapp_configuration( pptr->profile )))
+	if (!( config = use_onapp_configuration_action( pptr->profile )))
 	{
 		oaptr = NULL;
 	}
@@ -1389,7 +1447,7 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr, s
 	char   reference[512];
 	char *	vptr;
 
-	if (!( config = use_onapp_configuration( pptr->profile )))
+	if (!( config = use_onapp_configuration_action( pptr->profile )))
 		return((struct oa_response *) 0);
 	else
 	{
@@ -1428,7 +1486,7 @@ private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr, st
 	struct oa_response * oaptr;
 	const struct oa_config * config=(struct oa_config *) 0;
 
-	if (!( config = use_onapp_configuration( pptr->profile )))
+	if (!( config = use_onapp_configuration_action( pptr->profile )))
 	{
 		oaptr = NULL;
 	}
@@ -1454,7 +1512,7 @@ private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr, st
 	struct oa_response * oaptr;
 	const struct oa_config * config=(struct oa_config *) 0;
 
-	if (!( config = use_onapp_configuration( pptr->profile )))
+	if (!( config = use_onapp_configuration_action( pptr->profile )))
 	{
 		oaptr = NULL;
 	}

@@ -723,7 +723,10 @@ _node* node, struct
 [[[cog t.category_name()]]]
 [[[end]]] 
 _control );
-	if (node->contents) {
+	if (node->contents && node->contents != updated_
+[[[cog t.filename_root()]]]
+[[[end]]] 
+) {
 		liberate_
 [[[cog t.category_name()]]]
 [[[end]]] 

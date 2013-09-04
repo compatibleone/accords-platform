@@ -371,53 +371,53 @@ int onapp_normalise_value( char * sptr, int normal, char **ppzeroed_string )
 #endif
 
 /// HTTP functions.
+/// HTTP functions.
 char * get_http_body_length_string(char *buffer, size_t buffer_size, int type, char const *body)
 {
-	char * body_length = NULL;
+ char * body_length = NULL;
 
-	if (buffer_size > 0 && body != NULL)
-	{
-		if (type == _FILE_BODY)
-		{
-			struct	stat info;
-			struct	rest_header * hptr;
-			if ( stat( body,&info ) >= 0 )
-			{
-				if (snprintf(buffer, buffer_size, "%lu", info.st_size) < buffer_size)
-				{
-					body_length = buffer;
-				}
-			}
-		}
-		else if (type == _TEXT_BODY)
-		{
-			// Take strlen() of body as Content-Length.
-			if (body == NULL)
-			{
-				buffer[0] = '0';
+ if (buffer_size > 0 && body != NULL)
+ {
+   if (type == _FILE_BODY)
+   {
+     struct  stat info;
+     struct  rest_header * hptr;
+     if ( stat( body,&info ) >= 0 )
+     {
+       if (snprintf(buffer, buffer_size, "%lu", info.st_size) < buffer_size)
+       {
+         body_length = buffer;
+       }
+     }
+   }
+   else if (type == _TEXT_BODY)
+   {
+     // Take strlen() of body as Content-Length.
+     if (body == NULL)
+     {
+       buffer[0] = '0';
 
-				if (buffer_size > 1)
-				{
-					buffer[1] = '\0';
-				}
+       if (buffer_size > 1)
+       {
+         buffer[1] = '\0';
+       }
 
-				body_length = buffer;
-			}
-			else
-			{
-				buffer[0] = '\0';
-				if (snprintf(buffer, buffer_size, "%lu", strlen(body)) < buffer_size)
-				{
-					body_length = buffer;
+       body_length = buffer;
+     }
+     else
+     {
+       buffer[0] = '\0';
+       if (snprintf(buffer, buffer_size, "%lu", strlen(body)) < buffer_size)
+       {
+         body_length = buffer;
 
-				}
-			}
-		}
-	}
+       }
+     }
+   }
+ }
 
-	return body_length;
+ return body_length;
 }
-
 
 /// File handling.
 size_t write_filecontent_to_filehandle(char const * const filename, FILE* h, char const * const prefix, char const * const suffix)
@@ -489,13 +489,8 @@ size_t write_filecontent_to_filename(char const * const filename, char const * c
 
 /// Dump code.
 
-/// @brief Dump oa_config and onapp to FILE.
-/// @param pptr oa_config to dump.
-/// @param ponapp onapp to dump.
-/// @return 0 if successful.
-int dump_onapp_data( struct oa_config const * pptr
-    , struct onapp *ponapp
-    , FILE *h)
+int dump_oa_config_data( FILE *h,
+  struct oa_config const * pptr)
 {
   if ( h == NULL ) {
     h = stdout;
@@ -571,9 +566,24 @@ int dump_onapp_data( struct oa_config const * pptr
     , pptr->net_zone_label
     , pptr->store_label
   );
-  fprintf(h, "\n\n");
+  fprintf(h, "\n");
 
-  fprintf(h, "===onapp info===\n");
+  return 0;
+}
+
+int dump_oa_config_data_stdout( struct oa_config const * poa_config )
+{
+	return dump_oa_config_data(stdout, poa_config);
+}
+
+int dump_onapp_data( FILE *h,
+  struct onapp *ponapp)
+{
+  if ( h == NULL ) {
+    h = stdout;
+  }
+
+  fprintf(h, "\n===onapp info===\n");
   fprintf(h, "  id = %s\n"
     "  node = %s\n"
     "  disk_type_of_format = %s\n"
@@ -659,17 +669,16 @@ int dump_onapp_data( struct oa_config const * pptr
   return 0;
 }
 
-int dump_onapp_data_stdout(struct oa_config const * pptr
-    , struct onapp *ponapp
+int dump_onapp_data_stdout(struct onapp *ponapp
   )
 {
-  return dump_onapp_data(pptr, ponapp, stdout);
+  return dump_onapp_data(stdout, ponapp);
 }
 
-void dump_url(struct url const *purl, FILE *hOutput)
+void dump_url(FILE *hOutput, struct url const *purl)
 {
-  fwrite("Url: '", 1, 5, hOutput);
-  fwrite(purl->host, 1, strlen(purl->host), hOutput);
+  fwrite("Url: '", 1, 6, hOutput);
+  fputs(purl->host, hOutput);
 
   if (purl->port != 0)
   {
@@ -678,15 +687,15 @@ void dump_url(struct url const *purl, FILE *hOutput)
 
   if (purl->object != NULL)
   {
-    fwrite(purl->object, 1, strlen(purl->object), hOutput);
+    fputs(purl->object, hOutput);
   }
 
-  fwrite("'", 1, 1, hOutput);
+  fputc('\'', hOutput);
 
   if (purl->service != NULL)
   {
     fwrite(". Service: '", 1, 12, hOutput);
-    fwrite(purl->service, 1, strlen(purl->service), hOutput);
+    fputs(purl->service, hOutput);
     fwrite("'.", 1, 2, hOutput);
   }
 }
@@ -707,7 +716,7 @@ struct  occi_attribute
   int       immutable;
 };
 */
-void dump_occi_attribute(struct occi_attribute const *pocci_attribute, FILE *hOutput)
+void dump_occi_attribute(FILE *hOutput, struct occi_attribute const *pocci_attribute)
 {
   if (pocci_attribute == NULL)
   {
@@ -762,7 +771,7 @@ struct  occi_category
 
 };
  */
-void test_dump_occi_category(struct occi_category const *pocci_category, FILE *hOutput)
+void test_dump_occi_category(FILE *hOutput, struct occi_category const *pocci_category)
 {
   struct occi_attribute *pocci_attribute_iter = NULL;
 
@@ -813,7 +822,7 @@ void test_dump_occi_category(struct occi_category const *pocci_category, FILE *h
 
     for (pocci_attribute_iter = pocci_category->first; pocci_attribute_iter != NULL; pocci_attribute_iter=pocci_attribute_iter->next)
     {
-      dump_occi_attribute(pocci_attribute_iter, hOutput);
+      dump_occi_attribute(hOutput, pocci_attribute_iter);
       fputc('\n', hOutput);
     }
   }
@@ -830,7 +839,7 @@ struct  rest_response
   char      * body;
 };
 */
-void dump_rest_response(struct rest_response const *prest_response, FILE *hOutput)
+void dump_rest_response(FILE *hOutput, struct rest_response const *prest_response)
 {
   struct rest_header *prest_header;
   fprintf(hOutput, "rest_response status=%d version='%s' message='%s' type=%d body='%s'\n"
@@ -859,7 +868,7 @@ struct  occi_response
   struct  rest_response * response;
 };
  */
-void dump_occi_response(struct occi_response const * pocci_response, FILE* hOutput)
+void dump_occi_response(FILE* hOutput, struct occi_response const * pocci_response)
 {
   struct occi_element* pocci_element_iter = (struct occi_element *) NULL;
   char* psz = NULL;
@@ -891,13 +900,13 @@ void dump_occi_response(struct occi_response const * pocci_response, FILE* hOutp
     //else  sprintf(url,"%s%s",buffer,vptr);
   }
 
-  test_dump_occi_category(pocci_response->category, hOutput);
+  test_dump_occi_category(hOutput, pocci_response->category);
   fputc('\n', hOutput);
-  dump_rest_response(pocci_response->response, hOutput);
+  dump_rest_response(hOutput, pocci_response->response);
   fputc('\n', hOutput);
 }
 
-struct occi_response * dump_occi_response_liberate(struct occi_response * pocci_response, FILE* hOutput)
+struct occi_response * dump_occi_response_liberate(FILE* hOutput, struct occi_response * pocci_response)
 {
   if (pocci_response == NULL)
   {
@@ -905,17 +914,17 @@ struct occi_response * dump_occi_response_liberate(struct occi_response * pocci_
   }
   else
   {
-    dump_occi_response(pocci_response, hOutput);
+    dump_occi_response(hOutput, pocci_response);
   }
 
   return occi_remove_response(pocci_response);
 }
 
-void dump_occi_client(struct occi_client const *pocci_client, FILE *hOutput)
+void dump_occi_client(FILE *hOutput, struct occi_client const *pocci_client)
 {
   fwrite("===Occi Client===\n", 1, 18, hOutput);
   fwrite("Target ", 1, 7, hOutput);
-  dump_url(pocci_client->target, hOutput);
+  dump_url(hOutput, pocci_client->target);
   fputc('\n', hOutput);
 
   fprintf(hOutput, "Host: '%s'\nAgent: '%s'\nMimetype: '%s'\nCategories: %d\nStarted: %d\nRequests: %d\nFailures: %d\n"
@@ -930,7 +939,7 @@ void dump_occi_client(struct occi_client const *pocci_client, FILE *hOutput)
   fputc('\n', hOutput);
 }
 
-void dump_onapp_extras_occi(struct occi_response *pocci_response, FILE *hOutput)
+void dump_onapp_extras_occi(FILE *hOutput, struct occi_response *pocci_response)
 {
   struct printf_field
   {
@@ -959,7 +968,7 @@ void dump_onapp_extras_occi(struct occi_response *pocci_response, FILE *hOutput)
   char *pattribute_iter;
 
   fputs("===Get Onapp occi_response===\n", hOutput);
-  dump_occi_response(pocci_response, hOutput);
+  dump_occi_response(hOutput, pocci_response);
   fputc('\n', hOutput);
 
   fputs("===Parsing out onapp_extras===\n", hOutput);
@@ -973,7 +982,7 @@ void dump_onapp_extras_occi(struct occi_response *pocci_response, FILE *hOutput)
   fputc('\n', hOutput);
 }
 
-void dump_onapp_extras(struct cords_onapp_extras const *ponapp_extras, FILE *hOutput)
+void dump_onapp_extras(FILE *hOutput, struct cords_onapp_extras const *ponapp_extras)
 {
   fprintf(hOutput, "  id = %s\n"
     "  initial_root_password = %s\n"
