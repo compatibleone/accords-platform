@@ -760,10 +760,13 @@ _node(id);
 		ll_
 [[[cog t.category_name()]]]
 [[[end]]]
-_rebase_node_contents(node, updated_
+_rebase_node_contents(node, clone_
+[[[cog t.category_name()]]]
+[[[end]]]
+(updated_
 [[[cog t.filename_root()]]]
 [[[end]]] 
-);
+));
 	}
     pthread_mutex_unlock( &list_
 [[[cog t.category_name()]]]

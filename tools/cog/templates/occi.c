@@ -503,17 +503,24 @@ _execute_callback(iptr->update,
 [[[end]]] 
 , optr, rptr);
 	}
-	 
+    
 [[[cog t.category_name()]]]
 [[[end]]] 
 _backend->update(id, 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 );
+    liberate_
+[[[cog t.category_name()]]]
+[[[end]]]
+(
+[[[cog t.filename_root()]]]
+[[[end]]] 
+);
 	if (iptr) {	
 [[[cog t.category_name()]]]
 [[[end]]] 
-_execute_callback(iptr->pre_update, 
+_execute_callback(iptr->post_update, 
 [[[cog t.filename_root()]]]
 [[[end]]] 
 , optr, rptr); }
