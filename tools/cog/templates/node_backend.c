@@ -329,35 +329,8 @@ _node *) 0;
 	return( nptr );
 }
 
-private struct occi_
-[[[cog t.node_type()]]]
-[[[end]]] 
-_node * locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(char * id) {
-	struct occi_
-[[[cog t.node_type()]]]
-[[[end]]] 
-_node * nptr;
-	pthread_mutex_lock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
-	nptr = ll_locate_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_node(id);
-	pthread_mutex_unlock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
-	return( nptr );
-}
-
 [[[cog t.retrieve_from_name_locate_funcs()]]]
 [[[end]]]
-
 /*	--------------------------------------------	*/
 /*	o c c i   c a t e g o r y   a d d   n o d e 	*/
 /*	--------------------------------------------	*/
@@ -653,20 +626,29 @@ private struct
 _retrieve_from_id(char *id) {
 [[[cog t.profile('retrieve_from_ids')]]]
 [[[end]]]
-	struct occi_
-[[[cog t.node_type()]]]
+    struct 
+[[[cog t.category_name()]]]
 [[[end]]] 
-_node *node = locate_
+*retVal = NULL;
+    pthread_mutex_lock( &list_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_control );
+    struct occi_kind_node *node = ll_locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(id);
-	if (node) {
-		return clone_
+    if (node) {
+        retVal = clone_
 [[[cog t.category_name()]]]
 [[[end]]] 
 (node->contents);
-	}
-	return NULL;
+    }
+    pthread_mutex_unlock( &list_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_control );
+    return retVal;
 }
 
 private struct 
@@ -720,26 +702,34 @@ private void
 _del(char *id) {
 [[[cog t.profile('deletes')]]]
 [[[end]]]
+    pthread_mutex_lock( &list_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_control );
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node *node = locate_
+_node *node = ll_locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(id);
 	if(node) {
-		drop_
+		ll_drop_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node( node );
 	}
+    pthread_mutex_unlock( &list_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_control );
 	autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _nodes();
 }
 
-void   
+void ll_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _rebase_node_contents(struct occi_
@@ -752,10 +742,6 @@ _node* node, struct
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ) {
-	pthread_mutex_lock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
 	if (node->contents) {
 		liberate_
 [[[cog t.category_name()]]]
@@ -766,10 +752,6 @@ _control );
 [[[cog t.filename_root()]]]
 [[[end]]] 
 ;
-	pthread_mutex_unlock( &list_
-[[[cog t.category_name()]]]
-[[[end]]] 
-_control );
 }
 
 private void   
@@ -784,15 +766,19 @@ _update(char *id, struct
 ) {
 [[[cog t.profile('updates')]]]
 [[[end]]]
+    pthread_mutex_lock( &list_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_control );
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node *node = locate_
+_node *node = ll_locate_
 [[[cog t.category_name()]]]
 [[[end]]] 
 _node(id);
 	if(node) {
-		
+		ll_
 [[[cog t.category_name()]]]
 [[[end]]]
 _rebase_node_contents(node, updated_
@@ -800,6 +786,10 @@ _rebase_node_contents(node, updated_
 [[[end]]] 
 );
 	}
+    pthread_mutex_unlock( &list_
+[[[cog t.category_name()]]]
+[[[end]]] 
+_control );
 	autosave_
 [[[cog t.category_name()]]]
 [[[end]]] 
