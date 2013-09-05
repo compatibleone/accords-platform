@@ -22,13 +22,12 @@
 #include "allocate.h"
 #include "rest.h"
 #include "occipar.h"
-#include "occiact.h"
 #include "occiatb.h"
 #include "occicat.h"
+#include "occiact.h"
 #include "occilink.h"
 #include "occimixin.h"
 #include "linknode.h"
-#include "kindnode.h"
 
 public	char *	occi_http_link( struct occi_category * optr, char * target, char * id );
 
@@ -178,7 +177,7 @@ public	struct	occi_mixin *	allocate_occi_mixin();
 public	struct	occi_category *	occi_parse_category( char * sptr );
 public	struct	occi_category * occi_remove_category( struct occi_category * cptr );
 public	struct	occi_category * occi_create_category( char * domain, char * name, char * scheme, char * klass, char * rel, char * title );
-public	struct	occi_category * occi_add_action(struct occi_category * cptr,char * name,char * parameters, void * method);
+public	struct	occi_category * occi_add_action(struct occi_category * cptr,char * name,char * parameters, occi_action_func method);
 public	struct	occi_category * occi_add_attribute(struct occi_category * cptr,char * name,int m,int i );
 public	char *	occi_http_capacity( struct occi_category * optr );
 public	char *	occi_http_category( struct occi_category * optr );

@@ -99,7 +99,7 @@ public	struct	occi_category * occi_create_resource_template( char * domain, char
 /*	---------------------------------------------------	*/
 /*		o c c i _ a d d _ a c t i o n           	*/
 /*	---------------------------------------------------	*/
-public	struct	occi_category * occi_add_action(struct occi_category * cptr,char * name,char * parameters, void * target )
+public	struct	occi_category * occi_add_action(struct occi_category * cptr,char * name,char * parameters, occi_action_func target )
 {
 	struct	occi_parameter * pptr;
 	struct	occi_action * aptr;

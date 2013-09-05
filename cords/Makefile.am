@@ -26,7 +26,7 @@ model_h_files = azconfig.h paconfig.h publication.h placement.h account.h instru
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
 libcords_la_SOURCES = cords2occi.c cordsbase.c
-libcords_la_CFLAGS = $(CFLAGS_BACKEND) $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI) 
+libcords_la_CFLAGS = $(CFLAGS_BACKEND) $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI) -Werror
 libcords_la_LDFLAGS = $(LD_COXML) $(LD_BACKEND)
 
 cords2occi.c cordsbase.c: $(model_c_files)

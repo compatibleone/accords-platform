@@ -137,7 +137,6 @@ private	struct rest_extension * parser_extension( void * v,struct rest_server * 
 /*	-------------------------------------------	*/
 private	int	delete_instruction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node 		* nptr;
 	struct	cords_instruction 	* pptr;
 	struct occi_response 		* zptr;
 	pptr = vptr;

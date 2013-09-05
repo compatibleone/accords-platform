@@ -28,6 +28,8 @@
 #include "occibuilder.h"
 #include "cordslang.h"
 
+#include "kindnode.h"
+
 #include <sys/types.h>
 #include <sys/wait.h>
 
