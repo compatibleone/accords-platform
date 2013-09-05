@@ -2,5 +2,6 @@
 #define _backend_common_h
 
 void *allocate_pointer_array(int id_count);
+char *generate_id();
 
 #endif

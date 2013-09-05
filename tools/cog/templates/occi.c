@@ -32,6 +32,8 @@
 #include "document.h"
 #include "cordspublic.h"
 
+#include "backend_common.h"
+ 
 #include "FILENAME_ROOT_occi_filter.h"
 #include "FILENAME_ROOT.h"
 #include "FILENAME_ROOT_backend_interface.h"
@@ -214,10 +216,15 @@ private struct rest_response * CATEGORY_NAME_post_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	if (!( occi_process_atributs( optr, rptr,aptr, initial_FILENAME_ROOT, set_CATEGORY_NAME_field ) ))
 		return( rest_html_response( aptr, 500, "Server Failure") );
+	char *id = generate_id();
+	if (!id) {
+	    return( rest_html_response( aptr, 500, "Server Failure") );
+	}
+	initial_FILENAME_ROOT->id = id;
 	if (iptr) {
 		CATEGORY_NAME_execute_callback(iptr->pre_create, initial_FILENAME_ROOT, optr, rptr);
 	}
-	if (!( new_FILENAME_ROOT =  CATEGORY_NAME_backend->create(1, initial_FILENAME_ROOT))) {
+	if (!( new_FILENAME_ROOT =  CATEGORY_NAME_backend->create(initial_FILENAME_ROOT))) {
 		liberate_CATEGORY_NAME(initial_FILENAME_ROOT);
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	}

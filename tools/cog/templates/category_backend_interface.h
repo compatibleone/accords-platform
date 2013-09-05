@@ -19,7 +19,7 @@ struct	FILENAME_ROOT_backend_interface
 {
 	void (*init)();
 	void (*finalise)();
-	struct CATEGORY_NAME *(*create)  (int allocate_uuid, struct CATEGORY_NAME *initial_FILENAME_ROOT);
+	struct CATEGORY_NAME *(*create) (struct CATEGORY_NAME *initial_FILENAME_ROOT);
 	struct CATEGORY_NAME *(*retrieve_from_id)(char *id);
 	FILENAME_ROOT_list (*retrieve_from_filter)(struct CATEGORY_NAME_occi_filter *filter);
 	void (*update)  (char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT);

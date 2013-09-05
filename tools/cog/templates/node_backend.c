@@ -56,14 +56,8 @@ _node() { return( CATEGORY_NAME_last ); }
 
 private void  CATEGORY_NAME_init();
 private void CATEGORY_NAME_finalise();
-private struct CATEGORY_NAME * 
- [[[cog t.category_name()]]]
- [[[end]]] 
-_create  (int allocate_uuid, struct CATEGORY_NAME *initial_FILENAME_ROOT);
-private struct CATEGORY_NAME * 
- [[[cog t.category_name()]]]
- [[[end]]] 
-_retrieve_from_id(char *id);
+private struct CATEGORY_NAME * CATEGORY_NAME_create  (struct CATEGORY_NAME *initial_FILENAME_ROOT);
+private struct CATEGORY_NAME * CATEGORY_NAME_retrieve_from_id(char *id);
 private FILENAME_ROOT_list  CATEGORY_NAME_retrieve_from_filter(struct CATEGORY_NAME_occi_filter *filter);
 private void  CATEGORY_NAME_update (char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT);
 private void  CATEGORY_NAME_del    (char *id);
@@ -160,7 +154,7 @@ _node *) 0;
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * ll_add_CATEGORY_NAME_node(int mode, struct CATEGORY_NAME *FILENAME_ROOT) {
+_node * ll_add_CATEGORY_NAME_node(struct CATEGORY_NAME *FILENAME_ROOT) {
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
@@ -170,32 +164,25 @@ _node * nptr;
 [[[end]]] 
 _node() ))
 		return( nptr );
-	else	{
+	else {
 		nptr->contents = FILENAME_ROOT;
-		if (( mode != 0 ) && (!( FILENAME_ROOT->id = occi_allocate_uuid())))
-			return( liberate_occi_
-[[[cog t.node_type()]]]
-[[[end]]] 
-_node(nptr) );
-		else	{
-			if (!( nptr->previous = CATEGORY_NAME_last ))
-				CATEGORY_NAME_first = nptr;
-			else	nptr->previous->next = nptr;
-			CATEGORY_NAME_last = nptr;
-			return( nptr );
-			}
-		}
+        if (!( nptr->previous = CATEGORY_NAME_last ))
+            CATEGORY_NAME_first = nptr;
+        else	nptr->previous->next = nptr;
+        CATEGORY_NAME_last = nptr;
+        return( nptr );
+	}
 }
 private struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
-_node * add_CATEGORY_NAME_node(int mode, struct CATEGORY_NAME *FILENAME_ROOT) {
+_node * add_CATEGORY_NAME_node(struct CATEGORY_NAME *FILENAME_ROOT) {
 	struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node * nptr;
 	pthread_mutex_lock( &list_CATEGORY_NAME_control );
-	nptr = ll_add_CATEGORY_NAME_node( mode, FILENAME_ROOT );
+	nptr = ll_add_CATEGORY_NAME_node(FILENAME_ROOT);
 	pthread_mutex_unlock( &list_CATEGORY_NAME_control );
 	return(nptr);
 }
@@ -230,7 +217,7 @@ private void autoload_CATEGORY_NAME_nodes() {
 			if(!(FILENAME_ROOT = allocate_CATEGORY_NAME())) { break; }
 			[[[cog t.load_attributes()]]]
 			[[[end]]]
-     		if (!( add_CATEGORY_NAME_node(0, FILENAME_ROOT))) {
+     		if (!( add_CATEGORY_NAME_node(FILENAME_ROOT))) {
      			liberate_CATEGORY_NAME(FILENAME_ROOT);
      			break;
      		}
@@ -306,11 +293,11 @@ _node *node = ll_locate_CATEGORY_NAME_node(id);
     return retVal;
 }
 
-private struct CATEGORY_NAME *  CATEGORY_NAME_create(int allocate_uuid, struct CATEGORY_NAME *initial_FILENAME_ROOT) {
+private struct CATEGORY_NAME *  CATEGORY_NAME_create(struct CATEGORY_NAME *initial_FILENAME_ROOT) {
 [[[cog t.profile('creates')]]]
 [[[end]]]
 	struct CATEGORY_NAME *new_FILENAME_ROOT = clone_CATEGORY_NAME(initial_FILENAME_ROOT);
-	add_CATEGORY_NAME_node(1, new_FILENAME_ROOT);
+	add_CATEGORY_NAME_node(new_FILENAME_ROOT);
 	autosave_CATEGORY_NAME_nodes();
 	return new_FILENAME_ROOT;
 }
