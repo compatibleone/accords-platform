@@ -218,6 +218,7 @@ private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_r
 	struct rest_response *prest_response_dummy;
 	struct rest_response *prest_response_createvm;
 	struct	onapp * pptr;
+	struct onapp_action_context context = onapp_action_context_crud_default;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
@@ -234,6 +235,7 @@ private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_r
 			rptr,
 			prest_response_dummy,
 			nptr->contents,
+			&context,
 			GA_OWN
 		);
 
@@ -243,6 +245,8 @@ private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_r
 		}
 
 		prest_response_dummy = liberate_rest_response(prest_response_dummy);
+
+		// Ignore context dirty flag and assume that calling code will take care of state.
 		return (0);
 	}
 }

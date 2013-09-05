@@ -87,7 +87,7 @@ public struct rest_request * allocate_rest_request()
 void dump_rest_request(FILE *h, struct rest_request *rptr)
 {
 	/* rest_request *rptr */
-	fprintf(h, "Port %d, %s, '%s', '%s'\n", rptr->port, rptr->method, rptr->object, rptr->parameters);
+	fprintf(h, "\n=== REST Request Port %d, %s, '%s', '%s'===\n", rptr->port, rptr->method, rptr->object, rptr->parameters);
 	struct rest_header * header = rptr->first;
 	if (header != NULL) while (header->previous != NULL) header = header->previous;
 	while (header != NULL && header != rptr->last)
