@@ -22,7 +22,6 @@
 
 private int intercloudGW_create(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct intercloudGW * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -125,7 +124,6 @@ private int intercloudGW_create(struct occi_category * optr, void * vptr, struct
 
 private int intercloudGW_retrieve(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct intercloudGW * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -228,7 +226,6 @@ private int intercloudGW_retrieve(struct occi_category * optr, void * vptr, stru
 
 private int intercloudGW_update(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct intercloudGW * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -331,7 +328,6 @@ private int intercloudGW_update(struct occi_category * optr, void * vptr, struct
 
 private int intercloudGW_delete(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct intercloudGW * pptr;
 	char sendstr[1024];
 	char strtmp[1024];

@@ -22,7 +22,6 @@
 
 private int linkgw_create(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct linkgw * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -229,7 +228,6 @@ private int linkgw_create(struct occi_category * optr, void * vptr, struct rest_
 
 private int linkgw_retrieve(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct linkgw * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -436,7 +434,6 @@ private int linkgw_retrieve(struct occi_category * optr, void * vptr, struct res
 
 private int linkgw_update(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct linkgw * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -643,7 +640,6 @@ private int linkgw_update(struct occi_category * optr, void * vptr, struct rest_
 
 private int linkgw_delete(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct linkgw * pptr;
 	char sendstr[1024];
 	char strtmp[1024];

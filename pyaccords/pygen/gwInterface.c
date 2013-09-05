@@ -22,7 +22,6 @@
 
 private int gw_create(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct gw * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -203,7 +202,6 @@ private int gw_create(struct occi_category * optr, void * vptr, struct rest_requ
 
 private int gw_retrieve(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct gw * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -384,7 +382,6 @@ private int gw_retrieve(struct occi_category * optr, void * vptr, struct rest_re
 
 private int gw_update(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct gw * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -565,7 +562,6 @@ private int gw_update(struct occi_category * optr, void * vptr, struct rest_requ
 
 private int gw_delete(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct gw * pptr;
 	char sendstr[1024];
 	char strtmp[1024];

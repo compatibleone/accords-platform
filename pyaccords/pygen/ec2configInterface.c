@@ -24,7 +24,6 @@
 
 private int ec2config_create(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -234,7 +233,6 @@ private int ec2config_create(struct occi_category * optr, void * vptr, struct re
 
 private int ec2config_retrieve(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -443,7 +441,6 @@ private int ec2config_retrieve(struct occi_category * optr, void * vptr, struct 
 
 private int ec2config_update(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
@@ -652,7 +649,6 @@ private int ec2config_update(struct occi_category * optr, void * vptr, struct re
 
 private int ec2config_delete(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct occi_kind_node * nptr;
 	struct ec2config * pptr;
 	char sendstr[1024];
 	char strtmp[1024];
