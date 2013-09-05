@@ -107,48 +107,6 @@ private	struct rest_response * stop_monitor(
 }
 
 /*	-------------------------------------------	*/
-/* 	      c r e a t e _ m o n i t o r  		*/
-/*	-------------------------------------------	*/
-private	int	create_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_monitor * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ m o n i t o r  		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_monitor * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ m o n i t o r  		*/
-/*	-------------------------------------------	*/
-private	int	update_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_monitor * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	      d e l e t e _ m o n i t o r	  	*/
 /*	-------------------------------------------	*/
 private	int	delete_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
@@ -165,9 +123,9 @@ private	int	delete_monitor(struct occi_category * optr, void * vptr,struct rest_
 }
 
 private	struct	occi_interface	monitor_interface = {
-	create_monitor,
-	retrieve_monitor,
-	update_monitor,
+	NULL,
+	NULL,
+	NULL,
 	delete_monitor
 	};
 

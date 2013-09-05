@@ -355,47 +355,6 @@ private	struct rest_response * stop_connection(
 		else	return( rest_html_response( aptr, status, "Failure" ) );
 	}
 }
-/*	-------------------------------------------	*/
-/* 	      c r e a t e _ c o n n e c t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	create_connection(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_connection * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ c o n n e c t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_connection(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_connection * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ c o n n e c t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	update_connection(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_connection * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
 
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ c o n n e c t i o n  	*/
@@ -424,9 +383,9 @@ private	int	delete_connection(struct occi_category * optr, void * vptr,struct re
 }
 
 private	struct	occi_interface	connection_interface = {
-	create_connection,
-	retrieve_connection,
-	update_connection,
+	NULL,
+	NULL,
+	NULL,
 	delete_connection
 	};
 

@@ -111,48 +111,6 @@ private	struct rest_response * stop_session(
 }
 
 /*	-------------------------------------------	*/
-/* 	      c r e a t e _ c o n t r a c t  		*/
-/*	-------------------------------------------	*/
-private	int	create_session(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_session * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return( 0 ); 
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ c o n t r a c t  		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_session(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_session * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ c o n t r a c t  		*/
-/*	-------------------------------------------	*/
-private	int	update_session(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_session * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	      d e l e t e _ c o n t r a c t	  	*/
 /*	-------------------------------------------	*/
 private	int	delete_monitoring_session(struct occi_category * optr,struct cords_session * pptr)
@@ -210,9 +168,9 @@ private	int	delete_session(struct occi_category * optr, void * vptr,struct rest_
 
 private	struct	occi_interface	session_interface = 
 {
-	create_session,
-	retrieve_session,
-	update_session,
+	NULL,
+	NULL,
+	NULL,
 	delete_session
 };
 

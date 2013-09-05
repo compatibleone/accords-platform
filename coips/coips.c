@@ -871,53 +871,11 @@ private	int	create_cords_application(struct occi_category * optr, void * vptr,st
 	}
 }
 
-/*	-------------------------------------------	*/
-/* 	  r e t r i e v e _ a p p l i c a t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_cords_application(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_application * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ a p p l i c a t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	update_cords_application(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_application * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ a p p l i c a t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	delete_cords_application(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_application * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
 private	struct	occi_interface	cords_application_interface = {
 	create_cords_application,
-	retrieve_cords_application,
-	update_cords_application,
-	delete_cords_application
+	NULL,
+	NULL,
+	NULL
 	};
 
 #include "saas.h"

@@ -908,33 +908,6 @@ private	int	create_service(struct occi_category * optr, void * vptr,struct rest_
 	else	return( create_service_graph( optr, pptr ) ); 
 }
 
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ s e r v i c e  		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_service * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ s e r v i c e  		*/
-/*	-------------------------------------------	*/
-private	int	update_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_service * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
 
 /*	-------------------------------------------	*/
 /* 	      d e l e t e _ s e r v i c e	  	*/
@@ -952,8 +925,8 @@ private	int	delete_service(struct occi_category * optr, void * vptr,struct rest_
 
 private	struct	occi_interface	service_interface = {
 	create_service,
-	retrieve_service,
-	update_service,
+	NULL,
+	NULL,
 	delete_service
 	};
 

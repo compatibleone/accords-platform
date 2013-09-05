@@ -1114,32 +1114,6 @@ private	int	create_windowsazure(struct occi_category * optr, void * vptr,struct 
 	else	return(create_windowsazure_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WazProcci.tls));
 }
 
-/*	-------------------------------------------	*/
-/* 	 r e t r i e v e _ w i n d o w s a z u r e  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_windowsazure(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	windowsazure * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	   u p d a t e _ w i n d o w s a z u r e  	*/
-/*	-------------------------------------------	*/
-private	int	update_windowsazure(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	windowsazure * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);}
 
 /*	-------------------------------------------	*/
 /* 	   d e l e t e _ w i n d o w s a z u r e  	*/
@@ -1157,8 +1131,8 @@ private	int	delete_windowsazure(struct occi_category * optr, void * vptr,struct 
 
 private	struct	occi_interface	windowsazure_interface = {
 	create_windowsazure,
-	retrieve_windowsazure,
-	update_windowsazure,
+	NULL,
+	NULL,
 	delete_windowsazure
 	};
 

@@ -174,34 +174,6 @@ private	int	create_computenext(struct occi_category * optr, void * vptr, struct 
 }
 
 /*	-------------------------------------------	*/
-/* 	 r e t r i e v e _ c o m p u t e n e x t    */
-/*	-------------------------------------------	*/
-private	int	retrieve_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	computenext * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	   u p d a t e _ c o m p u t e n e x t		*/
-/*	-------------------------------------------	*/
-private	int	update_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	computenext * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	   d e l e t e  _ c o m p u t e n e x t     */
 /*	-------------------------------------------	*/
 private	int	delete_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
@@ -220,8 +192,8 @@ private	int	delete_computenext(struct occi_category * optr, void * vptr, struct 
 /*	--------------------------------------------	*/
 private	struct	occi_interface	cnprocci_interface = {
 	create_computenext,
-	retrieve_computenext,
-	update_computenext,
+	NULL,
+	NULL,
 	delete_computenext
 	};	
 

@@ -35,53 +35,12 @@ private	int	create_provider(struct occi_category * optr, void * vptr,struct rest
 	
 }
 
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ p r o v i d e r  		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_provider(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_provider * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ p r o v i d e r  		*/
-/*	-------------------------------------------	*/
-private	int	update_provider(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_provider * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ p r o v i d e r	  	*/
-/*	-------------------------------------------	*/
-private	int	delete_provider(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_provider * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
 
 private	struct	occi_interface	provider_interface = {
 	create_provider,
-	retrieve_provider,
-	update_provider,
-	delete_provider
+	NULL,
+	NULL,
+	NULL
 	};
 
 
