@@ -156,11 +156,12 @@ typedef int (*callback_func)(struct occi_category * optr, void * vptr,struct res
 
 struct	occi_interface
 {
-    callback_func create;
+    // This callback will pass a pointer to the category object before it is passed to the backend for storage
+    // It should be used for any initialisation of the object 
+    callback_func pre_create;   
 	callback_func retrieve;
 	callback_func update;
-	callback_func delete;
-	callback_func pre_create; // TODO Should pre_create have any value passed with it?
+	callback_func delete; 
 	callback_func pre_retrieve;
 	callback_func pre_update;
 	callback_func pre_delete;

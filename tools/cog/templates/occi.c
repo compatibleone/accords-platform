@@ -223,7 +223,6 @@ private struct rest_response * CATEGORY_NAME_post_item(
 	}
 	liberate_CATEGORY_NAME(initial_FILENAME_ROOT);
 	if (iptr) {
-	    CATEGORY_NAME_execute_callback(iptr->create, new_FILENAME_ROOT, optr, rptr);
         CATEGORY_NAME_execute_callback(iptr->post_create, new_FILENAME_ROOT, optr, rptr);
 	}
 	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,new_FILENAME_ROOT->id);
