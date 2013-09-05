@@ -64,14 +64,9 @@ struct	cords_oa_contract
 struct onapp_action_context
 {
 	OnAppBool onapp_dirty;
-	OnAppBool onapp_clone;
 };
 
-static struct onapp_action_context const onapp_action_context_action_default = { OABOOL_FALSE // onapp_dirty
-	, OABOOL_TRUE // onapp_clone (actions typically need to clone their onapp * since it is liberated at end of POST action)
-};
-static struct onapp_action_context const onapp_action_context_crud_default = { OABOOL_FALSE // onapp_dirty
-	, OABOOL_FALSE // onapp_clone
+static struct onapp_action_context const onapp_action_context_default = { OABOOL_FALSE // onapp_dirty
 };
 
 private	int	terminate_onapp_contract( int status, struct cords_oa_contract * cptr );
@@ -351,24 +346,8 @@ void handle_onapp_action_context(struct onapp *ponapp, struct onapp_action_conte
 	{
 		if (context->onapp_dirty != OABOOL_FALSE) // If onapp has changed
 		{
-			if (context->onapp_clone != OABOOL_FALSE) // If need to clone onapp
-			{
-				// Poor man's clone.
-				ponapp_update = onapp_backend->retrieve_from_id(ponapp->id);
-
-				if (ponapp_update == NULL && ponapp != NULL)
-				{
-					// TODO: Error
-				}
-
-			} // Ends if need to clone onapp
-
-			if (ponapp_update != NULL) // If got an onapp to update with
-			{
-				// Update takes ownership of onapp * parameter.
-				onapp_backend->update(ponapp_update->id, ponapp_update);
-
-			} // Ends if got an onapp to update with
+			// Update clones onapp * parameter.
+			onapp_backend->update(ponapp_update->id, ponapp_update);
 
 		} // Ends if onapp has changed
 	}
@@ -852,7 +831,7 @@ public	struct	rest_response * stop_onapp(
 	struct rest_response *prest_response_result = NULL;
 	int status;
 	struct onapp * ponapp;
-	struct onapp_action_context context = onapp_action_context_action_default;
+	struct onapp_action_context context = onapp_action_context_default;
 	if (!( ponapp = vptr ))
 	{
 		prest_response_result = rest_html_response( prest_response, 404, "Invalid Action" );
@@ -1151,8 +1130,7 @@ public	int	delete_onapp_contract(
 {
 	struct	oa_response * oaptr;
 	int result = 0;
-	struct onapp_action_context context = onapp_action_context_crud_default;
-	context.onapp_clone = OABOOL_TRUE; // Delete CRUD operations liberate onapp *.
+	struct onapp_action_context context = onapp_action_context_default;
 
 	if (1)
 	{
