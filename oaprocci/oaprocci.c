@@ -248,34 +248,6 @@ private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_r
 }
 
 /*	-------------------------------------------	*/
-/* 	 r e t r i e v e _ o n a p p    */
-/*	-------------------------------------------	*/
-private	int	retrieve_onapp(struct occi_category * optr, void * vptr, struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	onapp * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	   u p d a t e _ o n a p p		*/
-/*	-------------------------------------------	*/
-private	int	update_onapp(struct occi_category * optr, void * vptr, struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	onapp * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	   d e l e t e  _ o n a p p                 */
 /*	-------------------------------------------	*/
 private	int	delete_onapp(struct occi_category * optr, void * vptr, struct rest_request * rptr)
@@ -294,8 +266,8 @@ private	int	delete_onapp(struct occi_category * optr, void * vptr, struct rest_r
 /*	--------------------------------------------	*/
 private	struct	occi_interface	oaprocci_interface = {
 	create_onapp,
-	retrieve_onapp,
-	update_onapp,
+	NULL,
+	NULL,
 	delete_onapp
 	};	
 

@@ -942,48 +942,6 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 }
 
 /*	-------------------------------------------	*/
-/* 	      c r e a t e _ c o n t r a c t  		*/
-/*	-------------------------------------------	*/
-private	int	create_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_contract * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return( 0 ); 
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ c o n t r a c t  		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_contract * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ c o n t r a c t  		*/
-/*	-------------------------------------------	*/
-private	int	update_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_contract * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	      d e l e t e _ c o n t r a c t	  	*/
 /*	-------------------------------------------	*/
 private	int	delete_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
@@ -998,11 +956,11 @@ private	int	delete_contract(struct occi_category * optr, void * vptr,struct rest
 }
 
 private	struct	occi_interface	contract_interface = {
-	create_contract,
-	retrieve_contract,
-	update_contract,
-	delete_contract
-	};
+    NULL,
+    NULL,
+    NULL,
+    delete_contract
+};
 
 
 /*	------------------------------------------------------------------	*/

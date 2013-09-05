@@ -163,34 +163,6 @@ private	int	create_example(struct occi_category * optr, void * vptr,struct rest_
 }
 
 /*	-------------------------------------------	*/
-/* 	 r e t r i e v e _ e x a m p l e 	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_contract * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	   u p d a t e _ e x a m p l e		*/
-/*	-------------------------------------------	*/
-private	int	update_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_contract * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	   d e l e t e  _ e x a m p l e 		*/
 /*	-------------------------------------------	*/
 private	int	delete_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
@@ -209,8 +181,8 @@ private	int	delete_example(struct occi_category * optr, void * vptr,struct rest_
 /*	--------------------------------------------	*/
 private	struct	occi_interface	example_interface = {
 	create_example,
-	retrieve_example,
-	update_example,
+	NULL,
+	NULL,
 	delete_example
 	};	
 

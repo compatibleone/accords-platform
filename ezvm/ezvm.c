@@ -251,34 +251,6 @@ private	int	create_cords_vm(struct occi_category * optr, void * vptr, struct res
 }
 
 /*	-------------------------------------------	*/
-/* 	 	 r e t r i e v e _ v m   		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_cords_vm(struct occi_category * optr, void * vptr, struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_vm * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	  	    u p d a t e _ v m   		*/
-/*	-------------------------------------------	*/
-private	int	update_cords_vm(struct occi_category * optr, void * vptr, struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_vm * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	  	    d e l e t e _ v m  		 	*/
 /*	-------------------------------------------	*/
 private	int	delete_cords_vm(struct occi_category * optr, void * vptr, struct rest_request * rptr)
@@ -300,8 +272,8 @@ private	int	delete_cords_vm(struct occi_category * optr, void * vptr, struct res
 
 private	struct	occi_interface	cords_vm_interface = {
 	create_cords_vm,
-	retrieve_cords_vm,
-	update_cords_vm,
+	NULL,
+	NULL,
 	delete_cords_vm
 	};
 

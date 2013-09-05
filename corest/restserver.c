@@ -72,7 +72,7 @@ public	int	rest_thread_control(int new_value)
 /*	------------------------------------------------	*/
 /*		r e s t _ v a l i d _ s t r i n g		*/
 /*	------------------------------------------------	*/
-public	int	rest_valid_string( char * vptr )
+public	int	rest_valid_string( const char * vptr )
 {
 	if (!( vptr ))
 		return( 0 );

@@ -640,34 +640,6 @@ private	int	create_openstack(struct occi_category * optr, void * vptr,struct res
 }
 
 /*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ o p e n s t a c k  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_openstack(struct occi_category * optr, void * vptr,struct rest_request *rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ o p e n s t a c k 	 	*/
-/*	-------------------------------------------	*/
-private	int	update_openstack(struct occi_category * optr, void * vptr,struct rest_request *rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	      d e l e t e _ o p e n s t a c k  		*/
 /*	-------------------------------------------	*/
 private	int	delete_openstack(struct occi_category * optr, void * vptr,struct rest_request *rptr)
@@ -683,8 +655,8 @@ private	int	delete_openstack(struct occi_category * optr, void * vptr,struct res
 
 private	struct	occi_interface	openstack_interface = {
 	create_openstack,
-	retrieve_openstack,
-	update_openstack,
+	NULL,
+	NULL,
 	delete_openstack
 	};
 

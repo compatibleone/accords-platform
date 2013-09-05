@@ -533,53 +533,11 @@ private	int	create_proactive(struct occi_category * optr, void * vptr)
 	else	return(create_proactive_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WpaProcci.tls));
 }
 
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ p r o a c t i v e  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_proactive(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	proactive * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ p r o a c t i v e 	 	*/
-/*	-------------------------------------------	*/
-private	int	update_proactive(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	proactive * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ p r o a c t i v e  		*/
-/*	-------------------------------------------	*/
-private	int	delete_proactive(struct occi_category * optr, void * vptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	proactive * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
 private	struct	occi_interface	proactive_interface = {
 	create_proactive,
-	retrieve_proactive,
-	update_proactive,
-	delete_proactive
+	NULL,
+	NULL,
+	NULL
 	};
 
 /*	-------------------------------------------	*/

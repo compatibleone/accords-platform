@@ -165,34 +165,6 @@ private	int	create_paas(struct occi_category * optr, void * vptr,struct rest_req
 }
 
 /*	-------------------------------------------	*/
-/* 	 	r e t r i e v e _ p a a s 	  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	paas * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 		u p d a t e _ p a a s 		*/
-/*	-------------------------------------------	*/
-private	int	update_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	paas * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 		d e l e t e  _ p a a s		*/
 /*	-------------------------------------------	*/
 private	int	delete_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
@@ -211,8 +183,8 @@ private	int	delete_paas(struct occi_category * optr, void * vptr,struct rest_req
 /*	--------------------------------------------	*/
 private	struct	occi_interface	paas_interface = {
 	create_paas,
-	retrieve_paas,
-	update_paas,
+	NULL,
+	NULL,
 	delete_paas
 	};	
 

@@ -794,34 +794,6 @@ private	int	create_opennebula(struct occi_category * optr, void * vptr,struct re
 }
 
 /*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ o p e n n e b u l a  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	opennebula * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ o p e n n e b u l a  	*/
-/*	-------------------------------------------	*/
-private	int	update_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	opennebula * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	      d e l e t e _ o p e n n e b u l a  	*/
 /*	-------------------------------------------	*/
 private	int	delete_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
@@ -837,8 +809,8 @@ private	int	delete_opennebula(struct occi_category * optr, void * vptr,struct re
 
 private	struct	occi_interface	opennebula_interface = {
 	create_opennebula,
-	retrieve_opennebula,
-	update_opennebula,
+	NULL,
+	NULL,
 	delete_opennebula
 	};
 
