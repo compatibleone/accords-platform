@@ -21,7 +21,7 @@ struct	occi_category
 	char 			* rating;
 	int			  access;
 	void			* interface;
-	void			* callback;
+	struct occi_interface* callback;
 	void			* payload;
 	char *	(*html_rendering)(struct occi_category * cptr,struct rest_header  * hptr );
 
