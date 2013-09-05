@@ -831,7 +831,7 @@ public	struct rest_response * rest_file_response( struct rest_response  * aptr, 
 		return( aptr );
 	else
 	{
-		sprintf(buffer,"%u",info.st_size);
+		sprintf(buffer,"%u",(unsigned)info.st_size);
 		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, buffer ) ))
 			return( aptr );
 		else 

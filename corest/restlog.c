@@ -131,7 +131,7 @@ public 	int	rest_log_file( char * buffer )
 		return(46);
 	else
 	{
-		fprintf(h,"%u:%u:%u: %s\n",time((long *) 0),getpid(),rest_thread_id(),buffer);
+		fprintf(h,"%u:%u:%u: %s\n",(unsigned) time((long *) 0),getpid(),rest_thread_id(),buffer);
 		fclose(h);
 		return(0);
 	}
