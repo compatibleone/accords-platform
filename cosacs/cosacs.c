@@ -664,53 +664,11 @@ private	int	create_cords_script(struct occi_category * optr, void * vptr,struct 
 	else	return( 0 );
 }
 
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ s c r i p t  		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_cords_script(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_script * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ s c r i p t 	 	*/
-/*	-------------------------------------------	*/
-private	int	update_cords_script(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_script * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ s c r i p t  		*/
-/*	-------------------------------------------	*/
-private	int	delete_cords_script(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_script * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
 private	struct	occi_interface	cords_script_interface = {
 	create_cords_script,
-	retrieve_cords_script,
-	update_cords_script,
-	delete_cords_script
+	NULL,
+	NULL,
+	NULL
 	};
 
 /*	-------------------------------------------------	*/
@@ -863,55 +821,12 @@ private	int	create_metadata(struct occi_category * optr, void * vptr,struct rest
 	else	return( intercept_metadata( pptr->name, pptr->value ) );
 }
 
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ c o n t r a c t  		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_metadata(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_metadata * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ c o n t r a c t  		*/
-/*	-------------------------------------------	*/
-private	int	update_metadata(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_metadata * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ c o n t r a c t	  	*/
-/*	-------------------------------------------	*/
-private	int	delete_metadata(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_metadata * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
 private	struct	occi_interface	cords_metadata_interface = 
 {
 	create_metadata,
-	retrieve_metadata,
-	update_metadata,
-	delete_metadata
+	NULL,
+	NULL,
+	NULL
 };
 
 /*	------------------------------------------------------------------	*/

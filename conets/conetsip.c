@@ -72,53 +72,12 @@ private	int	create_ipaddress(struct occi_category * optr, void * vptr,struct res
         
 }
 
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ i p a d d r e s s  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_ipaddress(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_ipaddress * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ i p a d d r e s s 	 	*/
-/*	-------------------------------------------	*/
-private	int	update_ipaddress(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_ipaddress * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ i p a d d r e s s  		*/
-/*	-------------------------------------------	*/
-private	int	delete_ipaddress(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_ipaddress * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
 
 private	struct	occi_interface	ipaddress_interface = {
 	create_ipaddress,
-	retrieve_ipaddress,
-	update_ipaddress,
-	delete_ipaddress
+	NULL,
+	NULL,
+	NULL
 	};
 
 #endif	/* _conetsip_c */

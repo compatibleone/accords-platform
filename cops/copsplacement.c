@@ -444,50 +444,6 @@ private	struct rest_response * choose_placement(
 	}
 }
 
-/*	-------------------------------------------	*/
-/* 	      c r e a t e _ p l a c e m e n t  		*/
-/*	-------------------------------------------	*/
-private	int	create_placement(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_placement * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->node ))
-		return( 0 ); 
-	else	return( 0 );
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ p l a c e m e n t  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_placement(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_placement * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ p l a c e m e n t 	 	*/
-/*	-------------------------------------------	*/
-private	int	update_placement(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_placement * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
 /*	-----------------------------------------------------------	*/
 /* 	      d e l e t e _ p l a c e m e n t _ q u a n t i t i e s	*/
 /*	-----------------------------------------------------------	*/
@@ -533,9 +489,9 @@ private	int	delete_placement(struct occi_category * optr, void * vptr,struct res
 
 private	struct	occi_interface	placement_interface = 
 {
-	create_placement,
-	retrieve_placement,
-	update_placement,
+    NULL,
+    NULL,
+    NULL,
 	delete_placement
 };
 

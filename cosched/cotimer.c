@@ -754,34 +754,6 @@ private	int	create_timer(struct occi_category * optr, void * vptr,struct rest_re
 }
 
 /*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ t i m e r  		*/
-/*	-------------------------------------------	*/
-private	int	retrieve_timer(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_timer * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ t i m e r  			*/
-/*	-------------------------------------------	*/
-private	int	update_timer(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	cords_timer * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
 /* 	      d e l e t e _ t i m e r		  	*/
 /*	-------------------------------------------	*/
 private	int	delete_timer(struct occi_category * optr, void * vptr,struct rest_request * rptr)
@@ -797,8 +769,8 @@ private	int	delete_timer(struct occi_category * optr, void * vptr,struct rest_re
 
 private	struct	occi_interface	timer_interface = {
 	create_timer,
-	retrieve_timer,
-	update_timer,
+	NULL,
+	NULL,
 	delete_timer
 	};
 
