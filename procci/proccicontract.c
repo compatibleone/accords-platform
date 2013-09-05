@@ -946,13 +946,9 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 /*	-------------------------------------------	*/
 private	int	delete_contract(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_contract * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_generic_contract(optr, pptr));
+	pptr = vptr;
+    return(delete_generic_contract(optr, pptr));
 }
 
 private	struct	occi_interface	contract_interface = {

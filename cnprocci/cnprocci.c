@@ -164,13 +164,9 @@ private	struct rest_extension * cnprocci_extension( void * v,struct rest_server 
 /*	-------------------------------------------	*/
 private	int	create_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	computenext * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(create_computenext_contract(optr, pptr,rptr));
+	pptr = vptr;
+    return(create_computenext_contract(optr, pptr,rptr));
 }
 
 /*	-------------------------------------------	*/
@@ -178,13 +174,9 @@ private	int	create_computenext(struct occi_category * optr, void * vptr, struct 
 /*	-------------------------------------------	*/
 private	int	delete_computenext(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	computenext * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_computenext_contract(optr, pptr, rptr));
+	pptr = vptr;
+    return(delete_computenext_contract(optr, pptr, rptr));
 }
 
 /*	--------------------------------------------	*/

@@ -479,19 +479,12 @@ private	int	master_create_publication( struct cords_publication * pptr )
 private	int	create_publication(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
 	struct occi_response * zptr=(struct occi_response *) 0;
-	struct	occi_kind_node * nptr;
 	struct	cords_publication * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else
-	{
-		pptr->when  = time((long *) 0);
-		pptr->uptime = 0;
-		pptr->state  = _OCCI_RUNNING;
-		return( master_create_publication( pptr ) );
-	}
+	pptr = vptr;
+    pptr->when  = time((long *) 0);
+    pptr->uptime = 0;
+    pptr->state  = _OCCI_RUNNING;
+    return( master_create_publication( pptr ) );
 }
 
 /*	-----------------------------------------------------	*/
@@ -523,16 +516,10 @@ private	int	master_retrieve_publication( struct cords_publication * pptr )
 /*	-------------------------------------------	*/
 private	int	retrieve_publication(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_publication * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	{
-		pptr->uptime = (time((long*) 0) - pptr->when);
-		return( master_retrieve_publication( pptr ) );
-	}
+	pptr = vptr;
+    pptr->uptime = (time((long*) 0) - pptr->when);
+    return( master_retrieve_publication( pptr ) );
 }
 
 /*	-------------------------------------------------	*/
@@ -568,17 +555,10 @@ private	int	master_update_publication( struct cords_publication * pptr )
 /*	-------------------------------------------	*/
 private	int	update_publication(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_publication * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else
-	{
-		pptr->uptime = (time((long*) 0) - pptr->when);
-		return( master_update_publication( pptr ) );
-	}
+	pptr = vptr;
+    pptr->uptime = (time((long*) 0) - pptr->when);
+    return( master_update_publication( pptr ) );
 }
 
 /*	-------------------------------------------------	*/
@@ -607,13 +587,9 @@ private	int	master_delete_publication( struct cords_publication * pptr )
 /*	-------------------------------------------	*/
 private	int	delete_publication(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_publication * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return( master_delete_publication( pptr ) );
+	pptr = vptr;
+    return( master_delete_publication( pptr ) );
 }
 
 private	struct	occi_interface	publication_interface = {
@@ -636,19 +612,12 @@ private	struct	occi_interface	enquiry_interface = {
 /*	-------------------------------------------	*/
 private	int	create_agency(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_agency * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else
-	{
-		pptr->start  = time((long *) 0);
-		pptr->uptime = 0;
-		pptr->state  = 1;
-		return(0);
-	}
+	pptr = vptr;
+    pptr->start  = time((long *) 0);
+    pptr->uptime = 0;
+    pptr->state  = 1;
+    return(0);
 }
 
 /*	-------------------------------------------	*/
@@ -656,17 +625,10 @@ private	int	create_agency(struct occi_category * optr, void * vptr,struct rest_r
 /*	-------------------------------------------	*/
 private	int	retrieve_agency(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_agency * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else
-	{
-		pptr->uptime = (time((long*) 0) - pptr->start);
-		return(0);
-	}
+	pptr = vptr;
+    pptr->uptime = (time((long*) 0) - pptr->start);
+    return(0);
 }
 
 

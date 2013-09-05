@@ -6,17 +6,10 @@
 /*	-------------------------------------------	*/
 private	int	create_event(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_event * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else
-	{
-		pptr->timestamp = time((long*) 0);
-		return(0);
-	}
+	pptr = vptr;
+    pptr->timestamp = time((long*) 0);
+    return(0);
 }
 
 private	struct	occi_interface	event_interface = 

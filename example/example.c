@@ -153,13 +153,9 @@ private	struct rest_extension * example_extension( void * v,struct rest_server *
 /*	-------------------------------------------	*/
 private	int	create_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	exampleprocci * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(create_example_contract(optr, pptr));
+	pptr = vptr;
+    return(create_example_contract(optr, pptr));
 }
 
 /*	-------------------------------------------	*/
@@ -167,13 +163,9 @@ private	int	create_example(struct occi_category * optr, void * vptr,struct rest_
 /*	-------------------------------------------	*/
 private	int	delete_example(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	exampleprocci * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_example_contract(optr, pptr));
+	pptr = vptr;
+    return(delete_example_contract(optr, pptr));
 }
 
 /*	--------------------------------------------	*/

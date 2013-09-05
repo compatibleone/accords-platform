@@ -23,18 +23,13 @@
 /*	-------------------------------------------	*/
 private	int	create_ipaddress(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_ipaddress * pptr;
 	time_t  timestamp;
-        char timebuff[256];
-        char * range; 
-        char * domainame;
+    char timebuff[256];
+    char * range; 
+    char * domainame;
 	
-
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
         
 	if (!( pptr->version ))
          	pptr->version=_DEFAULT_VERSION;

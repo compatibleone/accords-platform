@@ -1105,13 +1105,9 @@ private	struct	rest_response * revert_windowsazure(
 /*	-------------------------------------------	*/
 private	int	create_windowsazure(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	windowsazure * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(create_windowsazure_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WazProcci.tls));
+	pptr = vptr;
+    return(create_windowsazure_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WazProcci.tls));
 }
 
 
@@ -1120,13 +1116,9 @@ private	int	create_windowsazure(struct occi_category * optr, void * vptr,struct 
 /*	-------------------------------------------	*/
 private	int	delete_windowsazure(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	windowsazure * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_windowsazure_contract(optr, pptr, _CORDS_CONTRACT_AGENT, WazProcci.tls));
+	pptr = vptr;
+    return(delete_windowsazure_contract(optr, pptr, _CORDS_CONTRACT_AGENT, WazProcci.tls));
 }
 
 private	struct	occi_interface	windowsazure_interface = {
@@ -1189,10 +1181,10 @@ private	int	set_default_windowsazure(struct occi_category * optr, void * vptr)
 	struct	occi_kind_node * nptr;
 	struct	az_config * pptr;
 	struct	az_config * wptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+    if (!( nptr = vptr ))
+        return(0);
+    else if (!( pptr = nptr->contents ))
+        return(0);
 	else
 	{
 		while ( nptr->previous )

@@ -169,18 +169,14 @@ private	int	create_cords_schedule(struct occi_category * optr, void * vptr,struc
 {
 	struct	rest_header * hptr;
 	struct	occi_response * zptr;
-	struct	occi_kind_node * nptr;
 	char	buffer[1024];
 	struct	cords_schedule * pptr;
 	char *	root;
 	char *	price;
 	char *	work;
 	char * wptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if ( pptr->state )
+	pptr = vptr;
+    if ( pptr->state )
 		return( 0 );
 	else if (!( pptr->operation ))
 		return( 0 );

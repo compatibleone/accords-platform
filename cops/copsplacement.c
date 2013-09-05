@@ -478,13 +478,9 @@ private	int	delete_placement_quantities( struct cords_placement * pptr )
 /*	-------------------------------------------	*/
 private	int	delete_placement(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_placement * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_placement_quantities(pptr));
+	pptr = vptr;
+    return(delete_placement_quantities(pptr));
 }
 
 private	struct	occi_interface	placement_interface = 

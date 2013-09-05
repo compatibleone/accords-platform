@@ -158,13 +158,9 @@ private	struct rest_extension * eziprocci_extension( void * v,struct rest_server
 /*	-------------------------------------------	*/
 private	int	create_easiclouds(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	easiclouds * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(create_easiclouds_contract(optr, pptr));
+	pptr = vptr;
+    return(create_easiclouds_contract(optr, pptr));
 }
 
 /*	-------------------------------------------	*/
@@ -172,13 +168,9 @@ private	int	create_easiclouds(struct occi_category * optr, void * vptr,struct re
 /*	-------------------------------------------	*/
 private	int	delete_easiclouds(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	easiclouds * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_easiclouds_contract(optr, pptr));
+	pptr = vptr;
+    return(delete_easiclouds_contract(optr, pptr));
 }
 
 /*	--------------------------------------------	*/

@@ -206,13 +206,9 @@ private	int	create_cords_vm(struct occi_category * optr, void * vptr, struct res
 	struct	occi_element *	eptr=(struct occi_element *) 0;
 	struct	occi_response * zptr=(struct occi_response*) 0;
 	char *	sptr;
-	struct	occi_kind_node * nptr;
 	struct	cords_vm * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if ( pptr->state )
+	pptr = vptr;
+    if ( pptr->state )
 		return(0);
 	else if (!( pptr->image ))
 		return(0);
@@ -255,13 +251,9 @@ private	int	create_cords_vm(struct occi_category * optr, void * vptr, struct res
 /*	-------------------------------------------	*/
 private	int	delete_cords_vm(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_vm * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->application ))
+	pptr = vptr;
+    if (!( pptr->application ))
 		return(0);
 	else	
 	{

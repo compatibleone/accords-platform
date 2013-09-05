@@ -651,13 +651,9 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 /*	-------------------------------------------	*/
 private	int	create_cords_script(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_script * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->name ))
+	pptr = vptr;
+    if (!( pptr->name ))
 		return( 0 ); 
 	else if (!( strcmp( _COSACS_START, pptr->name ) ))
 		return( cosacs_launch( optr, pptr ) );
@@ -808,13 +804,9 @@ private	int	intercept_metadata( char * nptr, char * vptr )
 /*	-------------------------------------------	*/
 private	int	create_metadata(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_metadata * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( rest_valid_string( pptr->name ) ))
+	pptr = vptr;
+    if (!( rest_valid_string( pptr->name ) ))
 		return( 0 );
 	else if (!( rest_valid_string( pptr->value ) ))
 		return( 0 );

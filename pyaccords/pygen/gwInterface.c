@@ -33,10 +33,7 @@ private int gw_create(struct occi_category * optr, void * vptr, struct rest_requ
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -217,10 +214,7 @@ private int gw_retrieve(struct occi_category * optr, void * vptr, struct rest_re
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -401,10 +395,7 @@ private int gw_update(struct occi_category * optr, void * vptr, struct rest_requ
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -585,10 +576,7 @@ private int gw_delete(struct occi_category * optr, void * vptr, struct rest_requ
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");

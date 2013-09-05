@@ -157,13 +157,9 @@ private	int	delete_monitoring_session(struct occi_category * optr,struct cords_s
 
 private	int	delete_session(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_session * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_monitoring_session(optr, pptr));
+	pptr = vptr;
+    return(delete_monitoring_session(optr, pptr));
 }
 
 private	struct	occi_interface	session_interface = 

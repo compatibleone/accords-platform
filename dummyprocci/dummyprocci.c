@@ -163,13 +163,9 @@ private	struct rest_extension * dummyprocci_extension( void * v,struct rest_serv
 /*	-------------------------------------------	*/
 private	int	create_dummy(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	dummy * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(create_dummy_contract(optr, pptr,rptr));
+	pptr = vptr;
+    return(create_dummy_contract(optr, pptr,rptr));
 }
 
 /*	-------------------------------------------	*/
@@ -177,13 +173,9 @@ private	int	create_dummy(struct occi_category * optr, void * vptr, struct rest_r
 /*	-------------------------------------------	*/
 private	int	retrieve_dummy(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	dummy * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
+	pptr = vptr;
+    return(0);
 }
 
 /*	-------------------------------------------	*/
@@ -191,13 +183,9 @@ private	int	retrieve_dummy(struct occi_category * optr, void * vptr, struct rest
 /*	-------------------------------------------	*/
 private	int	update_dummy(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	dummy * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
+	pptr = vptr;
+    return(0);
 }
 
 /*	-------------------------------------------	*/
@@ -205,13 +193,9 @@ private	int	update_dummy(struct occi_category * optr, void * vptr, struct rest_r
 /*	-------------------------------------------	*/
 private	int	delete_dummy(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	dummy * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_dummy_contract(optr, pptr, rptr));
+	pptr = vptr;
+    return(delete_dummy_contract(optr, pptr, rptr));
 }
 
 /*	--------------------------------------------	*/

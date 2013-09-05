@@ -522,13 +522,9 @@ private	struct	rest_response * revert_proactive(
 /*	-------------------------------------------	*/
 private	int	create_proactive(struct occi_category * optr, void * vptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	proactive * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->node )) 
+	pptr = vptr;
+    if (!( pptr->node )) 
 		return( 0 ); 
 	else	return(create_proactive_contract(optr,pptr, _CORDS_CONTRACT_AGENT, WpaProcci.tls));
 }
@@ -594,10 +590,10 @@ private	int	set_default_proactive(struct occi_category * optr, void * vptr)
 	struct	occi_kind_node * nptr;
 	struct	pa_config * pptr;
 	struct	pa_config * wptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+    if (!( nptr = vptr ))
+        return(0);
+    else if (!( pptr = nptr->contents ))
+        return(0);
 	else
 	{
 		while ( nptr->previous )

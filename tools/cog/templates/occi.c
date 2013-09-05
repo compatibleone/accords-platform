@@ -49,10 +49,8 @@
 struct FILENAME_ROOT_backend_interface * CATEGORY_NAME_backend;
 
 private void CATEGORY_NAME_execute_callback(callback_func func, struct CATEGORY_NAME *target, struct occi_category * optr, struct rest_request * rptr) {
-	if (func) {
-		struct occi_kind_node dummy;
-		dummy.contents = target; // TODO Update callback functions to expect contents, not occi_kind_node
-		(*func)(optr,&dummy,rptr);
+	if (func && target) {
+		(*func)(optr,target,rptr);
 	}
 }
 

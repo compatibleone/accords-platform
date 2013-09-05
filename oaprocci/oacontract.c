@@ -627,10 +627,9 @@ public	struct	rest_response * create_onapp_vm(
 	struct rest_client * cptr,
 	struct rest_request * rptr,
 	struct rest_response * aptr,
-	void * vptr,
+	struct  onapp * pptr,
 	int generate_alert)
 {
-	struct	onapp * pptr;
 	const struct  oa_config * config;
 	struct  oa_response * oaptr;
 	struct rest_request *old_rest_request;
@@ -652,7 +651,7 @@ public	struct	rest_response * create_onapp_vm(
 	/* --------------------------------- */
 	/* retrieve the instance information */
 	/* --------------------------------- */
-	if (!( pptr = vptr ))
+	if (!( pptr))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 
 	/* ------------------------------------- */

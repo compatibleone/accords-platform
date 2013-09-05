@@ -782,13 +782,9 @@ private	struct	rest_response * revert_opennebula(
 /*	-------------------------------------------	*/
 private	int	create_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	opennebula * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->node ))
+	pptr = vptr;
+    if (!( pptr->node ))
 		return( 0 ); 
 	else	return(create_opennebula_contract(optr, pptr, _CORDS_CONTRACT_AGENT, OnProcci.tls));
 }
@@ -798,13 +794,9 @@ private	int	create_opennebula(struct occi_category * optr, void * vptr,struct re
 /*	-------------------------------------------	*/
 private	int	delete_opennebula(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	opennebula * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_opennebula_contract(optr, pptr, _CORDS_CONTRACT_AGENT, OnProcci.tls));
+	pptr = vptr;
+    return(delete_opennebula_contract(optr, pptr, _CORDS_CONTRACT_AGENT, OnProcci.tls));
 }
 
 private	struct	occi_interface	opennebula_interface = {
@@ -865,10 +857,10 @@ private	int	set_default_opennebula(struct occi_category * optr, void * vptr)
 	struct	occi_kind_node * nptr;
 	struct	on_config * pptr;
 	struct	on_config * wptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+    if (!( nptr = vptr ))
+        return(0);
+    else if (!( pptr = nptr->contents ))
+        return(0);
 	else
 	{
 		while ( nptr->previous )

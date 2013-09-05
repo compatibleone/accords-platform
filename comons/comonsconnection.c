@@ -361,25 +361,18 @@ private	struct rest_response * stop_connection(
 /*	-------------------------------------------	*/
 private	int	delete_connection(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_connection * pptr;
 	struct	occi_response * zptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else
-	{
-		if ( pptr->state )
-			stop_connection_probes( pptr );
-		if ( pptr->monitor )
-		{
-			if ((zptr = occi_simple_delete( pptr->monitor, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-				zptr = occi_remove_response( zptr );
-			pptr->monitor = liberate( pptr->monitor );
-		}
-		return(0);
-	}
+	pptr = vptr;
+    if ( pptr->state )
+        stop_connection_probes( pptr );
+    if ( pptr->monitor )
+    {
+        if ((zptr = occi_simple_delete( pptr->monitor, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+            zptr = occi_remove_response( zptr );
+        pptr->monitor = liberate( pptr->monitor );
+    }
+    return(0);
 }
 
 private	struct	occi_interface	connection_interface = {

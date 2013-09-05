@@ -7,13 +7,9 @@
 /*	-------------------------------------------	*/
 private	int	create_provider(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_provider * pptr;
 	char	buffer[256];
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 	
 	if (!( rest_valid_string( pptr->opinion )))
 	{

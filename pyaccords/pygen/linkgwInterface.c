@@ -33,10 +33,7 @@ private int linkgw_create(struct occi_category * optr, void * vptr, struct rest_
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -243,10 +240,7 @@ private int linkgw_retrieve(struct occi_category * optr, void * vptr, struct res
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -453,10 +447,7 @@ private int linkgw_update(struct occi_category * optr, void * vptr, struct rest_
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -663,10 +654,7 @@ private int linkgw_delete(struct occi_category * optr, void * vptr, struct rest_
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");

@@ -100,10 +100,10 @@ private	int	set_default_deltacloud(struct occi_category * optr, void * vptr)
 	struct	occi_kind_node * nptr;
 	struct	dc_config * pptr;
 	struct	dc_config * wptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+    if (!( nptr = vptr ))
+        return(0);
+    else if (!( pptr = nptr->contents ))
+        return(0);
 	else
 	{
 		while ( nptr->previous )

@@ -857,18 +857,11 @@ private	struct rest_response * build_application(
 /*	-------------------------------------------	*/
 private	int	create_cords_application(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_application * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else
-	{
-		pptr->created = time((long *) 0);
-		pptr->state  = 0;
-		return(0);
-	}
+	pptr = vptr;
+    pptr->created = time((long *) 0);
+    pptr->state  = 0;
+    return(0);
 }
 
 private	struct	occi_interface	cords_application_interface = {

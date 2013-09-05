@@ -156,13 +156,9 @@ private	struct	occi_interface	invoice_interface = {
 /*	-------------------------------------------	*/
 private	int	create_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct cords_transaction * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->account ))
+	pptr = vptr;
+    if (!( pptr->account ))
 		return( 0 ); 
 	else
 	{

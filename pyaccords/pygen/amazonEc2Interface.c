@@ -35,10 +35,7 @@ private int amazonEc2_create(struct occi_category * optr, void * vptr, struct re
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 	
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
@@ -352,10 +349,7 @@ private int amazonEc2_retrieve(struct occi_category * optr, void * vptr, struct 
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
@@ -671,10 +665,7 @@ private int amazonEc2_update(struct occi_category * optr, void * vptr, struct re
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
@@ -988,10 +979,7 @@ private int amazonEc2_delete(struct occi_category * optr, void * vptr, struct re
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 	
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);

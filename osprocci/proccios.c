@@ -1843,14 +1843,10 @@ private	struct	rest_response * revert_openstack(
 /*	-------------------------------------------	*/
 private	int	create_openstack(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->node ))
+	pptr = vptr;
+    if (!( pptr->node ))
 		return( 0 ); 
 	else	return(create_openstack_contract(optr,pptr, _CORDS_CONTRACT_AGENT, OsProcci.tls));
 }
@@ -1860,14 +1856,10 @@ private	int	create_openstack(struct occi_category * optr, void * vptr,struct res
 /*	-------------------------------------------	*/
 private	int	delete_openstack(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_openstack_contract(optr, pptr, _CORDS_CONTRACT_AGENT, OsProcci.tls));
+	pptr = vptr;
+    return(delete_openstack_contract(optr, pptr, _CORDS_CONTRACT_AGENT, OsProcci.tls));
 }
 
 private	struct	occi_interface	openstack_interface = {
@@ -1933,9 +1925,9 @@ private	int	set_default_openstack(struct occi_category * optr, void * vptr)
 	struct	os_config * pptr;
 	struct	os_config * wptr;
 	if (!( nptr = vptr ))
-		return(0);
+	    return(0);
 	else if (!( pptr = nptr->contents ))
-		return(0);
+	    return(0);
 	else
 	{
 		while ( nptr->previous )

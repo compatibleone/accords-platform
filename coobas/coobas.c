@@ -198,7 +198,7 @@ private	char * transaction_date( int tt )
 	t = (time_t) tt;
 
 	if (!( tptr = localtime( &t )))
-		sprintf(buffer,"%u",t);
+		sprintf(buffer,"%u",(unsigned)t);
 	else
 	{
 		sprintf(buffer,"%u/%u/%u",
@@ -218,7 +218,7 @@ private	char * transaction_date_and_time( int tt )
 	t = (time_t) tt;
 
 	if (!( tptr = localtime( &t )))
-		sprintf(buffer,"%u",t);
+		sprintf(buffer,"%u",(unsigned)t);
 	else
 	{
 		sprintf(buffer,"%u/%u/%u %u:%u:%u",
@@ -688,15 +688,11 @@ private	int	process_invoice_transactions( struct cords_invoice * pptr )
 /*	-------------------------------------------	*/
 private	int	create_invoice(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct cords_invoice * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( rest_valid_string( pptr->account ) ))
+	pptr = vptr;
+	if (!( rest_valid_string( pptr->account ) ))
 		return( 0 ); 
-	else 	return( process_invoice_transactions( pptr ) );
+	return( process_invoice_transactions( pptr ) );
 }
 
 /*	-------------------------------------------	*/
@@ -704,17 +700,13 @@ private	int	create_invoice(struct occi_category * optr, void * vptr,struct rest_
 /*	-------------------------------------------	*/
 private	int	update_invoice(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct cords_invoice * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if ( pptr->state > 0 )
+	pptr = vptr;
+	if ( pptr->state > 0 )
 		return(0);
 	else if (!( rest_valid_string( pptr->account ) ))
 		return( 0 ); 
-	else 	return( process_invoice_transactions( pptr ) );
+	return( process_invoice_transactions( pptr ) );
 }
 
 private	struct	occi_interface	invoice_interface = {
@@ -729,19 +721,13 @@ private	struct	occi_interface	invoice_interface = {
 /*	-------------------------------------------	*/
 private	int	create_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct cords_transaction * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->account ))
+	pptr = vptr;
+	if (!( pptr->account )) {
 		return( 0 ); 
-	else
-	{
-		pptr->when = time((long *) 0);
-		return( 0 );
 	}
+    pptr->when = time((long *) 0);
+    return( 0 );
 }
 
 

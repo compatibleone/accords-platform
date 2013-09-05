@@ -111,13 +111,9 @@ private	struct rest_response * stop_monitor(
 /*	-------------------------------------------	*/
 private	int	delete_monitor(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_monitor * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->state ))
+	pptr = vptr;
+	if (!( pptr->state ))
 		return( 0 );
 	else	return( stop_monitor_controls( pptr ) );
 }

@@ -214,15 +214,11 @@ int read_body_bytes(char *buffer, int buffer_size, char * body, int body_type)
 /*	-------------------------------------------	*/
 private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct rest_response *prest_response_dummy;
 	struct rest_response *prest_response_createvm;
 	struct	onapp * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (create_onapp_contract(optr, pptr,rptr, _CORDS_CONTRACT_AGENT, OnAppConfiguration.tls) != 0)
+	pptr = vptr;
+    if (create_onapp_contract(optr, pptr,rptr, _CORDS_CONTRACT_AGENT, OnAppConfiguration.tls) != 0)
 		return (0);
 	else
 	{
@@ -233,7 +229,7 @@ private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_r
 			NULL, // rest_client
 			rptr,
 			prest_response_dummy,
-			nptr->contents,
+			pptr,
 			GA_OWN
 		);
 
@@ -252,13 +248,9 @@ private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_r
 /*	-------------------------------------------	*/
 private	int	delete_onapp(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	onapp * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_onapp_contract(optr, pptr, rptr));
+	pptr = vptr;
+    return(delete_onapp_contract(optr, pptr, rptr));
 }
 
 /*	--------------------------------------------	*/

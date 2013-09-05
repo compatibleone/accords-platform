@@ -628,13 +628,9 @@ private	struct	rest_response * stop_occi_openstack(
 /*	-------------------------------------------	*/
 private	int	create_openstack(struct occi_category * optr, void * vptr,struct rest_request *rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->node ))
+	pptr = vptr;
+    if (!( pptr->node ))
 		return( 0 ); 
 	else	return(create_openstack_contract( optr, pptr, _CORDS_CONTRACT_AGENT, default_tls()));
 }
@@ -644,13 +640,9 @@ private	int	create_openstack(struct occi_category * optr, void * vptr,struct res
 /*	-------------------------------------------	*/
 private	int	delete_openstack(struct occi_category * optr, void * vptr,struct rest_request *rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	openstack * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_openstack_contract(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls()));
+	pptr = vptr;
+    return(delete_openstack_contract(optr, pptr, _CORDS_CONTRACT_AGENT, default_tls()));
 }
 
 private	struct	occi_interface	openstack_interface = {

@@ -893,13 +893,9 @@ private	int	create_service_graph(struct occi_category * optr, struct cords_servi
 /*	-------------------------------------------	*/
 private	int	create_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_service * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->sla ))
+	pptr = vptr;
+	if (!( pptr->sla ))
 		return(0);
 	else if (!( strlen( pptr->sla ) ))
 		return(0);
@@ -914,13 +910,9 @@ private	int	create_service(struct occi_category * optr, void * vptr,struct rest_
 /*	-------------------------------------------	*/
 private	int	delete_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_service * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_service_contract(optr, pptr));
+	pptr = vptr;
+    return(delete_service_contract(optr, pptr));
 }
 
 private	struct	occi_interface	service_interface = {

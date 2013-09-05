@@ -23,43 +23,11 @@
 /*	-------------------------------------------	*/
 private	int	create_deltacloud(struct occi_category * optr, void * vptr,struct rest_request *rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	deltacloud * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->node ))
+	pptr = vptr;
+    if (!( pptr->node ))
 		return( 0 ); 
 	else	return(create_deltacloud_contract(optr,pptr, _CORDS_CONTRACT_AGENT, DcProcci.tls));
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ d e l t a c l o u d  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_deltacloud(struct occi_category * optr, void * vptr,struct rest_request *rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	deltacloud * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ d e l t a c l o u d  	*/
-/*	-------------------------------------------	*/
-private	int	update_deltacloud(struct occi_category * optr, void * vptr,struct rest_request *rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct	deltacloud * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
 }
 
 /*	-------------------------------------------	*/
@@ -67,19 +35,15 @@ private	int	update_deltacloud(struct occi_category * optr, void * vptr,struct re
 /*	-------------------------------------------	*/
 private	int	delete_deltacloud(struct occi_category * optr, void * vptr,struct rest_request *rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	deltacloud * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_deltacloud_contract(optr, pptr, _CORDS_CONTRACT_AGENT, DcProcci.tls));
+	pptr = vptr;
+    return(delete_deltacloud_contract(optr, pptr, _CORDS_CONTRACT_AGENT, DcProcci.tls));
 }
 
 private	struct	occi_interface	deltacloud_interface = {
 	create_deltacloud,
-	retrieve_deltacloud,
-	update_deltacloud,
+	NULL,
+	NULL,
 	delete_deltacloud
 	};
 

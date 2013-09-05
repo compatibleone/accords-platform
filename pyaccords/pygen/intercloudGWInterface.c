@@ -33,10 +33,7 @@ private int intercloudGW_create(struct occi_category * optr, void * vptr, struct
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -139,10 +136,7 @@ private int intercloudGW_retrieve(struct occi_category * optr, void * vptr, stru
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -245,10 +239,7 @@ private int intercloudGW_update(struct occi_category * optr, void * vptr, struct
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");
@@ -351,10 +342,7 @@ private int intercloudGW_delete(struct occi_category * optr, void * vptr, struct
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 
 	PyThreadState* pythr=NULL;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(pptr->name)) strcpy(sendstr," ");
 	else if(pptr->name[0]=='\0') strcpy(sendstr," ");

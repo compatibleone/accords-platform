@@ -736,21 +736,14 @@ private	struct	rest_response * stop_timer(
 /*	-------------------------------------------	*/
 private	int	create_timer(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	char 	buffer[256];
 	struct	cords_timer * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else
-	{
-		sprintf(buffer,"%lu",time((long *) 0));
-		pptr->created = allocate_string( buffer );
-		if ( pptr->state )
-			
-		return(0);
-	}
+	pptr = vptr;
+    sprintf(buffer,"%lu",time((long *) 0));
+    pptr->created = allocate_string( buffer );
+    if ( pptr->state )
+        
+    return(0);
 }
 
 /*	-------------------------------------------	*/
@@ -758,13 +751,9 @@ private	int	create_timer(struct occi_category * optr, void * vptr,struct rest_re
 /*	-------------------------------------------	*/
 private	int	delete_timer(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	cords_timer * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(stop_job_timer(pptr));
+	pptr = vptr;
+    return(stop_job_timer(pptr));
 }
 
 private	struct	occi_interface	timer_interface = {

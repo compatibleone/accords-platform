@@ -155,13 +155,9 @@ private	struct rest_extension * paasprocci_extension( void * v,struct rest_serve
 /*	-------------------------------------------	*/
 private	int	create_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	paas * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(create_paas_contract(optr, pptr));
+	pptr = vptr;
+    return(create_paas_contract(optr, pptr));
 }
 
 /*	-------------------------------------------	*/
@@ -169,13 +165,9 @@ private	int	create_paas(struct occi_category * optr, void * vptr,struct rest_req
 /*	-------------------------------------------	*/
 private	int	delete_paas(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	occi_kind_node * nptr;
 	struct	paas * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(delete_paas_contract(optr, pptr));
+	pptr = vptr;
+    return(delete_paas_contract(optr, pptr));
 }
 
 /*	--------------------------------------------	*/

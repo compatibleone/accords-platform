@@ -35,10 +35,7 @@ private int ec2config_create(struct occi_category * optr, void * vptr, struct re
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 	
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
@@ -248,10 +245,7 @@ private int ec2config_retrieve(struct occi_category * optr, void * vptr, struct 
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
@@ -460,10 +454,7 @@ private int ec2config_update(struct occi_category * optr, void * vptr, struct re
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 	
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
@@ -672,10 +663,7 @@ private int ec2config_delete(struct occi_category * optr, void * vptr, struct re
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
+	pptr = vptr;
 	
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
