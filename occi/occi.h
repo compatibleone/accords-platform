@@ -207,15 +207,6 @@ public	struct	rest_response * occi_invoke_action(
 		struct rest_response * aptr,	
 		void * pptr );
 
-public	struct	rest_response * occi_invoke_action_with_parameters(
-		struct occi_action * fptr,	
-		struct rest_header * hptr,
-		struct occi_category * optr,	
-		struct rest_client * cptr,	
-		struct rest_request * rptr,	
-		struct rest_response * aptr,	
-		void * pptr );
-
 public 	struct rest_response *	occi_content_type( 
 	struct occi_category * cptr,
 	struct rest_request * qptr, 

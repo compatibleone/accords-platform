@@ -392,36 +392,6 @@ public	struct	rest_response * occi_invoke_action(
 /*	Actions are invoked in response to post methods	on	*/
 /* 	specific instance identifiers.				*/
 /*	---------------------------------------------------	*/
-public	struct	rest_response * occi_invoke_action_with_parameters(
-		struct occi_action * fptr,	/* the action description element 	*/
-		struct rest_header * hptr,	/* the parameter value attributes 	*/
-		struct occi_category * optr,	/* the category description		*/
-		struct rest_client * cptr,	/* the calling rest client instance	*/
-		struct rest_request * rptr,	/* the request received from the client	*/
-		struct rest_response * aptr,	/* the response under preparation.	*/
-		void * pptr )			/* the actual occi data structure	*/
-{
-	int	status;
-	struct	rest_response * (*action)
-			(
-			struct occi_category * category, 
-			struct rest_client * client, 
-			struct rest_request * request,
-			struct rest_response * response,
-			void * data
-			);
-
-	/* -------------------------------------- */
-	/* undefined actions are silently ignored */
-	/* -------------------------------------- */
-	if (!( action = fptr->action ))
-		return( rest_response_status( aptr, 200, "OK" ) );
-
-	/* ----------------------- */
-	/* lanch the action target */
-	/* ----------------------- */
-	else 	return( (*action)( optr,cptr,rptr,aptr,pptr ) );
-}
 
 /*	---------------------------------------------------------	*/
 /*	O C C I    s t a n d a r d    L I N K    m a n a g e m e n t	*/
