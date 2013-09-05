@@ -152,20 +152,22 @@ struct	occi_action_target
 /*		   o c c i _ c a l l b a c k _ i n t e r f a c e		*/
 /*	-------------------------------------------------------------------	*/
 
+typedef int (*callback_func)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
+
 struct	occi_interface
 {
-	int	(*create)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*retrieve)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*update)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*delete)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*pre_create)  (struct occi_category * optr, void * vptr,struct rest_request * rptr); // TODO Should pre_create have any value passed with it?
-	int	(*pre_retrieve)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*pre_update)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*pre_delete)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*post_create)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*post_retrieve)(struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*post_update)  (struct occi_category * optr, void * vptr,struct rest_request * rptr);
-	int	(*post_delete)  (struct occi_category * optr, void * vptr,struct rest_request * rptr); // TODO Is a post-delete callback useful?
+    callback_func create;
+	callback_func retrieve;
+	callback_func update;
+	callback_func delete;
+	callback_func pre_create; // TODO Should pre_create have any value passed with it?
+	callback_func pre_retrieve;
+	callback_func pre_update;
+	callback_func pre_delete;
+	callback_func post_create;
+	callback_func post_retrieve;
+	callback_func post_update;
+	callback_func post_delete; // TODO Is a post-delete callback useful?
 };
 
 public	struct	occi_category * occi_create_os_template( char * domain, char * name, char * schema, char * title );

@@ -37,8 +37,6 @@
 #include "FILENAME_ROOT_backend_interface.h"
 #include "FILENAME_ROOT_node_backend.h"
 
-#include "occi_common.c" // Given the restrictions on the make system, this is the easiest way to get access to common functions
-
 /*	--------------------------------------------	*/
 /*	o c c i _ 
 [[[cog t.split_category_name()]]]
@@ -259,7 +257,7 @@ private struct rest_response * CATEGORY_NAME_put_item(
 	}
 	CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->post_update, FILENAME_ROOT, optr, rptr); }
-	struct CATEGORY_NAME *retVal = CATEGORY_NAME_occi_response(optr, cptr, rptr, aptr, FILENAME_ROOT);
+	struct rest_response *retVal = CATEGORY_NAME_occi_response(optr, cptr, rptr, aptr, FILENAME_ROOT);
 	liberate_CATEGORY_NAME(FILENAME_ROOT);
 	return retVal;
 }

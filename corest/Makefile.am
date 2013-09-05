@@ -21,7 +21,8 @@ libcorest_la_SOURCES = base64.c base64.h \
     tlsload.c tlsload.h \
     restlog.c restlog.h \
     restserver.c \
-    restclient.c restclient.h
+    restclient.c restclient.h \
+    standard_rest_responses.c
 
 libcorest_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML)
 libcorest_la_LDFLAGS = $(LD_COCCI) $(LD_PUBOCCI) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)

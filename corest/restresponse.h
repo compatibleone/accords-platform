@@ -13,6 +13,9 @@ struct	rest_response
 	char			* body;
 };
 
+struct rest_response *bad_request_html_response(struct rest_response *aptr);
+struct rest_response *not_found_html_response(struct rest_response *aptr);
+
 #endif
 
 
