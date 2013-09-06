@@ -231,6 +231,7 @@ private struct rest_response * CATEGORY_NAME_post_item(
         CATEGORY_NAME_execute_callback(iptr->post_create, new_FILENAME_ROOT, optr, rptr);
 	}
 	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,new_FILENAME_ROOT->id);
+	liberate_CATEGORY_NAME(new_FILENAME_ROOT);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
