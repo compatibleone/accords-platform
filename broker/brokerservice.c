@@ -502,7 +502,6 @@ private	struct	rest_response * suspend_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
@@ -532,7 +531,6 @@ private	struct	rest_response * restart_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
@@ -560,7 +558,6 @@ private	struct	rest_response * save_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
@@ -588,7 +585,6 @@ private	struct	rest_response * snapshot_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
@@ -616,7 +612,6 @@ private	struct	rest_response * stop_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;

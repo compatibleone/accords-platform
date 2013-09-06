@@ -27,7 +27,6 @@
 #include "occiact.h"
 #include "occilink.h"
 #include "occimixin.h"
-#include "linknode.h"
 
 public	char *	occi_http_link( struct occi_category * optr, char * target, char * id );
 

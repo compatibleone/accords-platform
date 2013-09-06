@@ -7,8 +7,11 @@
 #include "standard.h"
 #include "occi.h"
 #include "document.h"
- 
-#include "kindnode.h"
+
+#include "
+[[[cog t.node_type()]]]
+[[[end]]]
+node.h"
 
 #include "FILENAME_ROOT.h"
 #include "FILENAME_ROOT_occi_filter.h"

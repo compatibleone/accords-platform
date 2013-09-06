@@ -268,7 +268,6 @@ private	struct rest_response * scaleup_job(
 		void * vptr )
 {
 	struct	cords_job * pptr;
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
@@ -299,7 +298,6 @@ private	struct rest_response * scaledown_job(
 		void * vptr )
 {
 	struct	cords_job * pptr;
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
@@ -333,7 +331,6 @@ private	struct rest_response * scaleback_job(
 		void * vptr )
 {
 	struct	cords_job * pptr;
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
