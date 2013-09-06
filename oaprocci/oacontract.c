@@ -1175,7 +1175,7 @@ const struct oa_config * use_onapp_configuration( char * nptr, int is_active, in
 	struct onapp * ponapp;
 	struct oa_contract *poacontract;
 	char * operatorProfileName = NULL;
-	if (( sptr = resolve_oa_configuration( nptr )) != (struct oa_config *) 0)
+	if (( sptr = resolve_oa_configuration( nptr, is_active, check_is_active )) != (struct oa_config *) 0)
 		return( sptr );
 	else if (!( operatorProfileName = get_operator_profile() ))
 		return( sptr );
