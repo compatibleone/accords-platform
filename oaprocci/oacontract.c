@@ -299,7 +299,6 @@ int	onapp_build_failure( struct onapp * pptr, int status, char * message, struct
 	// TODO: Clear up ongoing OnApp activity.
 	rest_log_message( message );
 	pptr->build_state = allocate_string("failed");
-	context->onapp_dirty = OABOOL_TRUE;
 
 	return( status );
 }
@@ -1149,7 +1148,6 @@ public	int	delete_onapp_contract(
 
 	pptr->state = _OCCI_IDLE;
 	pptr->build_state = allocate_string("deleted");
-	context.onapp_dirty = OABOOL_TRUE;
 	handle_onapp_action_context(pptr, &context);
 
 	return result;
@@ -1374,7 +1372,6 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr, struc
 			if (pptr->state != _OCCI_IDLE)
 			{
 				pptr->state = _OCCI_IDLE;
-				context->onapp_dirty = OABOOL_TRUE;
 			}
 		}
 //		if ( pptr->hostname )
@@ -1406,7 +1403,6 @@ private	struct oa_response * start_onapp_provisioning( struct onapp * pptr, stru
 			if (pptr->state != _OCCI_ACTIVE)
 			{
 				pptr->state = _OCCI_ACTIVE;
-				context->onapp_dirty = OABOOL_TRUE;
 			}
 		}
 	}
@@ -1450,7 +1446,6 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr, s
 		if (pptr->state != _OCCI_IDLE)
 		{
 			pptr->state = _OCCI_IDLE;
-			context->onapp_dirty = OABOOL_TRUE;
 		}
 
 		return( oaptr );
@@ -1476,7 +1471,6 @@ private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr, st
 		if (pptr->state != _OCCI_ACTIVE)
 		{
 			pptr->state = _OCCI_ACTIVE;
-			context->onapp_dirty = OABOOL_TRUE;
 		}
 	}
 
@@ -1503,7 +1497,6 @@ private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr, st
 		{
 			pptr->state = _OCCI_IDLE;
 			pptr->build_state = allocate_string("deleted");
-			context->onapp_dirty = OABOOL_TRUE;
 		}
 	}
 
