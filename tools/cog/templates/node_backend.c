@@ -323,7 +323,7 @@ void ll_CATEGORY_NAME_rebase_node_contents(struct occi_
 [[[cog t.node_type()]]]
 [[[end]]] 
 _node* node, struct CATEGORY_NAME* updated_FILENAME_ROOT) {
-	if (node->contents) {
+	if (node->contents && node->contents != updated_FILENAME_ROOT) {
 		liberate_CATEGORY_NAME(node->contents);
 	}
 	node->contents = updated_FILENAME_ROOT;

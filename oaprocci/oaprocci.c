@@ -214,9 +214,11 @@ int read_body_bytes(char *buffer, int buffer_size, char * body, int body_type)
 /*	-------------------------------------------	*/
 private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_request * rptr)
 {
+	struct	occi_kind_node * nptr;
 	struct rest_response *prest_response_dummy;
 	struct rest_response *prest_response_createvm;
 	struct	onapp * pptr;
+	struct onapp_action_context context = onapp_action_context_default;
 	pptr = vptr;
     if (create_onapp_contract(optr, pptr,rptr, _CORDS_CONTRACT_AGENT, OnAppConfiguration.tls) != 0)
 		return (0);
@@ -230,6 +232,7 @@ private	int	create_onapp(struct occi_category * optr, void * vptr, struct rest_r
 			rptr,
 			prest_response_dummy,
 			pptr,
+			&context,
 			GA_OWN
 		);
 
@@ -261,7 +264,7 @@ private	struct	occi_interface	oaprocci_interface = {
 	NULL,
 	NULL,
 	delete_onapp
-	};	
+};
 
 /*	--------------------------------------------	*/
 /*	o n a p p _ o p e r a t i o n 		*/

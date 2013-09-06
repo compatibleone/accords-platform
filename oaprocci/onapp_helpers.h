@@ -71,17 +71,29 @@ extern int onapp_atoi(char *p);
 
 /// @}
 
+/// @defgroup oa_http_handling OnApp HTTP handling
+/// @brief HTTP functions used inside OnApp code.
+/// @{
+/// @brief Populate a buffer with a string representation of the HTTP body length.
+/// @param buffer[out]	Buffer to populate.
+/// @param buffer_size[in]	Buffer size.
+/// @param type	HTTP body type e.g. _FILE_BODY, _TEXT_BODY.
+/// @param body HTTP body.
+/// @return NULL if fail to discover buffer length, otherwise pointer to buffer.
+extern char * get_http_body_length_string(char *buffer, size_t buffer_size, int type, char const *body);
+/// @}
+
 /// @defgroup oa_file_handling OnApp File handling
 /// @brief File handling functions used inside OnApp code.
 /// @{
-/// @brief Write content of specified file to file handle, with prefixed strings if specified.
+/// @brief Write content of specified file to file handle, with prefix and suffix strings if specified.
 /// @param filename Name of file whose contents are being written from.
 /// @param h Handle to file being written to.
 /// @param prefix Prefix string to write to file handle [optional].
 /// @param suffix Suffix string to write to file handle [optional].
 extern size_t write_filecontent_to_filehandle(char const * const filename, FILE* h, char const * const prefix, char const * const suffix);
 
-/// @brief Write content of specified file to specified target file, with prefixed strings if specified.
+/// @brief Write content of specified file to specified target file, with prefix and suffix strings if specified.
 /// @param filename Name of file whose contents are being written from.
 /// @param output_filename Name of file being written to. Existing content is truncated.
 /// @param prefix Prefix string to write to output file [optional].
@@ -92,61 +104,72 @@ extern size_t write_filecontent_to_filename(char const * const filename, char co
 /// @defgroup oa_dump OnApp Variable Dumping
 /// @brief Variable dumping functions used inside OnApp code.
 /// @{
-/// @brief Dump oa_config and onapp to FILE.
-/// @param pptr oa_config to dump.
+/// @brief Dump oa_config to FILE.
+/// @param poa_config oa_config to dump.
+/// @param h File to dump to.
+/// @return 0 if successful.
+extern int dump_oa_config_data(FILE *h, struct oa_config const * poa_config);
+
+/// @brief Dump oa_config and onapp to stdout.
+/// @param poa_config oa_config to dump.
+/// @param h File to dump to.
+/// @return 0 if successful.
+extern int dump_oa_config_data_stdout(struct oa_config const * poa_config);
+
+/// @brief Dump onapp to FILE.
 /// @param ponapp onapp to dump.
 /// @param h File to dump to.
 /// @return 0 if successful.
-extern int dump_onapp_data( struct oa_config * pptr, struct onapp *ponapp, FILE *h);
+extern int dump_onapp_data(FILE *h, struct onapp *ponapp);
 
 /// @brief Dump oa_config and onapp to stdout.
 /// @param pptr oa_config to dump.
 /// @param ponapp onapp to dump.
 /// @param h File to dump to.
 /// @return 0 if successful.
-extern int dump_onapp_data_stdout(const struct oa_config * pptr, struct onapp *ponapp);
+extern int dump_onapp_data_stdout(struct onapp *ponapp);
 
 /// @brief Dump url to FILE.
 /// @param purl url to dump.
 /// @param h File to dump to.
-extern void dump_url(struct url *purl, FILE *hOutput);
+extern void dump_url(FILE *hOutput, struct url const *purl);
 
 /// @brief Dump occi_attribute to FILE.
 /// @param pocci_attribute occi_attribute to dump.
 /// @param h File to dump to.
-extern void dump_occi_attribute(struct occi_attribute *pocci_attribute, FILE *hOutput);
+extern void dump_occi_attribute(FILE *hOutput, struct occi_attribute const *pocci_attribute);
 
-extern void test_dump_occi_category(struct occi_category *pocci_category, FILE *hOutput);
+extern void test_dump_occi_category(FILE *hOutput, struct occi_category const *pocci_category);
 
 /// @brief Dump rest_response to FILE.
 /// @param prest_response rest_response to dump.
 /// @param h File to dump to.
-extern void dump_rest_response(struct rest_response *prest_response, FILE *hOutput);
+extern void dump_rest_response(FILE *hOutput, struct rest_response const *prest_response);
 
 /// @brief Dump occi_response to FILE.
 /// @param pocci_response occi_response to dump.
 /// @param h File to dump to.
-extern void dump_occi_response(struct occi_response* pocci_response, FILE* hOutput);
+extern void dump_occi_response(FILE* hOutput, struct occi_response const * pocci_response);
 
 /// @brief Dump occi_response to FILE, and liberate it.
 /// @param pocci_response occi_response to dump and liberate.
 /// @param h File to dump to.
 /// @return Result of liberating occi_response.
-extern struct occi_response * dump_occi_response_liberate(struct occi_response * pocci_response, FILE* hOutput);
+extern struct occi_response * dump_occi_response_liberate(FILE* hOutput, struct occi_response * pocci_response);
 
 /// @brief Dump occi_client to FILE.
 /// @param pocci_client occi_clientto dump.
 /// @param h File to dump to.
-extern void dump_occi_client(struct occi_client *pocci_client, FILE *hOutput);
+extern void dump_occi_client(FILE *hOutput, struct occi_client const *pocci_client);
 
 /// @brief Dump onapp_extras data from occi_response to FILE.
 /// @param pocci_response onapp_extras data to dump.
 /// @param h File to dump to.
-extern void dump_onapp_extras_occi(struct occi_response *pocci_response, FILE *hOutput);
+extern void dump_onapp_extras_occi(FILE *hOutput, struct occi_response *pocci_response);
 
 /// @brief Dump onapp_extras to FILE.
 /// @param ponapp_extras onapp_extras data to dump.
 /// @param h File to dump to.
-extern void dump_onapp_extras(struct cords_onapp_extras *ponapp_extras, FILE *hOutput);
+extern void dump_onapp_extras(FILE *hOutput, struct cords_onapp_extras const *ponapp_extras);
 
 #endif /* ONAPP_HELPERS_H_ */
