@@ -329,7 +329,7 @@ public	int	occi_render_links( struct rest_response * aptr, char * id )
 		return(0);
 	else if (!( id ))
 		return(0);
-	for (lptr = initialise_links_list(id); NULL != lptr; lptr = next_link(id)) {
+	for (lptr = initialise_and_get_first_link(id); NULL != lptr; lptr = next_link(id)) {
 		if (!( mptr = occi_http_link( OcciServerLinkManager, lptr->target, lptr->id ) ))
 			continue;
 		else if (!( hptr = rest_response_header( aptr, _OCCI_LINKHEAD, mptr )))

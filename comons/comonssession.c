@@ -27,7 +27,7 @@ private	struct rest_response * start_session(
 	else
 	{
 		pptr->connections=0;
-		for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+		for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
             if (!(zptr = cords_invoke_action( lptr->target, "start", _CORDS_SERVICE_AGENT, default_tls() )))
                 return( rest_html_response( aptr, 801, "Connection Start Failure" ) );
             else if ( cords_check_invocation( zptr, aptr ) != 0 )

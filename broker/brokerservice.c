@@ -213,7 +213,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		lptr = initialise_links_list(id); NULL != lptr; lptr = next_link(id)) {
+		lptr = initialise_and_get_first_link(id); NULL != lptr; lptr = next_link(id)) {
 		/* --------------------------------------------------- */
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
@@ -667,7 +667,7 @@ private	int	delete_service_contract(const struct occi_category * optr, const str
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	buffer[0] = 0;
-	for ( lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+	for ( lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
         if (!( buffer[0] ))
             strcpy( buffer, lptr->source );
         if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)

@@ -11,7 +11,7 @@
 static xlink_list list_of_links;
 static int link_index = 0; 
 
-const struct cords_xlink *initialise_links_list(const char *source_id) {
+const struct cords_xlink *initialise_and_get_first_link(const char *source_id) {
     // From the usage, it appears that only a single thread should be accessing these functions at any time.
     // If it's attempted to initialise the list while the list is still being parsed, that indicates a
     // problem which will require locking to solve.
