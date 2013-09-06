@@ -325,11 +325,8 @@ private struct rest_response * CATEGORY_NAME_get_list(
 		sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,ids.ids[id]);
 		if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 			failed = 1;
-	}
-	
-	[[[cog t.category_name()]]]
-	[[[end]]] 
-_free_id_list(&ids);
+	}	
+	CATEGORY_NAME_free_id_list(&ids);
 	liberate_CATEGORY_NAME(filter.attributes);
 	if(failed) {
 		return (rest_html_response( aptr, 500, "Server Failure" ));
@@ -361,7 +358,7 @@ private struct rest_response * CATEGORY_NAME_delete_all(
 		if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_delete, item_list.FILENAME_ROOTs[index], optr, rptr); }
 	}
 	free_FILENAME_ROOT_list(&item_list);
-	 CATEGORY_NAME_backend->delete_all_matching_filter(&filter);
+	CATEGORY_NAME_backend->delete_all_matching_filter(&filter);
 	liberate_CATEGORY_NAME(filter.attributes);
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );

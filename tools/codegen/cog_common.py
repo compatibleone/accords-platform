@@ -379,6 +379,7 @@ private struct rest_response * {0}_post_action(
         fptr = fptr->next )
         if (!( strncmp( mptr, fptr->name, strlen( fptr->name )) )) {{
             struct rest_response *retVal = occi_invoke_action(fptr,optr,cptr,rptr,aptr,{1});
+            {0}_backend->update(id, {1});
             liberate_{0}({1});
             return(retVal);
         }}
