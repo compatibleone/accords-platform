@@ -153,13 +153,10 @@ struct	occi_interface
 {
     // This callback will pass a pointer to the category object before it is passed to the backend for storage
     // It should be used for any initialisation of the object 
-    callback_func pre_create;   
-	callback_func retrieve;
-	callback_func update;
-	callback_func delete; 
-	callback_func pre_retrieve;
-	callback_func pre_update;
-	callback_func pre_delete;
+    callback_func pre_create;
+    callback_func pre_retrieve;   
+    callback_func pre_update;
+    callback_func pre_delete;
 	callback_func post_create;
 	callback_func post_retrieve;
 	callback_func post_update;
