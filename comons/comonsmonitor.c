@@ -43,38 +43,16 @@ private	struct rest_response * start_monitor(
 private	int	stop_monitor_controls( struct cords_monitor * pptr )
 {
 	int	status=0;
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	struct	occi_response 	* zptr;
 	struct	occi_element  	* eptr;
-	char *	wptr;
 	char	buffer[2048];
 	buffer[0] = 0;
-	for (	nptr=occi_last_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->previous )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( lptr->target ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, pptr->id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-		else
-		{	
-			strcpy(buffer,lptr->source);
-			liberate( wptr );
-			if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
-				break;
-			else	zptr = occi_remove_response( zptr );
-		}
+	for (lptr = initialise_and_get_last_link(pptr->id); lptr != NULL; lptr = previous_link(pptr->id)) {
+        strcpy(buffer,lptr->source);
+        if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
+            break;
+        else	zptr = occi_remove_response( zptr );
 	}
 	pptr->state = 0;
 	autosave_cords_monitor_nodes();

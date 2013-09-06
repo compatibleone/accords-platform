@@ -256,55 +256,32 @@ private	struct rest_response * start_connection(
 /*	------------------------------------------------	*/
 private	int	stop_connection_probes( struct cords_connection * pptr )
 {
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	int	status;
-	char *	wptr;
 	char	buffer[2048];
 
 	buffer[0] = 0;
-	for (	pptr->probes=0,
-		nptr=occi_last_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->previous )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( lptr->target ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, pptr->id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-		else
-		{	
-			strcpy(buffer,lptr->source);
-			liberate( wptr );
-			if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
-				return( 801 );
-			else if ((status = cords_check_invocation( zptr, (struct rest_response *) 0 )) != 0 )
-			{
-				zptr = occi_remove_response( zptr );
-				return( status );
-			}
-			else
-			{
-				zptr = occi_remove_response( zptr );
-				if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
-				{
-					zptr = occi_remove_response( zptr );
-					if ( pptr->probes )
-						pptr->probes--;
-				}
-			}
-		}
+	for (lptr = initialise_and_get_last_link(pptr->id); lptr != NULL; lptr = previous_link(pptr->id)) {	
+        strcpy(buffer,lptr->source);
+        if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
+            return( 801 );
+        else if ((status = cords_check_invocation( zptr, (struct rest_response *) 0 )) != 0 )
+        {
+            zptr = occi_remove_response( zptr );
+            return( status );
+        }
+        else
+        {
+            zptr = occi_remove_response( zptr );
+            if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )) != (struct occi_response *) 0)
+            {
+                zptr = occi_remove_response( zptr );
+                if ( pptr->probes )
+                    pptr->probes--;
+            }
+        }
 	}
 
 	if (!( rest_valid_string( pptr->monitor ) ))

@@ -335,10 +335,8 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	int	items=0;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
-	struct	occi_link_node  * nptr;
 	const struct cords_xlink * lptr;
 	char			* mptr;
-	char 			* wptr;
 	int			status;
 	FILE *			  h;
 	char			buffer[1024];
@@ -360,25 +358,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		nptr=occi_last_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->previous )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( lptr->target ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-		else	liberate( wptr );
-
+	    lptr = initialise_and_get_last_link(id); lptr != NULL; lptr = previous_link(id)) {
 		/* --------------------------------------------------- */
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
