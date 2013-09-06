@@ -96,7 +96,7 @@ private	int	connection_worker( struct cords_connection * pptr )
 {
 	int	inner=2;
 	int	outer=5;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink *lptr;
 	char	packets[1024];
 	sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
 	while (!( rest_server_signal()))
@@ -202,7 +202,7 @@ private	struct rest_response * start_connection(
 		void * vptr )
 {
 	struct	cords_connection * pptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	if (!( pptr = vptr ))

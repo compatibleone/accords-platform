@@ -159,7 +159,7 @@ private	struct rest_response * instance_agreement(
 	struct	occi_element  	* dptr;
 	struct	occi_element  	* eptr;
 	struct	occi_client 	* kptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink* lptr;
 	struct	cords_agreement * pptr;
 	struct	occi_request 	* qptr;
 	struct	occi_response 	* xptr;
