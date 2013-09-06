@@ -320,7 +320,7 @@ private	int	create_placement_solution(
 /*	-----------------------------------------------------------	*/
 private	int	invoke_placement_action( struct cords_placement * pptr, char * action )
 {
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink *lptr;
 	struct	occi_response * zptr;
 
 	if (!( pptr ))
@@ -450,7 +450,7 @@ private	struct rest_response * choose_placement(
 private	int	delete_placement_quantities( struct cords_placement * pptr )
 {
 	struct	occi_response 	* zptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink	* lptr;
 	char 			  buffer[2048];
 	/* ----------------------------------------------------- */
 	/* for all defined contract nodes of the current service */
