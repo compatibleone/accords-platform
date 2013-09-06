@@ -174,8 +174,9 @@ private struct rest_response * CATEGORY_NAME_get_item(
 	struct CATEGORY_NAME * FILENAME_ROOT;
 	if (!( FILENAME_ROOT =  CATEGORY_NAME_backend->retrieve_from_id(id)))
 		return( not_found_html_response(aptr) );
-	if (iptr) {
+	if (iptr && iptr->pre_retrieve) {
 		CATEGORY_NAME_execute_callback(iptr->pre_retrieve, FILENAME_ROOT, optr, rptr);
+		CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	}
 	return make_response_and_liberate_FILENAME_ROOT(optr, cptr, rptr, aptr, FILENAME_ROOT);
 }
