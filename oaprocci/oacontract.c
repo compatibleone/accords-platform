@@ -1289,7 +1289,7 @@ const struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char *
 
   pocci_response_list = (struct occi_response *)cords_retrieve_named_instance_list(
       "onapp_extras" // category
-    , "name" // namename
+    , "occi.onapp_extras.name" // namename
     , sptr // namevalue
     , agent // agent
     , tls // tls
