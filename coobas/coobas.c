@@ -831,7 +831,7 @@ private	struct rest_response * process_invoice(
 /*	------------------------------------------------------------------	*/
 private	int	close_invoice_transactions( struct cords_invoice * pptr )
 {
-    struct	cords_xlink	* lptr;
+    const struct cords_xlink * lptr;
     struct	occi_element 	* gptr;
     struct	occi_response 	* zptr;
     struct	occi_response 	* yptr;

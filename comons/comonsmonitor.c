@@ -12,7 +12,7 @@ private	struct rest_response * start_monitor(
 		void * vptr )
 {
 	struct	cords_monitor * pptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	if (!( pptr = vptr ))
@@ -44,7 +44,7 @@ private	int	stop_monitor_controls( struct cords_monitor * pptr )
 {
 	int	status=0;
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response 	* zptr;
 	struct	occi_element  	* eptr;
 	char *	wptr;

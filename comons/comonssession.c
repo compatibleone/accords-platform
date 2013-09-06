@@ -17,7 +17,7 @@ private	struct rest_response * start_session(
 		void * vptr )
 {
 	struct	cords_session * pptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	if (!( pptr = vptr ))
@@ -59,7 +59,7 @@ private	struct rest_response * stop_session(
 {
 	struct	cords_session * pptr;
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	char *	wptr;
@@ -116,7 +116,7 @@ private	struct rest_response * stop_session(
 private	int	delete_monitoring_session(struct occi_category * optr,struct cords_session * pptr)
 {
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	char 	buffer[2048];

@@ -190,7 +190,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	int	flags=0;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink	* lptr;
 	char			* mptr;
 	int			status=0;
 	FILE *			  h;
@@ -336,7 +336,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	int			status;
@@ -523,7 +523,7 @@ private	struct	rest_response * suspend_service(
 		void * vptr )
 {
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -553,7 +553,7 @@ private	struct	rest_response * restart_service(
 		void * vptr )
 {
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -581,7 +581,7 @@ private	struct	rest_response * save_service(
 		void * vptr )
 {
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -609,7 +609,7 @@ private	struct	rest_response * snapshot_service(
 		void * vptr )
 {
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -637,7 +637,7 @@ private	struct	rest_response * stop_service(
 		void * vptr )
 {
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -658,10 +658,10 @@ private	struct	rest_response * stop_service(
 /*	-----------------------------------------------------------	*/
 /*		d e l e t e _ s e r v i c e _ c o n t r a c t		*/
 /*	-----------------------------------------------------------	*/
-private	int	delete_service_contract( struct occi_category * optr, struct cords_service * pptr )
+private	int	delete_service_contract(const struct occi_category * optr, const struct cords_service * pptr )
 {
 	struct	occi_response 	* zptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink	* lptr;
 	char 			  buffer[2048];
 	/* ----------------------------------------------------- */
 	/* for all defined contract nodes of the current service */
@@ -806,7 +806,7 @@ private	void	establish_service_period( struct cords_service * pptr )
 	if (!( strcasecmp(( sptr = pptr->initiation ), "now" ) ))
 	{
 		liberate( pptr->initiation );
-		sprintf(buffer,"%u",time((long*)0));
+		sprintf(buffer,"%u",(unsigned) time((long*)0));
 		if (!( pptr->initiation = allocate_string( buffer ) ))
 			return;
 
@@ -815,7 +815,7 @@ private	void	establish_service_period( struct cords_service * pptr )
 	{
 		seconds = service_duration( (sptr+1) );
 		liberate( pptr->initiation );
-		sprintf(buffer,"%u",time((long*)0)+seconds);
+		sprintf(buffer,"%u",(unsigned) time((long*)0)+seconds);
 		if (!( pptr->initiation = allocate_string( buffer ) ))
 			return;
 	}
@@ -831,7 +831,7 @@ private	void	establish_service_period( struct cords_service * pptr )
 		{
 			seconds = service_duration( (sptr+1) );
 			liberate( pptr->expiration );
-			sprintf(buffer,"%u",time((long*)0)+seconds);
+			sprintf(buffer,"%u",(unsigned) time((long*)0)+seconds);
 			if (!( pptr->expiration = allocate_string( buffer ) ))
 				return;
 		}
@@ -910,7 +910,7 @@ private	int	create_service(struct occi_category * optr, void * vptr,struct rest_
 /*	-------------------------------------------	*/
 private	int	delete_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	cords_service * pptr;
+	const struct cords_service * pptr;
 	pptr = vptr;
     return(delete_service_contract(optr, pptr));
 }

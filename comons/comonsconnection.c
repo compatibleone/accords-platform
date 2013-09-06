@@ -257,7 +257,7 @@ private	struct rest_response * start_connection(
 private	int	stop_connection_probes( struct cords_connection * pptr )
 {
 	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	int	status;

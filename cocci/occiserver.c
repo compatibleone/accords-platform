@@ -322,7 +322,7 @@ struct rest_extension * xptr)
 /*	---------------------------------------------------	*/
 public	int	occi_render_links( struct rest_response * aptr, char * id )
 {
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	rest_header 	* hptr;
 	char			* mptr;
 	if (!( aptr ))
@@ -1779,7 +1779,7 @@ public	struct rest_response * occi_alert(
 	else
 	{
 		sprintf(ecode,"%u",status);
-		sprintf(etime,"%u",time((long *) 0));
+		sprintf(etime,"%u",(unsigned) time((long *) 0));
 	}
 
 	if (!( ihost = occi_resolve_category_provider( _CORDS_ALERT, agent, tls ) ))
