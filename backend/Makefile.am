@@ -7,7 +7,7 @@ lib_LTLIBRARIES = libbackend.la
 model_h_files = xlink.h
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
-libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c \
+libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c publication_riak_backend.c \
     $(abs_builddir)/xlink_node_backend.c $(abs_builddir)/occi_xlink_rest.c $(abs_builddir)/xlink.c
 libbackend_la_CFLAGS = $(CFLAGS_BACKEND) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) $(CFLAGS_CORDS) -Werror
 libbackend_la_LDFLAGS = 
