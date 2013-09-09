@@ -434,7 +434,7 @@ private	struct rest_response * occi_get_capacities(
 
 		else	rest_response_body( aptr, mptr, _TEXT_BODY );
 
-		sprintf(clbuff,"%lu",strlen(mptr));
+		sprintf(clbuff,"%u",(unsigned) strlen(mptr));
 
 		if (!( hptr = occi_accept_header( aptr ) ))
 			return( rest_response_status( aptr, 500, "Server Failure" ) );
