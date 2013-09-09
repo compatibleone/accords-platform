@@ -24,6 +24,6 @@ struct backend_profile {
 
 void save_backend_profile(const char *filename, const struct backend_profile *profile);
 
-#define BACKEND_PROFILING
+//#define BACKEND_PROFILING
 
 #endif
