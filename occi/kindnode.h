@@ -15,8 +15,6 @@ struct occi_kind_node
 
 public  struct  occi_kind_node * allocate_occi_kind_node();
 public  struct  occi_kind_node * liberate_occi_kind_node(struct occi_kind_node * n);
-public  struct  occi_link_node * allocate_occi_link_node();
-public  struct  occi_link_node * liberate_occi_link_node(struct occi_link_node * n);
 
 #endif
 

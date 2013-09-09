@@ -14,7 +14,7 @@ private	int	create_provider(struct occi_category * optr, void * vptr,struct rest
 	if (!( rest_valid_string( pptr->opinion )))
 	{
 
-		sprintf(buffer,"%u",(time((long *)0) % 10)+1);
+		sprintf(buffer,"%u",(unsigned)(time((long *)0) % 10)+1);
 		pptr->opinion = allocate_string( buffer );
 	}
 

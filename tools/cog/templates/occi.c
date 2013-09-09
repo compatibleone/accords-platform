@@ -174,9 +174,9 @@ private struct rest_response * CATEGORY_NAME_get_item(
 	struct CATEGORY_NAME * FILENAME_ROOT;
 	if (!( FILENAME_ROOT =  CATEGORY_NAME_backend->retrieve_from_id(id)))
 		return( not_found_html_response(aptr) );
-	if (iptr) {
-		CATEGORY_NAME_execute_callback(iptr->retrieve, FILENAME_ROOT, optr, rptr);
+	if (iptr && iptr->pre_retrieve) {
 		CATEGORY_NAME_execute_callback(iptr->pre_retrieve, FILENAME_ROOT, optr, rptr);
+		CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	}
 	return make_response_and_liberate_FILENAME_ROOT(optr, cptr, rptr, aptr, FILENAME_ROOT);
 }
@@ -231,6 +231,7 @@ private struct rest_response * CATEGORY_NAME_post_item(
         CATEGORY_NAME_execute_callback(iptr->post_create, new_FILENAME_ROOT, optr, rptr);
 	}
 	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,new_FILENAME_ROOT->id);
+	liberate_CATEGORY_NAME(new_FILENAME_ROOT);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
@@ -256,9 +257,6 @@ private struct rest_response * CATEGORY_NAME_put_item(
 		return( rest_html_response( aptr, 500, "Server Failure") );
 	}
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_update, FILENAME_ROOT, optr, rptr); }
-	if (iptr) {
-		CATEGORY_NAME_execute_callback(iptr->update, FILENAME_ROOT, optr, rptr);
-	}
 	CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->post_update, FILENAME_ROOT, optr, rptr); }
 	struct rest_response *retVal = CATEGORY_NAME_occi_response(optr, cptr, rptr, aptr, FILENAME_ROOT);
@@ -291,11 +289,8 @@ private struct rest_response * CATEGORY_NAME_delete_item(
 	if (!( target =  CATEGORY_NAME_backend->retrieve_from_id(id)))
 		return( not_found_html_response(aptr) );
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_delete, target, optr, rptr); }
-	if (iptr) {
-		CATEGORY_NAME_execute_callback(iptr->delete, target, optr, rptr);
-	}
 	liberate_CATEGORY_NAME(target);
-	 CATEGORY_NAME_backend->del(id);
+	CATEGORY_NAME_backend->del(id);
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->post_delete, NULL, optr, rptr); }
 	if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
@@ -352,9 +347,6 @@ private struct rest_response * CATEGORY_NAME_delete_all(
 	FILENAME_ROOT_list item_list =  CATEGORY_NAME_backend->retrieve_from_filter(&filter);
 	int index;
 	for(index = 0; index < item_list.count; index++) {
-		if (iptr) {
-			CATEGORY_NAME_execute_callback(iptr->delete, item_list.FILENAME_ROOTs[index], optr, rptr);
-		}
 		if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_delete, item_list.FILENAME_ROOTs[index], optr, rptr); }
 	}
 	free_FILENAME_ROOT_list(&item_list);
