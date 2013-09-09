@@ -304,7 +304,7 @@ private struct CATEGORY_NAME *  CATEGORY_NAME_create(struct CATEGORY_NAME *initi
 	struct CATEGORY_NAME *new_FILENAME_ROOT = clone_CATEGORY_NAME(initial_FILENAME_ROOT);
 	add_CATEGORY_NAME_node(new_FILENAME_ROOT);
 	autosave_CATEGORY_NAME_nodes();
-	return new_FILENAME_ROOT;
+	return clone_CATEGORY_NAME(new_FILENAME_ROOT);
 }
 
 private void   CATEGORY_NAME_del(char *id) {
