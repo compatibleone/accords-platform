@@ -30,14 +30,14 @@
 #include "rest.h"
 #include "occi.h"
 #include "document.h"
-#include "cordspublic.h"
 
 #include "backend_common.h"
  
 #include "FILENAME_ROOT_occi_filter.h"
 #include "FILENAME_ROOT.h"
 #include "FILENAME_ROOT_backend_interface.h"
-#include "FILENAME_ROOT_node_backend.h"
+[[[cog t.backend_include()]]]
+[[[end]]]
 
 /*	--------------------------------------------	*/
 /*	o c c i _ 
@@ -508,7 +508,8 @@ public struct occi_category * occi_CATEGORY_NAME_builder(char * a,char * b) {
 [[[end]]]
 #";
 	char * f="CompatibleOne OCCI resource CATEGORY_NAME";
-	 CATEGORY_NAME_backend = CATEGORY_NAME_node_interface_func();	// TODO There's no obvious place to delete this pointer on completion.  Find somewhere!
+	[[[cog t.backend_init()]]]
+	[[[end]]]
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
