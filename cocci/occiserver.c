@@ -322,14 +322,14 @@ struct rest_extension * xptr)
 /*	---------------------------------------------------	*/
 public	int	occi_render_links( struct rest_response * aptr, char * id )
 {
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	rest_header 	* hptr;
 	char			* mptr;
 	if (!( aptr ))
 		return(0);
 	else if (!( id ))
 		return(0);
-	for (lptr = initialise_links_list(id); NULL != lptr; lptr = next_link(id)) {
+	for (lptr = initialise_and_get_first_link(id); NULL != lptr; lptr = next_link(id)) {
 		if (!( mptr = occi_http_link( OcciServerLinkManager, lptr->target, lptr->id ) ))
 			continue;
 		else if (!( hptr = rest_response_header( aptr, _OCCI_LINKHEAD, mptr )))
@@ -1779,7 +1779,7 @@ public	struct rest_response * occi_alert(
 	else
 	{
 		sprintf(ecode,"%u",status);
-		sprintf(etime,"%u",time((long *) 0));
+		sprintf(etime,"%u",(unsigned) time((long *) 0));
 	}
 
 	if (!( ihost = occi_resolve_category_provider( _CORDS_ALERT, agent, tls ) ))

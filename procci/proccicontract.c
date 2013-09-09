@@ -873,7 +873,7 @@ private	struct	rest_response * snapshot_contract(
 private	int	delete_generic_contract( struct occi_category * optr, struct cords_contract * pptr )
 {
 	struct	occi_response 	* zptr = NULL;
-	struct	cords_xlink	* lptr = NULL;
+	const struct	cords_xlink	* lptr;
 	char			buffer[2048];
 
 	buffer[0] = 0;
@@ -895,7 +895,7 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	/* ----------------------------------------------------- */
 	/* for all defined instructions of the current contract  */
 	/* ----------------------------------------------------- */
-	for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+	for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
         if (!( buffer[0] ))
             strcpy(buffer, lptr->source );
         if (!( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )))

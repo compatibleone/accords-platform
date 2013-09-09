@@ -190,7 +190,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	int	flags=0;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink	* lptr;
 	char			* mptr;
 	int			status=0;
 	FILE *			  h;
@@ -213,7 +213,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		lptr = initialise_links_list(id); NULL != lptr; lptr = next_link(id)) {
+		lptr = initialise_and_get_first_link(id); NULL != lptr; lptr = next_link(id)) {
 		/* --------------------------------------------------- */
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
@@ -335,10 +335,8 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	int	items=0;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
-	char 			* wptr;
 	int			status;
 	FILE *			  h;
 	char			buffer[1024];
@@ -360,25 +358,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		nptr=occi_last_link_node();
-		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->previous )
-	{
-		if (!( lptr = nptr->contents ))
-			continue;
-		else if (!( lptr->source ))
-			continue;
-		else if (!( lptr->target ))
-			continue;
-		else if (!( wptr = occi_category_id( lptr->source ) ))
-			continue;
-		else if ( strcmp( wptr, id ) != 0)
-		{
-			liberate( wptr );
-			continue;
-		}
-		else	liberate( wptr );
-
+	    lptr = initialise_and_get_last_link(id); lptr != NULL; lptr = previous_link(id)) {
 		/* --------------------------------------------------- */
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
@@ -522,8 +502,7 @@ private	struct	rest_response * suspend_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -552,8 +531,7 @@ private	struct	rest_response * restart_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -580,8 +558,7 @@ private	struct	rest_response * save_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -608,8 +585,7 @@ private	struct	rest_response * snapshot_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -636,8 +612,7 @@ private	struct	rest_response * stop_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	char			* mptr;
 	char 			* wptr;
 	struct	cords_service * pptr;
@@ -658,16 +633,16 @@ private	struct	rest_response * stop_service(
 /*	-----------------------------------------------------------	*/
 /*		d e l e t e _ s e r v i c e _ c o n t r a c t		*/
 /*	-----------------------------------------------------------	*/
-private	int	delete_service_contract( struct occi_category * optr, struct cords_service * pptr )
+private	int	delete_service_contract(const struct occi_category * optr, const struct cords_service * pptr )
 {
 	struct	occi_response 	* zptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink	* lptr;
 	char 			  buffer[2048];
 	/* ----------------------------------------------------- */
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	buffer[0] = 0;
-	for ( lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+	for ( lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
         if (!( buffer[0] ))
             strcpy( buffer, lptr->source );
         if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
@@ -806,7 +781,7 @@ private	void	establish_service_period( struct cords_service * pptr )
 	if (!( strcasecmp(( sptr = pptr->initiation ), "now" ) ))
 	{
 		liberate( pptr->initiation );
-		sprintf(buffer,"%u",time((long*)0));
+		sprintf(buffer,"%u",(unsigned) time((long*)0));
 		if (!( pptr->initiation = allocate_string( buffer ) ))
 			return;
 
@@ -815,7 +790,7 @@ private	void	establish_service_period( struct cords_service * pptr )
 	{
 		seconds = service_duration( (sptr+1) );
 		liberate( pptr->initiation );
-		sprintf(buffer,"%u",time((long*)0)+seconds);
+		sprintf(buffer,"%u",(unsigned) time((long*)0)+seconds);
 		if (!( pptr->initiation = allocate_string( buffer ) ))
 			return;
 	}
@@ -831,7 +806,7 @@ private	void	establish_service_period( struct cords_service * pptr )
 		{
 			seconds = service_duration( (sptr+1) );
 			liberate( pptr->expiration );
-			sprintf(buffer,"%u",time((long*)0)+seconds);
+			sprintf(buffer,"%u",(unsigned) time((long*)0)+seconds);
 			if (!( pptr->expiration = allocate_string( buffer ) ))
 				return;
 		}
@@ -910,7 +885,7 @@ private	int	create_service(struct occi_category * optr, void * vptr,struct rest_
 /*	-------------------------------------------	*/
 private	int	delete_service(struct occi_category * optr, void * vptr,struct rest_request * rptr)
 {
-	struct	cords_service * pptr;
+	const struct cords_service * pptr;
 	pptr = vptr;
     return(delete_service_contract(optr, pptr));
 }

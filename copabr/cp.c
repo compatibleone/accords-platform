@@ -1291,7 +1291,7 @@ private	int	cords_build_plan( struct xml_element * document, char * agent, char 
 	char	when[32];
 	int	status;
 
-	sprintf(when,"%u",time((long*)0));
+	sprintf(when,"%u",(unsigned) time((long*)0));
 
 	/* ----------------------------------------------- */
 	/* build the plan document and append the atributs */

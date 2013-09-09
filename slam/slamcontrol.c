@@ -582,8 +582,7 @@ private	int	control_period( struct cords_control * pptr )
 private	int	control_worker( struct cords_control * pptr )
 {
 	int	tempo=_DEFAULT_CONTROL_PERIOD;
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response 	* zptr; 
 	struct	occi_element	* dptr;
 	char *	wptr;
@@ -716,8 +715,7 @@ private	struct rest_response * start_control(
 		void * vptr )
 {
 	struct	cords_control * pptr;
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	char *	wptr;
@@ -744,8 +742,7 @@ private	struct rest_response * stop_control(
 {
 	int	status=0;
 	struct	cords_control * pptr;
-	struct	occi_link_node  * nptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	char *	wptr;

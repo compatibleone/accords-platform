@@ -14,5 +14,6 @@ EXTRA_DIST = csa.c csa.h \
 	cpxsd.c cpxsd.h
 
 libcopabr_la_SOURCES = cp.c cp.h cb.c cb.h
-libcopabr_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_COCCI) $(CFLAGS_OCCI) $(CFLAGS_PUBOCCI)
+libcopabr_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_COCCI) $(CFLAGS_OCCI) $(CFLAGS_PUBOCCI) \
+                      -Werror
 libcopabr_la_LDFLAGS = $(LD_COCCI) $(LD_CORDS) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)

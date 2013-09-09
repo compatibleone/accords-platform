@@ -159,7 +159,7 @@ private	struct rest_response * instance_agreement(
 	struct	occi_element  	* dptr;
 	struct	occi_element  	* eptr;
 	struct	occi_client 	* kptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink* lptr;
 	struct	cords_agreement * pptr;
 	struct	occi_request 	* qptr;
 	struct	occi_response 	* xptr;
@@ -183,7 +183,7 @@ private	struct rest_response * instance_agreement(
 	/* ----------------------------- */
 	/* retrieve manifest description */
 	/* ----------------------------- */
-	for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+	for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
 		/* ------------------------- */
 		/* retrieve the terms record */
 		/* ------------------------- */

@@ -114,7 +114,7 @@ public	int	occi_resolve_authorization( char * xauth )
 	}
 	else if ( rptr->status >= 400 )
 	{
-		printf("incorrect status : %s\n",rptr->status);
+		printf("incorrect status : %d\n",rptr->status);
 		zptr = occi_remove_response( zptr );
 		return(0);
 	}

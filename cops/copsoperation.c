@@ -611,7 +611,7 @@ private	struct	cops_solution *	build_cops_quantities( struct cords_placement * p
 		/* ----------------------------- */
 		/* the timestamp when occured    */
 		/* ----------------------------- */
-		sprintf(value,"%u",time((long *) 0));
+		sprintf(value,"%u",(unsigned) time((long *) 0));
 		if (!( eptr = occi_create_element( "occi.quantity.when", value ) ))
 			return( build_cops_failure( pptr,sptr ) );
 		else
@@ -624,7 +624,7 @@ private	struct	cops_solution *	build_cops_quantities( struct cords_placement * p
 		/* ----------------------------- */
 		/* the quantity name token       */
 		/* ----------------------------- */
-		sprintf(value,"%u",time((long *) 0));
+		sprintf(value,"%u",(unsigned) time((long *) 0));
 		if (!( eptr = occi_create_element( "occi.quantity.name", qname ) ))
 			return( build_cops_failure( pptr,sptr ) );
 		else

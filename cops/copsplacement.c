@@ -320,7 +320,7 @@ private	int	create_placement_solution(
 /*	-----------------------------------------------------------	*/
 private	int	invoke_placement_action( struct cords_placement * pptr, char * action )
 {
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink *lptr;
 	struct	occi_response * zptr;
 
 	if (!( pptr ))
@@ -328,7 +328,7 @@ private	int	invoke_placement_action( struct cords_placement * pptr, char * actio
 	else if (!( rest_valid_string( pptr->id ) ))
 		return( 0 );
 
-	for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+	for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
 		if (!( zptr = cords_invoke_action( lptr->target, action, _CORDS_CONTRACT_AGENT, default_tls() )))
 			continue;
 		else	zptr = occi_remove_response( zptr );
@@ -450,13 +450,13 @@ private	struct rest_response * choose_placement(
 private	int	delete_placement_quantities( struct cords_placement * pptr )
 {
 	struct	occi_response 	* zptr;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink	* lptr;
 	char 			  buffer[2048];
 	/* ----------------------------------------------------- */
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	buffer[0] = 0;
-	for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+	for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
         if (!( buffer[0] ))
             strcpy( buffer, lptr->source );
         if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)

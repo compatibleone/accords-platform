@@ -46,7 +46,7 @@ public	char *	occi_content_length( struct rest_header * hptr, char * filename )
 		return( filename );
 	else
 	{
-		sprintf(length,"%u",info.st_size);
+		sprintf(length,"%u",(unsigned) info.st_size);
 		rest_replace_header( hptr, length );
 		return( filename );
 	}
@@ -482,7 +482,7 @@ public	char *	occi_html_body(
 	char *	publisher;
 	struct	occi_action * aptr;
 	struct	rest_header * contentlength=(struct rest_header *) 0;
-	struct	cords_xlink	* lptr;
+	const struct cords_xlink * lptr;
 	int	linkto=0;
 	int	allow_methods=1;
 
@@ -616,7 +616,7 @@ public	char *	occi_html_body(
 			/* generate the list of links if available */
 			/* --------------------------------------- */
 			fprintf(h,"<tr><th>Links</th><td><div align=center><table>\n");
-			for ( lptr = initialise_links_list(id);	NULL != lptr; lptr = next_link(id)) {
+			for ( lptr = initialise_and_get_first_link(id);	NULL != lptr; lptr = next_link(id)) {
 				fprintf(h,"<tr><td><a href='%s'>%s</a>",lptr->target,lptr->target);
 			}
 			fprintf(h,"</table></div></td></tr>\n");

@@ -831,7 +831,7 @@ private	struct rest_response * process_invoice(
 /*	------------------------------------------------------------------	*/
 private	int	close_invoice_transactions( struct cords_invoice * pptr )
 {
-    struct	cords_xlink	* lptr;
+    const struct cords_xlink * lptr;
     struct	occi_element 	* gptr;
     struct	occi_response 	* zptr;
     struct	occi_response 	* yptr;
@@ -839,7 +839,7 @@ private	int	close_invoice_transactions( struct cords_invoice * pptr )
     /* ----------------------------------------------------- */
     /* for all defined contract nodes of the current service */
     /* ----------------------------------------------------- */
-    for (lptr = initialise_links_list(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {        
+    for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {        
         /* --------------------------------------------------- */
         /* launch / invoke the required action on the contract */
         /* --------------------------------------------------- */

@@ -9,5 +9,8 @@ struct occi_link_node
 	void 			* contents;
 };
 
+public  struct  occi_link_node * allocate_occi_link_node();
+public  struct  occi_link_node * liberate_occi_link_node(struct occi_link_node * n);
+
 #endif
 
