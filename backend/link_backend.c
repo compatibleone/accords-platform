@@ -47,6 +47,7 @@ const struct cords_xlink *initialise_and_get_last_link(const char *source_id) {
 static const struct cords_xlink *valid_current_link(const char *source_id) {    
     const struct cords_xlink *found, *current;
     current = list_of_links.xlinks[link_index];
+    found = NULL;
     if (current && current->source && current->target) {
         char *wptr = occi_category_id( current->source );
         if (wptr) {
