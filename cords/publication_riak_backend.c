@@ -4,6 +4,9 @@
 #include <string.h>
 
 #include <curl/curl.h>
+#include <json.h>
+
+#include "allocate.h"
 
 #include "publication_occi_filter.h"
 #include "publication.h"
@@ -57,17 +60,18 @@ void finalise() {
 }
 
 struct transfer_data {
+    size_t total;
     size_t transfered;
-    struct cords_publication *data;
+    char *data;
 };
 
 static size_t upload(void *ptr, size_t size, size_t nmemb, void *userdata) {
     size_t limit = size * nmemb;
     struct transfer_data *data = userdata;
     
-    size_t bytes_to_transfer = MIN(limit, 14 - data->transfered);
+    size_t bytes_to_transfer = MIN(limit, data->total - data->transfered);
     data->transfered += bytes_to_transfer;    
-    sprintf(ptr, "{\"bar\":\"baz\"}");
+    memcpy(ptr, data->data + data->transfered, bytes_to_transfer);
     return bytes_to_transfer;
 }
 
@@ -75,18 +79,52 @@ static size_t download(void *content, size_t size, size_t nmemb, void *userdata)
     size_t limit = size * nmemb;
     struct transfer_data *data = userdata;
     
-    char buf[256];
-    size_t bytes_read = MIN(limit, 14);
-    memcpy(buf, content, bytes_read);
-    buf[bytes_read] = '\0';
-    char *colon = strrchr(buf, ':');
-    *(colon + 4) = '\0';
-    strcpy(data->data->id, colon);
+    data->data = realloc(data->data, data->transfered + limit + 1);
+    if (!data->data) {        
+        return 0;
+    }
+    
+    memcpy(data->data + data->transfered, content, limit);
+    data->transfered += limit;
+    data->data[data->transfered] = '\0';
     
     return limit;    
 }
 
-struct cords_publication * create  (struct cords_publication *initial_publication) {
+static char *json_string(const struct cords_publication *publication) {
+    json_object *jo = json_object_new_object();
+    
+    //char buf[1024];
+    //sprintf(buf, "{\"id\":\"%s\"}", publication->id);
+    //return allocate_string(buf);
+    json_object_object_add(jo, "id", json_object_new_string(publication->id));
+    char *retVal = allocate_string(json_object_to_json_string(jo));
+    
+    // Free the object
+    json_object_put(jo);
+    
+    return retVal;
+}
+
+static struct cords_publication *cords_publication_from_json(const char *input) {
+    struct cords_publication *new_publication = allocate_cords_publication();
+    if (new_publication) {
+        json_bool success = TRUE;
+        json_object *jo = json_tokener_parse(input);
+        
+        json_object *id;
+        success &= json_object_object_get_ex(jo, "id", &id);
+        if (success) {
+            new_publication->id = allocate_string(json_object_get_string(id));
+        }
+        
+        json_object_put(jo);
+    }
+    
+    return new_publication;
+}
+
+struct cords_publication * create(struct cords_publication *initial_publication) {
     CURL *curl;
     CURLcode res;
 
@@ -98,35 +136,42 @@ struct cords_publication * create  (struct cords_publication *initial_publicatio
         
         struct transfer_data data;
         data.transfered = 0;
-        data.data = initial_publication;
-        
-        // Define the function that is used during upload, i.e. formats the category object
-        curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
-        curl_easy_setopt(curl, CURLOPT_READDATA, &data);
-        
-        char request_buffer[1024];
-        sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", initial_publication->id);        
-        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-        
-        // In case of redirection, follow
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-     
-        curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-        //curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)14); // TODO Use proper files size
-
-        struct curl_slist *headers = NULL;
-        // Disable Expect: Continue 100 header
-        static const char buf[] = "Expect:"; 
-        headers = curl_slist_append(headers, buf);
-        
-        headers = curl_slist_append(headers, "Content-Type: application/json"); 
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        
-        res = curl_easy_perform(curl);
-        
-        if (CURLE_OK == res) {
+        data.data = json_string(initial_publication);
+        data.total = strlen(data.data);  // TODO +1?
+        if(data.data) {
             
-            // TODO Extract the publication here
+            // Define the function that is used during upload, i.e. formats the category object
+            curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
+            curl_easy_setopt(curl, CURLOPT_READDATA, &data);
+            
+            char request_buffer[1024];
+            sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s?returnbody=true", "publication", initial_publication->id);        
+            curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+            
+            // In case of redirection, follow
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+         
+            curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+            //curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)14); // TODO Use proper files size
+    
+            struct curl_slist *headers = NULL;
+            // Disable Expect: Continue 100 header
+            static const char buf[] = "Expect:"; 
+            headers = curl_slist_append(headers, buf);
+            
+            headers = curl_slist_append(headers, "Content-Type: application/json"); 
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+            
+            res = curl_easy_perform(curl);
+            
+            if (CURLE_OK == res) {
+                long http_code = 0;
+                curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
+                if (200 == http_code) {
+                    new_publication = cords_publication_from_json(data.data);
+                }
+            }
+            free(data.data);
         }
         curl_easy_cleanup(curl);
     }
@@ -145,27 +190,29 @@ struct cords_publication * retrieve_from_id(char *id) {
         
         struct transfer_data data;
         data.transfered = 0;
-        data.data = allocate_cords_publication();
-        if (data.data) {            
+        data.data = NULL;          
                     
-            // Define the function that is used during upload, i.e. formats the category object
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, download);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
-            
-            char request_buffer[1024];
-            sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
-            curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-            
-            // In case of redirection, follow
-            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-            
-            res = curl_easy_perform(curl);
-            
-            if (CURLE_OK == res) {
-                
-                // TODO Extract the publication here
+        // Define the function that is used during upload, i.e. formats the category object
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, download);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
+        
+        char request_buffer[1024];
+        sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
+        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+        
+        // In case of redirection, follow
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        
+        res = curl_easy_perform(curl);
+        
+        if (CURLE_OK == res) {
+            long http_code = 0;
+            curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
+            if (200 == http_code) {
+                retrieved_publication = cords_publication_from_json(data.data);
             }
         }
+        free(data.data);
         curl_easy_cleanup(curl);
     }
     return retrieved_publication; 
@@ -177,7 +224,36 @@ publication_list retrieve_from_filter(struct cords_publication_occi_filter *filt
     return retVal; 
 }
 void  update (char *id, struct cords_publication *updated_publication) { }
-void  del    (char *id) {}
+void  del    (char *id) {
+    CURL *curl;
+    CURLcode res;
+    
+    curl = curl_easy_init();
+    if(curl) {
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+        
+        char request_buffer[1024];
+        sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
+        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+        
+        // In case of redirection, follow
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        
+        res = curl_easy_perform(curl);
+        
+        // TODO We don't return anything, so no need to check for success.  
+        // However once we get more advanced and want to retry on failure, we might want to do something here.
+//        if (CURLE_OK == res) {
+//            long http_code = 0;
+//            curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
+//            if (200 == http_code) {
+//            }
+//        }
+        curl_easy_cleanup(curl);
+    }    
+}
 void  delete_all_matching_filter (struct cords_publication_occi_filter *filter) {}
 cords_publication_id_list list_ids (struct cords_publication_occi_filter *filter) { 
     cords_publication_id_list retVal;
