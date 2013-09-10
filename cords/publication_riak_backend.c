@@ -134,16 +134,43 @@ static struct cords_publication *cords_publication_from_json(const char *input) 
     return new_publication;
 }
 
-static void setup_download(CURL *curl, struct transfer_data *download_data) {
-    download_data->transfered = 0;
-    download_data->data = NULL;          
-                
-    // Define the function that is used during upload, i.e. formats the category object
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, download);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, download_data);
+static const char VCLOCK_HEADER[] = "X-Riak-Vclock: ";
+static char *vclock_from_headers(const char *headers) {
+    const char *start = strstr(headers, VCLOCK_HEADER);
+    if (start) {
+        start += sizeof(VCLOCK_HEADER) - 1;
+        const char *end = strchr(start, '\r');
+        if (end) {
+            size_t length = end - start + 1;
+            char *retval = malloc(length);
+            if (retval) {
+                strncpy(retval, start, length - 1);
+                retval[length] = '\0';
+                return retval;
+            }
+        }
+    }
+    return NULL;
 }
 
-struct cords_publication * create(struct cords_publication *initial_publication) {
+static void initialise_download_operation(CURL *curl, struct transfer_data *data, CURLoption function_option, CURLoption data_option) {
+    data->transfered = 0;
+    data->data = NULL;          
+                
+    // Define the function that is used during upload, i.e. formats the category object
+    curl_easy_setopt(curl, function_option, download);
+    curl_easy_setopt(curl, data_option, data);
+}
+
+static void setup_download(CURL *curl, struct transfer_data *download_data) {
+    initialise_download_operation(curl, download_data, CURLOPT_WRITEFUNCTION, CURLOPT_WRITEDATA);
+}
+
+static void setup_read_vclock(CURL *curl, struct transfer_data *header_data) {
+    initialise_download_operation(curl, header_data, CURLOPT_HEADERFUNCTION, CURLOPT_HEADERDATA);
+}
+
+struct cords_publication *create(struct cords_publication *initial_publication) {
     CURL *curl;
     CURLcode res;
 
@@ -200,11 +227,16 @@ struct cords_publication * create(struct cords_publication *initial_publication)
     return new_publication; 
 }
 
-struct cords_publication * retrieve_from_id(char *id) {
+struct publication_with_vclock {
+    char *vclock;
+    struct cords_publication *publication;
+};
+
+struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
+    struct publication_with_vclock retval = {0};
+    
     CURL *curl;
     CURLcode res;
-
-    struct cords_publication *retrieved_publication = NULL;
     
     curl = curl_easy_init();
     if(curl) {
@@ -212,6 +244,9 @@ struct cords_publication * retrieve_from_id(char *id) {
         
         struct transfer_data data;
         setup_download(curl, &data);
+        
+        struct transfer_data header_data;
+        setup_read_vclock(curl, &header_data);
         
         char request_buffer[1024];
         sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
@@ -226,13 +261,21 @@ struct cords_publication * retrieve_from_id(char *id) {
             long http_code = 0;
             curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
             if (200 == http_code) {
-                retrieved_publication = cords_publication_from_json(data.data);
+                retval.publication = cords_publication_from_json(data.data);
+                retval.vclock = vclock_from_headers(header_data.data);
             }
         }
+        
         free(data.data);
+        free(header_data.data);
         curl_easy_cleanup(curl);
     }
-    return retrieved_publication; 
+    return retval;     
+}
+
+struct cords_publication * retrieve_from_id(char *id) {
+    struct publication_with_vclock retrieved = retrieve_with_vclock_from_id(id);
+    return retrieved.publication;
 }
 
 publication_list retrieve_from_filter(struct cords_publication_occi_filter *filter) { 
@@ -240,7 +283,11 @@ publication_list retrieve_from_filter(struct cords_publication_occi_filter *filt
     memset(&retVal, 0, sizeof(publication_list));
     return retVal; 
 }
-void  update (char *id, struct cords_publication *updated_publication) { }
+
+void  update (char *id, struct cords_publication *updated_publication) { 
+    //struct publication_with_vclock retrieved = retrieve_with_vclock_from_id(id);            
+}
+
 void  del    (char *id) {
     CURL *curl;
     CURLcode res;
