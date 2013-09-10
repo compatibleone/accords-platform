@@ -135,6 +135,9 @@ endif
 if ENABLE_COEASY
 SUBDIRS += coeasy
 endif
+if ENABLE_EASIGSM
+SUBDIRS += easigsm
+endif
 if ENABLE_OAPROCCI
 SUBDIRS += oaprocci
 endif
