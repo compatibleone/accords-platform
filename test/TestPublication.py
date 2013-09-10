@@ -12,6 +12,11 @@ from hamcrest import assert_that, is_, is_not, greater_than
 _co_start_script_path = "../../../../../small-accords" #TODO This path should be discovered in some way, not hardcoded
 _request_root = "http://127.0.0.1:8086/publication/"
 
+def _root_with_id(id):
+    if not id:
+        raise Exception("No id, did a previous lookup fail?")
+    return _request_root + id
+
 class TestPublication(unittest.TestCase):
     _find_id_regex = u"X-OCCI-Location: (\S+)/(\S+)\n"
     
@@ -41,6 +46,8 @@ class TestPublication(unittest.TestCase):
 
     def _find_id_of_entry(self, response):        
         match = re.search(self._find_id_regex, response)
+        if not match:
+            return None
         if len(match.groups()) > 1:
             return match.groups()[1]
         return None
@@ -68,7 +75,7 @@ class TestPublication(unittest.TestCase):
         r = self._post(_request_root)
         id = self._find_id_of_entry(r.text)
         
-        r = self._delete(_request_root + id) 
+        r = self._delete(_root_with_id(id)) 
         
         assert_that(r.status_code, is_(requests.codes.ok))
         
@@ -76,8 +83,8 @@ class TestPublication(unittest.TestCase):
         r = self._post(_request_root)
         id = self._find_id_of_entry(r.text)
         
-        self._delete(_request_root + id) 
-        r = self._get(_request_root + id)
+        self._delete(_root_with_id(id)) 
+        r = self._get(_root_with_id(id))
         
         assert_that(r.status_code, is_(requests.codes.not_found))
         
@@ -102,7 +109,7 @@ class TestPublication(unittest.TestCase):
         r = self._post(_request_root)
         id = self._find_id_of_entry(r.text)
         
-        r = self._get(_request_root + id) 
+        r = self._get(_root_with_id(id)) 
         
         assert_that(r.status_code, is_(requests.codes.ok))        
         
@@ -146,7 +153,7 @@ class TestPublication(unittest.TestCase):
         operator = u"Bob"        
         put_headers = self._headers_with_attribute(attr_name, operator)
         
-        r = self._put(_request_root + id, headers = put_headers)
+        r = self._put(_root_with_id(id), headers = put_headers)
         response = r.text
         
         assert_that(r.status_code, is_(requests.codes.ok))
@@ -158,8 +165,8 @@ class TestPublication(unittest.TestCase):
         operator = u"Bob"        
         put_headers = self._headers_with_attribute(attr_name, operator)
         
-        self._put(_request_root + id, headers = put_headers)
-        r = self._get(_request_root + id)
+        self._put(_root_with_id(id), headers = put_headers)
+        r = self._get(_root_with_id(id))
         response = r.text        
         
         assert_that(self._find_attribute(response, attr_name), is_(operator))
@@ -172,7 +179,7 @@ class TestPublication(unittest.TestCase):
         r = self._post(_request_root, None, headers = post_headers)
         id = self._find_id_of_entry(r.text)
         
-        r = self._get(_request_root + id)
+        r = self._get(_root_with_id(id))
         response = r.text
         assert_that(self._find_attribute(response, attr_name), is_(operator))
         
@@ -184,21 +191,24 @@ class TestPublication(unittest.TestCase):
         r = self._post(_request_root, None, headers = post_headers)
         id = self._find_id_of_entry(r.text)
                 
-        self._put(_request_root + id, headers = put_headers)
+        self._put(_root_with_id(id), headers = put_headers)
         
-        r = self._get(_request_root + id)
+        r = self._get(_root_with_id(id))
         response = r.text        
         assert_that(self._find_attribute(response, attr_name), is_(operator))        
         
     def _create_entry(self):
         r = self._post(_request_root)
-        return self._find_id_of_entry(r.text)
+        retval = self._find_id_of_entry(r.text)
+        if not retval:
+            raise Exception("Failed to create entry")
+        return retval
 
     def test_suspend_action_returns_okay_status(self):
         id = self._create_entry()        
         post_data = {'action':'suspend'}
         
-        r = self._post(_request_root + id, params = post_data)
+        r = self._post(_root_with_id(id), params = post_data)
         
         assert_that(r.status_code, is_(requests.codes.ok))
 
@@ -206,7 +216,7 @@ class TestPublication(unittest.TestCase):
         id = self._create_entry()        
         post_data = {'action':'restart'}
         
-        r = self._post(_request_root + id, params = post_data)
+        r = self._post(_root_with_id(id), params = post_data)
         
         assert_that(r.status_code, is_(requests.codes.ok))
         
@@ -214,8 +224,8 @@ class TestPublication(unittest.TestCase):
         id = self._create_entry()        
         post_data = {'action':'restart'}        
         
-        self._post(_request_root + id, params = post_data)        
-        response = self._get(_request_root + id).text
+        self._post(_root_with_id(id), params = post_data)        
+        response = self._get(_root_with_id(id)).text
         
         assert_that(self._find_attribute(response, 'uptime'), is_("0"))
         time_now = calendar.timegm(time.gmtime())
