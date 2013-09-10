@@ -17,13 +17,13 @@
 
 static void init();
 static void finalise();
-static struct cords_publication * create  (struct cords_publication *initial_publication);
-static struct cords_publication * retrieve_from_id(char *id);
-static publication_list  retrieve_from_filter(struct cords_publication_occi_filter *filter);
-static void  update (char *id, struct cords_publication *updated_publication);
-static void  del    (char *id);
-static void  delete_all_matching_filter (struct cords_publication_occi_filter *filter);
-static cords_publication_id_list  list_ids (struct cords_publication_occi_filter *filter);
+static struct cords_publication *create(struct cords_publication *initial_publication);
+static struct cords_publication *retrieve_from_id(char *id);
+static publication_list retrieve_from_filter(struct cords_publication_occi_filter *filter);
+static void update(char *id, struct cords_publication *updated_publication);
+static void del(char *id);
+static void delete_all_matching_filter(struct cords_publication_occi_filter *filter);
+static cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter);
 
 struct publication_backend_interface *  cords_publication_riak_backend_interface() {
     struct publication_backend_interface riak_interface =
