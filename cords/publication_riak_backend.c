@@ -138,7 +138,6 @@ static const char VCLOCK_HEADER[] = "X-Riak-Vclock: ";
 static char *vclock_from_headers(const char *headers) {
     const char *start = strstr(headers, VCLOCK_HEADER);
     if (start) {
-        start += sizeof(VCLOCK_HEADER) - 1;
         const char *end = strchr(start, '\r');
         if (end) {
             size_t length = end - start + 1;
@@ -170,12 +169,10 @@ static void setup_read_vclock(CURL *curl, struct transfer_data *header_data) {
     initialise_download_operation(curl, header_data, CURLOPT_HEADERFUNCTION, CURLOPT_HEADERDATA);
 }
 
-struct cords_publication *create(struct cords_publication *initial_publication) {
+static struct cords_publication *create_or_update(const struct cords_publication *initial_publication, const char *vclock) {
     CURL *curl;
     CURLcode res;
-
-    struct cords_publication *new_publication = NULL;
-    
+    struct cords_publication *new_publication = NULL;    
     curl = curl_easy_init();
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
@@ -184,8 +181,7 @@ struct cords_publication *create(struct cords_publication *initial_publication) 
         data.transfered = 0;
         data.data = json_string(initial_publication);
         data.total = strlen(data.data);
-        if(data.data) {
-            
+        if(data.data) {            
             // Define the function that is used during upload, i.e. formats the category object
             curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
             curl_easy_setopt(curl, CURLOPT_READDATA, &data);
@@ -206,7 +202,12 @@ struct cords_publication *create(struct cords_publication *initial_publication) 
             struct curl_slist *headers = NULL;
             // Disable Expect: Continue 100 header
             static const char buf[] = "Expect:"; 
-            headers = curl_slist_append(headers, buf);
+            headers = curl_slist_append(headers, buf);            
+            // If we've been provided with a vclock, add it to the headers to ensure we do an update, and don't create a 
+            // sibling
+            if (vclock) {
+                headers = curl_slist_append(headers, vclock);   
+            }            
             
             headers = curl_slist_append(headers, "Content-Type: application/json"); 
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -224,7 +225,11 @@ struct cords_publication *create(struct cords_publication *initial_publication) 
         }
         curl_easy_cleanup(curl);
     }
-    return new_publication; 
+    return new_publication;    
+}
+
+struct cords_publication *create(struct cords_publication *initial_publication) {
+    return create_or_update(initial_publication, NULL);
 }
 
 struct publication_with_vclock {
@@ -275,20 +280,29 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
 
 struct cords_publication * retrieve_from_id(char *id) {
     struct publication_with_vclock retrieved = retrieve_with_vclock_from_id(id);
+    free(retrieved.vclock);
     return retrieved.publication;
 }
 
 publication_list retrieve_from_filter(struct cords_publication_occi_filter *filter) { 
-    publication_list retVal;
-    memset(&retVal, 0, sizeof(publication_list));
+    publication_list retVal = {0};
     return retVal; 
 }
 
-void  update (char *id, struct cords_publication *updated_publication) { 
-    //struct publication_with_vclock retrieved = retrieve_with_vclock_from_id(id);            
+// Riak has a vclock recorded for each object stored which is used for assisting with
+// consistency in the face of different database nodes having different versions.
+// In order to ensure Riak updates the correct node, we must first read it and 
+// use the vclock returned when sending our update.
+void update(char *id, struct cords_publication *updated_publication) { 
+    struct publication_with_vclock retrieved = retrieve_with_vclock_from_id(id);
+    if (retrieved.vclock && retrieved.publication) {
+        create_or_update(updated_publication, retrieved.vclock);
+        free(retrieved.vclock);
+        free(retrieved.publication);
+    }    
 }
 
-void  del    (char *id) {
+void del(char *id) {
     CURL *curl;
     CURLcode res;
     
