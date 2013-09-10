@@ -69,9 +69,9 @@ static size_t upload(void *ptr, size_t size, size_t nmemb, void *userdata) {
     size_t limit = size * nmemb;
     struct transfer_data *data = userdata;
     
-    size_t bytes_to_transfer = MIN(limit, data->total - data->transfered);
-    data->transfered += bytes_to_transfer;    
+    size_t bytes_to_transfer = MIN(limit, data->total - data->transfered);    
     memcpy(ptr, data->data + data->transfered, bytes_to_transfer);
+    data->transfered += bytes_to_transfer;
     return bytes_to_transfer;
 }
 
@@ -94,10 +94,13 @@ static size_t download(void *content, size_t size, size_t nmemb, void *userdata)
 static char *json_string(const struct cords_publication *publication) {
     json_object *jo = json_object_new_object();
     
-    //char buf[1024];
-    //sprintf(buf, "{\"id\":\"%s\"}", publication->id);
-    //return allocate_string(buf);
-    json_object_object_add(jo, "id", json_object_new_string(publication->id));
+    if (publication->id) {
+        json_object_object_add(jo, "id", json_object_new_string(publication->id));
+    }
+    if (publication->operator) {
+        json_object_object_add(jo, "operator", json_object_new_string(publication->operator));
+    }
+    
     char *retVal = allocate_string(json_object_to_json_string(jo));
     
     // Free the object
@@ -109,19 +112,35 @@ static char *json_string(const struct cords_publication *publication) {
 static struct cords_publication *cords_publication_from_json(const char *input) {
     struct cords_publication *new_publication = allocate_cords_publication();
     if (new_publication) {
-        json_bool success = TRUE;
+        json_bool success;
         json_object *jo = json_tokener_parse(input);
         
         json_object *id;
-        success &= json_object_object_get_ex(jo, "id", &id);
+        success = json_object_object_get_ex(jo, "id", &id);
         if (success) {
             new_publication->id = allocate_string(json_object_get_string(id));
         }
-        
+
+        json_object *operator;
+        success = json_object_object_get_ex(jo, "operator", &operator);
+        if (success) {
+            new_publication->operator = allocate_string(json_object_get_string(operator));
+        }
+
+        // Free the object
         json_object_put(jo);
     }
     
     return new_publication;
+}
+
+static void setup_download(CURL *curl, struct transfer_data *download_data) {
+    download_data->transfered = 0;
+    download_data->data = NULL;          
+                
+    // Define the function that is used during upload, i.e. formats the category object
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, download);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, download_data);
 }
 
 struct cords_publication * create(struct cords_publication *initial_publication) {
@@ -137,12 +156,15 @@ struct cords_publication * create(struct cords_publication *initial_publication)
         struct transfer_data data;
         data.transfered = 0;
         data.data = json_string(initial_publication);
-        data.total = strlen(data.data);  // TODO +1?
+        data.total = strlen(data.data);
         if(data.data) {
             
             // Define the function that is used during upload, i.e. formats the category object
             curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
             curl_easy_setopt(curl, CURLOPT_READDATA, &data);
+            
+            struct transfer_data response;
+            setup_download(curl, &response);
             
             char request_buffer[1024];
             sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s?returnbody=true", "publication", initial_publication->id);        
@@ -168,7 +190,7 @@ struct cords_publication * create(struct cords_publication *initial_publication)
                 long http_code = 0;
                 curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
                 if (200 == http_code) {
-                    new_publication = cords_publication_from_json(data.data);
+                    new_publication = cords_publication_from_json(response.data);
                 }
             }
             free(data.data);
@@ -189,12 +211,7 @@ struct cords_publication * retrieve_from_id(char *id) {
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
         
         struct transfer_data data;
-        data.transfered = 0;
-        data.data = NULL;          
-                    
-        // Define the function that is used during upload, i.e. formats the category object
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, download);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
+        setup_download(curl, &data);
         
         char request_buffer[1024];
         sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
