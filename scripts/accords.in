@@ -169,6 +169,7 @@ _co_platform() {
     _co_run_serv broker "accords broker services"
     _co_run_serv procci "accords procci services"
     _co_run_serv command "accords remote command server"
+    _co_run_serv easigsm "accords easiclouds GSM server"
 
 # ---------------------------------------------------
 #       The provisioning services agreements 
@@ -355,7 +356,7 @@ _co_status() {
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas|coeasy)'
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|coobas|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas|coeasy|easigsm)'
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true
@@ -376,6 +377,7 @@ _co_status() {
 	lsof -i | grep LISTEN | grep slam || true
 	lsof -i | grep LISTEN | grep copaas || true
 	lsof -i | grep LISTEN | grep coeasy || true
+	lsof -i | grep LISTEN | grep easigsm|| true
     else
 	echo "Unsupported OS ($(uname -s))"
 	exit 1
@@ -400,6 +402,7 @@ _co_stop() {
     _stop_service ec2procci
     _stop_service cosched
     _stop_service command
+    _stop_service easigsm
     _stop_service procci
     _stop_service broker
     _stop_service parser
@@ -511,6 +514,10 @@ _run_coeasy() {
     coeasy --config $target CO-EASY/1.0
 }
 
+_run_easigsm() {
+    easigsm --config $target CO-EASIGSM/1.0
+}
+
 _run_conagios() {
     conagios --config $target CO-NAGIOS/1.0
 }
@@ -591,6 +598,7 @@ _make_security_files() {
 	_mksecs conagios 1
 	_mksecs paasprocci 1
 	_mksecs command 1
+	_mksecs easigsm 1
     
 	_mksect testcp 1
 	_mksect testpa 1
@@ -690,6 +698,7 @@ _accords_config() {
 		_mkcert teston
 		_mkcert testresolver
 		_mkcert command
+		_mkcert easigsm
 	fi
     fi
 
@@ -737,6 +746,7 @@ _accords_config() {
     _mkpro oaprocci
     _mkpro dummyprocci
     _mkcfg command
+    _mkcfg easigsm
     _mkcosacs cosacs
 
     _termnag
@@ -1246,6 +1256,9 @@ case `basename $0` in
 	;;
     run-command)
 	_run_command $*
+	;;
+    run-easigsm)
+	_run_easigsm $*
 	;;
     run-publisher)
 	_run_publisher $*
