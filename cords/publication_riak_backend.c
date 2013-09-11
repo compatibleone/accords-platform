@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include <curl/curl.h>
 #include <json.h>
@@ -97,7 +98,7 @@ static size_t download(void *content, size_t size, size_t nmemb, void *userdata)
 }
 
 static char *json_string(const struct cords_publication *publication) {
-    json_object *jo = json_object_new_object();
+    struct json_object *jo = json_object_new_object();
     
     if (publication->id) {
         json_object_object_add(jo, "id", json_object_new_string(publication->id));
@@ -114,28 +115,30 @@ static char *json_string(const struct cords_publication *publication) {
     return retVal;
 }
 
-static struct cords_publication *cords_publication_from_json(const char *input) {
+static struct cords_publication *cords_publication_from_json_object(struct json_object *jo) {
     struct cords_publication *new_publication = allocate_cords_publication();
     if (new_publication) {
         json_bool success;
-        json_object *jo = json_tokener_parse(input);
         
-        json_object *id;
+        struct json_object *id;
         success = json_object_object_get_ex(jo, "id", &id);
         if (success) {
             new_publication->id = allocate_string(json_object_get_string(id));
         }
 
-        json_object *operator;
+        struct json_object *operator;
         success = json_object_object_get_ex(jo, "operator", &operator);
         if (success) {
             new_publication->operator = allocate_string(json_object_get_string(operator));
         }
-
-        // Free the object
-        json_object_put(jo);
     }
-    
+    return new_publication;
+}
+
+static struct cords_publication *cords_publication_from_json_string(const char *input) {
+    struct json_object *jo = json_tokener_parse(input);            
+    struct cords_publication *new_publication = cords_publication_from_json_object(jo);    
+    json_object_put(jo); // Free the object
     return new_publication;
 }
 
@@ -242,7 +245,7 @@ static struct cords_publication *create_or_update(const struct cords_publication
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
             if(curl_perform_and_check(curl)) {
-                new_publication = cords_publication_from_json(response.data);
+                new_publication = cords_publication_from_json_string(response.data);
             }
             free(data.data);
         }
@@ -273,7 +276,7 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
         set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);
                 
         if(curl_perform_and_check(curl)) {
-            retval.publication = cords_publication_from_json(data.data);
+            retval.publication = cords_publication_from_json_string(data.data);
             retval.vclock = vclock_from_headers(header_data.data);
         }
         
@@ -322,8 +325,58 @@ void del(char *id) {
 }
 
 void  delete_all_matching_filter (struct cords_publication_occi_filter *filter) {}
+
 cords_publication_id_list list_ids (struct cords_publication_occi_filter *filter) { 
-    cords_publication_id_list retVal;
-    memset(&retVal, 0, sizeof(cords_publication_id_list));
+    cords_publication_id_list retVal = {0};
+    CURL *curl = init_curl_common();
+    if(curl) {
+        unsigned n_filters = cords_publication_count_filters(filter);
+        char request_buffer[1024];
+        switch (n_filters) {
+        case 0:
+            // List - warning, shouldn't be used in production for performance reasons
+            sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", "publication");
+            break;
+        default:
+            assert(0);
+        }
+
+        struct transfer_data response;
+        setup_download(curl, &response);
+
+        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+        if(curl_perform_and_check(curl)) {
+            // In order to reduce nesting here, we're relying on the fact that json-c behaves nicely
+            // when passed null pointers.  We don't need to check the return values from json-c calls
+            // if all we're doing is passing them back to json-c functions.
+            struct json_object *jo = json_tokener_parse(response.data);
+            struct json_object *keys;
+            json_object_object_get_ex(jo, "keys", &keys);
+            struct array_list *items = json_object_get_array(keys);  
+            if (items) {
+                retVal.ids = malloc(items->length * sizeof(char *));
+                if (retVal.ids) {
+                    int i;
+                    for(i = 0; i < items->length; i++) {
+                        //struct cords_publication *publication = cords_publication_from_json_object(items->array[i]);                        
+                        //if(publication && publication->id) {
+                        const char *id = json_object_get_string(items->array[i]);
+                        if(id) {
+                            retVal.ids[i] = allocate_string(id);
+                            retVal.count++;
+                        }
+                        else {
+                            cords_publication_free_id_list(&retVal);
+                            break;
+                        }
+                    }
+                }
+            }
+            json_object_put(jo);            
+        }
+        //int written = sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&q=%s:%s", "publication", fieldname, value);        
+        free(response.data);
+    }
+    curl_easy_cleanup(curl);    
     return retVal; 
 }
