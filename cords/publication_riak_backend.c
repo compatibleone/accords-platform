@@ -324,53 +324,115 @@ void del(char *id) {
     }    
 }
 
-void  delete_all_matching_filter (struct cords_publication_occi_filter *filter) {}
+void  delete_all_matching_filter(struct cords_publication_occi_filter *filter) {}
 
-cords_publication_id_list list_ids (struct cords_publication_occi_filter *filter) { 
+static char *search_query(const struct cords_publication_occi_filter *filter) {
+    char buf[256];
+    if(filter->id) {
+        sprintf(buf, "id:%s", filter->attributes->id);
+        return allocate_string(buf);
+    }
+
+    if(filter->operator) {
+        sprintf(buf, "operator:%s", filter->attributes->operator);
+        return allocate_string(buf);
+    }
+}
+
+static void publication_list_from_search_json(struct json_object *jo, cords_publication_id_list *list) {
+    struct json_object *response;
+    json_object_object_get_ex(jo, "response", &response);
+    struct json_object *docs;
+    json_object_object_get_ex(response, "docs", &docs);
+    struct array_list *items = json_object_get_array(docs);
+    if (items) {
+        list->ids = malloc(items->length * sizeof(char *));
+        unsigned i;
+        for(i = 0; i < items->length; i++) {
+            struct json_object *id_json;
+            json_object_object_get_ex(items->array[i], "id", &id_json);
+            const char *id = json_object_get_string(id_json);
+            if(id) {
+                list->ids[i] = allocate_string(id);
+                list->count++;
+            }
+            else {
+                cords_publication_free_id_list(list);
+                break;
+            }
+        }
+    }
+}
+
+static void publication_list_from_list_json(struct json_object *jo, cords_publication_id_list *list) {
+    struct json_object *keys;
+    json_object_object_get_ex(jo, "keys", &keys);
+    struct array_list *items = json_object_get_array(keys);  
+    if (items) {
+        list->ids = malloc(items->length * sizeof(char *));
+        if (list->ids) {
+            int i;
+            for(i = 0; i < items->length; i++) {
+                //struct cords_publication *publication = cords_publication_from_json_object(items->array[i]);                        
+                //if(publication && publication->id) {
+                const char *id = json_object_get_string(items->array[i]);
+                if(id) {
+                    list->ids[i] = allocate_string(id);
+                    list->count++;
+                }
+                else {
+                    cords_publication_free_id_list(list);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter) { 
     cords_publication_id_list retVal = {0};
     CURL *curl = init_curl_common();
     if(curl) {
         unsigned n_filters = cords_publication_count_filters(filter);
         char request_buffer[1024];
+        char *query;
         switch (n_filters) {
         case 0:
             // List - warning, shouldn't be used in production for performance reasons
             sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", "publication");
             break;
+        case 1:
+            // Single item filter...possibly a candidate for replacing with i2 search
+            query = search_query(filter);
+            if(query) {
+                // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
+                // Don't find out!  
+                sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", "publication", query);
+                liberate(query);
+            }
+            break;
         default:
             assert(0);
         }
-
+        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+        
         struct transfer_data response;
         setup_download(curl, &response);
 
-        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
         if(curl_perform_and_check(curl)) {
             // In order to reduce nesting here, we're relying on the fact that json-c behaves nicely
             // when passed null pointers.  We don't need to check the return values from json-c calls
             // if all we're doing is passing them back to json-c functions.
             struct json_object *jo = json_tokener_parse(response.data);
-            struct json_object *keys;
-            json_object_object_get_ex(jo, "keys", &keys);
-            struct array_list *items = json_object_get_array(keys);  
-            if (items) {
-                retVal.ids = malloc(items->length * sizeof(char *));
-                if (retVal.ids) {
-                    int i;
-                    for(i = 0; i < items->length; i++) {
-                        //struct cords_publication *publication = cords_publication_from_json_object(items->array[i]);                        
-                        //if(publication && publication->id) {
-                        const char *id = json_object_get_string(items->array[i]);
-                        if(id) {
-                            retVal.ids[i] = allocate_string(id);
-                            retVal.count++;
-                        }
-                        else {
-                            cords_publication_free_id_list(&retVal);
-                            break;
-                        }
-                    }
-                }
+            switch(n_filters) {
+            case 0:
+                publication_list_from_list_json(jo, &retVal);
+                break;
+            case 1:
+                publication_list_from_search_json(jo, &retVal);
+                break;
+            default:
+                assert(0);
             }
             json_object_put(jo);            
         }

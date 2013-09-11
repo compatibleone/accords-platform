@@ -7,7 +7,7 @@ import re
 import time
 import calendar
 
-from hamcrest import assert_that, is_, is_not, greater_than
+from hamcrest import assert_that, is_, is_not, greater_than, has_item
 
 _co_start_script_path = "../../../../../small-accords" #TODO This path should be discovered in some way, not hardcoded
 _request_root = "http://127.0.0.1:8086/publication/"
@@ -102,8 +102,7 @@ class TestPublication(unittest.TestCase):
         
         r = self._delete(_request_root)
         
-        assert_that(r.status_code, is_(requests.codes.ok))
-        
+        assert_that(r.status_code, is_(requests.codes.ok))        
          
     def test_that_get_returns_ok_if_id_is_valid(self):
         r = self._post(_request_root)
@@ -115,7 +114,7 @@ class TestPublication(unittest.TestCase):
         
     def _find_ids_of_all_entries(self, response):
         matches = re.finditer(self._find_id_regex, response)
-        return [match.group(0) for match in matches]
+        return [match.group(2) for match in matches]
     
     def test_that_get_all_returns_list_of_ids(self):
         # Ensure that at least two entries exist      
@@ -127,8 +126,22 @@ class TestPublication(unittest.TestCase):
         responses = self._find_ids_of_all_entries(r.text)
         
         assert_that(len(responses), is_(greater_than(1)))
-
-
+        
+    def test_that_get_with_filter_returns_only_matching_ids(self):
+        attr_name = 'operator'
+        operator = u"Bob"        
+        post_headers = self._headers_with_attribute(attr_name, operator)        
+        r = self._post(_request_root, None, headers = post_headers)
+        matching_id = self._find_id_of_entry(r.text)        
+        post_headers = self._headers_with_attribute(attr_name, "something random")        
+        r = self._post(_request_root, None, headers = post_headers)        
+        non_matching_id = self._find_id_of_entry(r.text)
+        
+        r = self._get(_request_root, self._headers_with_attribute(attr_name, operator))
+        
+        responses = self._find_ids_of_all_entries(r.text)
+        assert_that(responses, has_item(matching_id))
+        assert_that(responses, is_not(has_item(non_matching_id)))
         
     def _find_attribute(self, response, attribute):            
         find_attribute = u'X-OCCI-Attribute: occi.publication.{0}="(\S+)"\n'.format(attribute)
@@ -232,18 +245,22 @@ class TestPublication(unittest.TestCase):
         self.assertAlmostEqual(int(self._find_attribute(response, 'when')), time_now, delta = 2)
         assert_that(self._find_attribute(response, 'state'), is_("1"))
         
-    def _post(self, url, params = None, headers = None):
+    def _headers(self, headers):
         if headers:
             headers['accept'] = 'text'
         else:
             headers = {'accept' : 'text'}
+        return headers
+        
+    def _post(self, url, params = None, headers = None):
+        headers = self._headers(headers)
         if params:
             return requests.post(url, params=params, headers=headers)
         else:
             return requests.post(url, None, headers=headers)
         
-    def _get(self, url):
-        headers = {'accept' : 'text'}
+    def _get(self, url, headers = None):
+        headers = self._headers(headers)
         return requests.get(url, headers=headers)
     
     def _delete(self, url):
@@ -251,10 +268,7 @@ class TestPublication(unittest.TestCase):
         return requests.delete(url, headers=headers)
     
     def _put(self, url, headers = None):
-        if headers:
-            headers['accept'] = 'text'
-        else:
-            headers = {'accept' : 'text'}
+        headers = self._headers(headers)
         return requests.put(url, None, headers=headers)
         
         
