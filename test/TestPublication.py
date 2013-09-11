@@ -127,7 +127,7 @@ class TestPublication(unittest.TestCase):
         
         assert_that(len(responses), is_(greater_than(1)))
         
-    def test_that_get_with_filter_returns_only_matching_ids(self):
+    def test_that_get_with_single_filter_returns_only_matching_ids(self):
         attr_name = 'operator'
         operator = u"Bob"        
         post_headers = self._headers_with_attribute(attr_name, operator)        
@@ -142,6 +142,28 @@ class TestPublication(unittest.TestCase):
         responses = self._find_ids_of_all_entries(r.text)
         assert_that(responses, has_item(matching_id))
         assert_that(responses, is_not(has_item(non_matching_id)))
+                
+    def test_that_get_with_two_filters_returns_only_matching_ids(self):
+        attr_1_name = 'operator'
+        operator = u"Bob"    
+        attr_2_name = 'identity'
+        identity = "Alice"    
+        post_headers = self._headers_with_attributes([attr_1_name, attr_2_name], [operator, identity])        
+        r = self._post(_request_root, None, headers = post_headers)
+        matching_id = self._find_id_of_entry(r.text)        
+        post_headers = self._headers_with_attributes([attr_1_name, attr_2_name], ["Someone else", identity])
+        r = self._post(_request_root, None, headers = post_headers)        
+        non_matching_id_1 = self._find_id_of_entry(r.text)    
+        post_headers = self._headers_with_attributes([attr_1_name, attr_2_name], [operator, "Zorro"])
+        r = self._post(_request_root, None, headers = post_headers)        
+        non_matching_id_2 = self._find_id_of_entry(r.text)
+        
+        r = self._get(_request_root, self._headers_with_attributes([attr_1_name, attr_2_name], [operator, identity]))
+        
+        responses = self._find_ids_of_all_entries(r.text)
+        assert_that(responses, has_item(matching_id))
+        assert_that(responses, is_not(has_item(non_matching_id_1)))
+        assert_that(responses, is_not(has_item(non_matching_id_2)))
         
     def _find_attribute(self, response, attribute):            
         find_attribute = u'X-OCCI-Attribute: occi.publication.{0}="(\S+)"\n'.format(attribute)
@@ -157,8 +179,16 @@ class TestPublication(unittest.TestCase):
         
 
     def _headers_with_attribute(self, name, value):
-        put_headers = {'X-OCCI-Attribute':('occi.publication.{0}={1}'.format(name, value))}
-        return put_headers
+        headers = {'X-OCCI-Attribute':('occi.publication.{0}={1}'.format(name, value))}
+        return headers
+    
+    def _headers_with_attributes(self, names, values):
+        hacked_value = 'occi.publication.{0}={1}'.format(names[0], values[0])
+        names = names[1:]
+        values = values[1:]
+        for name, value in zip(names,values):
+            hacked_value = hacked_value + '\r\nX-OCCI-Attribute: occi.publication.{0}={1}'.format(name, value)
+        return {'X-OCCI-Attribute':hacked_value}           
 
     def test_that_put_reports_updated_entry(self):
         id = self._create_entry()

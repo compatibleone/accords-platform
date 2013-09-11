@@ -106,6 +106,9 @@ static char *json_string(const struct cords_publication *publication) {
     if (publication->operator) {
         json_object_object_add(jo, "operator", json_object_new_string(publication->operator));
     }
+    if (publication->identity) {
+        json_object_object_add(jo, "identity", json_object_new_string(publication->identity));
+    }
     
     char *retVal = allocate_string(json_object_to_json_string(jo));
     
@@ -130,6 +133,12 @@ static struct cords_publication *cords_publication_from_json_object(struct json_
         success = json_object_object_get_ex(jo, "operator", &operator);
         if (success) {
             new_publication->operator = allocate_string(json_object_get_string(operator));
+        }
+        
+        struct json_object *identity;
+        success = json_object_object_get_ex(jo, "identity", &identity);
+        if (success) {
+            new_publication->identity = allocate_string(json_object_get_string(identity));
         }
     }
     return new_publication;
@@ -328,15 +337,28 @@ void  delete_all_matching_filter(struct cords_publication_occi_filter *filter) {
 
 static char *search_query(const struct cords_publication_occi_filter *filter) {
     char buf[256];
+    unsigned written = 0;
     if(filter->id) {
-        sprintf(buf, "id:%s", filter->attributes->id);
-        return allocate_string(buf);
+        if(written > 0) {
+            written += sprintf(&buf[written], "%%20AND%%20");
+        }
+        written += sprintf(&buf[written], "id:%s", filter->attributes->id);
     }
 
     if(filter->operator) {
-        sprintf(buf, "operator:%s", filter->attributes->operator);
-        return allocate_string(buf);
+        if(written > 0) {
+            written += sprintf(&buf[written], "%%20AND%%20");
+        }
+        written += sprintf(&buf[written], "operator:%s", filter->attributes->operator);
     }
+
+    if(filter->identity) {
+        if(written > 0) {
+            written += sprintf(&buf[written], "%%20AND%%20");
+        }
+        written += sprintf(&buf[written], "identity:%s", filter->attributes->identity);
+    }
+    return allocate_string(buf);
 }
 
 static void publication_list_from_search_json(struct json_object *jo, cords_publication_id_list *list) {
@@ -396,12 +418,11 @@ cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter)
         unsigned n_filters = cords_publication_count_filters(filter);
         char request_buffer[1024];
         char *query;
-        switch (n_filters) {
-        case 0:
+        if(0 == n_filters) {
             // List - warning, shouldn't be used in production for performance reasons
             sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", "publication");
-            break;
-        case 1:
+        }
+        else {
             // Single item filter...possibly a candidate for replacing with i2 search
             query = search_query(filter);
             if(query) {
@@ -410,9 +431,6 @@ cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter)
                 sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", "publication", query);
                 liberate(query);
             }
-            break;
-        default:
-            assert(0);
         }
         curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
         
@@ -424,15 +442,11 @@ cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter)
             // when passed null pointers.  We don't need to check the return values from json-c calls
             // if all we're doing is passing them back to json-c functions.
             struct json_object *jo = json_tokener_parse(response.data);
-            switch(n_filters) {
-            case 0:
+            if(0 == n_filters) {
                 publication_list_from_list_json(jo, &retVal);
-                break;
-            case 1:
+            }
+            else {
                 publication_list_from_search_json(jo, &retVal);
-                break;
-            default:
-                assert(0);
             }
             json_object_put(jo);            
         }
