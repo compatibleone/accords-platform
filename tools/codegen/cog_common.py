@@ -431,18 +431,15 @@ def profile(function_name, filter_name = None):
 """#ifdef BACKEND_PROFILING
     {0}_backend_profile.{1}++;""".format(_filename_root(), function_name))
     if filter_name:
-        cog.outl("    {2}_count_filters(filter, &{0}_backend_profile.{1});".format(
+        cog.outl("    {2}_record_filter_count(filter, &{0}_backend_profile.{1});".format(
             _filename_root(), filter_name, _category_name()))
     cog.outl("    save_backend_profile(autosave_{0}_name, &{1}_backend_profile);".format(_category_name(), _filename_root()))
     cog.outl("#endif")
-    
+
 def count_filters():
-    cog.outl(
-"""void {0}_count_filters(struct {0}_occi_filter *filter, filter_count *counts) {{
-    int count = 0;""".format(_category_name()))
     _format_category(None,
-                     "    if (filter->{0}) count++;",
-                     "    if (filter->{0}) count++;") 
+                     "if (filter->{0}) count++;",
+                     "if (filter->{0}) count++;") 
          
 def backend_include():    
     if (_category_name() != 'cords_publication'): #TODO Hardcoding switch for now

@@ -125,4 +125,11 @@ public int rest_occi_CATEGORY_NAME(FILE * fh,struct CATEGORY_NAME * sptr,char * 
 
 }
 
+unsigned CATEGORY_NAME_count_filters(struct CATEGORY_NAME_occi_filter *filter) {
+    unsigned count = 0;
+    [[[cog t.count_filters()]]]
+    [[[end]]]
+    return count;
+}
+ 
 #endif	/* _FILENAME_ROOT_c_ */

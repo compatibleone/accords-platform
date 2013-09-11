@@ -23,7 +23,7 @@ node.h"
 
 #ifdef BACKEND_PROFILING
 static struct backend_profile FILENAME_ROOT_backend_profile;
-static void CATEGORY_NAME_count_filters(struct CATEGORY_NAME_occi_filter *filter, filter_count *counts);
+static void CATEGORY_NAME_record_filter_count(struct CATEGORY_NAME_occi_filter *filter, filter_count *counts);
 #endif
 
 /*	--------------------------------------------------------------------	*/
@@ -492,8 +492,8 @@ void  CATEGORY_NAME_init() {
 void CATEGORY_NAME_finalise() {}
 
 #ifdef BACKEND_PROFILING
-[[[cog t.count_filters()]]]
-[[[end]]]
+void CATEGORY_NAME_record_filter_count(struct CATEGORY_NAME_occi_filter *filter, filter_count *counts) {
+    unsigned count = CATEGORY_NAME_count_filters(filter);
     switch (count) {
     case 0:
         counts->zeros++;
