@@ -15,6 +15,11 @@
 
 #define MIN(a,b) ((a < b) ? (a) : (b))
 
+typedef enum {
+    RIAK_OPTION_RETURN_OBJECT,
+    RIAK_OPTION_NO_OBJECT
+} riak_object_return;
+
 static void init();
 static void finalise();
 static struct cords_publication *create(struct cords_publication *initial_publication);
@@ -180,6 +185,15 @@ static CURL *init_curl_common() {
     return curl;    
 }
 
+static void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_object_return return_object) {
+    char request_buffer[1024];
+    int written = sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", bucket, key);
+    if (RIAK_OPTION_RETURN_OBJECT == return_object) {
+        sprintf(&request_buffer[written], "?returnbody=true");
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+}
+
 static int curl_perform_and_check(CURL *curl) {
     CURLcode res;
     res = curl_easy_perform(curl);
@@ -209,9 +223,7 @@ static struct cords_publication *create_or_update(const struct cords_publication
             struct transfer_data response;
             setup_download(curl, &response);
             
-            char request_buffer[1024];
-            sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s?returnbody=true", "publication", initial_publication->id);        
-            curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+            set_curl_query_url(curl, "publication", initial_publication->id, RIAK_OPTION_RETURN_OBJECT);
                      
             curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
             //curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)14); // TODO Use proper files size
@@ -250,9 +262,7 @@ struct publication_with_vclock {
 
 struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
     struct publication_with_vclock retval = {0};    
-    CURL *curl;
-    
-    curl = init_curl_common();
+    CURL *curl = init_curl_common();
     if(curl) {
         struct transfer_data data;
         setup_download(curl, &data);
@@ -260,9 +270,7 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
         struct transfer_data header_data;
         setup_read_vclock(curl, &header_data);
         
-        char request_buffer[1024];
-        sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
-        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+        set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);
                 
         if(curl_perform_and_check(curl)) {
             retval.publication = cords_publication_from_json(data.data);
@@ -301,24 +309,18 @@ void update(char *id, struct cords_publication *updated_publication) {
 }
 
 void del(char *id) {
-    CURL *curl;
-    
-    curl = init_curl_common();
+    CURL *curl = init_curl_common();
     if(curl) {        
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-        
-        char request_buffer[1024];
-        sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
-        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-                
+        set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);                
         if(curl_perform_and_check(curl)) {
             // TODO We don't return anything, so no need to check for success.  
             // However once we get more advanced and want to retry on failure, we might want to do something here.            
-        }
-        
+        }        
         curl_easy_cleanup(curl);
     }    
 }
+
 void  delete_all_matching_filter (struct cords_publication_occi_filter *filter) {}
 cords_publication_id_list list_ids (struct cords_publication_occi_filter *filter) { 
     cords_publication_id_list retVal;
