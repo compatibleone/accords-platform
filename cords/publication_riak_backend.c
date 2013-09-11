@@ -169,14 +169,23 @@ static void setup_read_vclock(CURL *curl, struct transfer_data *header_data) {
     initialise_download_operation(curl, header_data, CURLOPT_HEADERFUNCTION, CURLOPT_HEADERDATA);
 }
 
+static CURL *init_curl_common() {
+    CURL *curl = curl_easy_init();
+    if(curl) {
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+
+        // In case of redirection, follow
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    }
+    return curl;    
+}
+
 static struct cords_publication *create_or_update(const struct cords_publication *initial_publication, const char *vclock) {
     CURL *curl;
     CURLcode res;
     struct cords_publication *new_publication = NULL;    
-    curl = curl_easy_init();
+    curl = init_curl_common();
     if(curl) {
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-        
         struct transfer_data data;
         data.transfered = 0;
         data.data = json_string(initial_publication);
@@ -192,10 +201,7 @@ static struct cords_publication *create_or_update(const struct cords_publication
             char request_buffer[1024];
             sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s?returnbody=true", "publication", initial_publication->id);        
             curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-            
-            // In case of redirection, follow
-            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-         
+                     
             curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
             //curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)14); // TODO Use proper files size
     
@@ -243,10 +249,8 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
     CURL *curl;
     CURLcode res;
     
-    curl = curl_easy_init();
+    curl = init_curl_common();
     if(curl) {
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-        
         struct transfer_data data;
         setup_download(curl, &data);
         
@@ -256,10 +260,7 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
         char request_buffer[1024];
         sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
         curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-        
-        // In case of redirection, follow
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        
+                
         res = curl_easy_perform(curl);
         
         if (CURLE_OK == res) {
@@ -306,19 +307,14 @@ void del(char *id) {
     CURL *curl;
     CURLcode res;
     
-    curl = curl_easy_init();
-    if(curl) {
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-        
+    curl = init_curl_common();
+    if(curl) {        
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
         
         char request_buffer[1024];
         sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
         curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-        
-        // In case of redirection, follow
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        
+                
         res = curl_easy_perform(curl);
         
         // TODO We don't return anything, so no need to check for success.  
