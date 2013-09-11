@@ -180,9 +180,20 @@ static CURL *init_curl_common() {
     return curl;    
 }
 
+static int curl_perform_and_check(CURL *curl) {
+    CURLcode res;
+    res = curl_easy_perform(curl);
+    
+    if (CURLE_OK == res) {
+        long http_code = 0;
+        curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
+        return (200 == http_code);
+    }
+    return 0;
+}
+
 static struct cords_publication *create_or_update(const struct cords_publication *initial_publication, const char *vclock) {
     CURL *curl;
-    CURLcode res;
     struct cords_publication *new_publication = NULL;    
     curl = init_curl_common();
     if(curl) {
@@ -217,15 +228,9 @@ static struct cords_publication *create_or_update(const struct cords_publication
             
             headers = curl_slist_append(headers, "Content-Type: application/json"); 
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-            
-            res = curl_easy_perform(curl);
-            
-            if (CURLE_OK == res) {
-                long http_code = 0;
-                curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
-                if (200 == http_code) {
-                    new_publication = cords_publication_from_json(response.data);
-                }
+
+            if(curl_perform_and_check(curl)) {
+                new_publication = cords_publication_from_json(response.data);
             }
             free(data.data);
         }
@@ -244,10 +249,8 @@ struct publication_with_vclock {
 };
 
 struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
-    struct publication_with_vclock retval = {0};
-    
+    struct publication_with_vclock retval = {0};    
     CURL *curl;
-    CURLcode res;
     
     curl = init_curl_common();
     if(curl) {
@@ -261,15 +264,9 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
         sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
         curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
                 
-        res = curl_easy_perform(curl);
-        
-        if (CURLE_OK == res) {
-            long http_code = 0;
-            curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
-            if (200 == http_code) {
-                retval.publication = cords_publication_from_json(data.data);
-                retval.vclock = vclock_from_headers(header_data.data);
-            }
+        if(curl_perform_and_check(curl)) {
+            retval.publication = cords_publication_from_json(data.data);
+            retval.vclock = vclock_from_headers(header_data.data);
         }
         
         free(data.data);
@@ -305,7 +302,6 @@ void update(char *id, struct cords_publication *updated_publication) {
 
 void del(char *id) {
     CURL *curl;
-    CURLcode res;
     
     curl = init_curl_common();
     if(curl) {        
@@ -315,16 +311,11 @@ void del(char *id) {
         sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", "publication", id);        
         curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
                 
-        res = curl_easy_perform(curl);
+        if(curl_perform_and_check(curl)) {
+            // TODO We don't return anything, so no need to check for success.  
+            // However once we get more advanced and want to retry on failure, we might want to do something here.            
+        }
         
-        // TODO We don't return anything, so no need to check for success.  
-        // However once we get more advanced and want to retry on failure, we might want to do something here.
-//        if (CURLE_OK == res) {
-//            long http_code = 0;
-//            curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
-//            if (200 == http_code) {
-//            }
-//        }
         curl_easy_cleanup(curl);
     }    
 }
