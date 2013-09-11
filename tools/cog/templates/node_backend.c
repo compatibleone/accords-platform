@@ -445,11 +445,13 @@ void CATEGORY_NAME_free_id_list(CATEGORY_NAME_id_list *list) {
 		liberate(list->ids[i]);
 	}
 	liberate(list->ids);
+	list->ids = NULL;
 	list->count = 0;
 }
 
 void free_FILENAME_ROOT_list(FILENAME_ROOT_list *list) {
 	liberate(list->FILENAME_ROOTs);
+	list->FILENAME_ROOTs = NULL;
 	list->count = 0;
 }
 
