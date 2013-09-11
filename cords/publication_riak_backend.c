@@ -140,10 +140,10 @@ static char *vclock_from_headers(const char *headers) {
     if (start) {
         const char *end = strchr(start, '\r');
         if (end) {
-            size_t length = end - start + 1;
-            char *retval = malloc(length);
+            size_t length = end - start;
+            char *retval = malloc(length + 1);
             if (retval) {
-                strncpy(retval, start, length - 1);
+                strncpy(retval, start, length);
                 retval[length] = '\0';
                 return retval;
             }
