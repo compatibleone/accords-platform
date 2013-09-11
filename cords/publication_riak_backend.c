@@ -333,7 +333,14 @@ void del(char *id) {
     }    
 }
 
-void  delete_all_matching_filter(struct cords_publication_occi_filter *filter) {}
+void  delete_all_matching_filter(struct cords_publication_occi_filter *filter) {
+    cords_publication_id_list to_delete = list_ids(filter);
+    unsigned i;
+    for(i = 0; i < to_delete.count; i++) {
+        del(to_delete.ids[i]);
+    }
+    cords_publication_free_id_list(&to_delete);
+}
 
 static char *search_query(const struct cords_publication_occi_filter *filter) {
     char buf[256];
@@ -361,28 +368,32 @@ static char *search_query(const struct cords_publication_occi_filter *filter) {
     return allocate_string(buf);
 }
 
-static void publication_list_from_search_json(struct json_object *jo, cords_publication_id_list *list) {
+static void publication_id_list_from_json_array(struct array_list *items, cords_publication_id_list *list) {       
+    list->ids = malloc(items->length * sizeof(char *));
+    unsigned i;
+    for(i = 0; i < items->length; i++) {
+        struct json_object *id_json;
+        json_object_object_get_ex(items->array[i], "id", &id_json);
+        const char *id = json_object_get_string(id_json);
+        if(id) {
+            list->ids[i] = allocate_string(id);
+            list->count++;
+        }
+        else {
+            cords_publication_free_id_list(list);
+            break;
+        }
+    }
+}
+
+static void publication_list_from_search_json(struct json_object *jo, cords_publication_id_list *list, riak_object_return return_objects) {
     struct json_object *response;
     json_object_object_get_ex(jo, "response", &response);
     struct json_object *docs;
     json_object_object_get_ex(response, "docs", &docs);
     struct array_list *items = json_object_get_array(docs);
     if (items) {
-        list->ids = malloc(items->length * sizeof(char *));
-        unsigned i;
-        for(i = 0; i < items->length; i++) {
-            struct json_object *id_json;
-            json_object_object_get_ex(items->array[i], "id", &id_json);
-            const char *id = json_object_get_string(id_json);
-            if(id) {
-                list->ids[i] = allocate_string(id);
-                list->count++;
-            }
-            else {
-                cords_publication_free_id_list(list);
-                break;
-            }
-        }
+        publication_id_list_from_json_array(items, list);
     }
 }
 
@@ -446,7 +457,7 @@ cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter)
                 publication_list_from_list_json(jo, &retVal);
             }
             else {
-                publication_list_from_search_json(jo, &retVal);
+                publication_list_from_search_json(jo, &retVal, RIAK_OPTION_NO_OBJECT);
             }
             json_object_put(jo);            
         }

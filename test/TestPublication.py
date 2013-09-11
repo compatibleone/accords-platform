@@ -92,9 +92,15 @@ class TestPublication(unittest.TestCase):
         self._post(_request_root)
         
         self._delete(_request_root)
-        r = self._get(_request_root)   
-        responses = self._find_ids_of_all_entries(r.text)
         
+        # Riak does not have good support for listing.  List caches results for performance
+        # reasons, but this means that a large delete followed by a list can result in 
+        # erroneous reporting of not deleted items.
+        #import time
+        #time.sleep(10)
+        
+        r = self._get(_request_root)   
+        responses = self._find_ids_of_all_entries(r.text)        
         assert_that(len(responses), is_(0))
         
     def test_that_delete_responds_ok(self):
