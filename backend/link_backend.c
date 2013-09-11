@@ -8,7 +8,7 @@
 
 #include "link_backend.h"
 
-static xlink_list list_of_links;
+static cords_xlink_list list_of_links;
 static int link_index = 0; 
 
 static void initialise_links() {
@@ -63,7 +63,7 @@ static const struct cords_xlink *valid_current_link(const char *source_id) {
 static const struct cords_xlink *check_found(const struct cords_xlink *found) { 
     if (!found) {
         link_index = 0;
-        free_xlink_list(&list_of_links);
+        free_cords_xlink_list(&list_of_links);
     }
     return found;
 }

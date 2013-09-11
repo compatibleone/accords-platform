@@ -344,12 +344,12 @@ private struct rest_response * CATEGORY_NAME_delete_all(
 	iptr = optr->callback;
 	if (!( filter_CATEGORY_NAME_info(&filter, optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	FILENAME_ROOT_list item_list =  CATEGORY_NAME_backend->retrieve_from_filter(&filter);
+	CATEGORY_NAME_list item_list =  CATEGORY_NAME_backend->retrieve_from_filter(&filter);
 	int index;
 	for(index = 0; index < item_list.count; index++) {
 		if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_delete, item_list.FILENAME_ROOTs[index], optr, rptr); }
 	}
-	free_FILENAME_ROOT_list(&item_list);
+	free_CATEGORY_NAME_list(&item_list);
 	CATEGORY_NAME_backend->delete_all_matching_filter(&filter);
 	liberate_CATEGORY_NAME(filter.attributes);
 	if (!( occi_success( aptr ) ))

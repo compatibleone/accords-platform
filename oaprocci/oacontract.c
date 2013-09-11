@@ -1218,14 +1218,14 @@ const struct oa_config * resolve_oa_configuration( char * sptr, int is_active, i
 	filter.attributes->deleted = 0;
 	filter.deleted = 1;
 	
-	oaconfig_list matches = oa_config_backend->retrieve_from_filter(&filter); 
+	oa_config_list matches = oa_config_backend->retrieve_from_filter(&filter); 
 	
 	liberate_oa_config(filter.attributes);
 	const struct oa_config *retVal = NULL;
 	if (matches.count > 0) {
 	    retVal = matches.oaconfigs[0];
 	}
-	free_oaconfig_list(&matches);	
+	free_oa_config_list(&matches);	
 	return (retVal);
 }
 

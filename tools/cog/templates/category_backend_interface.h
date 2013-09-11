@@ -9,11 +9,11 @@ typedef struct  CATEGORY_NAME_id_list_t
 	char **ids;
 }  CATEGORY_NAME_id_list;
 
-typedef struct FILENAME_ROOT_list_t
+typedef struct CATEGORY_NAME_list_t
 {
 	int count;
 	struct CATEGORY_NAME **FILENAME_ROOTs;
-} FILENAME_ROOT_list;
+} CATEGORY_NAME_list;
 
 struct	FILENAME_ROOT_backend_interface
 {
@@ -21,7 +21,7 @@ struct	FILENAME_ROOT_backend_interface
 	void (*finalise)();
 	struct CATEGORY_NAME *(*create) (struct CATEGORY_NAME *initial_FILENAME_ROOT);
 	struct CATEGORY_NAME *(*retrieve_from_id)(char *id);
-	FILENAME_ROOT_list (*retrieve_from_filter)(struct CATEGORY_NAME_occi_filter *filter);
+	CATEGORY_NAME_list (*retrieve_from_filter)(struct CATEGORY_NAME_occi_filter *filter);
 	void (*update)  (char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT);
 	void (*del)     (char *id);
 	void (*delete_all_matching_filter) (struct CATEGORY_NAME_occi_filter *filter);	// Delete all FILENAME_ROOTs matching filter
@@ -33,6 +33,6 @@ struct	FILENAME_ROOT_backend_interface
 extern struct FILENAME_ROOT_backend_interface * CATEGORY_NAME_backend;
 
 void CATEGORY_NAME_free_id_list( CATEGORY_NAME_id_list *list);
-void free_FILENAME_ROOT_list(FILENAME_ROOT_list *list);
+void free_CATEGORY_NAME_list(CATEGORY_NAME_list *list);
 
 #endif

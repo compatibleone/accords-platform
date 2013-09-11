@@ -63,7 +63,7 @@ private void  CATEGORY_NAME_init();
 private void CATEGORY_NAME_finalise();
 private struct CATEGORY_NAME * CATEGORY_NAME_create  (struct CATEGORY_NAME *initial_FILENAME_ROOT);
 private struct CATEGORY_NAME * CATEGORY_NAME_retrieve_from_id(char *id);
-private FILENAME_ROOT_list  CATEGORY_NAME_retrieve_from_filter(struct CATEGORY_NAME_occi_filter *filter);
+private CATEGORY_NAME_list  CATEGORY_NAME_retrieve_from_filter(struct CATEGORY_NAME_occi_filter *filter);
 private void  CATEGORY_NAME_update (char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT);
 private void  CATEGORY_NAME_del    (char *id);
 private void  CATEGORY_NAME_delete_all_matching_filter (struct CATEGORY_NAME_occi_filter *filter);
@@ -406,11 +406,11 @@ _node *) 0;
 	return ids;
 }
 
-private FILENAME_ROOT_list CATEGORY_NAME_retrieve_from_filter(struct CATEGORY_NAME_occi_filter *filter) {
+private CATEGORY_NAME_list CATEGORY_NAME_retrieve_from_filter(struct CATEGORY_NAME_occi_filter *filter) {
 [[[cog t.profile('retrieve_from_filters', 'retrieve_from_counts')]]]
 [[[end]]]
     pthread_mutex_lock( &list_CATEGORY_NAME_control );
-	FILENAME_ROOT_list FILENAME_ROOTs;
+	CATEGORY_NAME_list FILENAME_ROOTs;
 	FILENAME_ROOTs.count = 0;
 
 	int pub_count = CATEGORY_NAME_count_filter_matches(filter);
@@ -449,7 +449,7 @@ void CATEGORY_NAME_free_id_list(CATEGORY_NAME_id_list *list) {
 	list->count = 0;
 }
 
-void free_FILENAME_ROOT_list(FILENAME_ROOT_list *list) {
+void free_CATEGORY_NAME_list(CATEGORY_NAME_list *list) {
 	liberate(list->FILENAME_ROOTs);
 	list->FILENAME_ROOTs = NULL;
 	list->count = 0;
