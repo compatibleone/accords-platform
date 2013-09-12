@@ -59,7 +59,14 @@ private	char * CosacsContract=(char *) 0;
 
 public	int	check_debug()		{	return(Cosacs.debug);		}
 public	int	check_verbose()		{	return(Cosacs.verbose);		}
-public	char *	default_publisher()	{	return(Cosacs.publisher);	}
+public	char *	default_publisher()	
+{
+	rest_log_message("COSACS: default_publisher");
+	if ( Cosacs.publisher )
+		rest_log_message( Cosacs.publisher );
+	else	rest_log_message("NULL");
+	return(Cosacs.publisher);	
+}
 public	char *	default_operator()	{	return(Cosacs.operator);	}
 public	char *	default_tls()		{	return(Cosacs.tls);		}
 public	char *	default_zone()		{	return(Cosacs.zone);		}
@@ -766,12 +773,17 @@ private	int	intercept_identity( char * vptr )
 /*	-------------------------------------------------	*/
 /*		i n t e r c e p t _ p u b l i s h e r		*/
 /*	-------------------------------------------------	*/
-private	int	intercept_publisher( char * vptr )
+public 	int	intercept_publisher( char * vptr )
 {
 	int	status;
+	if (!( vptr ))
+		return( 0 );
+	rest_log_message("intercept publisher");
+	rest_log_message( vptr );	
 	if ( rest_valid_string( Cosacs.publisher ) )
-		return(0);
-	else if (!( Cosacs.publisher = allocate_string( vptr ) ))
+		Cosacs.publisher = liberate( Cosacs.publisher );
+
+	if (!( Cosacs.publisher = allocate_string( vptr ) ))
 		return(0); 
 	else if (!( status = cosacs_use_publisher()))
 		return(0);
