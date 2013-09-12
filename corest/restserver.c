@@ -1820,15 +1820,16 @@ private	struct rest_response *	rest_consume_response_body(
 	{
 		while ( bytes )
 		{
-			if ( fwrite((cptr->buffer+cptr->consumed),(cptr->bytes - cptr->consumed),1,h) <= 0 )
+			if ((cptr->bytes - cptr->consumed) > 0)
 			{
-				/* TODO FAILURE */
-				break;
+				if ( fwrite((cptr->buffer+cptr->consumed),(cptr->bytes - cptr->consumed),1,h) <= 0 )
+				{
+					break;
+				}
+				else 	bytes -= (cptr->bytes - cptr->consumed);
+				if (!( bytes ))
+					break;
 			}
-			else 	bytes -= (cptr->bytes - cptr->consumed);
-
-			if (!( bytes ))
-				break;
 
 			if (!( rest_client_read( cptr ) ))
 			{
