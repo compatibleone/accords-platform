@@ -40,7 +40,7 @@
 #include "occiresolver.h"
 #include "occibody.h"
 #include "occilogin.h"
-#include "json.h"
+#include "co_json.h"
 #include "restclient.h"
 
 #include "link_backend.h"
