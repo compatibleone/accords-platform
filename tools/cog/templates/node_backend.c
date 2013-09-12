@@ -452,7 +452,7 @@ void CATEGORY_NAME_free_id_list(CATEGORY_NAME_id_list *list) {
 void free_CATEGORY_NAME_list(CATEGORY_NAME_list *list) {
     int i;
     for(i = 0; i < list->count; i++) {
-        liberate(list->FILENAME_ROOTs[i]);
+        liberate_CATEGORY_NAME(list->FILENAME_ROOTs[i]);
     }
 	liberate(list->FILENAME_ROOTs);
 	list->FILENAME_ROOTs = NULL;
