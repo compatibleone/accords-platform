@@ -16,6 +16,8 @@
 
 #define MIN(a,b) ((a < b) ? (a) : (b))
 
+#define CURL_RETRIES (3)
+
 typedef enum {
     RIAK_OPTION_RETURN_OBJECT,
     RIAK_OPTION_NO_OBJECT
@@ -24,6 +26,12 @@ typedef enum {
 union riak_object_list {
     cords_publication_id_list ids_only;
     cords_publication_list objects;
+};
+
+struct transfer_data {
+    size_t total;
+    size_t transfered;
+    char *data;
 };
 
 // API Functions
@@ -38,7 +46,12 @@ static void delete_all_matching_filter(struct cords_publication_occi_filter *fil
 static cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter);
 
 // Local Functions
+static CURL *init_curl_common();
 static union riak_object_list list_from_filter(struct cords_publication_occi_filter *filter, riak_object_return return_objects);
+static void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_object_return return_object);
+static size_t upload(void *ptr, size_t size, size_t nmemb, void *userdata);
+static long perform_curl_and_get_code(CURL *curl);
+static int perform_curl_and_check(CURL *curl);
 
 struct publication_backend_interface *  cords_publication_riak_backend_interface() {
     struct publication_backend_interface riak_interface =
@@ -66,19 +79,52 @@ struct publication_backend_interface *  cords_publication_riak_backend_interface
     return interface_ptr;
 }
 
+static void set_http_headers(CURL *curl, struct curl_slist *headers) {
+    // Disable Expect: Continue 100 header
+    static const char buf[] = "Expect:"; 
+    headers = curl_slist_append(headers, buf);            
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+}
+
+static char ENABLE_SEARCH_CMD[] = "{\"props\":{\"precommit\":[{\"mod\":\"riak_search_kv_hook\",\"fun\":\"precommit\"}]}}";
+static void enable_riak_search() {
+    CURL *curl = init_curl_common();
+    if(curl) {
+        int success = 0;
+        unsigned retries;
+        for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {   
+            struct transfer_data data;
+            data.transfered = 0;
+            data.data = ENABLE_SEARCH_CMD;
+            data.total = sizeof(ENABLE_SEARCH_CMD) - 1; // Ignore null terminator
+            
+            // Define the function that is used during upload, i.e. formats the category object
+            curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
+            curl_easy_setopt(curl, CURLOPT_READDATA, &data);
+
+            struct curl_slist *headers = NULL;
+            set_http_headers(curl, headers);
+                            
+            set_curl_query_url(curl, "publication", "", RIAK_OPTION_NO_OBJECT);
+            
+            curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+
+            success = (204 == perform_curl_and_get_code(curl));
+        }
+        curl_easy_cleanup(curl);
+    } 
+}
+
 void init() {
     curl_global_init(CURL_GLOBAL_ALL);
+    enable_riak_search();
 }
 
 void finalise() {
     curl_global_cleanup();
 }
-
-struct transfer_data {
-    size_t total;
-    size_t transfered;
-    char *data;
-};
 
 static size_t upload(void *ptr, size_t size, size_t nmemb, void *userdata) {
     size_t limit = size * nmemb;
@@ -217,16 +263,20 @@ static void set_curl_query_url(CURL *curl, const char *bucket, const char *key, 
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
 }
 
-static int curl_perform_and_check(CURL *curl) {
+long perform_curl_and_get_code(CURL *curl) {
     CURLcode res;
     res = curl_easy_perform(curl);
     
     if (CURLE_OK == res) {
         long http_code = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
-        return (200 == http_code);
+        return http_code;
     }
-    return 0;
+    return -1;
+}
+
+int perform_curl_and_check(CURL *curl) {
+    return (200 == perform_curl_and_get_code(curl));
 }
 
 static struct cords_publication *create_or_update(const struct cords_publication *initial_publication, const char *vclock) {
@@ -234,40 +284,38 @@ static struct cords_publication *create_or_update(const struct cords_publication
     struct cords_publication *new_publication = NULL;    
     curl = init_curl_common();
     if(curl) {
-        struct transfer_data data;
-        data.transfered = 0;
-        data.data = json_string(initial_publication);
-        data.total = strlen(data.data);
-        if(data.data) {            
-            // Define the function that is used during upload, i.e. formats the category object
-            curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
-            curl_easy_setopt(curl, CURLOPT_READDATA, &data);
-            
-            struct transfer_data response;
-            setup_download(curl, &response);
-            
-            set_curl_query_url(curl, "publication", initial_publication->id, RIAK_OPTION_RETURN_OBJECT);
-                     
-            curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-            //curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)14); // TODO Use proper files size
+        unsigned retries;
+        for(retries = CURL_RETRIES; retries > 0 && NULL == new_publication; retries--) {
+            struct transfer_data data;
+            data.transfered = 0;
+            data.data = json_string(initial_publication);
+            data.total = strlen(data.data);
+            if(data.data) {            
+                // Define the function that is used during upload, i.e. formats the category object
+                curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
+                curl_easy_setopt(curl, CURLOPT_READDATA, &data);
+                
+                struct transfer_data response = {0};
+                setup_download(curl, &response);
+                
+                set_curl_query_url(curl, "publication", initial_publication->id, RIAK_OPTION_RETURN_OBJECT);
+                         
+                curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+                //curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)14); // TODO Use proper files size
+        
+                struct curl_slist *headers = NULL;            
+                // If we've been provided with a vclock, add it to the headers to ensure we do an update, and don't create a 
+                // sibling
+                if (vclock) {
+                    headers = curl_slist_append(headers, vclock);   
+                }            
+                set_http_headers(curl, headers);
     
-            struct curl_slist *headers = NULL;
-            // Disable Expect: Continue 100 header
-            static const char buf[] = "Expect:"; 
-            headers = curl_slist_append(headers, buf);            
-            // If we've been provided with a vclock, add it to the headers to ensure we do an update, and don't create a 
-            // sibling
-            if (vclock) {
-                headers = curl_slist_append(headers, vclock);   
-            }            
-            
-            headers = curl_slist_append(headers, "Content-Type: application/json"); 
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-            if(curl_perform_and_check(curl)) {
-                new_publication = cords_publication_from_json_string(response.data);
+                if(perform_curl_and_check(curl)) {
+                    new_publication = cords_publication_from_json_string(response.data);
+                }
+                free(data.data);
             }
-            free(data.data);
         }
         curl_easy_cleanup(curl);
     }
@@ -287,21 +335,24 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
     struct publication_with_vclock retval = {0};    
     CURL *curl = init_curl_common();
     if(curl) {
-        struct transfer_data data;
-        setup_download(curl, &data);
-        
-        struct transfer_data header_data;
-        setup_read_vclock(curl, &header_data);
-        
-        set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);
-                
-        if(curl_perform_and_check(curl)) {
-            retval.publication = cords_publication_from_json_string(data.data);
-            retval.vclock = vclock_from_headers(header_data.data);
+        unsigned retries;
+        for(retries = CURL_RETRIES; retries > 0 && NULL == retval.publication; retries--) {
+            struct transfer_data data = {0};
+            setup_download(curl, &data);
+            
+            struct transfer_data header_data = {0};
+            setup_read_vclock(curl, &header_data);
+            
+            set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);
+                    
+            if(perform_curl_and_check(curl)) {
+                retval.publication = cords_publication_from_json_string(data.data);
+                retval.vclock = vclock_from_headers(header_data.data);
+            }
+            
+            free(data.data);
+            free(header_data.data);
         }
-        
-        free(data.data);
-        free(header_data.data);
         curl_easy_cleanup(curl);
     }
     return retval;     
@@ -333,13 +384,17 @@ void update(char *id, struct cords_publication *updated_publication) {
 
 void del(char *id) {
     CURL *curl = init_curl_common();
-    if(curl) {        
-        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-        set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);                
-        if(curl_perform_and_check(curl)) {
-            // TODO We don't return anything, so no need to check for success.  
-            // However once we get more advanced and want to retry on failure, we might want to do something here.            
-        }        
+    if(curl) {
+        int success = 0;
+        unsigned retries;
+        for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {    
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+            set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);                
+            long code = perform_curl_and_get_code(curl);
+            if (204 == code || 404 == code) {
+                success = 1;
+            }
+        }
         curl_easy_cleanup(curl);
     }    
 }
@@ -466,60 +521,65 @@ union riak_object_list list_from_filter(struct cords_publication_occi_filter *fi
     union riak_object_list retVal = {0};
     CURL *curl = init_curl_common();
     if(curl) {
-        unsigned n_filters = cords_publication_count_filters(filter);
-        char request_buffer[1024];
-        char *query;
-        if(0 == n_filters) {
-            // List - warning, shouldn't be used in production for performance reasons
-            sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", "publication");
-        }
-        else {
-            // Single item filter...possibly a candidate for replacing with i2 search
-            query = search_query(filter);
-            if(query) {
-                // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
-                // Don't find out!  
-                sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", "publication", query);
-                liberate(query);
-            }
-        }
-        curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-        
-        struct transfer_data response;
-        setup_download(curl, &response);
-
-        if(curl_perform_and_check(curl)) {
-            // In order to reduce nesting here, we're relying on the fact that json-c behaves nicely
-            // when passed null pointers.  We don't need to check the return values from json-c calls
-            // if all we're doing is passing them back to json-c functions.
-            struct json_object *jo = json_tokener_parse(response.data);
-            if(0 == n_filters) {                
-                // In production, may want to ban this (assert(0) or warning), since 
-                // list all should be strongly discouraged
-                cords_publication_id_list ids = {0};
-                publication_list_from_list_json(jo, &ids);
-                if (RIAK_OPTION_RETURN_OBJECT == return_objects) {
-                    retVal.objects.publications = malloc(ids.count * sizeof(struct cords_publication *));
-                    unsigned i;
-                    for(i = 0; i < ids.count; i++) {
-                        struct cords_publication *publication = retrieve_from_id(ids.ids[i]);
-                        if (publication) {
-                            retVal.objects.publications[retVal.objects.count++] = publication;
-                        }
-                    }
-                    cords_publication_free_id_list(&ids);
-                }
-                else {
-                    retVal.ids_only = ids;
-                }
+        int success = 0;
+        unsigned retries;
+        for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {
+            unsigned n_filters = cords_publication_count_filters(filter);
+            char request_buffer[1024];
+            char *query;
+            if(0 == n_filters) {
+                // List - warning, shouldn't be used in production for performance reasons
+                sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", "publication");
             }
             else {
-                publication_list_from_search_json(jo, &retVal, return_objects);
+                // Single item filter...possibly a candidate for replacing with i2 search
+                query = search_query(filter);
+                if(query) {
+                    // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
+                    // Don't find out!  
+                    sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", "publication", query);
+                    liberate(query);
+                }
             }
-            json_object_put(jo);            
+            curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+            
+            struct transfer_data response = {0};
+            setup_download(curl, &response);
+    
+            if(perform_curl_and_check(curl)) {
+                success = 1;  // If we got data back from curl, we don't want to retry, even if parsing the
+                              // data is unsuccessful
+                // In order to reduce nesting here, we're relying on the fact that json-c behaves nicely
+                // when passed null pointers.  We don't need to check the return values from json-c calls
+                // if all we're doing is passing them back to json-c functions.
+                struct json_object *jo = json_tokener_parse(response.data);
+                if(0 == n_filters) {                
+                    // In production, may want to ban this (assert(0) or warning), since 
+                    // list all should be strongly discouraged
+                    cords_publication_id_list ids = {0};
+                    publication_list_from_list_json(jo, &ids);
+                    if (RIAK_OPTION_RETURN_OBJECT == return_objects) {
+                        retVal.objects.publications = malloc(ids.count * sizeof(struct cords_publication *));
+                        unsigned i;
+                        for(i = 0; i < ids.count; i++) {
+                            struct cords_publication *publication = retrieve_from_id(ids.ids[i]);
+                            if (publication) {
+                                retVal.objects.publications[retVal.objects.count++] = publication;
+                            }
+                        }
+                        cords_publication_free_id_list(&ids);
+                    }
+                    else {
+                        retVal.ids_only = ids;
+                    }
+                }
+                else {
+                    publication_list_from_search_json(jo, &retVal, return_objects);
+                }
+                json_object_put(jo);            
+            }       
+            free(response.data);
         }
-        //int written = sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&q=%s:%s", "publication", fieldname, value);        
-        free(response.data);
     }
     curl_easy_cleanup(curl);    
     return retVal; 
