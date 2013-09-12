@@ -52,8 +52,8 @@ static CURL *init_curl_common();
 static union riak_object_list list_from_filter(struct cords_publication_occi_filter *filter, riak_object_return return_objects);
 static void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_object_return return_object);
 static size_t upload(void *ptr, size_t size, size_t nmemb, void *userdata);
-static long perform_curl_and_get_code(CURL *curl);
-static int perform_curl_and_check(CURL *curl);
+static long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers);
+static int perform_curl_and_check(CURL *curl, struct curl_slist *headers);
 
 struct publication_backend_interface *  cords_publication_riak_backend_interface() {
     struct publication_backend_interface riak_interface =
@@ -81,13 +81,14 @@ struct publication_backend_interface *  cords_publication_riak_backend_interface
     return interface_ptr;
 }
 
-static void set_http_headers(CURL *curl, struct curl_slist *headers) {
+static struct curl_slist *set_http_headers(CURL *curl, struct curl_slist *headers) {
     // Disable Expect: Continue 100 header
     static const char buf[] = "Expect:"; 
     headers = curl_slist_append(headers, buf);            
     headers = curl_slist_append(headers, "Content-Type: application/json");
     
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    return headers;
 }
 
 static void register_upload_data(CURL *curl, struct transfer_data *transfer, char *data) {
@@ -108,14 +109,13 @@ static void enable_riak_search() {
             struct transfer_data transfer;
             register_upload_data(curl, &transfer, ENABLE_SEARCH_CMD);
 
-            struct curl_slist *headers = NULL;
-            set_http_headers(curl, headers);
+            struct curl_slist *headers = set_http_headers(curl, NULL);
                             
             set_curl_query_url(curl, "publication", "", RIAK_OPTION_NO_OBJECT);
             
             curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 
-            success = (204 == perform_curl_and_get_code(curl));
+            success = (204 == perform_curl_and_get_code(curl, headers));
         }
         curl_easy_cleanup(curl);
     } 
@@ -268,9 +268,10 @@ static void set_curl_query_url(CURL *curl, const char *bucket, const char *key, 
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
 }
 
-long perform_curl_and_get_code(CURL *curl) {
+long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {
     CURLcode res;
     res = curl_easy_perform(curl);
+    curl_slist_free_all(headers);
     
     if (CURLE_OK == res) {
         long http_code = 0;
@@ -280,8 +281,8 @@ long perform_curl_and_get_code(CURL *curl) {
     return -1;
 }
 
-int perform_curl_and_check(CURL *curl) {
-    return (200 == perform_curl_and_get_code(curl));
+int perform_curl_and_check(CURL *curl, struct curl_slist *headers) {
+    return (200 == perform_curl_and_get_code(curl, headers));
 }
 
 static struct cords_publication *create_or_update(const struct cords_publication *initial_publication, const char *vclock) {
@@ -309,9 +310,9 @@ static struct cords_publication *create_or_update(const struct cords_publication
                 if (vclock) {
                     headers = curl_slist_append(headers, vclock);   
                 }            
-                set_http_headers(curl, headers);
+                headers = set_http_headers(curl, headers);
     
-                if(perform_curl_and_check(curl)) {
+                if(perform_curl_and_check(curl, headers)) {
                     new_publication = cords_publication_from_json_string(response.data);
                 }
                 free(transfer.data);
@@ -337,6 +338,7 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
     if(curl) {
         unsigned retries;
         for(retries = CURL_RETRIES; retries > 0 && NULL == retval.publication; retries--) {
+            free(retval.vclock);  // Just in case we're in a retry and it was allocated
             struct transfer_data data = {0};
             setup_download(curl, &data);
             
@@ -345,7 +347,7 @@ struct publication_with_vclock retrieve_with_vclock_from_id(const char *id) {
             
             set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);
                     
-            if(perform_curl_and_check(curl)) {
+            if(perform_curl_and_check(curl, NULL)) {
                 retval.publication = cords_publication_from_json_string(data.data);
                 retval.vclock = vclock_from_headers(header_data.data);
             }
@@ -390,7 +392,7 @@ void del(char *id) {
         for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {    
             curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
             set_curl_query_url(curl, "publication", id, RIAK_OPTION_NO_OBJECT);                
-            long code = perform_curl_and_get_code(curl);
+            long code = perform_curl_and_get_code(curl, NULL);
             if (204 == code || 404 == code) {
                 success = 1;
             }
@@ -583,7 +585,7 @@ union riak_object_list list_from_filter(struct cords_publication_occi_filter *fi
             struct transfer_data response = {0};
             setup_download(curl, &response);
     
-            if(perform_curl_and_check(curl)) {
+            if(perform_curl_and_check(curl, NULL)) {
                 success = 1;  // If we got data back from curl, we don't want to retry, even if parsing the
                               // data is unsuccessful
                 retVal = list_from_curl_response(response.data, n_filters, return_objects);                            
