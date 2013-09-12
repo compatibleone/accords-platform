@@ -316,6 +316,7 @@ static struct cords_publication *create_or_update(const struct cords_publication
                     new_publication = cords_publication_from_json_string(response.data);
                 }
                 free(transfer.data);
+                free(response.data);
             }
         }
         curl_easy_cleanup(curl);
