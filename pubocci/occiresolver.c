@@ -131,6 +131,8 @@ public	int	initialise_occi_resolver( char * host, char * room, char * publicatio
 		if ( Resolver.host )
 			Resolver.host = liberate( Resolver.host );
 		Resolver.host = sptr;
+		if ( Resolver.uri )
+			Resolver.uri = liberate( Resolver.uri );
 	}
 	if ( room )
 	{
