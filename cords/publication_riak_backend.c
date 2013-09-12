@@ -34,6 +34,8 @@ struct transfer_data {
     char *data;
 };
 
+static char ENABLE_SEARCH_CMD[] = "{\"props\":{\"precommit\":[{\"mod\":\"riak_search_kv_hook\",\"fun\":\"precommit\"}]}}";
+
 // API Functions
 static void init();
 static void finalise();
@@ -88,21 +90,23 @@ static void set_http_headers(CURL *curl, struct curl_slist *headers) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 }
 
-static char ENABLE_SEARCH_CMD[] = "{\"props\":{\"precommit\":[{\"mod\":\"riak_search_kv_hook\",\"fun\":\"precommit\"}]}}";
+static void register_upload_data(CURL *curl, struct transfer_data *transfer, char *data) {
+    transfer->transfered = 0;
+    transfer->data = data;
+    transfer->total = strlen(transfer->data);          
+    // Define the function that is used during upload, i.e. formats the category object
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
+    curl_easy_setopt(curl, CURLOPT_READDATA, transfer);
+}
+
 static void enable_riak_search() {
     CURL *curl = init_curl_common();
     if(curl) {
         int success = 0;
         unsigned retries;
         for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {   
-            struct transfer_data data;
-            data.transfered = 0;
-            data.data = ENABLE_SEARCH_CMD;
-            data.total = sizeof(ENABLE_SEARCH_CMD) - 1; // Ignore null terminator
-            
-            // Define the function that is used during upload, i.e. formats the category object
-            curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
-            curl_easy_setopt(curl, CURLOPT_READDATA, &data);
+            struct transfer_data transfer;
+            register_upload_data(curl, &transfer, ENABLE_SEARCH_CMD);
 
             struct curl_slist *headers = NULL;
             set_http_headers(curl, headers);
@@ -286,14 +290,10 @@ static struct cords_publication *create_or_update(const struct cords_publication
     if(curl) {
         unsigned retries;
         for(retries = CURL_RETRIES; retries > 0 && NULL == new_publication; retries--) {
-            struct transfer_data data;
-            data.transfered = 0;
-            data.data = json_string(initial_publication);
-            data.total = strlen(data.data);
-            if(data.data) {            
-                // Define the function that is used during upload, i.e. formats the category object
-                curl_easy_setopt(curl, CURLOPT_READFUNCTION, upload);
-                curl_easy_setopt(curl, CURLOPT_READDATA, &data);
+            char *data = json_string(initial_publication);
+            if(data) {
+                struct transfer_data transfer;
+                register_upload_data(curl, &transfer, data);
                 
                 struct transfer_data response = {0};
                 setup_download(curl, &response);
@@ -314,7 +314,7 @@ static struct cords_publication *create_or_update(const struct cords_publication
                 if(perform_curl_and_check(curl)) {
                     new_publication = cords_publication_from_json_string(response.data);
                 }
-                free(data.data);
+                free(transfer.data);
             }
         }
         curl_easy_cleanup(curl);
