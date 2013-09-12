@@ -56,7 +56,8 @@
 #define	_OPEN_FUNCTION		10
 #define	_EVAL_FUNCTION		11
 #define	_TIME_FUNCTION		12
-#define	_MAX_FUNCTIONS		13
+#define	_SEND_FUNCTION		13
+#define	_MAX_FUNCTIONS		14
 
 #define	_MAX_KEYWORDS	20
 #define	_KEYWORD_HASH	57

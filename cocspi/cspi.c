@@ -1845,7 +1845,8 @@ private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 	{	"new",		_NEW_FUNCTION,		-1 },
 	{	"open",		_OPEN_FUNCTION,		-1 },
 	{	"eval",		_EVAL_FUNCTION,		-1 },
-	{	"time",		_TIME_FUNCTION,		-1 }
+	{	"time",		_TIME_FUNCTION,		-1 },
+	{	"send",		_SEND_FUNCTION,		-1 }
 };
 
 int	prepare_hashcodes=3;
@@ -2030,6 +2031,46 @@ private	void	csp_category_attributes( struct cordscript_instruction * iptr, char
 	return;
 }
 
+/*	---------------------------	*/
+/*	s e n d _ o p e r a t i o n	*/
+/*	---------------------------	*/
+private	void	send_operation( struct cordscript_instruction * iptr, struct cordscript_value * uptr, struct cordscript_value * bptr )
+{
+	struct	rest_response * aptr;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	char *	filename;
+	FILE * h;
+	char * url;
+	char * body;
+	int	contentlength=0;
+	if (!( uptr ))
+		push_value( iptr->context, string_value("expected url") );
+	else if (!( url = uptr->value ))
+		push_value( iptr->context, string_value("expected url") );
+	else if (!( bptr ))
+		push_value( iptr->context, string_value("expected body") );
+	else if (!( body = bptr->value ))
+		push_value( iptr->context, string_value("expected body") );
+	else if (!( filename = rest_temporary_filename( ".xml" ) ))
+		push_value( iptr->context, string_value("expected filename") );
+	else
+	{
+		if (!( h = fopen( filename, "w" ) ))
+			push_value( iptr->context, string_value("expected file") );
+		else
+		{
+			contentlength = strlen( body );
+			fprintf(h,"%s",body);
+			fclose(h);
+			if (!( aptr = rest_client_post_request( url,default_tls(),"CORC",filename,hptr) ))
+				push_value( iptr->context, string_value("expected response") );
+			else	push_value( iptr->context, string_value("OK") );
+			aptr = liberate_rest_response( aptr );
+			liberate( filename );
+		}
+	}
+}
+
 /*	---------------		*/
 /*	 eval_operation		*/
 /*	---------------		*/
@@ -2124,6 +2165,9 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		/* ---------------------------------- */
 		switch ( resolve_language_function( wptr->value ) )
 		{
+		case	_SEND_FUNCTION		:
+			send_operation( iptr, vptr, argv[0] );
+			return( eval_next( iptr,argv ) );
 		case	_OPEN_FUNCTION		:
 			OpenScriptOutput( vptr->value );
 			return( eval_next( iptr, argv ) );
