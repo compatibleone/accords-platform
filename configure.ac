@@ -393,6 +393,15 @@ AM_CONDITIONAL([ENABLE_COEASY], [test "$enable_coeasy" = "yes"])
 AC_SUBST([CFLAGS_COEASY], [-I\${abs_top_srcdir}/coeasy])
 AC_SUBST([PATH_COEASY], [${abs_top_srcdir}/coeasy])
 
+AC_ARG_ENABLE([easigsm],
+      [AS_HELP_STRING([--disable-easigsm],
+		      [Disable easigsm @<:@default=enable@:>@])],
+      [],
+      [enable_easigsm=yes])
+AM_CONDITIONAL([ENABLE_EASIGSM], [test "$enable_easigsm" = "yes"])
+AC_SUBST([CFLAGS_EASIGSM], [-I\${abs_top_srcdir}/easigsm])
+AC_SUBST([PATH_EASIGSM], [${abs_top_srcdir}/easigsm])
+
 AC_ARG_ENABLE([oaprocci],
       [AS_HELP_STRING([--disable-oaprocci],
 		      [Disable oaprocci @<:@default=enable@:>@])],
@@ -678,6 +687,7 @@ AC_CONFIG_FILES([paasprocci/Makefile])
 AC_CONFIG_FILES([cnprocci/Makefile])
 AC_CONFIG_FILES([eziprocci/Makefile])
 AC_CONFIG_FILES([coeasy/Makefile])
+AC_CONFIG_FILES([easigsm/Makefile])
 AC_CONFIG_FILES([oaprocci/Makefile])
 AC_CONFIG_FILES([dummyprocci/Makefile])
 AC_CONFIG_FILES([comodel/Makefile])
@@ -753,6 +763,7 @@ echo "    - paasprocci               : $enable_paasprocci"
 echo "    - cnprocci                 : $enable_cnprocci"
 echo "    - eziprocci                : $enable_eziprocci"
 echo "    - coeasy                   : $enable_coeasy"
+echo "    - easigsm                  : $enable_easigsm"
 echo "    - oaprocci                 : $enable_oaprocci"
 echo "    - dummyprocci              : $enable_dummyprocci"
 echo "    - comodel                  : $enable_comodel"

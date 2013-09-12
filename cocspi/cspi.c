@@ -5950,5 +5950,47 @@ public	int	cordscript_interpreter( char * sptr, int argc, char * argv[] )
 	}
 }
 
+
+/*	------------------------------------------------------------------	*/
+/*	      e v a l u a t e _ c a t e g o r y _ c a r d s c r i p t		*/
+/*	------------------------------------------------------------------	*/
+public	int	evaluate_category_cordscript(
+		char * component,
+		char * category,
+		char * id,
+		char * expression,
+		char * parameters )
+{
+	char *	argv[10];
+	int	argc=0;
+	char *	result;
+	char 	buffer[2048];
+	char 	other[1024];
+
+	if (!( rest_valid_string( expression ) ))
+		return( 0 );
+	else 
+	{
+		if (!( strncasecmp( expression, "cordscript:", strlen("cordscript:")  ) ))
+			expression += strlen("cordscript:");
+
+		/* ----------------------------------------------------------------------- */
+		/* CORDSCRIPT: CALLER, INSTANCE ID, PARAMETERS, PUBLISHER, OPERATOR, TLS   */
+		/* ----------------------------------------------------------------------- */
+		sprintf(buffer,"%s/%s/%s",get_identity(), category, id );
+		sprintf(other,"%s.%s",component,category);
+		argv[argc++] = other;
+		argv[argc++] = buffer;
+		argv[argc++] = parameters;
+		argv[argc++] = default_publisher();
+		argv[argc++] = default_operator();
+		argv[argc++] = default_tls();
+		argv[argc] = (char *) 0;
+		if (!( result = evaluate_cordscript( expression, argc, argv )))
+			return( 0 );
+		else	return( atoi( result ) );
+	}
+}
+
 #endif	/* _cspi_c */
 
