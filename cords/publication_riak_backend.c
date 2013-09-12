@@ -301,7 +301,6 @@ static struct cords_publication *create_or_update(const struct cords_publication
                 set_curl_query_url(curl, "publication", initial_publication->id, RIAK_OPTION_RETURN_OBJECT);
                          
                 curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-                //curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)14); // TODO Use proper files size
         
                 struct curl_slist *headers = NULL;            
                 // If we've been provided with a vclock, add it to the headers to ensure we do an update, and don't create a 
@@ -517,7 +516,60 @@ static void publication_list_from_list_json(struct json_object *jo, cords_public
     }
 }
 
-union riak_object_list list_from_filter(struct cords_publication_occi_filter *filter, riak_object_return return_objects) {    
+static void set_query_url(CURL *curl, unsigned n_filters, struct cords_publication_occi_filter *filter, const char *bucket) {
+    char request_buffer[1024];
+    char *query;
+    if(0 == n_filters) {
+        // List - warning, shouldn't be used in production for performance reasons
+        sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", bucket);
+    }
+    else {
+        // Single item filter...possibly a candidate for replacing with i2 search
+        query = search_query(filter);
+        if(query) {
+            // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
+            // Don't find out!  
+            sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", bucket, query);
+            liberate(query);
+        }
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+}
+
+static union riak_object_list list_from_curl_response(const char *response, unsigned n_filters, riak_object_return return_objects) {  
+    union riak_object_list retVal = {0}; 
+    // In order to reduce nesting here, we're relying on the fact that json-c behaves nicely
+    // when passed null pointers.  We don't need to check the return values from json-c calls
+    // if all we're doing is passing them back to json-c functions.
+    struct json_object *jo = json_tokener_parse(response);
+    if(0 == n_filters) {                
+        // In production, may want to ban this (assert(0) or warning), since 
+        // list all should be strongly discouraged
+        cords_publication_id_list ids = {0};
+        publication_list_from_list_json(jo, &ids);
+        if (RIAK_OPTION_RETURN_OBJECT == return_objects) {
+            retVal.objects.publications = malloc(ids.count * sizeof(struct cords_publication *));
+            unsigned i;
+            for(i = 0; i < ids.count; i++) {
+                struct cords_publication *publication = retrieve_from_id(ids.ids[i]);
+                if (publication) {
+                    retVal.objects.publications[retVal.objects.count++] = publication;
+                }
+            }
+            cords_publication_free_id_list(&ids);
+        }
+        else {
+            retVal.ids_only = ids;
+        }
+    }
+    else {
+        publication_list_from_search_json(jo, &retVal, return_objects);
+    }
+    json_object_put(jo);
+    return retVal;
+}
+
+union riak_object_list list_from_filter(struct cords_publication_occi_filter *filter, riak_object_return return_objects) { 
     union riak_object_list retVal = {0};
     CURL *curl = init_curl_common();
     if(curl) {
@@ -525,23 +577,7 @@ union riak_object_list list_from_filter(struct cords_publication_occi_filter *fi
         unsigned retries;
         for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {
             unsigned n_filters = cords_publication_count_filters(filter);
-            char request_buffer[1024];
-            char *query;
-            if(0 == n_filters) {
-                // List - warning, shouldn't be used in production for performance reasons
-                sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", "publication");
-            }
-            else {
-                // Single item filter...possibly a candidate for replacing with i2 search
-                query = search_query(filter);
-                if(query) {
-                    // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
-                    // Don't find out!  
-                    sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", "publication", query);
-                    liberate(query);
-                }
-            }
-            curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+            set_query_url(curl, n_filters, filter, "publication");
             
             struct transfer_data response = {0};
             setup_download(curl, &response);
@@ -549,34 +585,7 @@ union riak_object_list list_from_filter(struct cords_publication_occi_filter *fi
             if(perform_curl_and_check(curl)) {
                 success = 1;  // If we got data back from curl, we don't want to retry, even if parsing the
                               // data is unsuccessful
-                // In order to reduce nesting here, we're relying on the fact that json-c behaves nicely
-                // when passed null pointers.  We don't need to check the return values from json-c calls
-                // if all we're doing is passing them back to json-c functions.
-                struct json_object *jo = json_tokener_parse(response.data);
-                if(0 == n_filters) {                
-                    // In production, may want to ban this (assert(0) or warning), since 
-                    // list all should be strongly discouraged
-                    cords_publication_id_list ids = {0};
-                    publication_list_from_list_json(jo, &ids);
-                    if (RIAK_OPTION_RETURN_OBJECT == return_objects) {
-                        retVal.objects.publications = malloc(ids.count * sizeof(struct cords_publication *));
-                        unsigned i;
-                        for(i = 0; i < ids.count; i++) {
-                            struct cords_publication *publication = retrieve_from_id(ids.ids[i]);
-                            if (publication) {
-                                retVal.objects.publications[retVal.objects.count++] = publication;
-                            }
-                        }
-                        cords_publication_free_id_list(&ids);
-                    }
-                    else {
-                        retVal.ids_only = ids;
-                    }
-                }
-                else {
-                    publication_list_from_search_json(jo, &retVal, return_objects);
-                }
-                json_object_put(jo);            
+                retVal = list_from_curl_response(response.data, n_filters, return_objects);                            
             }       
             free(response.data);
         }
