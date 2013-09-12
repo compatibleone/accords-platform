@@ -76,6 +76,11 @@
 		    :type                                   - Ignore
 		    :api                                    - Ignore
 		    :build_state                            - String - building, active or deleted
+		    :transaction_id							- String - transaction ID that resulted in VM creation
+		    :deleted_at                             - Date it was deleted (UNIX timestamp)
+		    :user_local_id                          - From market -> User.local_id
+		    :supplier_id                            - From market -> User.user_id of supplier
+		    :supplier_local_id                      - From market -> User.local_id of supplier
 		-->
 		<attribute name='cpu_shares' type='string' required='false' immutable='false'/>
 		<attribute name='disk_type_of_format' type='string' required='false' immutable='false'/>
@@ -95,6 +100,11 @@
 		<attribute name='user_id' type='string' required='false' immutable='false'/>
 		<attribute name='created_at' type='int' required='false' immutable='false'/>
 		<attribute name='build_state' type='string' required='true' immutable='false'/>
+		<attribute name='transaction_id' type='string' required='true' immutable='false'/>
+		<attribute name='deleted_at' type='int' required='true' immutable='false'/>
+		<attribute name='user_local_id' type='string' required='true' immutable='false'/>
+		<attribute name='supplier_id' type='string' required='true' immutable='false'/>
+		<attribute name='supplier_local_id' type='string' required='true' immutable='false'/>
 	    </attributes>
 	    <actions>
 	    </actions>
@@ -143,6 +153,9 @@
 				is_active           - Is this active ?
 				deleted             - Has it been deleted	
 				backup_supported	- Is back up of VMs supported?	
+			:transaction_id							- String - transaction ID that resulted in VM creation
+		    :deleted_at                             - Date it was deleted (UNIX timestamp)
+		    :user_local_id                          - From market -> User.local_id
 	        -->
 	        <attribute name='cloud_id' type='string' required='false' immutable='false'/>
 	        <!--<attribute name='zone_id' type='int' required='false' immutable='false'/>-->
@@ -168,6 +181,9 @@
 	        <attribute name='created_at' type='int' required='false' immutable='false'/>
 	        <attribute name='deleted' type='int' required='false' immutable='false'/>
 	        <attribute name='backup_supported' type='int' required='false' immutable='false'/>
+	        <attribute name='transaction_id' type='string' required='true' immutable='false'/>
+			<attribute name='deleted_at' type='int' required='true' immutable='false'/>
+			<attribute name='user_local_id' type='string' required='true' immutable='false'/>
 	    </attributes>
 	    <actions>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
