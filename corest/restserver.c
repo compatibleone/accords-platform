@@ -516,7 +516,15 @@ private	struct rest_response * rest_transmit_response(
 
 	rest_response_string( cptr, aptr->version, " ");
 	rest_response_value( cptr, aptr->status, " ");
-	rest_response_string( cptr, aptr->message, "\r\n");
+
+	if (aptr->message != NULL)
+	{
+		rest_response_string( cptr, aptr->message, "\r\n");
+	}
+	else
+	{
+		rest_response_string( cptr, "", "\r\n");
+	}
 
 	if ( cptr->server )
 	{
@@ -595,7 +603,13 @@ public	struct rest_response * rest_response_status(struct rest_response* aptr,in
 	if (!( aptr ))
 		return( aptr );
 	else if (!( aptr->message = allocate_string( message ) ))
+	{
+		if (aptr->message == NULL)
+		{
+			aptr->status = status;
+		}
 		return( aptr );
+	}
 	else 
 	{
 		aptr->status = status;
