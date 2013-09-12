@@ -23,7 +23,7 @@
 #include "occim.c"
 #include "occiauth.h"
 #include "occibody.h"
-#include "json.h"
+#include "co_json.h"
 #include "document.h"
 #include "occicat.h"
 #include "restlog.h"

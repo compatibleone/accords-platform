@@ -24,7 +24,7 @@
 #include "occiresolver.h"
 #include "occilogin.h"
 #include "cp.h"
-#include "json.h"
+#include "co_json.h"
 
 private	int	noauth=0;
 

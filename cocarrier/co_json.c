@@ -18,7 +18,7 @@
 #ifndef	_json_c
 #define	_json_c
 
-#include "json.h"
+#include "co_json.h"
 
 #include "dataelement.c"
 

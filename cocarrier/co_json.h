@@ -15,8 +15,8 @@
 /* See the License for the specific language governing permissions and 	*/
 /* limitations under the License. 					*/
 /* -------------------------------------------------------------------- */
-#ifndef	_json_h
-#define	_json_h
+#ifndef	_co_json_h
+#define	_co_json_h
 
 #include "standard.h"
 #include "allocate.h"
@@ -32,6 +32,6 @@ public	char *			json_atribut( struct data_element * dptr, char * nptr );
 public	struct data_element * 	json_element( struct data_element * dptr, char * nptr );
 
 	/* ------- */
-#endif	/* _json_h */
+#endif	/* _co_json_h */
 	/* ------- */
 
