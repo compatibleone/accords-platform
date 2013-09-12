@@ -21,6 +21,12 @@ typedef enum {
     RIAK_OPTION_NO_OBJECT
 } riak_object_return;
 
+union riak_object_list {
+    cords_publication_id_list ids_only;
+    cords_publication_list objects;
+};
+
+// API Functions
 static void init();
 static void finalise();
 static struct cords_publication *create(struct cords_publication *initial_publication);
@@ -30,6 +36,9 @@ static void update(char *id, struct cords_publication *updated_publication);
 static void del(char *id);
 static void delete_all_matching_filter(struct cords_publication_occi_filter *filter);
 static cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter);
+
+// Local Functions
+static union riak_object_list list_from_filter(struct cords_publication_occi_filter *filter, riak_object_return return_objects);
 
 struct publication_backend_interface *  cords_publication_riak_backend_interface() {
     struct publication_backend_interface riak_interface =
@@ -119,16 +128,17 @@ static char *json_string(const struct cords_publication *publication) {
 }
 
 static struct cords_publication *cords_publication_from_json_object(struct json_object *jo) {
-    struct cords_publication *new_publication = allocate_cords_publication();
-    if (new_publication) {
-        json_bool success;
-        
-        struct json_object *id;
-        success = json_object_object_get_ex(jo, "id", &id);
-        if (success) {
-            new_publication->id = allocate_string(json_object_get_string(id));
+    json_bool success;
+    
+    struct json_object *id;
+    success = json_object_object_get_ex(jo, "id", &id);
+    if (success) {
+        struct cords_publication *new_publication = allocate_cords_publication();
+        if (!new_publication) {
+            return NULL;
         }
-
+        new_publication->id = allocate_string(json_object_get_string(id));
+        
         struct json_object *operator;
         success = json_object_object_get_ex(jo, "operator", &operator);
         if (success) {
@@ -140,8 +150,9 @@ static struct cords_publication *cords_publication_from_json_object(struct json_
         if (success) {
             new_publication->identity = allocate_string(json_object_get_string(identity));
         }
+        return new_publication;
     }
-    return new_publication;
+    return NULL;
 }
 
 static struct cords_publication *cords_publication_from_json_string(const char *input) {
@@ -303,8 +314,8 @@ struct cords_publication * retrieve_from_id(char *id) {
 }
 
 cords_publication_list retrieve_from_filter(struct cords_publication_occi_filter *filter) { 
-    cords_publication_list retVal = {0};
-    return retVal; 
+    union riak_object_list list = list_from_filter(filter, RIAK_OPTION_RETURN_OBJECT); 
+    return list.objects;
 }
 
 // Riak has a vclock recorded for each object stored which is used for assisting with
@@ -368,6 +379,29 @@ static char *search_query(const struct cords_publication_occi_filter *filter) {
     return allocate_string(buf);
 }
 
+
+static void publication_list_from_json_array(struct array_list *items, cords_publication_list *list) {
+    list->publications = malloc(items->length * sizeof(char *));
+    unsigned i;
+    for(i = 0; i < items->length; i++) {
+        struct json_object *fields;
+        json_object_object_get_ex(items->array[i], "fields", &fields);
+        if(fields) {
+            struct cords_publication *publication = cords_publication_from_json_object(fields);            
+            // This filtering means that we may have malloc'd more memory than we needed for 
+            // the list.  However the object is likely to be short-lived, so we don't worry about it
+            if (publication) {
+                list->publications[list->count++] = publication;
+            }
+        }
+        else {
+            // It might be nice to have some error handling here.  It makes the
+            // interface robust to ignore any bad objects returned, but if there
+            // was a way to log it we should do so
+        }
+    }
+}
+
 static void publication_id_list_from_json_array(struct array_list *items, cords_publication_id_list *list) {       
     list->ids = malloc(items->length * sizeof(char *));
     unsigned i;
@@ -376,24 +410,29 @@ static void publication_id_list_from_json_array(struct array_list *items, cords_
         json_object_object_get_ex(items->array[i], "id", &id_json);
         const char *id = json_object_get_string(id_json);
         if(id) {
-            list->ids[i] = allocate_string(id);
-            list->count++;
+            list->ids[list->count++] = allocate_string(id);
         }
         else {
-            cords_publication_free_id_list(list);
-            break;
+            // It might be nice to have some error handling here.  It makes the
+            // interface robust to ignore any bad objects returned, but if there
+            // was a way to log it we should do so
         }
     }
 }
 
-static void publication_list_from_search_json(struct json_object *jo, cords_publication_id_list *list, riak_object_return return_objects) {
+static void publication_list_from_search_json(struct json_object *jo, union riak_object_list *list, riak_object_return return_objects) {
     struct json_object *response;
     json_object_object_get_ex(jo, "response", &response);
     struct json_object *docs;
     json_object_object_get_ex(response, "docs", &docs);
     struct array_list *items = json_object_get_array(docs);
     if (items) {
-        publication_id_list_from_json_array(items, list);
+        if (RIAK_OPTION_RETURN_OBJECT == return_objects) {
+            publication_list_from_json_array(items, &list->objects);
+        }
+        else {
+            publication_id_list_from_json_array(items, &list->ids_only);
+        }
     }
 }
 
@@ -406,24 +445,25 @@ static void publication_list_from_list_json(struct json_object *jo, cords_public
         if (list->ids) {
             int i;
             for(i = 0; i < items->length; i++) {
-                //struct cords_publication *publication = cords_publication_from_json_object(items->array[i]);                        
-                //if(publication && publication->id) {
                 const char *id = json_object_get_string(items->array[i]);
                 if(id) {
-                    list->ids[i] = allocate_string(id);
-                    list->count++;
+                    char *new_id = allocate_string(id);
+                    if(new_id) {
+                        list->ids[list->count++] = new_id;
+                    }
                 }
                 else {
-                    cords_publication_free_id_list(list);
-                    break;
+                    // It might be nice to have some error handling here.  It makes the
+                    // interface robust to ignore any bad objects returned, but if there
+                    // was a way to log it we should do so
                 }
             }
         }
     }
 }
 
-cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter) { 
-    cords_publication_id_list retVal = {0};
+union riak_object_list list_from_filter(struct cords_publication_occi_filter *filter, riak_object_return return_objects) {    
+    union riak_object_list retVal = {0};
     CURL *curl = init_curl_common();
     if(curl) {
         unsigned n_filters = cords_publication_count_filters(filter);
@@ -453,11 +493,28 @@ cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter)
             // when passed null pointers.  We don't need to check the return values from json-c calls
             // if all we're doing is passing them back to json-c functions.
             struct json_object *jo = json_tokener_parse(response.data);
-            if(0 == n_filters) {
-                publication_list_from_list_json(jo, &retVal);
+            if(0 == n_filters) {                
+                // In production, may want to ban this (assert(0) or warning), since 
+                // list all should be strongly discouraged
+                cords_publication_id_list ids = {0};
+                publication_list_from_list_json(jo, &ids);
+                if (RIAK_OPTION_RETURN_OBJECT == return_objects) {
+                    retVal.objects.publications = malloc(ids.count * sizeof(struct cords_publication *));
+                    unsigned i;
+                    for(i = 0; i < ids.count; i++) {
+                        struct cords_publication *publication = retrieve_from_id(ids.ids[i]);
+                        if (publication) {
+                            retVal.objects.publications[retVal.objects.count++] = publication;
+                        }
+                    }
+                    cords_publication_free_id_list(&ids);
+                }
+                else {
+                    retVal.ids_only = ids;
+                }
             }
             else {
-                publication_list_from_search_json(jo, &retVal, RIAK_OPTION_NO_OBJECT);
+                publication_list_from_search_json(jo, &retVal, return_objects);
             }
             json_object_put(jo);            
         }
@@ -466,4 +523,9 @@ cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter)
     }
     curl_easy_cleanup(curl);    
     return retVal; 
+}
+
+cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter) { 
+    union riak_object_list list = list_from_filter(filter, RIAK_OPTION_NO_OBJECT); 
+    return list.ids_only;
 }

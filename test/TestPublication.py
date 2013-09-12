@@ -93,11 +93,9 @@ class TestPublication(unittest.TestCase):
         
         self._delete(_request_root)
         
-        # Riak does not have good support for listing.  List caches results for performance
-        # reasons, but this means that a large delete followed by a list can result in 
-        # erroneous reporting of not deleted items.
-        #import time
-        #time.sleep(10)
+        # Riak takes 3 seconds between marking objects as deleted and actually deleting them
+        import time
+        time.sleep(4)
         
         r = self._get(_request_root)   
         responses = self._find_ids_of_all_entries(r.text)        
