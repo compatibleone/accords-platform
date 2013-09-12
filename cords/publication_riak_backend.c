@@ -250,7 +250,8 @@ static void setup_read_vclock(CURL *curl, struct transfer_data *header_data) {
 static CURL *init_curl_common() {
     CURL *curl = curl_easy_init();
     if(curl) {
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        // CURLOPT_VERBOSE is useful to enable during debug
+        //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
 
         // In case of redirection, follow
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
