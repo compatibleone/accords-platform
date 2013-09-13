@@ -74,15 +74,8 @@ void finalise() {
 static char *json_string(const struct CATEGORY_NAME *FILENAME_ROOT) {
     struct json_object *jo = json_object_new_object();
     
-    if (FILENAME_ROOT->id) {
-        json_object_object_add(jo, "id", json_object_new_string(FILENAME_ROOT->id));
-    }
-    if (FILENAME_ROOT->operator) {
-        json_object_object_add(jo, "operator", json_object_new_string(FILENAME_ROOT->operator));
-    }
-    if (FILENAME_ROOT->identity) {
-        json_object_object_add(jo, "identity", json_object_new_string(FILENAME_ROOT->identity));
-    }
+    [[[cog t.json_from_category()]]]
+    [[[end]]]
     
     char *retVal = allocate_string(json_object_to_json_string(jo));
     
@@ -105,17 +98,9 @@ static struct CATEGORY_NAME *CATEGORY_NAME_from_json_object(struct json_object *
         }
         new_FILENAME_ROOT->id = allocate_string(json_object_get_string(id));
         
-        struct json_object *operator;
-        success = json_object_object_get_ex(jo, "operator", &operator);
-        if (success) {
-            new_FILENAME_ROOT->operator = allocate_string(json_object_get_string(operator));
-        }
-        
-        struct json_object *identity;
-        success = json_object_object_get_ex(jo, "identity", &identity);
-        if (success) {
-            new_FILENAME_ROOT->identity = allocate_string(json_object_get_string(identity));
-        }
+        [[[cog t.category_from_json()]]]
+        [[[end]]]
+         
         return new_FILENAME_ROOT;
     }
     return NULL;
@@ -261,26 +246,8 @@ static char *search_query(const struct CATEGORY_NAME_occi_filter *filter) {
     assert(filter);
     char buf[256];
     unsigned written = 0;
-    if(filter->id) {
-        if(written > 0) {
-            written += sprintf(&buf[written], "%%20AND%%20");
-        }
-        written += sprintf(&buf[written], "id:%s", filter->attributes->id);
-    }
-
-    if(filter->operator) {
-        if(written > 0) {
-            written += sprintf(&buf[written], "%%20AND%%20");
-        }
-        written += sprintf(&buf[written], "operator:%s", filter->attributes->operator);
-    }
-
-    if(filter->identity) {
-        if(written > 0) {
-            written += sprintf(&buf[written], "%%20AND%%20");
-        }
-        written += sprintf(&buf[written], "identity:%s", filter->attributes->identity);
-    }
+    [[[cog t.riak_query_from_filter()]]]
+    [[[end]]]
     assert(written > 0); // Shouldn't get here unless at least one filter was set
     return allocate_string(buf);
 }

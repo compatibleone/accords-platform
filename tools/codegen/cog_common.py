@@ -227,6 +227,31 @@ def rest_print():
                      "fprintf(fh,\"X-OCCI-Attribute: %s.%s.{0}='%s'\\r\\n\",prefix,nptr,(sptr->{0}?sptr->{0}:\"\"));",
                      "fprintf(fh,\"X-OCCI-Attribute: %s.%s.{0}='%u'\\r\\n\",prefix,nptr,sptr->{0});")
     
+def json_from_category():
+    _format_category(None,
+                     ["if({1}->{0}) {{",
+                     "    json_object_object_add(jo, \"{0}\", json_object_new_string({1}->{0}));",
+                     "}}"],
+                     "json_object_object_add(jo, \"{0}\", json_object_new_int64({1}->{0}));")
+                    
+def category_from_json():
+    _format_category(["struct json_object *{0};",
+                      "success = json_object_object_get_ex(jo, \"{0}\", &{0});",
+                      "if (success) {{"],
+                     "    new_{1}->{0} = allocate_string(json_object_get_string({0}));",
+                     "    new_{1}->{0} = json_object_get_int64({0});",
+                     "}}",
+                     include_id = False) 
+
+def riak_query_from_filter():
+    _format_category(["if(filter->{0}) {{",
+                      "    if(written > 0) {{",
+                      "        written += sprintf(&buf[written], \"%%20AND%%20\");",
+                      "    }}"],
+                     "    written += sprintf(&buf[written], \"{0}:%s\", filter->attributes->{0});",
+                     "    written += sprintf(&buf[written], \"{0}:%d\", filter->attributes->{0});",
+                     "}}")                                           
+    
 def _format_category(prefix = None, string_format = None, int_format = None, suffix = None, include_id = True):
     for name, type_name in category.backend_type_list(include_id, skip_legacy_types = True):
         _output_lines(prefix, name)
@@ -395,9 +420,10 @@ def backend_include():
     if (_category_name() != 'cords_publication'): #TODO Hardcoding switch for now
         cog.outl("#include \"{0}_node_backend.h\"".format(_filename_root()))
     else:
-        cog.outl("#include \"{0}_riak_backend.h\"".format(_filename_root()))             
-    
+        cog.outl("#include \"{0}_riak_backend.h\"".format(_filename_root()))
+        
 def backend_init():
+    cog.outl("//Backend is {0}".format(category.backend.plugin))
     cog.out("{0}_backend = ".format(_category_name()))
     if (_category_name() != 'cords_publication'): #TODO Hardcoding switch for now
         cog.out("{0}_node_interface_func();    // TODO There's no obvious place to delete this pointer on completion.  Find somewhere!".format(
