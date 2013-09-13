@@ -18,5 +18,9 @@ CURL *init_curl_common();
 void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_object_return return_object);
 long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers);
 int perform_curl_and_check(CURL *curl, struct curl_slist *headers);
+void enable_riak_search(const char *bucket);
+void register_upload_data(CURL *curl, struct transfer_data *transfer, char *data);
+struct curl_slist *set_http_headers(CURL *curl, struct curl_slist *headers);
+char *vclock_from_headers(const char *headers);
 
 #endif
