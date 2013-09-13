@@ -100,7 +100,7 @@ static void register_upload_data(CURL *curl, struct transfer_data *transfer, cha
     curl_easy_setopt(curl, CURLOPT_READDATA, transfer);
 }
 
-static void enable_riak_search() {
+static void enable_riak_search(const char *bucket) {
     CURL *curl = init_curl_common();
     if(curl) {
         int success = 0;
@@ -111,7 +111,7 @@ static void enable_riak_search() {
 
             struct curl_slist *headers = set_http_headers(curl, NULL);
                             
-            set_curl_query_url(curl, "publication", "", RIAK_OPTION_NO_OBJECT);
+            set_curl_query_url(curl, bucket, "", RIAK_OPTION_NO_OBJECT);
             
             curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 
@@ -126,7 +126,7 @@ static void enable_riak_search() {
 
 void init() {
     curl_global_init(CURL_GLOBAL_ALL);
-    enable_riak_search();
+    enable_riak_search("publication");
 }
 
 void finalise() {
