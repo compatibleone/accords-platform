@@ -420,6 +420,7 @@ void  delete_all_matching_filter(struct cords_publication_occi_filter *filter) {
 }
 
 static char *search_query(const struct cords_publication_occi_filter *filter) {
+    assert(filter);
     char buf[256];
     unsigned written = 0;
     if(filter->id) {
@@ -442,6 +443,7 @@ static char *search_query(const struct cords_publication_occi_filter *filter) {
         }
         written += sprintf(&buf[written], "identity:%s", filter->attributes->identity);
     }
+    assert(written > 0); // Shouldn't get here unless at least one filter was set
     return allocate_string(buf);
 }
 
@@ -534,6 +536,10 @@ static void publication_list_from_list_json(struct json_object *jo, cords_public
 }
 
 static void set_query_url(CURL *curl, unsigned n_filters, struct cords_publication_occi_filter *filter, const char *bucket) {
+    assert(bucket);
+    assert(filter);
+    assert(curl);
+    
     char request_buffer[1024];
     char *query;
     if(0 == n_filters) {
@@ -541,8 +547,8 @@ static void set_query_url(CURL *curl, unsigned n_filters, struct cords_publicati
         sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", bucket);
     }
     else {
-        // Single item filter...possibly a candidate for replacing with i2 search
         query = search_query(filter);
+        assert(query);
         if(query) {
             // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
             // Don't find out!  
