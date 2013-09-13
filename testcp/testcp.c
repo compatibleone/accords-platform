@@ -70,13 +70,13 @@ private	int	ll_test_cords_parser_operation( char * filename )
 	char *dirc, *basec, *bname, *dname;
 	struct	xml_element * dptr;
 	char	nameplan[512];
-	if (!( Cp.host ))
+	if (!( Cp.publisher ))
 		return( failure(1,"requires","publication host"));
 	else if (!( Cp.agent ))
 		return( failure(2,"requires","parser agent name"));
 	else if (!( filename ))
 		return( failure(3,"requires","cords filename"));
-	else if (!( dptr = cords_document_parser( Cp.host, filename, Cp.agent, Cp.tls, Cp.xsd ) ))
+	else if (!( dptr = cords_document_parser( Cp.publisher, filename, Cp.agent, Cp.tls, Cp.xsd ) ))
 		return( failure(4,"parse error",filename));
 	else if (!( Cp.result ))
 	{
@@ -233,8 +233,8 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_parser_banner(char * n)
 {
-	printf("\n   Cords Parser : Version 1.0.c.0.01 ");
-	printf("\n   Beta Version 05/01/2013 \n");
+	printf("\n   Cords Parser : Version 1.0.c.0.02 ");
+	printf("\n   Beta Version 12/09/2013 \n");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --xsd                dis-activate xsd validation ");

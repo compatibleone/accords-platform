@@ -252,7 +252,7 @@ private	int	ll_sla_broker_operation( char * filename )
 	/* ------------------- */
 	if (!(nptr = Cb.result))
 		sprintf((nptr=nameplan),"instance_%s",filename);
-	if (!( Cb.host ))
+	if (!( Cb.publisher ))
 		return( failure(1,"requires","publication host"));
 	else if (!( Cb.agent ))
 		return( failure(2,"requires","parser agent name"));
@@ -272,7 +272,7 @@ private	int	ll_sla_broker_operation( char * filename )
 	{
 		if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"failure resolving plan",filename));
-		else if ((status = cords_instance_plan( Cb.host, aptr->value, Cb.agent, nptr )) != 0)
+		else if ((status = cords_instance_plan( Cb.publisher, aptr->value, Cb.agent, nptr )) != 0)
 			return( failure(status,"failure provisioning plan",aptr->value));
 		else	return( 0 );
 	}
@@ -305,7 +305,7 @@ private	int	ll_sla_broker_operation( char * filename )
 			return( failure(5,"missing manifest name",filename));
 		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"missing plan identifier",filename));
-		else if ((status = cords_instance_agreement( Cb.host, pptr->value, gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
+		else if ((status = cords_instance_agreement( Cb.publisher, pptr->value, gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
 			return( failure(status,"failure to provision plan",aptr->value));
 		else	return( 0 );
 	}
@@ -465,8 +465,8 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_broker_banner(char * n)
 {
-	printf("\n   Cords Broker : Version 1.0.b.0.02 ");
-	printf("\n   Beta Version 15/03/2013 \n");
+	printf("\n   Cords Broker : Version 1.0.b.0.03 ");
+	printf("\n   Beta Version 12/09/2013 \n");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
