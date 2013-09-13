@@ -117,6 +117,9 @@ static void enable_riak_search() {
 
             success = (204 == perform_curl_and_get_code(curl, headers));
         }
+        if(!success) {
+            printf("************* Failed to connect to riak server: Is it running and accessible? ************\n");
+        }
         curl_easy_cleanup(curl);
     } 
 }
@@ -185,6 +188,7 @@ static struct cords_publication *cords_publication_from_json_object(struct json_
     if (success) {
         struct cords_publication *new_publication = allocate_cords_publication();
         if (!new_publication) {
+            assert(0); // Out of memory!
             return NULL;
         }
         new_publication->id = allocate_string(json_object_get_string(id));
@@ -227,6 +231,7 @@ static char *vclock_from_headers(const char *headers) {
             }
         }
     }
+    assert(0); // Invalid Vclock string
     return NULL;
 }
 
@@ -379,10 +384,13 @@ cords_publication_list retrieve_from_filter(struct cords_publication_occi_filter
 void update(char *id, struct cords_publication *updated_publication) { 
     struct publication_with_vclock retrieved = retrieve_with_vclock_from_id(id);
     if (retrieved.vclock && retrieved.publication) {
-        create_or_update(updated_publication, retrieved.vclock);
+        liberate_cords_publication(create_or_update(updated_publication, retrieved.vclock));
         free(retrieved.vclock);
-        free(retrieved.publication);
-    }    
+        liberate_cords_publication(retrieved.publication);
+    }
+    else {
+        assert(0); // Unexpected failure to retrieve original object
+    }
 }
 
 void del(char *id) {
@@ -451,6 +459,8 @@ static void publication_list_from_json_array(struct array_list *items, cords_pub
             if (publication) {
                 list->publications[list->count++] = publication;
             }
+            else {
+            }
         }
         else {
             // It might be nice to have some error handling here.  It makes the
@@ -509,6 +519,9 @@ static void publication_list_from_list_json(struct json_object *jo, cords_public
                     if(new_id) {
                         list->ids[list->count++] = new_id;
                     }
+                    else {
+                        assert(0); // Out of memory
+                    }
                 }
                 else {
                     // It might be nice to have some error handling here.  It makes the
@@ -558,6 +571,8 @@ static union riak_object_list list_from_curl_response(const char *response, unsi
                 struct cords_publication *publication = retrieve_from_id(ids.ids[i]);
                 if (publication) {
                     retVal.objects.publications[retVal.objects.count++] = publication;
+                }
+                else {
                 }
             }
             cords_publication_free_id_list(&ids);
