@@ -39,6 +39,8 @@
 [[[cog t.backend_include()]]]
 [[[end]]]
 
+#include "occi_rest_FILENAME_ROOT.h"
+
 /*	--------------------------------------------	*/
 /*	o c c i _ 
 [[[cog t.split_category_name()]]]

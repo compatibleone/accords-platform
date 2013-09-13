@@ -420,8 +420,7 @@ union riak_object_list list_from_filter(struct cords_publication_occi_filter *fi
                 query = search_query(filter);
             }
             set_search_url(curl, n_filters, "publication", query);
-            liberate(query);
-            
+            liberate(query);            
             
             struct transfer_data response = {0};
             setup_download(curl, &response);

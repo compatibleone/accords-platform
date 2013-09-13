@@ -29,8 +29,6 @@
 
 #include "azconfig.h"
 #include "windowsazure.h"
-#include "windowsazure.c"
-#include "occiwindowsazure.c"
 #include "azconfig.c"
 #include "occiazconfig.c"
 

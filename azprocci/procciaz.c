@@ -23,6 +23,8 @@
 #include "cosacsctrl.h"
 #include "stdnode.h"
 
+#include "occi_rest_windowsazure.h"
+
 #define	_AZURE_STATUS_POLL	5
 
 /* ---------------------------------------------------------------------------------- */

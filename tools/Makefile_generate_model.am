@@ -13,13 +13,14 @@ schema_files = $(patsubst %.h,%.xsd,$(model_h_files))
 model_backend_h_files = $(patsubst %.h,%_backend_interface.h,$(model_h_files))
 node_backend_c_files = $(patsubst %.h,%_node_backend.c,$(model_h_files))
 node_backend_h_files = $(patsubst %.h,%_node_backend.h,$(model_h_files))
-occi_rest_c_files = $(patsubst %.h,occi_%_rest.c,$(model_h_files))
+occi_rest_c_files = $(patsubst %.h,occi_rest_%.c,$(model_h_files))
+occi_rest_h_files = $(patsubst %.h,occi_rest_%.h,$(model_h_files))
 occi_c_files = $(patsubst %.h,occi%.c,$(model_h_files))
 occi_filter_files = $(patsubst %.h, %_occi_filter.h,$(model_h_files))
 
 model_c_files = $(patsubst %.h,%.c,$(model_h_files))
 
-model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) 
+model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) $(occi_rest_h_files) 
 
 $(schema_files) : %.xsd : %.h $(COG_TEMPLATES)schema.xsd
 	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %.xsd,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)schema.xsd
@@ -30,8 +31,11 @@ $(node_backend_h_files) : %_node_backend.h : %.h $(COG_TEMPLATES)node_backend.h
 $(node_backend_c_files) : %_node_backend.c : %.h $(COG_TEMPLATES)node_backend.c
 	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_node_backend.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)node_backend.c
 
-$(occi_rest_c_files) : occi_%_rest.c : %.h $(COG_TEMPLATES)occi.c
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst occi_%_rest.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)occi.c
+$(occi_rest_c_files) : occi_rest_%.c : occi_rest_%.h %.h $(COG_TEMPLATES)occi.c
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst occi_rest_%.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)occi.c
+
+$(occi_rest_h_files) : occi_rest_%.h : %.h $(COG_TEMPLATES)occi.h
+	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst occi_rest_%.h,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)occi.h
 	
 $(occi_c_files) : occi%.c : %.h $(COG_TEMPLATES)occi_include.c
 	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst occi%.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)occi_include.c
@@ -45,7 +49,7 @@ $(occi_filter_files) : %_occi_filter.h : %.h $(COG_TEMPLATES)category_filter.h
 $(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h
 	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$@ -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category.h
 	
-$(model_c_files) : %.c : %.h %.xsd occi%.c %_occi_filter.h occi_%_rest.c %_node_backend.c %_node_backend.h %_backend_interface.h $(COG_TEMPLATES)category.c  
+$(model_c_files) : %.c : %.h %.xsd occi%.c %_occi_filter.h occi_rest_%.c occi_rest_%.h %_node_backend.c %_node_backend.h %_backend_interface.h $(COG_TEMPLATES)category.c  
 	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %.c,%.h, $@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category.c
 
 CLEANFILES = $(model_all_files)
