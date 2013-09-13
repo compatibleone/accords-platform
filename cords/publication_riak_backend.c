@@ -372,25 +372,21 @@ static void publication_list_from_list_json(struct json_object *jo, cords_public
     }
 }
 
-static void set_query_url(CURL *curl, unsigned n_filters, struct cords_publication_occi_filter *filter, const char *bucket) {
+static void set_query_url(CURL *curl, unsigned n_filters, const char *bucket, const char *query) {
     assert(bucket);
-    assert(filter);
     assert(curl);
     
     char request_buffer[1024];
-    char *query;
     if(0 == n_filters) {
         // List - warning, shouldn't be used in production for performance reasons
-        sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", bucket);
+        snprintf(request_buffer, sizeof(request_buffer), "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", bucket);
     }
     else {
-        query = search_query(filter);
         assert(query);
         if(query) {
             // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
             // Don't find out!  
-            sprintf(request_buffer, "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", bucket, query);
-            liberate(query);
+            snprintf(request_buffer, sizeof(request_buffer), "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", bucket, query);            
         }
     }
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
@@ -439,7 +435,13 @@ union riak_object_list list_from_filter(struct cords_publication_occi_filter *fi
         unsigned retries;
         for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {
             unsigned n_filters = cords_publication_count_filters(filter);
-            set_query_url(curl, n_filters, filter, "publication");
+            char *query = NULL;
+            if(n_filters) {
+                query = search_query(filter);
+            }
+            set_query_url(curl, n_filters, "publication", query);
+            liberate(query);
+            
             
             struct transfer_data response = {0};
             setup_download(curl, &response);
