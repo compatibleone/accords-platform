@@ -416,6 +416,7 @@ _co_stop() {
     _stop_service coss
     _stop_service fileserver
     _stop_service publisher
+    #_stop_service valgrind
 }
 
 _run_azprocci() {
@@ -552,6 +553,7 @@ _run_cosched() {
  
 _run_publisher() {
     publisher --config $target CO-PUB/1.0
+    #valgrind --leak-check=yes publisher --config $target CO-PUB/1.0
 }
 
 _run_fileserver() {
