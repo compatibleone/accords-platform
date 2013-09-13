@@ -135,12 +135,11 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 public	void	tls_configuration_use(struct tls_configuration * cptr )
 {
 	security_lock(0,"configuration");
+
 	if ( cptr->option & _OPTIMISE_OCCI_CLIENT )
 		occi_optimise_client(1);
-	else	occi_optimise_client(0);
 	if ( cptr->option & _OPTIMISE_OCCI_LOCAL )
 		occi_optimise_local(1);
-	else	occi_optimise_local(0);
 
 	https_use_encryption( cptr->key );
 	https_use_certificate( cptr->certificate );

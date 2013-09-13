@@ -2607,13 +2607,18 @@ private	int	cool_operation( char * nptr )
 		Cool.tls = (char *) 0;
 	else if (!( tlsconf = tls_configuration_load( Cool.tls ) ))
 		return( 40 );
-	else if ( tlsconf->authenticate )
+	else
 	{
-		if ((Cool.user) && (Cool.password))
+		/* force optimise local */
+		tlsconf->option |= 4096;
+		if ( tlsconf->authenticate )
 		{
-			if ((status = occi_secure_AAA( Cool.user, Cool.password, nptr, Cool.tls )) != 0)
-				return( status );
-			else	cool_log_message( "authentication", 0 );
+			if ((Cool.user) && (Cool.password))
+			{
+				if ((status = occi_secure_AAA( Cool.user, Cool.password, nptr, Cool.tls )) != 0)
+					return( status );
+				else	cool_log_message( "authentication", 0 );
+			}
 		}
 	}
 
