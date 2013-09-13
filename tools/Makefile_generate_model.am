@@ -10,43 +10,10 @@ COG_TEMPLATES = $(TEMPLATE_DIR)template_
 
 COG_COMMON = $(top_srcdir)/tools/codegen/cog_common.py 
 
-schema_files = $(patsubst %.h,%.xsd,$(model_h_files))
-model_backend_h_files = $(patsubst %.h,%_backend_interface.h,$(model_h_files))
-node_backend_c_files = $(patsubst %.h,%_node_backend.c,$(model_h_files))
-node_backend_h_files = $(patsubst %.h,%_node_backend.h,$(model_h_files))
-occi_rest_c_files = $(patsubst %.h,occi_rest_%.c,$(model_h_files))
-occi_rest_h_files = $(patsubst %.h,occi_rest_%.h,$(model_h_files))
-occi_c_files = $(patsubst %.h,occi%.c,$(model_h_files))
-occi_filter_files = $(patsubst %.h, %_occi_filter.h,$(model_h_files))
-
 model_c_files = $(patsubst %.h,%.c,$(model_h_files))
 
 model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) $(occi_rest_h_files) 
 
-$(schema_files) : %.xsd : $(COG_TEMPLATES)schema.xsd generator_input.txt
-	$(MODEL_COG) @generator_input.txt
-	
-$(node_backend_h_files) : %_node_backend.h : $(COG_TEMPLATES)node_backend.h generator_input.txt
-	$(MODEL_COG) @generator_input.txt
-	
-$(node_backend_c_files) : %_node_backend.c : $(COG_TEMPLATES)node_backend.c generator_input.txt
-	$(MODEL_COG) @generator_input.txt
-
-$(occi_rest_c_files) : occi_rest_%.c : $(COG_TEMPLATES)occi.c generator_input.txt
-	$(MODEL_COG) @generator_input.txt
-
-$(occi_rest_h_files) : occi_rest_%.h : $(COG_TEMPLATES)occi.h generator_input.txt
-	$(MODEL_COG) @generator_input.txt
-	
-$(occi_c_files) : occi%.c : $(COG_TEMPLATES)occi_include.c generator_input.txt
-	$(MODEL_COG) @generator_input.txt
-	
-$(model_backend_h_files) : %_backend_interface.h : $(COG_TEMPLATES)category_backend_interface.h generator_input.txt
-	$(MODEL_COG) @generator_input.txt
-
-$(occi_filter_files) : %_occi_filter.h : $(COG_TEMPLATES)category_filter.h generator_input.txt
-	$(MODEL_COG) @generator_input.txt
-	
 $(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h generator_input.txt
 	$(MODEL_COG) @generator_input.txt
 	
