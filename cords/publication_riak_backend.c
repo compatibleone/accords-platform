@@ -12,27 +12,17 @@
 #include "publication_occi_filter.h"
 #include "publication.h"
 #include "publication_backend_interface.h"
+#include "riak_backend.h"
 #include "publication_riak_backend.h"
 
 #define MIN(a,b) ((a < b) ? (a) : (b))
 
-#define CURL_RETRIES (3)
-
-typedef enum {
-    RIAK_OPTION_RETURN_OBJECT,
-    RIAK_OPTION_NO_OBJECT
-} riak_object_return;
 
 union riak_object_list {
     cords_publication_id_list ids_only;
     cords_publication_list objects;
 };
 
-struct transfer_data {
-    size_t total;
-    size_t transfered;
-    char *data;
-};
 
 static char ENABLE_SEARCH_CMD[] = "{\"props\":{\"precommit\":[{\"mod\":\"riak_search_kv_hook\",\"fun\":\"precommit\"}]}}";
 
@@ -48,12 +38,8 @@ static void delete_all_matching_filter(struct cords_publication_occi_filter *fil
 static cords_publication_id_list list_ids(struct cords_publication_occi_filter *filter);
 
 // Local Functions
-static CURL *init_curl_common();
 static union riak_object_list list_from_filter(struct cords_publication_occi_filter *filter, riak_object_return return_objects);
-static void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_object_return return_object);
 static size_t upload(void *ptr, size_t size, size_t nmemb, void *userdata);
-static long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers);
-static int perform_curl_and_check(CURL *curl, struct curl_slist *headers);
 
 struct publication_backend_interface *  cords_publication_riak_backend_interface() {
     struct publication_backend_interface riak_interface =
@@ -252,43 +238,6 @@ static void setup_read_vclock(CURL *curl, struct transfer_data *header_data) {
     initialise_download_operation(curl, header_data, CURLOPT_HEADERFUNCTION, CURLOPT_HEADERDATA);
 }
 
-static CURL *init_curl_common() {
-    CURL *curl = curl_easy_init();
-    if(curl) {
-        // CURLOPT_VERBOSE is useful to enable during debug
-        //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-
-        // In case of redirection, follow
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-    }
-    return curl;    
-}
-
-static void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_object_return return_object) {
-    char request_buffer[1024];
-    int written = sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", bucket, key);
-    if (RIAK_OPTION_RETURN_OBJECT == return_object) {
-        sprintf(&request_buffer[written], "?returnbody=true");
-    }
-    curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-}
-
-long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {
-    CURLcode res;
-    res = curl_easy_perform(curl);
-    curl_slist_free_all(headers);
-    
-    if (CURLE_OK == res) {
-        long http_code = 0;
-        curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
-        return http_code;
-    }
-    return -1;
-}
-
-int perform_curl_and_check(CURL *curl, struct curl_slist *headers) {
-    return (200 == perform_curl_and_get_code(curl, headers));
-}
 
 static struct cords_publication *create_or_update(const struct cords_publication *initial_publication, const char *vclock) {
     CURL *curl;
