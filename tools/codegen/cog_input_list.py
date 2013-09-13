@@ -28,7 +28,7 @@ templates = [_category_c_template, _category_h_template, _node_backend_c_templat
              _occi_rest_c_template, _occi_rest_h_template, _backend_interface_template, _filter_template, _occi_include_template]
 name_patterns = ["{0}.c", "{0}.h", "{0}_node_backend.c", "{0}_node_backend.h", "{0}.xsd", \
                  "occi_rest_{0}.c", "occi_rest_{0}.h", "{0}_backend_interface.h", "{0}_occi_filter.h", \
-                 "{0}_occi_include.c"]
+                 "occi{0}.c"]
 
 with open(args.filename, 'w+') as output:
     output.write("# This is a generated list of commands to generate model .c and .h files\n")
