@@ -2066,7 +2066,6 @@ private	void	send_operation( struct cordscript_instruction * iptr, struct cordsc
 				push_value( iptr->context, string_value("expected response") );
 			else	push_value( iptr->context, string_value("OK") );
 			aptr = liberate_rest_response( aptr );
-			liberate( filename );
 		}
 	}
 }
