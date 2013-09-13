@@ -8,6 +8,11 @@ COG_CONVERT = python $(abspath $(top_srcdir)/tools/codegen/cog_convert.py)
 TEMPLATE_DIR = $(top_srcdir)/tools/cog/templates/
 COG_TEMPLATES = $(TEMPLATE_DIR)template_
 
+ALL_PRE_COG_TEMPLATES = category_backend_interface.h category_filter.h category.c category.h  node_backend.c \
+                        node_backend.h occi_include.c occi.c occi.h riak_backend.c riak_backend.h
+                        
+ALL_TEMPLATES = $(patsubst %,$(COG_TEMPLATES)%,$(ALL_PRE_COG_TEMPLATES))
+
 COG_COMMON = $(top_srcdir)/tools/codegen/cog_common.py 
 
 model_c_files = $(patsubst %.h,%.c,$(model_h_files))
@@ -17,7 +22,7 @@ model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(s
 $(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h generator_input.txt
 	$(MODEL_COG) @generator_input.txt
 	
-$(model_c_files) : %.c : $(COG_TEMPLATES)category.c generator_input.txt
+$(model_c_files) : %.c : $(COG_TEMPLATES)category.c generator_input.txt $(ALL_TEMPLATES)
 	$(MODEL_COG) @generator_input.txt
 
 CLEANFILES = $(model_all_files)

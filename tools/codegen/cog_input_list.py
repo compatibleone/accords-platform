@@ -16,6 +16,8 @@ _category_c_template = os.path.join(_template_dir, 'template_category.c')
 _category_h_template = os.path.join(_template_dir, 'template_category.h')
 _node_backend_c_template = os.path.join(_template_dir, 'template_node_backend.c')
 _node_backend_h_template = os.path.join(_template_dir, 'template_node_backend.h')
+_riak_backend_c_template = os.path.join(_template_dir, 'template_riak_backend.c')
+_riak_backend_h_template = os.path.join(_template_dir, 'template_riak_backend.h')
 _schema_template = os.path.join(_template_dir, 'template_schema.xsd')
 _occi_rest_c_template = os.path.join(_template_dir, 'template_occi.c')
 _occi_rest_h_template = os.path.join(_template_dir, 'template_occi.h')
@@ -25,10 +27,11 @@ _occi_include_template = os.path.join(_template_dir, 'template_occi_include.c')
 
 
 templates = [_category_c_template, _category_h_template, _node_backend_c_template, _node_backend_h_template, _schema_template, \
-             _occi_rest_c_template, _occi_rest_h_template, _backend_interface_template, _filter_template, _occi_include_template]
+             _occi_rest_c_template, _occi_rest_h_template, _backend_interface_template, _filter_template, \
+             _riak_backend_c_template, _riak_backend_h_template, _occi_include_template]
 name_patterns = ["{0}.c", "{0}.h", "{0}_node_backend.c", "{0}_node_backend.h", "{0}.xsd", \
                  "occi_rest_{0}.c", "occi_rest_{0}.h", "{0}_backend_interface.h", "{0}_occi_filter.h", \
-                 "occi{0}.c"]
+                 "{0}_riak_backend.c", "{0}_riak_backend.h", "occi{0}.c"]
 
 with open(args.filename, 'w+') as output:
     output.write("# This is a generated list of commands to generate model .c and .h files\n")
