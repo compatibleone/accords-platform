@@ -34,7 +34,7 @@ void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_ob
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
 }
 
-void set_query_url(CURL *curl, unsigned n_filters, const char *bucket, const char *query) {
+void set_search_url(CURL *curl, unsigned n_filters, const char *bucket, const char *query) {
     assert(bucket);
     assert(curl);
     

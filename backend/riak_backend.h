@@ -16,7 +16,7 @@ struct transfer_data {
 
 CURL *init_curl_common();
 void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_object_return return_object);
-void set_query_url(CURL *curl, unsigned n_filters, const char *bucket, const char *query);
+void set_search_url(CURL *curl, unsigned n_filters, const char *bucket, const char *query);
 long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers);
 int perform_curl_and_check(CURL *curl, struct curl_slist *headers);
 void enable_riak_search(const char *bucket);

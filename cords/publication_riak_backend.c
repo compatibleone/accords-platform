@@ -419,7 +419,7 @@ union riak_object_list list_from_filter(struct cords_publication_occi_filter *fi
             if(n_filters) {
                 query = search_query(filter);
             }
-            set_query_url(curl, n_filters, "publication", query);
+            set_search_url(curl, n_filters, "publication", query);
             liberate(query);
             
             
