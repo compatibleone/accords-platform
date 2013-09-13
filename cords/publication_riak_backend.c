@@ -372,26 +372,6 @@ static void publication_list_from_list_json(struct json_object *jo, cords_public
     }
 }
 
-static void set_query_url(CURL *curl, unsigned n_filters, const char *bucket, const char *query) {
-    assert(bucket);
-    assert(curl);
-    
-    char request_buffer[1024];
-    if(0 == n_filters) {
-        // List - warning, shouldn't be used in production for performance reasons
-        snprintf(request_buffer, sizeof(request_buffer), "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", bucket);
-    }
-    else {
-        assert(query);
-        if(query) {
-            // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
-            // Don't find out!  
-            snprintf(request_buffer, sizeof(request_buffer), "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", bucket, query);            
-        }
-    }
-    curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
-}
-
 static union riak_object_list list_from_curl_response(const char *response, unsigned n_filters, riak_object_return return_objects) {  
     union riak_object_list retVal = {0}; 
     // In order to reduce nesting here, we're relying on the fact that json-c behaves nicely

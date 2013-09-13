@@ -34,6 +34,27 @@ void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_ob
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
 }
 
+void set_query_url(CURL *curl, unsigned n_filters, const char *bucket, const char *query) {
+    assert(bucket);
+    assert(curl);
+    
+    char request_buffer[1024];
+    if(0 == n_filters) {
+        // List - warning, shouldn't be used in production for performance reasons
+        snprintf(request_buffer, sizeof(request_buffer), "http://devriak.market.onapp.com:10018/riak/%s?keys=true&props=false", bucket);
+    }
+    else {
+        assert(query);
+        if(query) {
+            // Here we request up to 100,000 results.  What happens if there are more than 100,000 matches?
+            // Don't find out!  
+            snprintf(request_buffer, sizeof(request_buffer), "http://devriak.market.onapp.com:10018/solr/%s/select?wt=json&rows=100000&q=%s", bucket, query);            
+        }
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
+}
+
+
 long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {
     CURLcode res;
     res = curl_easy_perform(curl);
