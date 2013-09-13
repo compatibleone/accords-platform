@@ -238,6 +238,10 @@ class Category(object):
     def set_backend(self, backend):
         self._backend = backend
         
+    @property
+    def backend(self):
+        return self._backend
+        
     def for_file(self, filename):
         if self.headerFilename is not None:
             return filename == self.headerFilename
