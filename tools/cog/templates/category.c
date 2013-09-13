@@ -80,8 +80,6 @@ public struct CATEGORY_NAME * allocate_CATEGORY_NAME()
 		return( sptr );
 	else	return( reset_CATEGORY_NAME(sptr) );
 }
-[[[cog t.authorization_special_code()]]]
-[[[end]]]
  
 /*	----------------------------------------------	*/
 /*	x m l i n _ 

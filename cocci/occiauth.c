@@ -46,6 +46,58 @@ public	void	occi_authorization_set_ttl( int value )
 	return;
 }
 
+/*    ------------------------------------------------------    */
+/*    a d d _ o c c i _ a u t h o r i z a t i o n _ i t e m     */
+/*    ------------------------------------------------------    */
+private struct occi_authorization_item * add_occi_authorization_item(struct occi_authorization_cache * pptr)
+{
+    struct occi_authorization_item * sptr;
+    if (!( sptr = allocate( sizeof( struct occi_authorization_item ) ) ))
+        return( sptr );
+    else if (!( sptr = reset_occi_authorization_item(sptr) ))
+        return( sptr );
+    else
+    {
+        if (!( sptr->previous = pptr->last ))
+            pptr->first = sptr;
+        else    sptr->previous->next = sptr;
+        pptr->last = sptr;
+        sptr->parent = pptr;
+        return( sptr );
+    }
+
+}
+
+/*    --------------------------------------------------------    */
+/*    d r o p _ o c c i _ a u t h o r i z a t i o n _ i t e m     */
+/*    --------------------------------------------------------    */
+private struct occi_authorization_item * drop_occi_authorization_item(struct occi_authorization_item * sptr)
+{
+    if ( sptr )
+    {
+        if (!( sptr->parent )) return(sptr);
+        if (!( sptr->previous ))
+        {
+            if (!( sptr->parent->first = sptr->next ))
+                sptr->parent->last = (struct occi_authorization_item *) 0;
+            else    sptr->parent->first->previous = (struct occi_authorization_item *) 0;
+        }
+        else if (!( sptr->previous->next = sptr->next ))
+            sptr->parent->last = sptr->previous;
+        if (!( sptr->next ))
+        {
+            if (!( sptr->parent->last = sptr->previous ))
+                sptr->parent->first = (struct occi_authorization_item *) 0;
+            else    sptr->parent->last->next = (struct occi_authorization_item *) 0;
+        }
+        else if (!( sptr->next->previous = sptr->previous ))
+            sptr->parent->first = sptr->next;
+        sptr = liberate_occi_authorization_item(sptr);
+    }
+    return((struct occi_authorization_item *) 0);
+}
+
+
 /*	---------------------------------------------------	*/
 /*	o c c i _ r e l e a s e _ a u t h o r i z a t i o n	*/
 /*	---------------------------------------------------	*/
