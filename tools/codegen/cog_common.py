@@ -37,13 +37,20 @@ import codegen_types.ctypes as ctypes
 def _link_special_case():
     return _category_name() == "cords_xlink"
 
+def parse_models(model_dir):
+    global models
+    # Not re-parsing the models each time gives a massive speed-up
+    if 'models' not in globals():
+        print "Parsing models"
+        models = parse([model_dir], None, None, None)    
+
 def init_models(model_dir, filename):
     global models
     global category_file
     global category
     global _has_name
+    parse_models(model_dir)
     category_file = filename
-    models = parse([model_dir], None, None, None)
     category = category_for_file(category_file, models)
     _has_name = False
     for name, _ in category.backend_type_list():
