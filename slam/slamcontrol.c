@@ -199,7 +199,8 @@ private	int	invoke_business_values( char * nature, struct cords_control * pptr, 
 				liberate( sptr );
 				continue;
 			}
-			else if ( strcasecmp( dptr->value, nature ) != 0)
+			else if (( strcasecmp( dptr->value, nature ) != 0)
+			&&       ( strcasecmp( dptr->value, "BOTH" ) != 0))
 			{
 				yptr = occi_remove_response( yptr );
 				liberate( sptr );
