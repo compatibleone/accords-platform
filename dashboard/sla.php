@@ -142,6 +142,7 @@
 	print "<option value=none>none</option>\n";
 	print "<option value=penalty>penalty</option>\n";
 	print "<option value=reward>reward</option>\n";
+	print "<option value=both>both</option>\n";
 	print "</select></td></tr>\n";
 	print "<tr><td>Expression</td><td><input type=text name=gx1 size=64></td>\n";
 	print "<tr><td colspan=2><hr></td></tr>\n";
@@ -177,6 +178,7 @@
 	print "<option value=none>none</option>\n";
 	print "<option value=penalty>penalty</option>\n";
 	print "<option value=reward>reward</option>\n";
+	print "<option value=both>both</option>\n";
 	print "</select></td></tr>\n";
 	print "<tr><td>Expression</td><td><input type=text name=gx2 size=64></td>\n";
 	print "<tr><td colspan=2><hr></td></tr>\n";
@@ -212,6 +214,7 @@
 	print "<option value=none>none</option>\n";
 	print "<option value=penalty>penalty</option>\n";
 	print "<option value=reward>reward</option>\n";
+	print "<option value=both>both</option>\n";
 	print "</select></td></tr>\n";
 	print "<tr><td>Expression</td><td><input type=text name=gx3 size=64></td>\n";
 	print "<tr><td colspan=2><hr></td></tr>\n";
@@ -247,6 +250,7 @@
 	print "<option value=none>none</option>\n";
 	print "<option value=penalty>penalty</option>\n";
 	print "<option value=reward>reward</option>\n";
+	print "<option value=both>both</option>\n";
 	print "</select></td></tr>\n";
 	print "<tr><td>Expression</td><td><input type=text name=gx4 size=64></td>\n";
 	print "<tr><td colspan=2><hr></td></tr>\n";
