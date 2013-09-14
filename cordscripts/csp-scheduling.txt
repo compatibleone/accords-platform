@@ -37,12 +37,15 @@ include "csp-header.txt";
 		{
 			switch ( $url )
 			{
-			case	"paas"	:
+			case	"paas"		:
 			case	"easiclouds"	:
-			case	"computenext"	:
 			case	"openstack"	:
 			case	"opennebula"	:
 			case	"windowsazure"	:
+			case	"amazonEc2"	:
+			case	"vcloud"	:
+			case	"onapp"		:
+			case	"computenext"	:
 				$s = "{}";
 				$d = '"url":"'#$url#'"';
 				$s = $s + $d;
@@ -100,7 +103,11 @@ include "csp-header.txt";
 
 	"<tr><td class=title>Count<td class=title>Minumum<td class=title>Average<td class=title>Maximum<td class=title>Deviation</tr>".display();
 	$deviation = $maximum - $minimum;
-	$average   = $cumul / $total;
+	if ( $total > 0 )
+	{
+		$average   = $cumul / $total;
+	}
+
 
 	$m = "<tr><td>"#$total;
 	$m = $m#"<td>"#$minimum;
