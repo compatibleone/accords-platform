@@ -2051,7 +2051,7 @@ private	void	send_operation( struct cordscript_instruction * iptr, struct cordsc
 		push_value( iptr->context, string_value("expected body") );
 	else if (!( body = bptr->value ))
 		push_value( iptr->context, string_value("expected body") );
-	else if (!( filename = rest_temporary_filename( ".xml" ) ))
+	else if (!( filename = rest_temporary_filename( "xml" ) ))
 		push_value( iptr->context, string_value("expected filename") );
 	else
 	{

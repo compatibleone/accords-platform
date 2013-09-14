@@ -1187,9 +1187,9 @@ private	char *	cords_script_interpreter( char * filename )
 	char *	argv[10];
 	int	argc=0;
 	argv[0] = (char *) 0;
-	if (!( result = rest_temporary_filename( ".html" )))
+	if (!( result = rest_temporary_filename( "html" )))
 		return( (char *) 0 );
-	else if (!( newfile = rest_temporary_filename( ".html" )))
+	else if (!( newfile = rest_temporary_filename( "html" )))
 		return( (char *) 0 );
 	else if (!( h = fopen( result, "w" ) ))
 		return( (char *) 0 );
@@ -1235,7 +1235,7 @@ private	char * 	cords_resolver_operation( char * category )
 
 	if (!( rptr = occi_resolver( category, agent ) ))
 		return( (char *) 0 );
-	else if (!( filename = rest_temporary_filename( ".html" ) ))
+	else if (!( filename = rest_temporary_filename( "html" ) ))
 		return( filename );
 	else if (!( h = fopen( filename, "w" ) ))
 		return( (char *) 0 );

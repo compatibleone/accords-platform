@@ -417,7 +417,7 @@ public	struct	data_element *	json_parse_string( char * sptr )
 	struct	data_element * dptr;
 	char * rest_temporary_filename( char * s);
 	FILE * h;
-	if (!( filename = rest_temporary_filename( ".json" )))
+	if (!( filename = rest_temporary_filename( "json" )))
 		return((struct data_element *) 0);
 	else if (!(h = fopen( filename,"w" ) ))
 		return((struct data_element *) 0);
