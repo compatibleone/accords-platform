@@ -2062,7 +2062,7 @@ private	void	send_operation( struct cordscript_instruction * iptr, struct cordsc
 			contentlength = strlen( body );
 			fprintf(h,"%s",body);
 			fclose(h);
-			if (!( aptr = rest_client_post_request( url,default_tls(),"CORC",filename,hptr) ))
+			if (!( aptr = rest_client_post_request( url,default_tls(),get_default_agent(),filename,hptr) ))
 				push_value( iptr->context, string_value("expected response") );
 			else	push_value( iptr->context, string_value("OK") );
 			aptr = liberate_rest_response( aptr );
