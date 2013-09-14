@@ -90,8 +90,12 @@
 		$name = $sla["occi.agreement.name"];
 		$m = '<td><b>Agreement</b><td><a href="dashboard.php?action=compile&script=csp-agreement.txt&output=HTML&option=';
 		$m = $m#$name#'">'#$name#'</a>';
-		$m = $m#"<td colspan=2>&nbsp;</td></tr>";
 		$m.display();
+		$value = $record["occi.service.initiation"];
+		if ( $value == "now" )   { $value = "now".date();  }
+		else			 { $value = $value.date(); }
+		$m = "<td><b>Initiation</b><td>"#$value;
+		$m.display()
 
 
 		$m = "<tr>";
@@ -101,25 +105,20 @@
 		$name = $manifest["occi.manifest.name"];
 		$m = '<td><b>Manifest</b><td><a href="dashboard.php?action=compile&script=csp-manifest.txt&output=HTML&option=';
 		$m = $m#$name#'">'#$name#'</a>';
-		$m = $m#"<td colspan=2>&nbsp;</td></tr>";
 		$m.display();
 
-		$m = "<tr>";
-		$value = $record["occi.service.initiation"];
-		if ( $value == "now" )   { $value = "now".date();  }
-		else			 { $value = $value.date(); }
-		$m = $m#"<td><b>Initiation</b><td>"#$value;
 		$value = $record["occi.service.expiration"];
 		if ( $value != "never" ) { $value = $value.date(); }
-		$m = $m#"<td><b>Expires</b><td>"#$value;
-
+		$m = "<td><b>Expires</b><td>"#$value;
+		$m.display();
+		"<tr><td colspan=4>&nbsp;".display();
 		$value = $record["occi.service.when"];
 		$value = $value.date(); 
 		$state = $record["occi.service.state"];
 		if ( $state > 0 )
-		{ 	$m = $m#"<td><b>Deployed Since</b><td>"#$value;	}
+		{ 	$m = "<td><b>Deployed Since</b><td>"#$value;	}
 		else
-		{ 	$m = $m#"<td><b>Un-deployed Since</b><td>"#$value;	}
+		{ 	$m = "<td><b>Un-deployed Since</b><td>"#$value;	}
 		$m.display();
 
 		$m = "<tr><td class=title>Contract<td class=title>Provider<td class=title>Host<td class=title>State<td class=title>Date<td class=title>Price</tr>";
@@ -179,19 +178,22 @@
 				$agreement = $sla.get();
 				$aname = $agreement["occi.agreement.name"];
 				$m = "<tr><td colspan=2>"#$aname#"<td colspan=3><a href='dashboard.php?action=compile&script=csp-service.txt&output=HTML&option="#$sid#"'>"#$sid#"</a></td>";
+				$m.display();
+				$sid = $record["occi.core.id"];
+				$m = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
+				$m.display();
 				$state = $record["occi.service.state"];
 				if ( $state > 0 )
-				{ $m = $m#"<td>Deployed</td></tr>"; }
+				{
+				"<input type=submit class=action name=action value='stop service'></form></tr>".display();	
+				}
 				else
-				{ $m = $m#"<td>Created</td></tr>"; }
-				$m.display();
+				{
+				"<input type=submit class=action name=action value='start service'></form></tr>".display();	
+				}
 			}
 		}
 	}
-		
-
-
-		$m = "<tr><td
 
 	HtmlFooter();
 
