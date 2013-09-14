@@ -86,8 +86,10 @@
 		$m = "<tr>";
 		$name = $account["occi.account.name"];
 		$m = $m#"<td><b>Account</b><td>"#$name;
+		$m.display();
 		$name = $sla["occi.agreement.name"];
-		$m = $m#"<td><b>Agreement</b><td>"#$name;
+		$m = '<td><b>Agreement</b><td><a href="dashboard.php?action=compile&script=csp-agreement.txt&output=HTML&option=';
+		$m = $m#$name#'">'#$name#'</a>';
 		$m = $m#"<td colspan=2>&nbsp;</td></tr>";
 		$m.display();
 
@@ -95,8 +97,10 @@
 		$m = "<tr>";
 		$name = $vender["occi.account.name"];
 		$m = $m#"<td><b>Vender</b><td>"#$name;
+		$m.display();
 		$name = $manifest["occi.manifest.name"];
-		$m = $m#"<td><b>Manifest</b><td>"#$name;
+		$m = '<td><b>Manifest</b><td><a href="dashboard.php?action=compile&script=csp-manifest.txt&output=HTML&option=';
+		$m = $m#$name#'">'#$name#'</a>';
 		$m = $m#"<td colspan=2>&nbsp;</td></tr>";
 		$m.display();
 

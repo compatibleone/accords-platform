@@ -1,0 +1,41 @@
+function XmlCategory( $object )
+{
+	$xml = '<uuid>'#$object#'</uuid>';
+	$array = $object.get();
+	foreach ( $array as $tuple )
+	{
+		forboth ( $tuple as $name and $value )
+		{
+			if ( $value.length() > 0 )
+			{
+				$result = "<"#$name#">"#$value#"</"#$name#">";
+				$xml = $xml # $result;
+			}
+		}
+	}
+	return( $xml );
+}
+
+function OcciSoapMessage( $t, $o )
+{
+
+	$r = '<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">';
+	$r = $r#'<SOAP:Body>';
+
+	$w = '<'#$t#' xmlns="http://accordys/callbacks/1.0">';
+	$r = $r#$w;
+
+	$r = $r#'<OCCIMsg>';
+
+	$s = XmlCategory( $o );
+	$r = $r#$s;
+
+     	$r = $r#'</OCCIMsg>';
+
+	$w = '</'#$t#'>';
+    	$r = $r#$w;
+	$r = $r#'</SOAP:Body>';
+	$r = $r#'</SOAP:Envelope>';
+	return( $r );
+}
+

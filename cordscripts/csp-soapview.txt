@@ -1,0 +1,32 @@
+	include "csp-soap.txt";
+
+	if ( $2.length() > 0 )
+	{
+		$soaphost = "https://csbdemo.cordys.com:443/cordys/com.eibus.web.soap.Gateway.wcp?organization=o=accordys,cn=cordys,cn=bop,o=cordys.com";
+
+		$l = $2.list();
+		$p= $l[0];
+ 
+		$m = OcciSoapMessage( "UsageDataCallBack", $p );
+		"<p>*** Usage Data Call Back ***<p>".display();
+		$m = $soaphost.send( $m );
+		$m.display();
+		$a = $m / "<";
+		$m = $a * "&lt;";
+		$a = $m / ">";
+		$m = $a * "&gt;";
+		$m = "&lt;"#$m#"&gt;";
+		$m.display();
+
+		$m = OcciSoapMessage( "SLADataCallBack", $p );
+		"<p>*** SLA Data Call Back ***<p>".display();
+		$m = $soaphost.send( $m );
+		$m.display();
+		$a = $m / "<";
+		$m = $a * "&lt;";
+		$a = $m / ">";
+		$m = $a * "&gt;";
+		$m = "&lt;"#$m#"&gt;";
+		$m.display();;
+	}
+
