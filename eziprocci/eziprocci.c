@@ -25,6 +25,7 @@
 #include "document.h"
 #include "cordspublic.h"
 #include "occipublisher.h"
+#include "occi_rest_easiclouds.h"
 
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/

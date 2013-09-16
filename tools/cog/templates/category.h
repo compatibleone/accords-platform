@@ -10,5 +10,6 @@
 
 struct CATEGORY_NAME * allocate_CATEGORY_NAME();
 struct CATEGORY_NAME * liberate_CATEGORY_NAME(struct CATEGORY_NAME * optr);
+struct CATEGORY_NAME * reset_CATEGORY_NAME(struct CATEGORY_NAME * sptr);
 
 #endif

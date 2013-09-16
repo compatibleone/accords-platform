@@ -21,7 +21,6 @@
 #include "occiauth.h"
 #include "cordslang.h"
 #include "occiresolver.h"
-#include "authitem.c"
 
 /*	----------------------------------------------------	*/
 /*	This file provides an OCCI authorization token cache	*/

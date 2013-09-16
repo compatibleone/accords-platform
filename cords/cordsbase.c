@@ -77,7 +77,6 @@
 
 #include "agency.c"
 #include "enquiry.c"
-#include "publication.c"
 
 #include "monitor.c"
 #include "control.c"
