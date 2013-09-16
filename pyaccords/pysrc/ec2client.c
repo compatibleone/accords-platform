@@ -263,7 +263,7 @@ char * build_ec2_firewall(struct ec2_subscription * subptr, struct amazonEc2 * p
 				release_standard_message( &firewall );
 				break;
 			}
-			else if (!(response = add_ec2_rule( subptr, secgroup, rulename, atoi(rulefrom), atoi(rulefrom), ruleproto )))
+			else if (!(response = add_ec2_rule( subptr, secgroup, rulename, atoi(rulefrom), atoi(ruleto), ruleproto )))
 				return response;
 		}
 		
