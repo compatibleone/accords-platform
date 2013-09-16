@@ -300,9 +300,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 					/* ------------------------------------ */
 					/* output information to service report */
 					/* ------------------------------------ */
-					fprintf(h,"%c%s%c: %c%s%c",
-						0x0022,eptr->name,0x0022,
-						0x0022,eptr->value,0x0022);	
+					fprintf(h,"'%s': '%s'", eptr->name, eptr->value);	
 				}
 			}
 
