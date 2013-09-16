@@ -10,7 +10,11 @@ model_h_files = xlink.h windowsazure.h cnconfig.h computenext.h publication.h au
     easiclouds_model.h easiclouds_node.h easiclouds_parameters.h \
     easiclouds_postconf.h easiclouds_server.h easiclouds_input.h easiclouds_output.h \
     saas.h \
-    eziconfig.h easiclouds.h
+    eziconfig.h easiclouds.h \
+    job.h workload.h \
+    nagioscommand.h nagioscontact.h nagioscontactgroup.h nagioshost.h nagioshostdependancy.h nagioshostescalation.h \
+    nagioshostextinfo.h nagioshostgroup.h nagiosservice.h nagiosserviceescalation.h nagiosservicegroup.h \
+    nagiostimeperiod.h nagiosservicedependancy.h nagiosserviceextinfo.h
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
 libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c riak_backend.c \
@@ -37,7 +41,23 @@ libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c riak
     easiclouds_output_node_backend.c occi_rest_easiclouds_output.c easiclouds_output.c \
     saas_node_backend.c occi_rest_saas.c saas.c \
     eziconfig_node_backend.c occi_rest_eziconfig.c eziconfig.c \
-    easiclouds_node_backend.c occi_rest_easiclouds.c easiclouds.c 
+    easiclouds_node_backend.c occi_rest_easiclouds.c easiclouds.c \ 
+    job_node_backend.c occi_rest_job.c job.c \
+    workload_node_backend.c occi_rest_workload.c workload.c \
+    nagioscommand_node_backend.c occi_rest_nagioscommand.c nagioscommand.c \
+    nagioscontact_node_backend.c occi_rest_nagioscontact.c nagioscontact.c \
+    nagioscontactgroup_node_backend.c occi_rest_nagioscontactgroup.c nagioscontactgroup.c \
+    nagioshost_node_backend.c occi_rest_nagioshost.c nagioshost.c \
+    nagioshostdependancy_node_backend.c occi_rest_nagioshostdependancy.c nagioshostdependancy.c \
+    nagioshostescalation_node_backend.c occi_rest_nagioshostescalation.c nagioshostescalation.c \
+    nagioshostextinfo_node_backend.c occi_rest_nagioshostextinfo.c nagioshostextinfo.c \
+    nagioshostgroup_node_backend.c occi_rest_nagioshostgroup.c nagioshostgroup.c \
+    nagiosservice_node_backend.c occi_rest_nagiosservice.c nagiosservice.c \
+    nagiosserviceescalation_node_backend.c occi_rest_nagiosserviceescalation.c nagiosserviceescalation.c \
+    nagiosservicegroup_node_backend.c occi_rest_nagiosservicegroup.c nagiosservicegroup.c \
+    nagiostimeperiod_node_backend.c occi_rest_nagiostimeperiod.c nagiostimeperiod.c \
+    nagiosservicedependancy_node_backend.c occi_rest_nagiosservicedependancy.c nagiosservicedependancy.c \
+    nagiosserviceextinfo_node_backend.c occi_rest_nagiosserviceextinfo.c nagiosserviceextinfo.c 
 libbackend_la_CFLAGS = $(CFLAGS_BACKEND) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) -Werror
 libbackend_la_LDFLAGS = -lcurl 
 

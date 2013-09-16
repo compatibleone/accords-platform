@@ -32,6 +32,9 @@
 #include "cordslang.h"
 #include "cb.h"
 #include "url.h"
+#include "job.h"
+#include "occi_rest_job.h"
+#include "occi_rest_workload.h"
 
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
@@ -173,11 +176,6 @@ private	struct rest_extension * cool_extension( void * v,struct rest_server * sp
 }
 
 #include "comonsconnection.c"
-#include "job.c"
-#include "occijob.c"
-#include "workload.c"
-#include "occiworkload.c"
-
 
 /*	-------------------------------------------	*/
 /*	E l a s t i c i t y   M a n a g e m e n t	*/

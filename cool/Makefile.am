@@ -16,7 +16,3 @@ cool_LDFLAGS = $(LD_BACKEND) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS) $
 cool_CFLAGS = $(CFLAGS_BACKEND) $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) \
               $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COPABR) $(CFLAGS_PUBOCCI) $(CFLAGS_COMONS)
 
-# Create auto-generated model files
-model_h_files = job.h workload.h
-include $(top_srcdir)/tools/Makefile_generate_model.am
-cool.c: $(model_c_files)
