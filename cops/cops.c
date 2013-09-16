@@ -28,6 +28,9 @@
 #include "occiresolver.h"
 #include "occibuilder.h"
 
+#include "federation.h"
+#include "occi_rest_federation.h"
+
 struct	accords_configuration Cops = {
 	0,0,
 	0,0,0,0,
@@ -138,10 +141,6 @@ private	struct rest_extension * cops_extension( void * v,struct rest_server * sp
 #include "copsquantity.c"
 #include "copsoperation.c"
 #include "copsplacement.c"
-
-#include "federation.h"
-#include "federation.c"
-#include "occifederation.c"
 
 /*	------------------------------------------------------------------	*/
 /*			c o p s _ o p e r a t i o n				*/

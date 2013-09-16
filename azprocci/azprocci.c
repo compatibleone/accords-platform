@@ -30,7 +30,6 @@
 #include "azconfig.h"
 #include "windowsazure.h"
 #include "azconfig.c"
-#include "occiazconfig.c"
 
 struct	accords_configuration WazProcci = {
 	0,0,

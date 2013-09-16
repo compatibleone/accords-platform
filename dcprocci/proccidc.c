@@ -4,6 +4,8 @@
 #include "cordslang.h"
 #include "dcclient.h"
 
+#include "kindnode.h" // TODO Remove all references to kindnodes directly from the procci
+
 /* -------------------------------------------------------------------- */
 /*   r e s o l v e _ d e l t a c l o u d _ c o n f i g u r a t i o n	*/
 /* -------------------------------------------------------------------- */

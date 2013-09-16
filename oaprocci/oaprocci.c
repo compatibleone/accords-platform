@@ -29,6 +29,9 @@
 #include "cosacsctrl.h"
 #include "stdnode.h"
 #include "onapp_helpers.h"
+#include "occi_rest_oaconfig.h"
+#include "occi_rest_onapp_extras.h"
+#include "occi_rest_onapp.h"
 
 struct	accords_configuration OnAppConfiguration = {
   .monitor = 0, .autopub=0,
@@ -78,14 +81,8 @@ public	int	failure( int e, char * m1, char * m2 )
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
 #include "oaconfig.h"
-#include "oaconfig.c"
-#include "occioaconfig.c"
 #include "onapp.h"
-#include "onapp.c"
 #include "onapp_extras.h"
-#include "onapp_extras.c"
-#include "occionapp_extras.c"
-#include "occionapp.c"
 #include "oaclient.h"
 #include "oaclient.c"
 #include "oacontract.h"

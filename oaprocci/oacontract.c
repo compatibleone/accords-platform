@@ -36,6 +36,8 @@
 #include "onapp_helpers.h"
 #include "oaconfig_backend_interface.h"
 #include "oaconfig_occi_filter.h"
+#include "onapp_occi_filter.h"
+#include "onapp_backend_interface.h"
 
 #define _USE_OCCI_ONAPPEXTRAS
 

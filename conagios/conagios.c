@@ -154,21 +154,6 @@ private	struct rest_extension * conagios_extension( void * v,struct rest_server 
 #include "occi_rest_nagiosserviceextinfo.h"
 #include "occi_rest_nagiostimeperiod.h"
 
-#include "occinagioscommand.c"
-#include "occinagioscontactgroup.c"
-#include "occinagioscontact.c"
-#include "occinagioshostdependancy.c"
-#include "occinagioshostescalation.c"
-#include "occinagioshostextinfo.c"
-#include "occinagioshostgroup.c"
-#include "occinagioshost.c"
-#include "occinagiosservicedependancy.c"
-#include "occinagiosserviceescalation.c"
-#include "occinagiosservicegroup.c"
-#include "occinagiosservice.c"
-#include "occinagiosserviceextinfo.c"
-#include "occinagiostimeperiod.c"
-
 /*	--------------------------------------------	*/
 /*	c o n a g i o s _ o p e r a t i o n 		*/
 /*	--------------------------------------------	*/

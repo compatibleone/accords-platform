@@ -27,6 +27,9 @@
 #include "occipublisher.h"
 #include "occibuilder.h"
 #include "paasclient.h"
+#include "paasconfig.h"
+
+#include "kindnode.h" // TODO Remove all references to kindnodes directly from the procci
 
 struct	cords_vector
 {

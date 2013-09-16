@@ -23,6 +23,8 @@
 #include "occiresolver.h"
 #include "cosacsctrl.h"
 
+#include "kindnode.h" // TODO This should be removed, references to node backend should be abstractred via API
+
 /* ---------------------------------------------------------------------------- */
 /*			x m l _ a t r i b u t _ v a l u e			*/
 /* ---------------------------------------------------------------------------- */

@@ -9,7 +9,7 @@ TEMPLATE_DIR = $(top_srcdir)/tools/cog/templates/
 COG_TEMPLATES = $(TEMPLATE_DIR)template_
 
 ALL_PRE_COG_TEMPLATES = category_backend_interface.h category_filter.h category.c category.h  node_backend.c \
-                        node_backend.h occi_include.c occi.c occi.h riak_backend.c riak_backend.h
+                        node_backend.h occi.c occi.h riak_backend.c riak_backend.h
                         
 ALL_TEMPLATES = $(patsubst %,$(COG_TEMPLATES)%,$(ALL_PRE_COG_TEMPLATES))
 

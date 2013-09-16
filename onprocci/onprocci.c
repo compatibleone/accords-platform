@@ -29,10 +29,8 @@
 
 #include "onconfig.h"
 #include "opennebula.h"
-#include "opennebula.c"
-#include "occiopennebula.c"
+#include "occi_rest_opennebula.h"
 #include "onconfig.c"
-#include "occionconfig.c"
 
 struct	accords_configuration OnProcci = {
 	0,0, 
