@@ -431,8 +431,14 @@ _node *) 0;
 			if (!( pptr = sptr->contents ))
 				continue;
 			if ( pass_CATEGORY_NAME_filter( pptr, filter ) ) {
-				FILENAME_ROOTs.FILENAME_ROOTs[FILENAME_ROOTs.count++] = pptr;
-            }
+			    struct CATEGORY_NAME *FILENAME_ROOT = clone_CATEGORY_NAME(pptr);
+			    if (FILENAME_ROOT) {
+	                FILENAME_ROOTs.FILENAME_ROOTs[FILENAME_ROOTs.count++] = FILENAME_ROOT;
+			    }
+			    else {
+			        assert(0); // Out of memory
+			    }
+			}
         }
 	}
     pthread_mutex_unlock( &list_CATEGORY_NAME_control );
