@@ -22,9 +22,7 @@
 /*										*/
 /* ---------------------------------------------------------------------------- */
 
-/* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _FILENAME_ROOT_c_
-#define _FILENAME_ROOT_c_
+/* WARNING : this file has been generated and should not be modified by hand */
 
 #include "element.h"
 #include "standard.h"
@@ -129,5 +127,23 @@ unsigned CATEGORY_NAME_count_filters(struct CATEGORY_NAME_occi_filter *filter) {
     [[[end]]]
     return count;
 }
- 
-#endif	/* _FILENAME_ROOT_c_ */
+
+void CATEGORY_NAME_free_id_list(CATEGORY_NAME_id_list *list) {
+    int i;
+    for(i = 0; i < list->count; i++) {
+        liberate(list->ids[i]);
+    }
+    liberate(list->ids);
+    list->ids = NULL;
+    list->count = 0;
+}
+
+void free_CATEGORY_NAME_list(CATEGORY_NAME_list *list) {
+    int i;
+    for(i = 0; i < list->count; i++) {
+        liberate_CATEGORY_NAME(list->FILENAME_ROOTs[i]);
+    }
+    liberate(list->FILENAME_ROOTs);
+    list->FILENAME_ROOTs = NULL;
+    list->count = 0;
+}

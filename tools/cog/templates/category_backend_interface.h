@@ -3,18 +3,6 @@
 #ifndef _FILENAME_ROOT_backend_interface_h
 #define _FILENAME_ROOT_backend_interface_h
 
-typedef struct  CATEGORY_NAME_id_list_t
-{
-	int count;
-	char **ids;
-}  CATEGORY_NAME_id_list;
-
-typedef struct CATEGORY_NAME_list_t
-{
-	int count;
-	struct CATEGORY_NAME **FILENAME_ROOTs;
-} CATEGORY_NAME_list;
-
 struct	FILENAME_ROOT_backend_interface
 {
 	void (*init)();
@@ -31,8 +19,5 @@ struct	FILENAME_ROOT_backend_interface
 };
 
 extern struct FILENAME_ROOT_backend_interface * CATEGORY_NAME_backend;
-
-void CATEGORY_NAME_free_id_list( CATEGORY_NAME_id_list *list);
-void free_CATEGORY_NAME_list(CATEGORY_NAME_list *list);
 
 #endif

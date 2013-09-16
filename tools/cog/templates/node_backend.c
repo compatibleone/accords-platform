@@ -445,26 +445,6 @@ _node *) 0;
 	return FILENAME_ROOTs;
 }
 
-void CATEGORY_NAME_free_id_list(CATEGORY_NAME_id_list *list) {
-	int i;
-	for(i = 0; i < list->count; i++) {
-		liberate(list->ids[i]);
-	}
-	liberate(list->ids);
-	list->ids = NULL;
-	list->count = 0;
-}
-
-void free_CATEGORY_NAME_list(CATEGORY_NAME_list *list) {
-    int i;
-    for(i = 0; i < list->count; i++) {
-        liberate_CATEGORY_NAME(list->FILENAME_ROOTs[i]);
-    }
-	liberate(list->FILENAME_ROOTs);
-	list->FILENAME_ROOTs = NULL;
-	list->count = 0;
-}
-
 void  CATEGORY_NAME_delete_all_matching_filter(struct CATEGORY_NAME_occi_filter *filter) {
 [[[cog t.profile('delete_from_filters', 'delete_from_counts')]]]
 [[[end]]]
