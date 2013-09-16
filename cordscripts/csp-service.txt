@@ -69,10 +69,17 @@
 		$m = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
 		$m.display();
 
-		if ( $state > 0 )
-		{	"<input type=submit class=action name=action value='stop service'></form></tr>".display();	}
-		else
-		{	"<input type=submit class=action name=action value='start service'></form></tr>".display();	}
+		switch ( $state )
+		{
+		case	1	:
+			"<input type=submit class=action name=action value='stop service'></form></tr>".display();
+			break;
+		case	0	:
+			"<input type=submit class=action name=action value='start service'></form></tr>".display();
+			break;
+		default		:
+			"<span class=action>Working</span></form></tr>".display();
+		}
 
 		$aid     = $record["occi.service.account"];
 		$account = $aid.get();
@@ -115,10 +122,17 @@
 		$value = $record["occi.service.when"];
 		$value = $value.date(); 
 		$state = $record["occi.service.state"];
-		if ( $state > 0 )
-		{ 	$m = "<td><b>Deployed Since</b><td>"#$value;	}
-		else
-		{ 	$m = "<td><b>Un-deployed Since</b><td>"#$value;	}
+		switch ( $state )
+		{
+		case	1	:
+		 	$m = "<td><b>Deployed Since</b><td>"#$value;
+			break;
+		case	0	:
+		 	$m = "<td><b>Un-deployed Since</b><td>"#$value;	
+			break;
+		default		:
+			$m = "<td><b>Working Since</b><td>"#$value;
+		}
 		$m.display();
 
 		$m = "<tr><td class=title>Contract<td class=title>Provider<td class=title>Host<td class=title>State<td class=title>Date<td class=title>Price</tr>";
@@ -183,13 +197,16 @@
 				$m = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
 				$m.display();
 				$state = $record["occi.service.state"];
-				if ( $state > 0 )
+				switch ( $state )
 				{
-				"<input type=submit class=action name=action value='stop service'></form></tr>".display();	
-				}
-				else
-				{
-				"<input type=submit class=action name=action value='start service'></form></tr>".display();	
+				case	1	:
+					"<input type=submit class=action name=action value='stop service'></form></tr>".display();	
+					break;
+				case	0	:
+					"<input type=submit class=action name=action value='start service'></form></tr>".display();
+					break;
+				default		:
+					"<span class=action>Working</span></form></tr>".display();
 				}
 			}
 		}
