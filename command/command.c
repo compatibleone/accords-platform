@@ -916,6 +916,25 @@ private	int	cords_instance_plan( char * host, char * plan, char * agent, char * 
 	}
 }
 
+/*	---------------------	*/
+/*	append_service_report	*/
+/*	---------------------	*/
+private	void	append_service_report(FILE * h, char * sid )
+{
+	FILE *	sh;
+	int	c;
+	if (( sh = fopen( sid, "r")) != (FILE *) 0)
+	{
+		while ((c = fgetc(sh)) != -1)
+			fputc(c,h);
+		fclose(sh);
+		fprintf(h," }\n");
+	}
+	else	fprintf(h," {} }\n");
+	fclose(h);
+	return;
+}
+
 /*	-----------------------------------------------------	*/
 /*	   c o r d s _ i n s t a n c e _ a g r e e m e n t	*/
 /*	-----------------------------------------------------	*/
@@ -931,11 +950,13 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 	int		i;
 	int		j;
 	FILE	*	h;
+	FILE	*	rh;
 	struct	occi_client * kptr;
 	struct	occi_request* qptr;
 	struct	occi_element* dptr;
 	struct	occi_response* yptr;
 	char	buffer[1024];
+	char	sbuffer[1024];
 
 	/* ------------------- */
 	/* prepare environment */
@@ -1025,29 +1046,46 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 		/* -------------------------------- */
 		rest_add_http_prefix(buffer,1024,ihost);
 
+		for ( j=0,i=0; *(ihost+i) != 0; i++)
+			if ( *(ihost+i) == '/' )
+				j = (i+1);
+		sprintf(sbuffer,"service/%s",(ihost+j));
+
+		if ((rh = fopen( result, "w")) != (FILE *) 0)
+		{
+			fprintf(rh,"{ 'instance':'%s', 'service':",buffer);
+		}
+	
 		if (!( Cb.deployment ))
 		{
-			for ( j=0,i=0; *(ihost+i) != 0; i++)
-				if ( *(ihost+i) == '/' )
-					j = (i+1);
-			sprintf(buffer,"service/%s",(ihost+j));
-			printf("%s\n",buffer);
-			if ((h = fopen(buffer,"w")) != (FILE *) 0)
+			/* ------------------------------------------- */
+			/* create empty service report if not deployed */
+			/* ------------------------------------------- */
+			if ((h = fopen(sbuffer,"w")) != (FILE *) 0)
 			{
 				fprintf(h,"{}\n");
 				fclose(h);
 			}
+			append_service_report(rh,sbuffer);
 			ihost = liberate( ihost );
 			return( 0 );
 		}
 		else 
 		{
+			/* ----------------- */
+			/* start the service */
+			/* ----------------- */
 			ihost = liberate( ihost );
 			if (!( zptr =  cords_invoke_action( buffer, _CORDS_START, agent, default_tls() ) ))
+			{
+				fprintf(rh,", {} }\n");
+				fclose(rh);
 				return(503);
+			}
 			else
 			{
 				zptr = occi_remove_response( zptr );
+				append_service_report(rh,sbuffer);
 				return( 0 );
 			}
 		}
@@ -1330,7 +1368,9 @@ private	int	cords_broker_operation( char * filename )
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
-	status = ll_sla_broker_operation( filename );
+	if (!( status = ll_sla_broker_operation( filename ) ))
+		status = 200;
+	else	status = 500;
 
 	(void) logout_occi_user( Command.user,Command.password,agent, auth, default_tls() );	
 
@@ -1915,8 +1955,8 @@ private	struct rest_response * cords_broker_response( struct rest_response * apt
 	struct	rest_header * hptr;
 	char	buffer[2048];
 	char	filesize[256];
-
-	return( rest_file_response( aptr, filename, "application/json" ) );
+	sprintf(buffer,"instance_%s",filename);
+	return( rest_file_response( aptr, buffer, "application/json" ) );
 }
 
 /*	------------------------------------------------------------------	*/
