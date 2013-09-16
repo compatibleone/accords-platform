@@ -191,7 +191,7 @@ private	void	cosacs_post_samples( struct cords_probe * pptr, int samples, char *
 	/* ------------------------------------- */
 	/* prepare the date stamp and packet URL */
 	/* ------------------------------------- */
-	sprintf(now,"%u",time((long*) 0));
+	sprintf(now,"%u",(unsigned)time((long*) 0));
 	sprintf(buffer,"/%s/",_CORDS_PACKET);
 	if (!( pptr->connection ))
 		return;

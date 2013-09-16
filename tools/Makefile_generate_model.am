@@ -19,16 +19,16 @@ model_c_files = $(patsubst %.h,%.c,$(model_h_files))
 
 model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) $(occi_rest_h_files) 
 
-$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h
+$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h generator_input.txt
 	$(MODEL_COG) @generator_input.txt
 	
-$(model_c_files) : %.c : $(COG_TEMPLATES)category.c $(ALL_TEMPLATES)
+$(model_c_files) : %.c : $(COG_TEMPLATES)category.c generator_input.txt
 	$(MODEL_COG) @generator_input.txt
-
+	
 CLEANFILES = $(model_all_files)
 
 $(COG_TEMPLATES)% : $(TEMPLATE_DIR)%
 	$(COG_CONVERT) $(subst template_,, $@) $@ 
 	
-generator_input.txt : $(MODEL_INPUT_GEN) $(model_h_files)
+generator_input.txt : $(MODEL_INPUT_GEN) $(ALL_TEMPLATES) 
 	python $(MODEL_INPUT_GEN) generator_input.txt $(top_srcdir) $(model_h_files)

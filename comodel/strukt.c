@@ -385,8 +385,12 @@ public	int	generate()
 		{
 			fprintf(C.target,"\t<xsd:attribute name=%c%s%c",0x0022,iptr->name,0x0022);
 			if (!( strcmp( iptr->basic , "int" ) ))
-				fprintf(C.target," type=%c%s%c",0x0022,"xsd:integer");
-			else	fprintf(C.target," type=%c%s%c",0x0022,"xsd:string");
+				//fprintf(C.target," type=%c%s%c",0x0022,"xsd:integer");
+			    // TODO The above code has an extra %c, unclear what the intention is, warning fixed with code below
+			    fprintf(C.target," type=%c%s",0x0022,"xsd:integer");
+			//else	fprintf(C.target," type=%c%s%c",0x0022,"xsd:string");
+			// TODO And again
+            else    fprintf(C.target," type=%c%s",0x0022,"xsd:string");
 			fprintf(C.target,"/>\n");
 		}
 		fprintf(C.target,"</xsd:complexType>\n");
