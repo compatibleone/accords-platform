@@ -9,7 +9,8 @@ model_h_files = xlink.h windowsazure.h cnconfig.h computenext.h publication.h au
     easiclouds_instance.h easiclouds_keypair.h easiclouds_link.h easiclouds_metadata.h \
     easiclouds_model.h easiclouds_node.h easiclouds_parameters.h \
     easiclouds_postconf.h easiclouds_server.h easiclouds_input.h easiclouds_output.h \
-    saas.h
+    saas.h \
+    eziconfig.h easiclouds.h
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
 libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c riak_backend.c \
@@ -34,7 +35,9 @@ libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c riak
     easiclouds_server_node_backend.c occi_rest_easiclouds_server.c easiclouds_server.c \
     easiclouds_input_node_backend.c occi_rest_easiclouds_input.c easiclouds_input.c \
     easiclouds_output_node_backend.c occi_rest_easiclouds_output.c easiclouds_output.c \
-    saas_node_backend.c occi_rest_saas.c saas.c 
+    saas_node_backend.c occi_rest_saas.c saas.c \
+    eziconfig_node_backend.c occi_rest_eziconfig.c eziconfig.c \
+    easiclouds_node_backend.c occi_rest_easiclouds.c easiclouds.c 
 libbackend_la_CFLAGS = $(CFLAGS_BACKEND) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) -Werror
 libbackend_la_LDFLAGS = -lcurl 
 
