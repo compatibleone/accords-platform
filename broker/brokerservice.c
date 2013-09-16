@@ -517,7 +517,7 @@ private	struct	rest_response * start_service(
 			case	2	:
 				return( rest_html_response( aptr, 410, "After Service Expiration" ) );
 			case	0	:
-				pptr->state = _OCCI_RUNNING;
+				pptr->state = _OCCI_WORKING;
 				autosave_cords_service_nodes();
 				service_action( pptr, pptr->id, _CORDS_START );
 				pptr->when  = time((long*) 0);
@@ -551,6 +551,7 @@ private	struct	rest_response * suspend_service(
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
+			pptr->state = _OCCI_WORKING;
 			service_action( pptr, pptr->id, _CORDS_SUSPEND );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
@@ -579,6 +580,8 @@ private	struct	rest_response * restart_service(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
 	{
+		pptr->state = _OCCI_WORKING;
+		autosave_cords_service_nodes();
 		reverse_service_action( pptr, pptr->id, _CORDS_STOP  );
 		service_action( pptr, pptr->id, _CORDS_START );
 		pptr->when  = time((long*) 0);
@@ -606,9 +609,12 @@ private	struct	rest_response * save_service(
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	{
-		if ( pptr->state != _OCCI_IDLE )
+		if ( pptr->state == _OCCI_RUNNING )
 		{
+			pptr->state = _OCCI_WORKING;
+			autosave_cords_service_nodes();
 			service_action( pptr, pptr->id, _CORDS_SAVE );
+			pptr->state = _OCCI_RUNNING;
 			pptr->when  = time((long*) 0);
 			autosave_cords_service_nodes();
 		}
@@ -634,9 +640,12 @@ private	struct	rest_response * snapshot_service(
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	{
-		if ( pptr->state != _OCCI_IDLE )
+		if ( pptr->state == _OCCI_RUNNING )
 		{
+			pptr->state = _OCCI_WORKING;
+			autosave_cords_service_nodes();
 			service_action( pptr, pptr->id, _CORDS_SNAPSHOT );
+			pptr->state = _OCCI_RUNNING;
 			pptr->when  = time((long*) 0);
 			autosave_cords_service_nodes();
 		}
@@ -662,9 +671,9 @@ private	struct	rest_response * stop_service(
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	{
-		if ( pptr->state != _OCCI_IDLE )
+		if ( pptr->state == _OCCI_RUNNING )
 		{
-			pptr->state = _OCCI_IDLE;
+			pptr->state = _OCCI_WORKING;
 			autosave_cords_service_nodes();
 			reverse_service_action( pptr, pptr->id, _CORDS_STOP );
 			pptr->when  = time((long*) 0);
