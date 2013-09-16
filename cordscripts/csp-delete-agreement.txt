@@ -1,0 +1,126 @@
+
+	include "csp-header.txt";
+
+
+	function DeleteServices( $t )
+	{
+
+		foreach ( $t as $tt )
+		{
+			forboth ( $tt as $ttn and $ttv )
+			{
+				if ( $ttn == "link" )
+				{
+					$ttv.delete();
+				}
+			}
+		}
+	}
+
+	function DeleteConditions( $t )
+	{
+
+		foreach ( $t as $tt )
+		{
+			forboth ( $tt as $ttn and $ttv )
+			{
+				if ( $ttn == "link" )
+				{
+					$st = $ttv.get();
+					foreach ( $st as $stt )
+					{
+						forboth ( $stt as $stn and $stv )
+						{
+							if ( $stn == "link" )
+							{
+								$stv.delete();
+							}
+						}
+					}			
+					$ttv.delete();
+				}
+			}
+		 }
+	}
+
+	function DeleteGuarantees( $t )
+	{
+
+		foreach ( $t as $tt )
+		{
+			forboth ( $tt as $ttn and $ttv )
+			{
+				if ( $ttn == "link" )
+				{
+					$gt = $ttv.get();
+					foreach ( $gt as $gtt )
+					{
+						forboth ( $gtt as $gtn and $gtv )
+						{
+							if ( $gtn == "link" )
+							{
+								$vt = $vtv.get();
+								foreach ( $vt as $vtt )
+								{
+									forboth ( $vtt as $vtn and $vtv )
+									{
+										if ( $vtn == "link" )
+										{
+											$vtv.delete();
+										}
+									}
+								}
+								$gtv.delete();
+							}
+						}
+					}			
+					$ttv.delete();
+				}
+			}
+		 }
+	}
+
+	$what = $2;
+
+	if ( $what.length() > 0 )
+	{
+
+		$agreements = agreement.list('occi.agreement.name="'#$what#'"');
+
+	
+		foreach ( $agreements as $aid )
+		{
+			$agreement = $aid.get();
+
+			foreach ( $agreement as $tuple )
+			{
+				forboth ( $tuple as $n and $v )
+				{
+					if ( $n == "link" )
+					{
+						$terms = $v.get();
+						$tn = $terms["occi.terms.type"];
+						switch ( $tn )
+						{
+						case	"services"	:
+							DeleteServices($terms);
+							break;
+						case	"conditions"	:
+							DeleteConditions($terms);
+							break;
+						case	"guarantees"	:
+							DeleteGuarantees($terms);
+							break;
+						}
+						$v.delete();						
+					}	
+				}
+			}
+			$aid.delete();
+		}
+	}
+
+
+	include "csp-agreements.txt";
+
+

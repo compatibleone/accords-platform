@@ -227,11 +227,8 @@
 
 	$what = $2;
 
-	$agreements = agreement.list('occi.agreement.name="'#$what#'"');
-
-
-
-	foreach ( $agreements as $aid )
+	$agreements = agreement.list( "occi.agreement.name='"#$what#"'" );
+	foreach( $agreements as $aid )
 	{
 		$m = "<table width='100%'><tr><td class=title><a href='dashboard.php?action=compile&output=HTML&script=csp-updatesla.txt&option="#$aid#"'>"#$aid#"</a></td></tr>";
 		$m.display();
@@ -313,7 +310,11 @@
 		"&lt;/agreement&gt;".display();	
 		"</pre></code></td></tr>".dislpay();	
 
+		$m = "<tr><th><a href='dashboard.php?action=compile&output=HTML&script=csp-delete-agreement.txt&option="#$what#"'>Delete This Service Level Agreement</a></th></tr>"
+		$m.display();
+
 	}
-
-
+	
 	HtmlFooter();
+
+
