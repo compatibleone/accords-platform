@@ -417,16 +417,19 @@ def count_filters():
                      "if (filter->{0}) count++;") 
          
 def backend_include():    
-    if (_category_name() != 'cords_publication'): #TODO Hardcoding switch for now
-        cog.outl("#include \"{0}_node_backend.h\"".format(_filename_root()))
-    else:
-        cog.outl("#include \"{0}_riak_backend.h\"".format(_filename_root()))
+#     if (_category_name() != 'cords_publication'): #TODO Hardcoding switch for now
+#         cog.outl("#include \"{0}_node_backend.h\"".format(_filename_root()))
+#     else:
+#         cog.outl("#include \"{0}_riak_backend.h\"".format(_filename_root()))
+    cog.outl("#include \"{0}_node_backend.h\"".format(_filename_root()))
         
 def backend_init():
     cog.outl("//Backend is {0}".format(category.backend.plugin))
     cog.out("{0}_backend = ".format(_category_name()))
-    if (_category_name() != 'cords_publication'): #TODO Hardcoding switch for now
-        cog.out("{0}_node_interface_func();    // TODO There's no obvious place to delete this pointer on completion.  Find somewhere!".format(
+#     if (_category_name() != 'cords_publication'): #TODO Hardcoding switch for now
+#         cog.out("{0}_node_interface_func();    // TODO There's no obvious place to delete this pointer on completion.  Find somewhere!".format(
+#             _category_name()))
+#     else:
+#         cog.out("{0}_riak_backend_interface();".format(_category_name()))
+    cog.out("{0}_node_interface_func();    // TODO There's no obvious place to delete this pointer on completion.  Find somewhere!".format(
             _category_name()))
-    else:
-        cog.out("{0}_riak_backend_interface();".format(_category_name()))

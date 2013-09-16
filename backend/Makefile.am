@@ -47,7 +47,7 @@ libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c riak
     cnconfig_node_backend.c occi_rest_cnconfig.c cnconfig.c \
     computenext_node_backend.c occi_rest_computenext.c computenext.c \
     windowsazure_node_backend.c occi_rest_windowsazure.c windowsazure.c \
-    publication_riak_backend.c occi_rest_publication.c publication.c \
+    publication_node_backend.c occi_rest_publication.c publication.c \
     authitem_node_backend.c occi_rest_authitem.c authitem.c \
     easiclouds_application_node_backend.c occi_rest_easiclouds_application.c easiclouds_application.c \
     easiclouds_connection_node_backend.c occi_rest_easiclouds_connection.c easiclouds_connection.c \
