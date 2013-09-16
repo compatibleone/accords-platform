@@ -222,7 +222,6 @@ private	struct	rest_response * suspend_publication(
 	{
 		pptr->when = 0;
 		pptr->state = _OCCI_SUSPENDED;
-		autosave_cords_publication_nodes("publication.xml");
 	  	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -245,7 +244,6 @@ private	struct	rest_response * restart_publication(
 		pptr->uptime = 0;
 		pptr->when = time((long*) 0);
 		pptr->state = _OCCI_RUNNING;
-		autosave_cords_publication_nodes("publication.xml");
 	  	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
