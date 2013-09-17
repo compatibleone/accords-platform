@@ -1216,43 +1216,69 @@ private	void	cords_rcs_style( FILE * h, char * filename )
 /*	-------------------------------------------	*/
 /*	c o r d s _ p a r s e r _ o p e r a t i o n	*/
 /*	-------------------------------------------	*/
-private	char *	cords_script_interpreter( char * filename )
+private	char *	cords_script_interpreter( char * filename, char * parameters )
 {
 	FILE *	h;
+	FILE *	rh;
 	int	holdout=-1;
 	int	newout=-1;
 	int	realout=-1;
 	char *	result;
 	char *	newfile;
-	char *	argv[10];
+	char *	argv[64];
 	int	argc=0;
+	char * 	pararoot=(char *) 0;
 	argv[0] = (char *) 0;
+	if ( parameters )
+	{
+		if (!(parameters = allocate_string( parameters )))
+			return( (char *) 0 );
+		else	pararoot = parameters;
+		while ( *parameters )
+		{
+			while ( *parameters == ' ' ) parameters++;
+			if (!( *parameters ))
+				break;
+			argv[argc++] = parameters;
+			while (( *parameters != 0) && ( *parameters != ' ' )) parameters++;
+			if ( *parameters )
+				*(parameters++) = 0;
+			else if ( argc > 63 )
+				break;
+		}
+	}
+
 	if (!( result = rest_temporary_filename( "html" )))
+	{
+		if ( pararoot ) liberate( pararoot );
 		return( (char *) 0 );
+	}
 	else if (!( newfile = rest_temporary_filename( "html" )))
+	{
+		if ( pararoot ) liberate( pararoot );
 		return( (char *) 0 );
+	}
 	else if (!( h = fopen( result, "w" ) ))
+	{
+		if ( pararoot ) liberate( pararoot );
 		return( (char *) 0 );
+	}
+	else
 	{
 		fprintf(h,"<html><head><title>corsdscript execution response</title>");
 		cords_rcs_style(h,"style.css");
 		fprintf(h,"</head><body><div align=center><h1>Script Execution</h1>\n");
 		fprintf(h,"<table><tr><th>%s</th><tr><td>\n",filename);
-		holdout = dup(1);
-		close(1);
-		if ((newout = open(newfile, O_CREAT | O_RDWR, 0666 )) >= 0)
+		if ((rh = freopen( newfile, "w", stdout )) != (FILE *) 0)
 		{
 			run_cordscript_interpreter( filename, argc, argv );
-			
-			close(newout);
+			printf("\n");
+			fclose(rh);
+			cords_copy_file( h, newfile );
 		}
-		realout = dup( holdout );
-		close( holdout );
-		cords_copy_file( h, newfile );
-		unlink( newfile );
 		fprintf(h,"</td></tr></table></div></body></html>\n");
 		fclose( h );
-
+		if ( pararoot ) liberate( pararoot );
 		return( result );
 	}
 }
@@ -1454,7 +1480,7 @@ private	char *	detect_command_file( char * stub, char * ext )
 /*	--------------------------------------------------------	*/
 private	void	default_service_table( FILE * h, char * service )
 {
-	fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=48");
+	fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=64");
 	if ( service )
 		fprintf(h," value=\"%s\"",service);
 	fprintf(h,"></tr>\n");
@@ -1494,23 +1520,24 @@ private	char *	default_get_filename( char * command )
 			fprintf(h,"<table class=%s>\n",command);
 			if (!( strcasecmp( command, "parser" ) ))
 			{
-				fprintf(h,"<tr><th>Select Manifest or SLA file<th><input type=file name=filename width=48></tr>\n");
+				fprintf(h,"<tr><th>Select Manifest or SLA file<th><input type=file name=filename width=64></tr>\n");
 				fprintf(h,"<tr><th>Parse Document<th><input type=submit name=%s value=%s></tr>\n","command",command);
 
 			}
 			else if (!( strcasecmp( command, "broker" ) ))
 			{
-				fprintf(h,"<tr><th>Select Plan File<th><input type=file name=filename width=48></tr>\n");
+				fprintf(h,"<tr><th>Select Plan File<th><input type=file name=filename width=64></tr>\n");
 				fprintf(h,"<tr><th>Broker Service<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}		
 			else if (!( strcasecmp( command, "resolver" ) ))
 			{
-				fprintf(h,"<tr><th>Specify Category<th><input type=text name=category width=48></tr>\n");
+				fprintf(h,"<tr><th>Specify Category<th><input type=text name=category width=64></tr>\n");
 				fprintf(h,"<tr><th>Resolve Category Endpoints<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}		
 			else if (!( strcasecmp( command, "script" ) ))
 			{
-				fprintf(h,"<tr><th>Select Script File<th><input type=file name=filename width=48></tr>\n");
+				fprintf(h,"<tr><th>Select Script File<th><input type=file name=filename width=64></tr>\n");
+				fprintf(h,"<tr><th>Parameters<th><input type=text name=parameters width=64></tr>\n");
 				fprintf(h,"<tr><th>Run Script<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}
 			else if (!( strcasecmp( command, "service" ) ))
@@ -2005,6 +2032,7 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 	char *	service;
 	char *	category;
 	char *	command;
+	char *	parameters;
 	char *	sptr;
 	struct	rest_header * form;
 	if (!( command = allocate_string( rptr->object ) ))
@@ -2083,9 +2111,13 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if (!( filename = get_multipart_data( form, "filename" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if (!(filename = cords_script_interpreter( filename )))
-			return( rest_html_response( aptr, status, "Incorrect request" ) );
-		else	return( cords_service_response( aptr, filename ) );
+		else
+		{
+			parameters = get_multipart_data( form, "parameters" );
+			if (!(filename = cords_script_interpreter( filename, parameters )))
+				return( rest_html_response( aptr, status, "Incorrect request" ));
+			else	return( cords_service_response( aptr, filename ) );
+		}
 	}
 	else	return( rest_html_response( aptr, 400, "Incorrect Request" ) );
 
@@ -2281,8 +2313,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.02");
-	printf("\n   Beta Version : 31/07/2013 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.03");
+	printf("\n   Beta Version : 17/09/2013 ");
 	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
@@ -2300,7 +2332,7 @@ private	int	banner()
 	printf("\n         command <options> ACCOUNT     <name> ");
 	printf("\n         command <options> USER        <account> <name> <pass> <role> <email> <permission> ");
 	printf("\n         command <options> INVOKE      <action> <instance> ");
-	printf("\n         command <options> RUN         <script> ");
+	printf("\n         command <options> RUN         <script> <parameters> ");
 	printf("\n         command <options> JSON        <script> ");
 	printf("\n         command <options> TRANSACTION <account> <price> <reference> <action> <description> ");
 	printf("\n   Options: ");
