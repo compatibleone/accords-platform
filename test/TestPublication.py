@@ -10,7 +10,7 @@ import calendar
 from hamcrest import assert_that, is_, is_not, greater_than, has_item
 
 _co_start_script_path = "../../../../../small-accords" #TODO This path should be discovered in some way, not hardcoded
-_request_root = "http://127.0.0.1:8086/publication/"
+_request_root = "http://co.market.onapp.com:8086/publication/"
 
 def _root_with_id(id):
     if not id:
@@ -197,8 +197,7 @@ class TestPublication(unittest.TestCase):
     def test_that_put_on_invalid_id_returns_not_found(self):
         r = self._put(_request_root + "arbitrary_id_string")
         
-        assert_that(r.status_code, is_(requests.codes.not_found))
-        
+        assert_that(r.status_code, is_(requests.codes.not_found)) 
 
     def _headers_with_attribute(self, name, value):
         headers = {'X-OCCI-Attribute':('occi.publication.{0}={1}'.format(name, value))}
