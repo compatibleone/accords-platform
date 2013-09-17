@@ -1,4 +1,4 @@
-	/* ------------------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------- */
 	/* 						csp-manifest.txt						 */
 	/* ------------------------------------------------------------------------------------------------------------- */
 	/* This script restitutes an XML representation of a parsed manifest from the distributed OCCI knowladge base    */
@@ -516,7 +516,7 @@
 			$n = $r["occi.interface.name"];
 			if ( $n.length() > 0 )
 			{
-				$m = $#' name="'#$n#'"';
+				$m = $m#' name="'#$n#'"';
 			}
 			$m = $m#"&gt;";
 			$m.display();
@@ -597,7 +597,7 @@
 	}
 
 
-	"<tr><th><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=yes'>Detailled Transactions List</a></th></tr>".display();
-	"<tr><th><a href='dashboard.php?action=compile&output=HTML&script=csp-transactions.txt&option=no'>Account Totals</a></th></tr>".display();
+	$m = "<tr><th><a href='dashboard.php?action=compile&output=HTML&script=csp-delete-manifest.txt&option="#$what#"'>Delete This Manifest</a></th></tr>";
+	$m.display();
 
 	HtmlFooter();
