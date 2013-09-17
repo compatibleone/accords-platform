@@ -80,9 +80,9 @@ fi
 cd $accords_workdir
 
 if [ -z "$tls" ]; then
-    tempo=1
+    tempo=0
 else
-    tempo=2
+    tempo=0
 fi
 
 if [ -z "$target" ]; then
@@ -173,7 +173,7 @@ _co_platform() {
 # ---------------------------------------------------
 #       The provisioning services agreements 
 # ---------------------------------------------------
-    secs=20
+    secs=5
     echo "Please wait $secs seconds while starting the provisioning services agreements"
     for i in $(seq 1 $secs)
     do 
