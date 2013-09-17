@@ -16,6 +16,8 @@
 #include "riak_backend.h"
 #include "FILENAME_ROOT_riak_backend.h"
 
+#define CATEGORY_BUCKET "co:FILENAME_ROOT"
+
 union riak_object_list {
     CATEGORY_NAME_id_list ids_only;
     CATEGORY_NAME_list objects;
@@ -64,7 +66,7 @@ struct FILENAME_ROOT_backend_interface *  CATEGORY_NAME_riak_backend_interface()
 
 void init() {
     curl_global_init(CURL_GLOBAL_ALL);
-    enable_riak_search("FILENAME_ROOT");
+    enable_riak_search(CATEGORY_BUCKET);
 }
 
 void finalise() {
@@ -128,7 +130,7 @@ static struct CATEGORY_NAME *create_or_update(const struct CATEGORY_NAME *initia
                 struct transfer_data response = {0};
                 setup_download(curl, &response);
                 
-                set_curl_query_url(curl, "FILENAME_ROOT", initial_FILENAME_ROOT->id, RIAK_OPTION_RETURN_OBJECT);
+                set_curl_query_url(curl, CATEGORY_BUCKET, initial_FILENAME_ROOT->id, RIAK_OPTION_RETURN_OBJECT);
                          
                 curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
         
@@ -174,7 +176,7 @@ static struct FILENAME_ROOT_with_vclock retrieve_with_vclock_from_id(const char 
             struct transfer_data header_data = {0};
             setup_read_vclock(curl, &header_data);
             
-            set_curl_query_url(curl, "FILENAME_ROOT", id, RIAK_OPTION_NO_OBJECT);
+            set_curl_query_url(curl, CATEGORY_BUCKET, id, RIAK_OPTION_NO_OBJECT);
                     
             if(perform_curl_and_check(curl, NULL)) {
                 retval.FILENAME_ROOT = CATEGORY_NAME_from_json_string(data.data);
@@ -223,7 +225,7 @@ void del(char *id) {
         unsigned retries;
         for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {    
             curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-            set_curl_query_url(curl, "FILENAME_ROOT", id, RIAK_OPTION_NO_OBJECT);                
+            set_curl_query_url(curl, CATEGORY_BUCKET, id, RIAK_OPTION_NO_OBJECT);                
             long code = perform_curl_and_get_code(curl, NULL);
             if (204 == code || 404 == code) {
                 success = 1;
@@ -387,7 +389,7 @@ union riak_object_list list_from_filter(struct CATEGORY_NAME_occi_filter *filter
             if(n_filters) {
                 query = search_query(filter);
             }
-            set_search_url(curl, n_filters, "FILENAME_ROOT", query);
+            set_search_url(curl, n_filters, CATEGORY_BUCKET, query);
             liberate(query);            
             
             struct transfer_data response = {0};
