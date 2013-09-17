@@ -169,6 +169,9 @@ _co_platform() {
     _co_run_serv broker "accords broker services"
     _co_run_serv procci "accords procci services"
     _co_run_serv command "accords remote command server"
+}
+
+_co_prov_services() {
 
 # ---------------------------------------------------
 #       The provisioning services agreements 
@@ -235,6 +238,7 @@ _co_provision()
 _co_start()
 {
 	_co_platform
+	_co_prov_services
 	_co_provision
 	_nagios_start
 }
@@ -1131,6 +1135,9 @@ case `basename $0` in
 	;;
     co-platform) 
 	_co_platform $*
+	;;
+	co-prov-services)
+	_co_prov_services $*
 	;;
     co-broker) 
 	_co_broker $*
