@@ -95,6 +95,22 @@ private	void	command_load()
 #include "cspi.h"
 #include "colog.c"
 
+/*	-------------------------	*/
+/*	set_command_server_accept	*/
+/*	-------------------------	*/
+private	char *	CommandServerAccept=(char *) 0;
+private void	set_command_server_accept( struct rest_request * rptr )
+{
+	struct	rest_header * hptr;
+	if ( CommandServerAccept ) liberate( CommandServerAccept );
+	if (!(hptr = rest_resolve_header( rptr->first, _HTTP_ACCEPT )))
+		CommandServerAccept = allocate_string( "text/html" );
+	else if (!( hptr->value ))
+		CommandServerAccept = allocate_string( "text/html" );
+	else	CommandServerAccept = allocate_string(hptr->value);
+	return;
+}
+
 /*	-----------------------------------------------------	*/
 /*	   l l _ c o r d s _ s e r v i c e _ a c t i o n	*/
 /*	-----------------------------------------------------	*/
@@ -840,11 +856,6 @@ private	int	cords_parser_operation( char * filename )
 	int	status;
 	char *	auth;
 
-	if ( Cp.accept )
-	{
-		occi_client_accept( Cp.accept );
-	}
-
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	set_xml_echo(echo);
@@ -1295,8 +1306,6 @@ private	char * 	cords_resolver_operation( char * category )
 	FILE * h;
 	struct	occi_element * eptr;
 
-	occi_client_accept( Cb.accept );
-
 	initialise_occi_resolver( default_publisher(), (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( rptr = occi_resolver( category, agent ) ))
@@ -1385,8 +1394,6 @@ private	int	cords_broker_operation( char * filename )
 {
 	int	status;
 	char *	auth;
-
-	occi_client_accept( Cb.accept );
 
 	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
@@ -1480,7 +1487,7 @@ private	char *	detect_command_file( char * stub, char * ext )
 /*	--------------------------------------------------------	*/
 private	void	default_service_table( FILE * h, char * service )
 {
-	fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service width=64");
+	fprintf(h,"<tr><th>Specify Service ID<th><input type=text name=service size=64");
 	if ( service )
 		fprintf(h," value=\"%s\"",service);
 	fprintf(h,"></tr>\n");
@@ -1520,24 +1527,24 @@ private	char *	default_get_filename( char * command )
 			fprintf(h,"<table class=%s>\n",command);
 			if (!( strcasecmp( command, "parser" ) ))
 			{
-				fprintf(h,"<tr><th>Select Manifest or SLA file<th><input type=file name=filename width=64></tr>\n");
+				fprintf(h,"<tr><th>Select Manifest or SLA file<th><input type=file name=filename size=64></tr>\n");
 				fprintf(h,"<tr><th>Parse Document<th><input type=submit name=%s value=%s></tr>\n","command",command);
 
 			}
 			else if (!( strcasecmp( command, "broker" ) ))
 			{
-				fprintf(h,"<tr><th>Select Plan File<th><input type=file name=filename width=64></tr>\n");
+				fprintf(h,"<tr><th>Select Plan File<th><input type=file name=filename size=64></tr>\n");
 				fprintf(h,"<tr><th>Broker Service<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}		
 			else if (!( strcasecmp( command, "resolver" ) ))
 			{
-				fprintf(h,"<tr><th>Specify Category<th><input type=text name=category width=64></tr>\n");
+				fprintf(h,"<tr><th>Specify Category<th><input type=text name=category size=64></tr>\n");
 				fprintf(h,"<tr><th>Resolve Category Endpoints<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}		
 			else if (!( strcasecmp( command, "script" ) ))
 			{
-				fprintf(h,"<tr><th>Select Script File<th><input type=file name=filename width=64></tr>\n");
-				fprintf(h,"<tr><th>Parameters<th><input type=text name=parameters width=64></tr>\n");
+				fprintf(h,"<tr><th>Select Script File<th><input type=file name=filename size=64></tr>\n");
+				fprintf(h,"<tr><th>Parameters<th><input type=text name=parameters size=64></tr>\n");
 				fprintf(h,"<tr><th>Run Script<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}
 			else if (!( strcasecmp( command, "service" ) ))
@@ -2035,6 +2042,7 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 	char *	parameters;
 	char *	sptr;
 	struct	rest_header * form;
+	struct	rest_header * hptr;
 	if (!( command = allocate_string( rptr->object ) ))
 		return( rest_html_response( aptr, 500, "Incorrect Request Body" ) );
 	else if ( *command == '/' )
@@ -2047,6 +2055,8 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 	}
 	*(sptr++) = 0;
 
+	set_command_server_accept( rptr );
+			
 	if (!( strcasecmp( command, "parser" ) ))
 	{
 		if (!( form = get_multipart_form( rptr ) ))
