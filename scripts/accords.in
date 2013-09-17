@@ -80,9 +80,9 @@ fi
 cd $accords_workdir
 
 if [ -z "$tls" ]; then
-    tempo=0
+    tempo=1
 else
-    tempo=0
+    tempo=2
 fi
 
 if [ -z "$target" ]; then
