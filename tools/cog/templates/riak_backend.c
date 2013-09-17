@@ -161,7 +161,7 @@ struct FILENAME_ROOT_with_vclock {
     struct CATEGORY_NAME *FILENAME_ROOT;
 };
 
-struct FILENAME_ROOT_with_vclock retrieve_with_vclock_from_id(const char *id) {
+static struct FILENAME_ROOT_with_vclock retrieve_with_vclock_from_id(const char *id) {
     struct FILENAME_ROOT_with_vclock retval = {0};    
     CURL *curl = init_curl_common();
     if(curl) {
