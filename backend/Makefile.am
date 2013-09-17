@@ -43,157 +43,157 @@ model_h_files = xlink.h windowsazure.h cnconfig.h computenext.h publication.h au
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
 libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c riak_backend.c \
-    xlink_node_backend.c occi_rest_xlink.c xlink.c \
-    cnconfig_node_backend.c occi_rest_cnconfig.c cnconfig.c \
-    computenext_node_backend.c occi_rest_computenext.c computenext.c \
-    windowsazure_node_backend.c occi_rest_windowsazure.c windowsazure.c \
-    publication_node_backend.c occi_rest_publication.c publication.c \
-    authitem_node_backend.c occi_rest_authitem.c authitem.c \
-    easiclouds_application_node_backend.c occi_rest_easiclouds_application.c easiclouds_application.c \
-    easiclouds_connection_node_backend.c occi_rest_easiclouds_connection.c easiclouds_connection.c \
-    easiclouds_description_node_backend.c occi_rest_easiclouds_description.c easiclouds_description.c \
-    easiclouds_extra_node_backend.c occi_rest_easiclouds_extra.c easiclouds_extra.c \
-    easiclouds_instance_node_backend.c occi_rest_easiclouds_instance.c easiclouds_instance.c \
-    easiclouds_keypair_node_backend.c occi_rest_easiclouds_keypair.c easiclouds_keypair.c \
-    easiclouds_link_node_backend.c occi_rest_easiclouds_link.c easiclouds_link.c \
-    easiclouds_metadata_node_backend.c occi_rest_easiclouds_metadata.c easiclouds_metadata.c \
-    easiclouds_model_node_backend.c occi_rest_easiclouds_model.c easiclouds_model.c \
-    easiclouds_node_node_backend.c occi_rest_easiclouds_node.c easiclouds_node.c \
-    easiclouds_parameters_node_backend.c occi_rest_easiclouds_parameters.c easiclouds_parameters.c \
-    easiclouds_postconf_node_backend.c occi_rest_easiclouds_postconf.c easiclouds_postconf.c \
-    easiclouds_server_node_backend.c occi_rest_easiclouds_server.c easiclouds_server.c \
-    easiclouds_input_node_backend.c occi_rest_easiclouds_input.c easiclouds_input.c \
-    easiclouds_output_node_backend.c occi_rest_easiclouds_output.c easiclouds_output.c \
-    saas_node_backend.c occi_rest_saas.c saas.c \
-    eziconfig_node_backend.c occi_rest_eziconfig.c eziconfig.c \
-    easiclouds_node_backend.c occi_rest_easiclouds.c easiclouds.c \
-    job_node_backend.c occi_rest_job.c job.c \
-    workload_node_backend.c occi_rest_workload.c workload.c \
-    nagioscommand_node_backend.c occi_rest_nagioscommand.c nagioscommand.c \
-    nagioscontact_node_backend.c occi_rest_nagioscontact.c nagioscontact.c \
-    nagioscontactgroup_node_backend.c occi_rest_nagioscontactgroup.c nagioscontactgroup.c \
-    nagioshost_node_backend.c occi_rest_nagioshost.c nagioshost.c \
-    nagioshostdependancy_node_backend.c occi_rest_nagioshostdependancy.c nagioshostdependancy.c \
-    nagioshostescalation_node_backend.c occi_rest_nagioshostescalation.c nagioshostescalation.c \
-    nagioshostextinfo_node_backend.c occi_rest_nagioshostextinfo.c nagioshostextinfo.c \
-    nagioshostgroup_node_backend.c occi_rest_nagioshostgroup.c nagioshostgroup.c \
-    nagiosservice_node_backend.c occi_rest_nagiosservice.c nagiosservice.c \
-    nagiosserviceescalation_node_backend.c occi_rest_nagiosserviceescalation.c nagiosserviceescalation.c \
-    nagiosservicegroup_node_backend.c occi_rest_nagiosservicegroup.c nagiosservicegroup.c \
-    nagiostimeperiod_node_backend.c occi_rest_nagiostimeperiod.c nagiostimeperiod.c \
-    nagiosservicedependancy_node_backend.c occi_rest_nagiosservicedependancy.c nagiosservicedependancy.c \
-    nagiosserviceextinfo_node_backend.c occi_rest_nagiosserviceextinfo.c nagiosserviceextinfo.c \
-    paas_application_node_backend.c occi_rest_paas_application.c paas_application.c \
-    paas_application_deployable_node_backend.c occi_rest_paas_application_deployable.c paas_application_deployable.c \
-    paas_application_manifest_node_backend.c occi_rest_paas_application_manifest.c paas_application_manifest.c \
-    paas_application_version_node_backend.c occi_rest_paas_application_version.c paas_application_version.c \
-    paas_application_version_instance_node_backend.c occi_rest_paas_application_version_instance.c paas_application_version_instance.c \
-    paas_environment_node_backend.c occi_rest_paas_environment.c paas_environment.c \
-    paas_environment_configuration_node_backend.c occi_rest_paas_environment_configuration.c paas_environment_configuration.c \
-    paas_environment_link_node_backend.c occi_rest_paas_environment_link.c paas_environment_link.c \
-    paas_environment_node_node_backend.c occi_rest_paas_environment_node.c paas_environment_node.c \
-    paas_environment_relation_node_backend.c occi_rest_paas_environment_relation.c paas_environment_relation.c \
-    paas_environment_template_node_backend.c occi_rest_paas_environment_template.c paas_environment_template.c \
-    paas_environment_variable_node_backend.c occi_rest_paas_environment_variable.c paas_environment_variable.c \
-    quantity_node_backend.c occi_rest_quantity.c quantity.c \
-    federation_node_backend.c occi_rest_federation.c federation.c \
-    azconfig_node_backend.c occi_rest_azconfig.c azconfig.c \
-    paconfig_node_backend.c occi_rest_paconfig.c paconfig.c \
-    placement_node_backend.c occi_rest_placement.c placement.c \
-    account_node_backend.c occi_rest_account.c account.c \
-    instruction_node_backend.c occi_rest_instruction.c instruction.c \
-    node_node_backend.c occi_rest_node.c node.c \
-    package_node_backend.c occi_rest_package.c package.c \
-    tarif_node_backend.c occi_rest_tarif.c tarif.c \
-    carrier_node_backend.c occi_rest_carrier.c carrier.c \
-    report_node_backend.c occi_rest_report.c report.c \
-    action_node_backend.c occi_rest_action.c action.c \
-    invoice_node_backend.c occi_rest_invoice.c invoice.c \
-    onconfig_node_backend.c occi_rest_onconfig.c onconfig.c \
-    parameter_node_backend.c occi_rest_parameter.c parameter.c \
-    transaction_node_backend.c occi_rest_transaction.c transaction.c \
-    compute_node_backend.c occi_rest_compute.c compute.c \
-    domain_node_backend.c occi_rest_domain.c domain.c \
-    requirement_node_backend.c occi_rest_requirement.c requirement.c \
-    agency_node_backend.c occi_rest_agency.c agency.c \
-    ipaddress_node_backend.c occi_rest_ipaddress.c ipaddress.c \
-    plan_node_backend.c occi_rest_plan.c plan.c \
-    user_node_backend.c occi_rest_user.c user.c \
-    configuration_node_backend.c occi_rest_configuration.c configuration.c \
-    enquiry_node_backend.c occi_rest_enquiry.c enquiry.c \
-    security_node_backend.c occi_rest_security.c security.c \
-    algorithm_node_backend.c occi_rest_algorithm.c algorithm.c \
-    openstack_node_backend.c occi_rest_openstack.c openstack.c \
-    price_node_backend.c occi_rest_price.c price.c \
-    value_node_backend.c occi_rest_value.c value.c \
-    constraint_node_backend.c occi_rest_constraint.c constraint.c \
-    event_node_backend.c occi_rest_event.c event.c \
-    manifest_node_backend.c occi_rest_manifest.c manifest.c \
-    service_node_backend.c occi_rest_service.c service.c \
-    appliance_node_backend.c occi_rest_appliance.c appliance.c \
-    profile_node_backend.c occi_rest_profile.c profile.c \
-    contract_node_backend.c occi_rest_contract.c contract.c \
-    image_node_backend.c occi_rest_image.c image.c \
-    monitor_node_backend.c occi_rest_monitor.c monitor.c \
-    optimise_node_backend.c occi_rest_optimise.c optimise.c \
-    storage_node_backend.c occi_rest_storage.c storage.c \
-    authorise_node_backend.c occi_rest_authorise.c authorise.c \
-    provider_node_backend.c occi_rest_provider.c provider.c \
-    infrastructure_node_backend.c occi_rest_infrastructure.c infrastructure.c \
-    network_node_backend.c occi_rest_network.c network.c \
-    osconfig_node_backend.c occi_rest_osconfig.c osconfig.c \
-    system_node_backend.c occi_rest_system.c system.c \
-    iprange_node_backend.c occi_rest_iprange.c iprange.c \
-    instance_node_backend.c occi_rest_instance.c instance.c \
-    operator_node_backend.c occi_rest_operator.c operator.c \
-    vm_node_backend.c occi_rest_vm.c vm.c \
-    port_node_backend.c occi_rest_port.c port.c \
-    firewall_node_backend.c occi_rest_firewall.c firewall.c \
-    import_node_backend.c occi_rest_import.c import.c \
-    agreement_node_backend.c occi_rest_agreement.c agreement.c \
-    metadata_node_backend.c occi_rest_metadata.c metadata.c \
-    file_node_backend.c occi_rest_file.c file.c \
-    script_node_backend.c occi_rest_script.c script.c \
-    interface_node_backend.c occi_rest_interface.c interface.c \
-    session_node_backend.c occi_rest_session.c session.c \
-    consumer_node_backend.c occi_rest_consumer.c consumer.c \
-    connection_node_backend.c occi_rest_connection.c connection.c \
-    stream_node_backend.c occi_rest_stream.c stream.c \
-    probe_node_backend.c occi_rest_probe.c probe.c \
-    metric_node_backend.c occi_rest_metric.c metric.c \
-    alert_node_backend.c occi_rest_alert.c alert.c \
-    quota_node_backend.c occi_rest_quota.c quota.c \
-    application_node_backend.c occi_rest_application.c application.c \
-    variable_node_backend.c occi_rest_variable.c variable.c \
-    business_node_backend.c occi_rest_business.c business.c \
-    zone_node_backend.c occi_rest_zone.c zone.c \
-    guarantee_node_backend.c occi_rest_guarantee.c guarantee.c \
-    term_node_backend.c occi_rest_term.c term.c \
-    terms_node_backend.c occi_rest_terms.c terms.c \
-    amazonEc2_node_backend.c occi_rest_amazonEc2.c amazonEc2.c \
-    control_node_backend.c occi_rest_control.c control.c \
-    ec2config_node_backend.c occi_rest_ec2config.c ec2config.c \
-    gw_node_backend.c occi_rest_gw.c gw.c \
-    intercloudGW_node_backend.c occi_rest_intercloudGW.c intercloudGW.c \
-    linkgw_node_backend.c occi_rest_linkgw.c linkgw.c \
-    packet_node_backend.c occi_rest_packet.c packet.c \
-    penalty_node_backend.c occi_rest_penalty.c penalty.c \
-    release_node_backend.c occi_rest_release.c release.c \
-    volume_node_backend.c occi_rest_volume.c volume.c \
-    counter_node_backend.c occi_rest_counter.c counter.c \
-    schedule_node_backend.c occi_rest_schedule.c schedule.c \
-    timer_node_backend.c occi_rest_timer.c timer.c \
-    deltacloud_node_backend.c occi_rest_deltacloud.c deltacloud.c \
-    dcconfig_node_backend.c occi_rest_dcconfig.c dcconfig.c \
-    dummy_node_backend.c occi_rest_dummy.c dummy.c \
-    dummyconfig_node_backend.c occi_rest_dummyconfig.c dummyconfig.c \
-    exampleprocci_node_backend.c occi_rest_exampleprocci.c exampleprocci.c \
-    onapp_node_backend.c occi_rest_onapp.c onapp.c \
-    oaconfig_node_backend.c occi_rest_oaconfig.c oaconfig.c \
-    onapp_extras_node_backend.c occi_rest_onapp_extras.c onapp_extras.c \
-    opennebula_node_backend.c occi_rest_opennebula.c opennebula.c \
-    paas_node_backend.c occi_rest_paas.c paas.c \
-    paasconfig_node_backend.c occi_rest_paasconfig.c paasconfig.c 
+    xlink_node_backend.c xlink_riak_backend.c occi_rest_xlink.c xlink.c \
+    cnconfig_node_backend.c cnconfig_riak_backend.c occi_rest_cnconfig.c cnconfig.c \
+    computenext_node_backend.c computenext_riak_backend.c occi_rest_computenext.c computenext.c \
+    windowsazure_node_backend.c windowsazure_riak_backend.c occi_rest_windowsazure.c windowsazure.c \
+    publication_node_backend.c publication_riak_backend.c occi_rest_publication.c publication.c \
+    authitem_node_backend.c authitem_riak_backend.c occi_rest_authitem.c authitem.c \
+    easiclouds_application_node_backend.c easiclouds_application_riak_backend.c occi_rest_easiclouds_application.c easiclouds_application.c \
+    easiclouds_connection_node_backend.c easiclouds_connection_riak_backend.c occi_rest_easiclouds_connection.c easiclouds_connection.c \
+    easiclouds_description_node_backend.c easiclouds_description_riak_backend.c occi_rest_easiclouds_description.c easiclouds_description.c \
+    easiclouds_extra_node_backend.c easiclouds_extra_riak_backend.c occi_rest_easiclouds_extra.c easiclouds_extra.c \
+    easiclouds_instance_node_backend.c easiclouds_instance_riak_backend.c occi_rest_easiclouds_instance.c easiclouds_instance.c \
+    easiclouds_keypair_node_backend.c easiclouds_keypair_riak_backend.c occi_rest_easiclouds_keypair.c easiclouds_keypair.c \
+    easiclouds_link_node_backend.c easiclouds_link_riak_backend.c occi_rest_easiclouds_link.c easiclouds_link.c \
+    easiclouds_metadata_node_backend.c easiclouds_metadata_riak_backend.c occi_rest_easiclouds_metadata.c easiclouds_metadata.c \
+    easiclouds_model_node_backend.c easiclouds_model_riak_backend.c occi_rest_easiclouds_model.c easiclouds_model.c \
+    easiclouds_node_node_backend.c easiclouds_node_riak_backend.c occi_rest_easiclouds_node.c easiclouds_node.c \
+    easiclouds_parameters_node_backend.c easiclouds_parameters_riak_backend.c occi_rest_easiclouds_parameters.c easiclouds_parameters.c \
+    easiclouds_postconf_node_backend.c easiclouds_postconf_riak_backend.c occi_rest_easiclouds_postconf.c easiclouds_postconf.c \
+    easiclouds_server_node_backend.c easiclouds_server_riak_backend.c occi_rest_easiclouds_server.c easiclouds_server.c \
+    easiclouds_input_node_backend.c easiclouds_input_riak_backend.c occi_rest_easiclouds_input.c easiclouds_input.c \
+    easiclouds_output_node_backend.c easiclouds_output_riak_backend.c occi_rest_easiclouds_output.c easiclouds_output.c \
+    saas_node_backend.c saas_riak_backend.c occi_rest_saas.c saas.c \
+    eziconfig_node_backend.c eziconfig_riak_backend.c occi_rest_eziconfig.c eziconfig.c \
+    easiclouds_node_backend.c easiclouds_riak_backend.c occi_rest_easiclouds.c easiclouds.c \
+    job_node_backend.c job_riak_backend.c occi_rest_job.c job.c \
+    workload_node_backend.c workload_riak_backend.c occi_rest_workload.c workload.c \
+    nagioscommand_node_backend.c nagioscommand_riak_backend.c occi_rest_nagioscommand.c nagioscommand.c \
+    nagioscontact_node_backend.c nagioscontact_riak_backend.c occi_rest_nagioscontact.c nagioscontact.c \
+    nagioscontactgroup_node_backend.c nagioscontactgroup_riak_backend.c occi_rest_nagioscontactgroup.c nagioscontactgroup.c \
+    nagioshost_node_backend.c nagioshost_riak_backend.c occi_rest_nagioshost.c nagioshost.c \
+    nagioshostdependancy_node_backend.c nagioshostdependancy_riak_backend.c occi_rest_nagioshostdependancy.c nagioshostdependancy.c \
+    nagioshostescalation_node_backend.c nagioshostescalation_riak_backend.c occi_rest_nagioshostescalation.c nagioshostescalation.c \
+    nagioshostextinfo_node_backend.c nagioshostextinfo_riak_backend.c occi_rest_nagioshostextinfo.c nagioshostextinfo.c \
+    nagioshostgroup_node_backend.c nagioshostgroup_riak_backend.c occi_rest_nagioshostgroup.c nagioshostgroup.c \
+    nagiosservice_node_backend.c nagiosservice_riak_backend.c occi_rest_nagiosservice.c nagiosservice.c \
+    nagiosserviceescalation_node_backend.c nagiosserviceescalation_riak_backend.c occi_rest_nagiosserviceescalation.c nagiosserviceescalation.c \
+    nagiosservicegroup_node_backend.c nagiosservicegroup_riak_backend.c occi_rest_nagiosservicegroup.c nagiosservicegroup.c \
+    nagiostimeperiod_node_backend.c nagiostimeperiod_riak_backend.c occi_rest_nagiostimeperiod.c nagiostimeperiod.c \
+    nagiosservicedependancy_node_backend.c nagiosservicedependancy_riak_backend.c occi_rest_nagiosservicedependancy.c nagiosservicedependancy.c \
+    nagiosserviceextinfo_node_backend.c nagiosserviceextinfo_riak_backend.c occi_rest_nagiosserviceextinfo.c nagiosserviceextinfo.c \
+    paas_application_node_backend.c paas_application_riak_backend.c occi_rest_paas_application.c paas_application.c \
+    paas_application_deployable_node_backend.c paas_application_deployable_riak_backend.c occi_rest_paas_application_deployable.c paas_application_deployable.c \
+    paas_application_manifest_node_backend.c paas_application_manifest_riak_backend.c occi_rest_paas_application_manifest.c paas_application_manifest.c \
+    paas_application_version_node_backend.c paas_application_version_riak_backend.c occi_rest_paas_application_version.c paas_application_version.c \
+    paas_application_version_instance_node_backend.c paas_application_version_instance_riak_backend.c occi_rest_paas_application_version_instance.c paas_application_version_instance.c \
+    paas_environment_node_backend.c paas_environment_riak_backend.c occi_rest_paas_environment.c paas_environment.c \
+    paas_environment_configuration_node_backend.c paas_environment_configuration_riak_backend.c occi_rest_paas_environment_configuration.c paas_environment_configuration.c \
+    paas_environment_link_node_backend.c paas_environment_link_riak_backend.c occi_rest_paas_environment_link.c paas_environment_link.c \
+    paas_environment_node_node_backend.c paas_environment_node_riak_backend.c occi_rest_paas_environment_node.c paas_environment_node.c \
+    paas_environment_relation_node_backend.c paas_environment_relation_riak_backend.c occi_rest_paas_environment_relation.c paas_environment_relation.c \
+    paas_environment_template_node_backend.c paas_environment_template_riak_backend.c occi_rest_paas_environment_template.c paas_environment_template.c \
+    paas_environment_variable_node_backend.c paas_environment_variable_riak_backend.c occi_rest_paas_environment_variable.c paas_environment_variable.c \
+    quantity_node_backend.c quantity_riak_backend.c occi_rest_quantity.c quantity.c \
+    federation_node_backend.c federation_riak_backend.c occi_rest_federation.c federation.c \
+    azconfig_node_backend.c azconfig_riak_backend.c occi_rest_azconfig.c azconfig.c \
+    paconfig_node_backend.c paconfig_riak_backend.c occi_rest_paconfig.c paconfig.c \
+    placement_node_backend.c placement_riak_backend.c occi_rest_placement.c placement.c \
+    account_node_backend.c account_riak_backend.c occi_rest_account.c account.c \
+    instruction_node_backend.c instruction_riak_backend.c occi_rest_instruction.c instruction.c \
+    node_node_backend.c node_riak_backend.c occi_rest_node.c node.c \
+    package_node_backend.c package_riak_backend.c occi_rest_package.c package.c \
+    tarif_node_backend.c tarif_riak_backend.c occi_rest_tarif.c tarif.c \
+    carrier_node_backend.c carrier_riak_backend.c occi_rest_carrier.c carrier.c \
+    report_node_backend.c report_riak_backend.c occi_rest_report.c report.c \
+    action_node_backend.c action_riak_backend.c occi_rest_action.c action.c \
+    invoice_node_backend.c invoice_riak_backend.c occi_rest_invoice.c invoice.c \
+    onconfig_node_backend.c onconfig_riak_backend.c occi_rest_onconfig.c onconfig.c \
+    parameter_node_backend.c parameter_riak_backend.c occi_rest_parameter.c parameter.c \
+    transaction_node_backend.c transaction_riak_backend.c occi_rest_transaction.c transaction.c \
+    compute_node_backend.c compute_riak_backend.c occi_rest_compute.c compute.c \
+    domain_node_backend.c domain_riak_backend.c occi_rest_domain.c domain.c \
+    requirement_node_backend.c requirement_riak_backend.c occi_rest_requirement.c requirement.c \
+    agency_node_backend.c agency_riak_backend.c occi_rest_agency.c agency.c \
+    ipaddress_node_backend.c ipaddress_riak_backend.c occi_rest_ipaddress.c ipaddress.c \
+    plan_node_backend.c plan_riak_backend.c occi_rest_plan.c plan.c \
+    user_node_backend.c user_riak_backend.c occi_rest_user.c user.c \
+    configuration_node_backend.c configuration_riak_backend.c occi_rest_configuration.c configuration.c \
+    enquiry_node_backend.c enquiry_riak_backend.c occi_rest_enquiry.c enquiry.c \
+    security_node_backend.c security_riak_backend.c occi_rest_security.c security.c \
+    algorithm_node_backend.c algorithm_riak_backend.c occi_rest_algorithm.c algorithm.c \
+    openstack_node_backend.c openstack_riak_backend.c occi_rest_openstack.c openstack.c \
+    price_node_backend.c price_riak_backend.c occi_rest_price.c price.c \
+    value_node_backend.c value_riak_backend.c occi_rest_value.c value.c \
+    constraint_node_backend.c constraint_riak_backend.c occi_rest_constraint.c constraint.c \
+    event_node_backend.c event_riak_backend.c occi_rest_event.c event.c \
+    manifest_node_backend.c manifest_riak_backend.c occi_rest_manifest.c manifest.c \
+    service_node_backend.c service_riak_backend.c occi_rest_service.c service.c \
+    appliance_node_backend.c appliance_riak_backend.c occi_rest_appliance.c appliance.c \
+    profile_node_backend.c profile_riak_backend.c occi_rest_profile.c profile.c \
+    contract_node_backend.c contract_riak_backend.c occi_rest_contract.c contract.c \
+    image_node_backend.c image_riak_backend.c occi_rest_image.c image.c \
+    monitor_node_backend.c monitor_riak_backend.c occi_rest_monitor.c monitor.c \
+    optimise_node_backend.c optimise_riak_backend.c occi_rest_optimise.c optimise.c \
+    storage_node_backend.c storage_riak_backend.c occi_rest_storage.c storage.c \
+    authorise_node_backend.c authorise_riak_backend.c occi_rest_authorise.c authorise.c \
+    provider_node_backend.c provider_riak_backend.c occi_rest_provider.c provider.c \
+    infrastructure_node_backend.c infrastructure_riak_backend.c occi_rest_infrastructure.c infrastructure.c \
+    network_node_backend.c network_riak_backend.c occi_rest_network.c network.c \
+    osconfig_node_backend.c osconfig_riak_backend.c occi_rest_osconfig.c osconfig.c \
+    system_node_backend.c system_riak_backend.c occi_rest_system.c system.c \
+    iprange_node_backend.c iprange_riak_backend.c occi_rest_iprange.c iprange.c \
+    instance_node_backend.c instance_riak_backend.c occi_rest_instance.c instance.c \
+    operator_node_backend.c operator_riak_backend.c occi_rest_operator.c operator.c \
+    vm_node_backend.c vm_riak_backend.c occi_rest_vm.c vm.c \
+    port_node_backend.c port_riak_backend.c occi_rest_port.c port.c \
+    firewall_node_backend.c firewall_riak_backend.c occi_rest_firewall.c firewall.c \
+    import_node_backend.c import_riak_backend.c occi_rest_import.c import.c \
+    agreement_node_backend.c agreement_riak_backend.c occi_rest_agreement.c agreement.c \
+    metadata_node_backend.c metadata_riak_backend.c occi_rest_metadata.c metadata.c \
+    file_node_backend.c file_riak_backend.c occi_rest_file.c file.c \
+    script_node_backend.c script_riak_backend.c occi_rest_script.c script.c \
+    interface_node_backend.c interface_riak_backend.c occi_rest_interface.c interface.c \
+    session_node_backend.c session_riak_backend.c occi_rest_session.c session.c \
+    consumer_node_backend.c consumer_riak_backend.c occi_rest_consumer.c consumer.c \
+    connection_node_backend.c connection_riak_backend.c occi_rest_connection.c connection.c \
+    stream_node_backend.c stream_riak_backend.c occi_rest_stream.c stream.c \
+    probe_node_backend.c probe_riak_backend.c occi_rest_probe.c probe.c \
+    metric_node_backend.c metric_riak_backend.c occi_rest_metric.c metric.c \
+    alert_node_backend.c alert_riak_backend.c occi_rest_alert.c alert.c \
+    quota_node_backend.c quota_riak_backend.c occi_rest_quota.c quota.c \
+    application_node_backend.c application_riak_backend.c occi_rest_application.c application.c \
+    variable_node_backend.c variable_riak_backend.c occi_rest_variable.c variable.c \
+    business_node_backend.c business_riak_backend.c occi_rest_business.c business.c \
+    zone_node_backend.c zone_riak_backend.c occi_rest_zone.c zone.c \
+    guarantee_node_backend.c guarantee_riak_backend.c occi_rest_guarantee.c guarantee.c \
+    term_node_backend.c term_riak_backend.c occi_rest_term.c term.c \
+    terms_node_backend.c terms_riak_backend.c occi_rest_terms.c terms.c \
+    amazonEc2_node_backend.c amazonEc2_riak_backend.c occi_rest_amazonEc2.c amazonEc2.c \
+    control_node_backend.c control_riak_backend.c occi_rest_control.c control.c \
+    ec2config_node_backend.c ec2config_riak_backend.c occi_rest_ec2config.c ec2config.c \
+    gw_node_backend.c gw_riak_backend.c occi_rest_gw.c gw.c \
+    intercloudGW_node_backend.c intercloudGW_riak_backend.c occi_rest_intercloudGW.c intercloudGW.c \
+    linkgw_node_backend.c linkgw_riak_backend.c occi_rest_linkgw.c linkgw.c \
+    packet_node_backend.c packet_riak_backend.c occi_rest_packet.c packet.c \
+    penalty_node_backend.c penalty_riak_backend.c occi_rest_penalty.c penalty.c \
+    release_node_backend.c release_riak_backend.c occi_rest_release.c release.c \
+    volume_node_backend.c volume_riak_backend.c occi_rest_volume.c volume.c \
+    counter_node_backend.c counter_riak_backend.c occi_rest_counter.c counter.c \
+    schedule_node_backend.c schedule_riak_backend.c occi_rest_schedule.c schedule.c \
+    timer_node_backend.c timer_riak_backend.c occi_rest_timer.c timer.c \
+    deltacloud_node_backend.c deltacloud_riak_backend.c occi_rest_deltacloud.c deltacloud.c \
+    dcconfig_node_backend.c dcconfig_riak_backend.c occi_rest_dcconfig.c dcconfig.c \
+    dummy_node_backend.c dummy_riak_backend.c occi_rest_dummy.c dummy.c \
+    dummyconfig_node_backend.c dummyconfig_riak_backend.c occi_rest_dummyconfig.c dummyconfig.c \
+    exampleprocci_node_backend.c exampleprocci_riak_backend.c occi_rest_exampleprocci.c exampleprocci.c \
+    onapp_node_backend.c onapp_riak_backend.c occi_rest_onapp.c onapp.c \
+    oaconfig_node_backend.c oaconfig_riak_backend.c occi_rest_oaconfig.c oaconfig.c \
+    onapp_extras_node_backend.c onapp_extras_riak_backend.c occi_rest_onapp_extras.c onapp_extras.c \
+    opennebula_node_backend.c opennebula_riak_backend.c occi_rest_opennebula.c opennebula.c \
+    paas_node_backend.c paas_riak_backend.c occi_rest_paas.c paas.c \
+    paasconfig_node_backend.c paasconfig_riak_backend.c occi_rest_paasconfig.c paasconfig.c 
     
 libbackend_la_CFLAGS = $(CFLAGS_BACKEND) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) -Werror
 libbackend_la_LDFLAGS = -lcurl 
