@@ -22,7 +22,7 @@ model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(s
 $(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h generator_input.txt
 	$(MODEL_COG) @generator_input.txt
 	
-$(model_c_files) : %.c : $(COG_TEMPLATES)category.c generator_input.txt
+$(model_c_files) : %.c : $(COG_TEMPLATES)category.c generator_input.txt $(ALL_TEMPLATES)
 	$(MODEL_COG) @generator_input.txt
 	
 CLEANFILES = $(model_all_files)
@@ -30,5 +30,5 @@ CLEANFILES = $(model_all_files)
 $(COG_TEMPLATES)% : $(TEMPLATE_DIR)%
 	$(COG_CONVERT) $(subst template_,, $@) $@ 
 	
-generator_input.txt : $(MODEL_INPUT_GEN) $(ALL_TEMPLATES) 
+generator_input.txt : $(MODEL_INPUT_GEN) $(top_srcdir)/model/*.xml
 	python $(MODEL_INPUT_GEN) generator_input.txt $(top_srcdir) $(model_h_files)
