@@ -24,7 +24,34 @@
 #define BIGBUFF 4096
 #define SMALLBUFF 1024
 
-struct ec2config * resolve_ec2_configuration(char * agent, char * tls, char * sptr)
+
+/* ---------------------------------------------------------------------------- */
+/* 		r e s o l v e _ o s _ c o n f i g u r a t i o n			*/
+/* ---------------------------------------------------------------------------- */
+private	struct	ec2config * resolve_ec2_configuration( char * sptr )
+{
+	struct	occi_kind_node * nptr;
+	struct	ec2config * pptr=(struct ec2config *) 0;
+	struct	occi_kind_node  * occi_first_ec2config_node();
+	rest_log_message("resolve_ec2_configuration");
+	rest_log_message( sptr );
+	for (	nptr = occi_first_ec2config_node();
+		nptr != (struct occi_kind_node *) 0;
+		nptr = nptr->next )
+	{
+		if (!( pptr = nptr->contents ))
+			continue;
+		else if (!( pptr->name ))
+			continue;
+		else if (!( strcmp( pptr->name, sptr ) ))
+			return( pptr );
+	}
+	return((struct ec2config *) 0);
+}
+
+
+
+struct ec2config * resolve_ec2_configurationb(char * agent, char * tls, char * sptr)
 {
    	struct	occi_element 	*	eptr=(struct occi_element*) 0;
 	struct	occi_element 	*	eptr2=(struct occi_element*) 0;
@@ -201,7 +228,7 @@ struct ec2_subscription * use_ec2_configuration( char * agent, char * tls, char 
 {
         struct	ec2config * pptr;
         struct  ec2_subscription * subptr = (struct ec2_subscription *) 0;
-	if (!( pptr = resolve_ec2_configuration(agent,tls,sptr)))
+	if (!( pptr = resolve_ec2_configuration(sptr)))
 	{
 	 	return((struct ec2_subscription *) 0);
 	}
@@ -375,7 +402,7 @@ int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, ch
 	//resolve the user credentials and configuration
 	if (!(subptr = use_ec2_configuration(agent, tls, pptr->profile)))
 		return (terminate_ec2_contract(404,&contract ));
-	else if (!(cfptr = resolve_ec2_configuration(agent, tls, pptr->profile)))
+	else if (!(cfptr = resolve_ec2_configuration(pptr->profile)))
 		return (terminate_ec2_contract(404, &contract));
 	else
 	{
