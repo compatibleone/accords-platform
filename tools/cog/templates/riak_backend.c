@@ -16,7 +16,7 @@
 #include "riak_backend.h"
 #include "FILENAME_ROOT_riak_backend.h"
 
-#define CATEGORY_BUCKET "co:FILENAME_ROOT"
+#define CATEGORY_BUCKET "co_FILENAME_ROOT"
 
 union riak_object_list {
     CATEGORY_NAME_id_list ids_only;
