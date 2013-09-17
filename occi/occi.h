@@ -93,6 +93,7 @@ public	char *	get_default_account_id();
 #define	_OCCI_RUNNING		1	/* the resource is active and running	*/
 #define	_OCCI_SUSPENDED		2	/* the resource is active but paused	*/
 #define	_OCCI_INVALID  		4	/* the resource should never have this value */
+#define	_OCCI_WORKING  		8	/* the resource is currently processing */
 
 #define	_OCCI_AUTHORIZE		"X-OCCI-AUTHORIZE"
 #define	_OCCI_ACCOUNT		"X-OCCI-ACCOUNT"
