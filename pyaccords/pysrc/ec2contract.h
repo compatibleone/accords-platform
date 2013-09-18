@@ -63,7 +63,7 @@ struct	ec2_image_infos
 	char *	updated;
 };
 
-struct	ec2config * resolve_ec2_configuration( char * sptr )
+struct	ec2config * resolve_ec2_configuration( char * sptr );
 struct ec2config * resolve_ec2_configurationb(char * agent, char * tls, char * sptr);
 struct ec2_subscription * initialise_ec2_subscription(char * accesskey, char * secretkey, char * zone, char * keypair);
 struct ec2_subscription * use_ec2_configuration( char * agent, char * tls, char * sptr );
