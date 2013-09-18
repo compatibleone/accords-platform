@@ -1,5 +1,5 @@
-[[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file)]]]
-[[[end]]]
+//[[[cog import codegen.cog_common as t; t.init_models(model_dir, cog_category_file)]]]
+//[[[end]]]
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -214,7 +214,7 @@ void update(char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT) {
         liberate_CATEGORY_NAME(retrieved.FILENAME_ROOT);
     }
     else {
-        assert(0); // Unexpected failure to retrieve original object
+        // This can happen e.g. during a 'delete' action...the object can be deleted before being passed to update. 
     }
 }
 
