@@ -60,12 +60,15 @@ long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
     
+    long http_code = 0;
+    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
+            
     if (CURLE_OK == res) {
-        long http_code = 0;
-        curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
         return http_code;
     }
-    return -1;
+    else {
+        return http_code ? http_code : -1; // Curl returns 0 if no response retrieved from server
+    }
 }
 
 int perform_curl_and_check(CURL *curl, struct curl_slist *headers) {
@@ -137,6 +140,7 @@ void register_upload_data(CURL *curl, struct transfer_data *transfer, char *data
 void enable_riak_search(const char *bucket) {
     CURL *curl = init_curl_common();
     if(curl) {
+        long http_code;
         int success = 0;
         unsigned retries;
         for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {   
@@ -149,10 +153,18 @@ void enable_riak_search(const char *bucket) {
             
             curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 
-            success = (204 == perform_curl_and_get_code(curl, headers));
+            http_code = perform_curl_and_get_code(curl, headers);
+            success = (204 == http_code);
         }
         if(!success) {
-            printf("************* Failed to connect to riak server: Is it running and accessible? ************\n");
+            char *url;
+            CURLcode url_retrieved = curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
+            if (CURLE_OK == url_retrieved) {
+                printf("***** Failed to connect to riak server: url '%s': HTTP Code: %lu ************\n", url, http_code);
+            }
+            else {
+                printf("***** Failed to connect to riak server at unknown url for bucket: '%s'. Is it running and accessible? ************\n", bucket);
+            }
         }
         curl_easy_cleanup(curl);
     } 
