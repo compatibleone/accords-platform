@@ -28,7 +28,7 @@
 /* ---------------------------------------------------------------------------- */
 /* 		r e s o l v e _ o s _ c o n f i g u r a t i o n			*/
 /* ---------------------------------------------------------------------------- */
-private	struct	ec2config * resolve_ec2_configuration( char * sptr )
+struct	ec2config * resolve_ec2_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
 	struct	ec2config * pptr=(struct ec2config *) 0;
