@@ -418,7 +418,7 @@ def count_filters():
          
 def riak_backend():
     #return (_category_name() != 'cords_publication') #TODO Hardcoding switch for now
-    return True
+    return False
          
 def backend_include():    
     if not riak_backend():
