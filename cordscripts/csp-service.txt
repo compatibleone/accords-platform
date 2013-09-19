@@ -68,7 +68,8 @@
 		$state = $record["occi.service.state"];
 		$m = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
 		$m.display();
-
+		if ( $record.length() > 0 )
+		{
 		switch ( $state )
 		{
 		case	1	:
@@ -78,7 +79,12 @@
 			"<input type=submit class=action name=action value='start service'></form></tr>".display();
 			break;
 		default		:
-			"<span class=action>Working</span></form></tr>".display();
+			"<span class=action>working</span></form></tr>".display();
+		}
+		}
+		else
+		{
+			"<span class=action>deleted</span></form></tr>".display();
 		}
 
 		$aid     = $record["occi.service.account"];
@@ -131,7 +137,7 @@
 		 	$m = "<td><b>Un-deployed Since</b><td>"#$value;	
 			break;
 		default		:
-			$m = "<td><b>Working Since</b><td>"#$value;
+			$m = "<td><b>working Since</b><td>"#$value;
 		}
 		$m.display();
 
@@ -193,9 +199,12 @@
 				$aname = $agreement["occi.agreement.name"];
 				$m = "<tr><td colspan=2>"#$aname#"<td colspan=3><a href='dashboard.php?action=compile&script=csp-service.txt&output=HTML&option="#$sid#"'>"#$sid#"</a></td>";
 				$m.display();
+				$ssid = $sid;
 				$sid = $record["occi.core.id"];
-				$m = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
+				$m = "<th><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
 				$m.display();
+		$m = '<a href="dashboard.php?action=compile&output=HTML&script=csp-delete-service.txt&option='#$ssid#'">';
+		$m = $m#"delete service</a>";
 				$state = $record["occi.service.state"];
 				switch ( $state )
 				{
@@ -203,10 +212,12 @@
 					"<input type=submit class=action name=action value='stop service'></form></tr>".display();	
 					break;
 				case	0	:
-					"<input type=submit class=action name=action value='start service'></form></tr>".display();
+					"<input type=submit class=action name=action value='start service'></form>".display();
+					$m = $m#"</tr>";
+					$m.display();
 					break;
 				default		:
-					"<span class=action>Working</span></form></tr>".display();
+					"<span class=action>working</span></form></tr>".display();
 				}
 			}
 		}

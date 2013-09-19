@@ -1,0 +1,7 @@
+	if ( $2.length() > 0 )
+	{
+		$2.delete();
+		$2 = "";
+	}
+	include "csp-service.txt";
+
