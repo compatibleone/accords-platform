@@ -18,8 +18,3 @@ cops_CFLAGS = $(CFLAGS_BACKEND) $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $
               $(CFLAGS_COPABR) $(CFLAGS_COCSPI) -Werror
 cops_LDFLAGS = $(LD_BACKEND) $(LD_COCSPI) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCCI) $(LD_OCCI) \
                $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
-
-# Create auto-generated model files
-model_h_files = quantity.h federation.h
-include $(top_srcdir)/tools/Makefile_generate_model.am
-cops.c: $(model_c_files)

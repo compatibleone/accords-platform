@@ -83,7 +83,7 @@ private	int	on_result( struct on_response * rptr )
 			else if ( rptr->response->status != 204 )
 			{
 				sprintf(buffer,"cat %s",rptr->response->body);
-				system( buffer );
+				if(system( buffer )){};
 				printf("\n");
 			}
 		}

@@ -14,9 +14,5 @@ coips_SOURCES = coips.c
 coips_LDFLAGS = $(LD_BACKEND) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) \
                 $(LD_COREST) $(LD_COXML) $(LD_PUBOCCI) $(LD_COPABR)
 coips_CFLAGS =  $(CFLAGS_BACKEND) $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_CORDS) \
-                $(CFLAGS_COCCI) $(CFLAGS_PUBOCCI) $(CFLAGS_COPABR)
+                $(CFLAGS_COCCI) $(CFLAGS_PUBOCCI) $(CFLAGS_COPABR) -Werror
 
-# Create auto-generated model files
-model_h_files = saas.h
-include $(top_srcdir)/tools/Makefile_generate_model.am
-coips.c: $(model_c_files)

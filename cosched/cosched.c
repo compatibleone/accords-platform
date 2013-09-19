@@ -31,6 +31,12 @@
 #include "cordslang.h"
 #include "cp.h"
 #include "cb.h"
+#include "counter.h"
+#include "occi_rest_counter.h"
+#include "timer.h"
+#include "occi_rest_timer.h"
+#include "schedule.h"
+#include "occi_rest_schedule.h"
 
 #define	_COSCHED_MODEL "cosched:model"
 #define _COSCHED_ACCOUNT "cosched"
@@ -148,19 +154,7 @@ private	void	cosched_synchronise()
 	sleep(1);
 }
 
-#include "counter.h"
-#include "counter.c"
-#include "occicounter.c"
-
-#include "timer.h"
-#include "timer.c"
-#include "occitimer.c"
-
 #include "cotimer.c"
-
-#include "schedule.h"
-#include "schedule.c"
-#include "occischedule.c"
 
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ s c h e d u l e   		*/

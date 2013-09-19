@@ -9,6 +9,22 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 
+#include "occi_rest_easiclouds_application.h"
+#include "occi_rest_easiclouds_connection.h"
+#include "occi_rest_easiclouds_description.h"
+#include "occi_rest_easiclouds_extra.h"
+#include "occi_rest_easiclouds_instance.h"
+#include "occi_rest_easiclouds_keypair.h"
+#include "occi_rest_easiclouds_link.h"
+#include "occi_rest_easiclouds_metadata.h"
+#include "occi_rest_easiclouds_model.h"
+#include "occi_rest_easiclouds_node.h"
+#include "occi_rest_easiclouds_parameters.h"
+#include "occi_rest_easiclouds_postconf.h"
+#include "occi_rest_easiclouds_server.h"
+#include "occi_rest_easiclouds_input.h"
+#include "occi_rest_easiclouds_output.h"
+
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
@@ -53,35 +69,6 @@ public	int	failure( int e, char * m1, char * m2 )
 	}
 	return( e );
 }
-
-#include "easiclouds_application.c"
-#include "easiclouds_connection.c"
-#include "easiclouds_description.c"
-#include "easiclouds_metadata.c"
-#include "easiclouds_extra.c"
-#include "easiclouds_instance.c"
-#include "easiclouds_keypair.c"
-#include "easiclouds_link.c"
-#include "easiclouds_model.c"
-#include "easiclouds_node.c"
-#include "easiclouds_parameters.c"
-#include "easiclouds_postconf.c"
-#include "easiclouds_server.c"
-
-#include "occieasiclouds_application.c"
-#include "occieasiclouds_connection.c"
-#include "occieasiclouds_description.c"
-#include "occieasiclouds_metadata.c"
-#include "occieasiclouds_extra.c"
-#include "occieasiclouds_instance.c"
-#include "occieasiclouds_keypair.c"
-#include "occieasiclouds_link.c"
-#include "occieasiclouds_model.c"
-#include "occieasiclouds_node.c"
-#include "occieasiclouds_parameters.c"
-#include "occieasiclouds_postconf.c"
-#include "occieasiclouds_server.c"
-
 
 /*	---------------------------------------------------------------	*/  
 /*	c o e a s y _ c o n f i g u r a t i o n				*/

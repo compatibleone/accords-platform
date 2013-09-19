@@ -16,4 +16,6 @@ struct CATEGORY_NAME_occi_filter
 	[[[end]]]
 };
 
+unsigned CATEGORY_NAME_count_filters(struct CATEGORY_NAME_occi_filter *filter);
+
 #endif

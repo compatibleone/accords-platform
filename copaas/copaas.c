@@ -9,6 +9,19 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 
+#include "occi_rest_paas_application_deployable.h"
+#include "occi_rest_paas_application.h"
+#include "occi_rest_paas_application_manifest.h"
+#include "occi_rest_paas_application_version.h"
+#include "occi_rest_paas_application_version_instance.h"
+#include "occi_rest_paas_environment_configuration.h"
+#include "occi_rest_paas_environment.h"
+#include "occi_rest_paas_environment_link.h"
+#include "occi_rest_paas_environment_node.h"
+#include "occi_rest_paas_environment_relation.h"
+#include "occi_rest_paas_environment_template.h"
+#include "occi_rest_paas_environment_variable.h"
+
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
@@ -53,33 +66,6 @@ public	int	failure( int e, char * m1, char * m2 )
 	}
 	return( e );
 }
-
-#include "paas_application_deployable.c"
-#include "paas_application.c"
-#include "paas_application_manifest.c"
-#include "paas_application_version.c"
-#include "paas_application_version_instance.c"
-#include "paas_environment_configuration.c"
-#include "paas_environment.c"
-#include "paas_environment_link.c"
-#include "paas_environment_node.c"
-#include "paas_environment_relation.c"
-#include "paas_environment_template.c"
-#include "paas_environment_variable.c"
-
-#include "occipaas_application_deployable.c"
-#include "occipaas_application.c"
-#include "occipaas_application_manifest.c"
-#include "occipaas_application_version.c"
-#include "occipaas_application_version_instance.c"
-#include "occipaas_environment_configuration.c"
-#include "occipaas_environment.c"
-#include "occipaas_environment_link.c"
-#include "occipaas_environment_node.c"
-#include "occipaas_environment_relation.c"
-#include "occipaas_environment_template.c"
-#include "occipaas_environment_variable.c"
-
 
 /*	---------------------------------------------------------------	*/  
 /*	c o p a a s _ c o n f i g u r a t i o n				*/

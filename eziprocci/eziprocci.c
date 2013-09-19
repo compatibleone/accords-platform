@@ -25,6 +25,8 @@
 #include "document.h"
 #include "cordspublic.h"
 #include "occipublisher.h"
+#include "occi_rest_easiclouds.h"
+#include "occi_rest_eziconfig.h"
 
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
@@ -32,11 +34,7 @@
 #include "eziconfig.h"
 #include "eziclient.h"
 #include "eziclient.c"
-#include "eziconfig.c"
-#include "occieziconfig.c"
 #include "easiclouds.h"
-#include "easiclouds.c"
-#include "occieasiclouds.c"
 #include "ezicontract.h"
 #include "ezicontract.c"
 

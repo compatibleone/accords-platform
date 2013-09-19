@@ -167,7 +167,12 @@ public	int	socket_create( int a, int b, int c )
 	else
 	{
 		optval = 60;
-		(void) setsockopt(h, SOL_SOCKET, (SO_KEEPALIVE | SO_REUSEADDR), (int *) & optval, sizeof( optval ));
+		(void) setsockopt(h, SOL_SOCKET, SO_KEEPALIVE, (int *) & optval, sizeof( optval ));
+		optval = 1;
+		int opt_set = setsockopt(h, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+		if (0 != opt_set && check_debug()) {
+		    printf("Failed to set reuse address on socket\n");
+		}
 		optval = 1;
 		(void) setsockopt(h, SOL_TCP, TCP_NODELAY, (int *) & optval, sizeof( optval ));
 	}

@@ -30,6 +30,8 @@
 #include "dummyclient.h"
 #include "cb.h"
 
+#include "kindnode.h" // TODO Remove all references to kindnodes directly from the procci
+
 #define	_CORDS_dummy_AGENT "DummyProcci/1.0"
 
 struct	cords_vector

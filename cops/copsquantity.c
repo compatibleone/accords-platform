@@ -19,8 +19,7 @@
 #define	_copsquantity_c
 
 #include "quantity.h"
-#include "quantity.c"
-#include "occiquantity.c"
+#include "occi_rest_quantity.h"
 
 /*	---------------------------------------------------------	*/
 /*		i n v o k e _ q u a n t i t y _ a c t i o n		*/

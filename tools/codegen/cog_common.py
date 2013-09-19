@@ -37,13 +37,20 @@ import codegen_types.ctypes as ctypes
 def _link_special_case():
     return _category_name() == "cords_xlink"
 
+def parse_models(model_dir):
+    global models
+    # Not re-parsing the models each time gives a massive speed-up
+    if 'models' not in globals():
+        print "Parsing models"
+        models = parse([model_dir], None, None, None)    
+
 def init_models(model_dir, filename):
     global models
     global category_file
     global category
     global _has_name
+    parse_models(model_dir)
     category_file = filename
-    models = parse([model_dir], None, None, None)
     category = category_for_file(category_file, models)
     _has_name = False
     for name, _ in category.backend_type_list():
@@ -220,6 +227,31 @@ def rest_print():
                      "fprintf(fh,\"X-OCCI-Attribute: %s.%s.{0}='%s'\\r\\n\",prefix,nptr,(sptr->{0}?sptr->{0}:\"\"));",
                      "fprintf(fh,\"X-OCCI-Attribute: %s.%s.{0}='%u'\\r\\n\",prefix,nptr,sptr->{0});")
     
+def json_from_category():
+    _format_category(None,
+                     ["if({1}->{0}) {{",
+                     "    json_object_object_add(jo, \"{0}\", json_object_new_string({1}->{0}));",
+                     "}}"],
+                     "json_object_object_add(jo, \"{0}\", json_object_new_int64({1}->{0}));")
+                    
+def category_from_json():
+    _format_category(["struct json_object *{0};",
+                      "success = json_object_object_get_ex(jo, \"{0}\", &{0});",
+                      "if (success) {{"],
+                     "    new_{1}->{0} = allocate_string(json_object_get_string({0}));",
+                     "    new_{1}->{0} = json_object_get_int64({0});",
+                     "}}",
+                     include_id = False) 
+
+def riak_query_from_filter():
+    _format_category(["if(filter->{0}) {{",
+                      "    if(written > 0) {{",
+                      "        written += sprintf(&buf[written], \"%%20AND%%20\");",
+                      "    }}"],
+                     "    written += sprintf(&buf[written], \"{0}:%s\", filter->attributes->{0});",
+                     "    written += sprintf(&buf[written], \"{0}:%d\", filter->attributes->{0});",
+                     "}}")                                           
+    
 def _format_category(prefix = None, string_format = None, int_format = None, suffix = None, include_id = True):
     for name, type_name in category.backend_type_list(include_id, skip_legacy_types = True):
         _output_lines(prefix, name)
@@ -239,63 +271,6 @@ def _output_lines(lines, *args):
                 cog.outl(line.format(*args))
         else:
             cog.outl(lines.format(*args))
-        
-
-authorization_code = """/*    ------------------------------------------------------    */
-/*    a d d _ o c c i _ a u t h o r i z a t i o n _ i t e m     */
-/*    ------------------------------------------------------    */
-public struct occi_authorization_item * add_occi_authorization_item(struct occi_authorization_cache * pptr)
-{
-    struct occi_authorization_item * sptr;
-    if (!( sptr = allocate( sizeof( struct occi_authorization_item ) ) ))
-        return( sptr );
-    else if (!( sptr = reset_occi_authorization_item(sptr) ))
-        return( sptr );
-    else
-    {
-        if (!( sptr->previous = pptr->last ))
-            pptr->first = sptr;
-        else    sptr->previous->next = sptr;
-        pptr->last = sptr;
-        sptr->parent = pptr;
-        return( sptr );
-    }
-
-}
-
-/*    --------------------------------------------------------    */
-/*    d r o p _ o c c i _ a u t h o r i z a t i o n _ i t e m     */
-/*    --------------------------------------------------------    */
-public struct occi_authorization_item * drop_occi_authorization_item(struct occi_authorization_item * sptr)
-{
-    if ( sptr )
-    {
-        if (!( sptr->parent )) return(sptr);
-        if (!( sptr->previous ))
-        {
-            if (!( sptr->parent->first = sptr->next ))
-                sptr->parent->last = (struct occi_authorization_item *) 0;
-            else    sptr->parent->first->previous = (struct occi_authorization_item *) 0;
-        }
-        else if (!( sptr->previous->next = sptr->next ))
-            sptr->parent->last = sptr->previous;
-        if (!( sptr->next ))
-        {
-            if (!( sptr->parent->last = sptr->previous ))
-                sptr->parent->first = (struct occi_authorization_item *) 0;
-            else    sptr->parent->last->next = (struct occi_authorization_item *) 0;
-        }
-        else if (!( sptr->next->previous = sptr->previous ))
-            sptr->parent->first = sptr->next;
-        sptr = liberate_occi_authorization_item(sptr);
-    }
-    return((struct occi_authorization_item *) 0);
-}
-"""
-
-def authorization_special_code():
-    if _category_name() == "occi_authorization_item":
-        cog.out(authorization_code)
         
 def node_type():
     cog.inline()
@@ -431,17 +406,31 @@ def profile(function_name, filter_name = None):
 """#ifdef BACKEND_PROFILING
     {0}_backend_profile.{1}++;""".format(_filename_root(), function_name))
     if filter_name:
-        cog.outl("    {2}_count_filters(filter, &{0}_backend_profile.{1});".format(
+        cog.outl("    {2}_record_filter_count(filter, &{0}_backend_profile.{1});".format(
             _filename_root(), filter_name, _category_name()))
     cog.outl("    save_backend_profile(autosave_{0}_name, &{1}_backend_profile);".format(_category_name(), _filename_root()))
     cog.outl("#endif")
-    
+
 def count_filters():
-    cog.outl(
-"""void {0}_count_filters(struct {0}_occi_filter *filter, filter_count *counts) {{
-    int count = 0;""".format(_category_name()))
     _format_category(None,
-                     "    if (filter->{0}) count++;",
-                     "    if (filter->{0}) count++;") 
-                      
-    
+                     "if (filter->{0}) count++;",
+                     "if (filter->{0}) count++;") 
+         
+def riak_backend():
+    #return (_category_name() != 'cords_publication') #TODO Hardcoding switch for now
+    return False
+         
+def backend_include():    
+    if not riak_backend():
+        cog.outl("#include \"{0}_node_backend.h\"".format(_filename_root()))
+    else:
+        cog.outl("#include \"{0}_riak_backend.h\"".format(_filename_root()))
+        
+def backend_init():
+    cog.outl("//Backend is {0}".format(category.backend.plugin))
+    cog.out("{0}_backend = ".format(_category_name()))
+    if not riak_backend():
+        cog.out("{0}_node_interface_func();    // TODO There's no obvious place to delete this pointer on completion.  Find somewhere!".format(
+            _category_name()))
+    else:
+        cog.out("{0}_riak_backend_interface();".format(_category_name()))

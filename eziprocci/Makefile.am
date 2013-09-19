@@ -17,8 +17,3 @@ eziprocci_CFLAGS = $(CFLAGS_BACKEND) $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROK
                    $(CFLAGS_COSACS) $(CFLAGS_COPABR) $(CFLAGS_COMONS) -Werror
 eziprocci_LDFLAGS = $(LD_BACKEND) $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) \
                     $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
-
-# Create auto-generated model files
-model_h_files = eziconfig.h easiclouds.h
-include $(top_srcdir)/tools/Makefile_generate_model.am
-eziprocci.c: $(model_c_files)

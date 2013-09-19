@@ -1,54 +1,34 @@
 # Including this makefile in another makefile.am will add all the necessary rules to automatically build
 # the model files. The special variable 'model_h_files' must be defined before including this file.
 
+MODEL_INPUT_GEN = $(top_srcdir)/tools/codegen/cog_input_list.py
 MODEL_CODEGEN = $(top_srcdir)/tools/codegen/codegen.py
 MODEL_COG = python $(abspath $(top_srcdir)/tools/cog/3rdParty/cogapp/__main__.py) -ed
 COG_CONVERT = python $(abspath $(top_srcdir)/tools/codegen/cog_convert.py)
 TEMPLATE_DIR = $(top_srcdir)/tools/cog/templates/
 COG_TEMPLATES = $(TEMPLATE_DIR)template_
 
-COG_COMMON = $(top_srcdir)/tools/codegen/cog_common.py 
+ALL_PRE_COG_TEMPLATES = category_backend_interface.h category_filter.h category.c category.h  node_backend.c \
+                        node_backend.h occi.c occi.h riak_backend.c riak_backend.h
+                        
+ALL_TEMPLATES = $(patsubst %,$(COG_TEMPLATES)%,$(ALL_PRE_COG_TEMPLATES))
 
-schema_files = $(patsubst %.h,%.xsd,$(model_h_files))
-model_backend_h_files = $(patsubst %.h,%_backend_interface.h,$(model_h_files))
-node_backend_c_files = $(patsubst %.h,%_node_backend.c,$(model_h_files))
-node_backend_h_files = $(patsubst %.h,%_node_backend.h,$(model_h_files))
-occi_rest_c_files = $(patsubst %.h,occi_%_rest.c,$(model_h_files))
-occi_c_files = $(patsubst %.h,occi%.c,$(model_h_files))
-occi_filter_files = $(patsubst %.h, %_occi_filter.h,$(model_h_files))
+COG_COMMON = $(top_srcdir)/tools/codegen/cog_common.py 
 
 model_c_files = $(patsubst %.h,%.c,$(model_h_files))
 
-model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) 
+model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) $(occi_rest_h_files) 
 
-$(schema_files) : %.xsd : %.h $(COG_TEMPLATES)schema.xsd
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %.xsd,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)schema.xsd
+$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h generator_input.txt
+	$(MODEL_COG) @generator_input.txt
 	
-$(node_backend_h_files) : %_node_backend.h : %.h $(COG_TEMPLATES)node_backend.h
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_node_backend.h,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)node_backend.h
+$(model_c_files) : %.c : $(COG_TEMPLATES)category.c generator_input.txt $(ALL_TEMPLATES)
+	$(MODEL_COG) @generator_input.txt
 	
-$(node_backend_c_files) : %_node_backend.c : %.h $(COG_TEMPLATES)node_backend.c
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_node_backend.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)node_backend.c
-
-$(occi_rest_c_files) : occi_%_rest.c : %.h $(COG_TEMPLATES)occi.c
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst occi_%_rest.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)occi.c
-	
-$(occi_c_files) : occi%.c : %.h $(COG_TEMPLATES)occi_include.c
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst occi%.c,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)occi_include.c
-	
-$(model_backend_h_files) : %_backend_interface.h : %.h $(COG_TEMPLATES)category_backend_interface.h
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_backend_interface.h,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category_backend_interface.h
-
-$(occi_filter_files) : %_occi_filter.h : %.h $(COG_TEMPLATES)category_filter.h
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %_occi_filter.h,%.h,$@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category_filter.h
-	
-$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$@ -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category.h
-	
-$(model_c_files) : %.c : %.h %.xsd occi%.c %_occi_filter.h occi_%_rest.c %_node_backend.c %_node_backend.h %_backend_interface.h $(COG_TEMPLATES)category.c  
-	$(MODEL_COG) -I $(top_srcdir)/tools/ -D cog_category_file=$(patsubst %.c,%.h, $@) -D model_dir='$(top_srcdir)/model' -o $@ $(COG_TEMPLATES)category.c
-
 CLEANFILES = $(model_all_files)
 
 $(COG_TEMPLATES)% : $(TEMPLATE_DIR)%
 	$(COG_CONVERT) $(subst template_,, $@) $@ 
+	
+generator_input.txt : $(MODEL_INPUT_GEN) $(top_srcdir)/model/*.xml
+	python $(MODEL_INPUT_GEN) generator_input.txt $(top_srcdir) $(model_h_files)

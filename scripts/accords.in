@@ -169,11 +169,14 @@ _co_platform() {
     _co_run_serv broker "accords broker services"
     _co_run_serv procci "accords procci services"
     _co_run_serv command "accords remote command server"
+}
+
+_co_prov_services() {
 
 # ---------------------------------------------------
 #       The provisioning services agreements 
 # ---------------------------------------------------
-    secs=20
+    secs=5
     echo "Please wait $secs seconds while starting the provisioning services agreements"
     for i in $(seq 1 $secs)
     do 
@@ -235,6 +238,7 @@ _co_provision()
 _co_start()
 {
 	_co_platform
+	_co_prov_services
 	_co_provision
 	_nagios_start
 }
@@ -416,6 +420,7 @@ _co_stop() {
     _stop_service coss
     _stop_service fileserver
     _stop_service publisher
+    #_stop_service valgrind
 }
 
 _run_azprocci() {
@@ -552,6 +557,7 @@ _run_cosched() {
  
 _run_publisher() {
     publisher --config $target CO-PUB/1.0
+    #valgrind --leak-check=yes publisher --config $target CO-PUB/1.0
 }
 
 _run_fileserver() {
@@ -1129,6 +1135,9 @@ case `basename $0` in
 	;;
     co-platform) 
 	_co_platform $*
+	;;
+	co-prov-services)
+	_co_prov_services $*
 	;;
     co-broker) 
 	_co_broker $*
