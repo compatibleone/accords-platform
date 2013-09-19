@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <time.h>
 
 #include <curl/curl.h>
 
@@ -12,6 +13,8 @@
 static char ENABLE_SEARCH_CMD[] = "{\"props\":{\"precommit\":[{\"mod\":\"riak_search_kv_hook\",\"fun\":\"precommit\"}]}}";
 
 static size_t upload(void *ptr, size_t size, size_t nmemb, void *userdata);
+
+static int backoff = 0;
 
 CURL *init_curl_common() {
     CURL *curl = curl_easy_init();
@@ -54,8 +57,7 @@ void set_search_url(CURL *curl, unsigned n_filters, const char *bucket, const ch
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
 }
 
-
-long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {
+long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {    
     CURLcode res;
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
@@ -63,6 +65,23 @@ long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {
     long http_code = 0;
     curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
             
+    if (500 == http_code) {
+        struct timespec requested, elapsed;
+        long long sleep_period = backoff ? 1000000ll << (3 * backoff) : 0;
+        backoff++;
+        requested.tv_sec = sleep_period / 1000000000ll;
+        requested.tv_nsec = sleep_period % 1000000000ll;
+        printf("*** Server failure when attempting to contact riak, backing off for %lums ***\n", requested.tv_sec * 1000 + requested.tv_nsec / 1000000l);
+        nanosleep(&requested, &elapsed);
+        printf("Backoff complete\n");
+    }    
+    else {
+        if (backoff > 0) {
+            printf("Succeeded in retrying after failure\n");
+            backoff = 0;
+        }
+    }
+    
     if (CURLE_OK == res) {
         return http_code;
     }
@@ -72,7 +91,11 @@ long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {
 }
 
 int perform_curl_and_check(CURL *curl, struct curl_slist *headers) {
-    return (200 == perform_curl_and_get_code(curl, headers));
+    int success = (200 == perform_curl_and_get_code(curl, headers));
+    if (success) {
+        backoff = 0;
+    }
+    return success;
 }
 
 struct curl_slist *set_http_headers(CURL *curl, struct curl_slist *headers) {

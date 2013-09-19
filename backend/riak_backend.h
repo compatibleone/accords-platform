@@ -1,7 +1,7 @@
 #ifndef _riak_backend_h
 #define _riak_backend_h
 
-#define CURL_RETRIES (3)
+#define CURL_RETRIES (6)
 
 typedef enum {
     RIAK_OPTION_RETURN_OBJECT,
