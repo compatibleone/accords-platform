@@ -345,7 +345,11 @@ private	struct	rest_response * start_occi_openstack(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else if (!(kptr = use_occi_openstack_configuration( pptr->profile )))
 		return( rest_html_response( aptr, 800, "Configuration Not Found" ) );
-	else
+	else if (!( rest_valid_string( pptr->flavor ) ))
+		return( rest_html_response( aptr, 801, "Start Contract: Incorrect Flavor" ) );
+	else if (!( rest_valid_string( pptr->image ) ))
+		return( rest_html_response( aptr, 802, "Start Contract: Incorrect Image" ) );
+
 	{
 		/* ---------------------------------------- */
 		/* Prepare the Flavor and Image information */
@@ -376,7 +380,7 @@ private	struct	rest_response * start_occi_openstack(
 		/* Create a new compute instance */
 		/* ----------------------------- */
 		else if (!( qptr = create_occi_os_secure_compute(flavor,image,fscheme,ischeme, pptr->group, pptr->zone) ))
-		 	return( rest_html_response( aptr, 801, "Bad Request (POST COMPUTE)" ) );
+		 	return( rest_html_response( aptr, 803, "Bad Request (POST COMPUTE)" ) );
 
 		else if ((status = qptr->status) > 299 )
 		{
@@ -390,21 +394,21 @@ private	struct	rest_response * start_occi_openstack(
 		else if (!( occi_os_reference( qptr, pptr ) ))
 		{
 			qptr = liberate_rest_response( qptr );
-		 	return( rest_html_response( aptr, 801, "Bad Request (NO LOCATION)" ) );
+		 	return( rest_html_response( aptr, 804, "Bad Request (NO LOCATION)" ) );
 		}
 		else if (!( pptr->reference ))
 		{
 			qptr = liberate_rest_response( qptr );
-		 	return( rest_html_response( aptr, 801, "Bad Request (NO REFERENCE)" ) );
+		 	return( rest_html_response( aptr, 805, "Bad Request (NO REFERENCE)" ) );
 		}
 
 		/* ------------------------------------ */
 		/* GET the Compute Instance information */
 		/* ------------------------------------ */
 		if (!( qptr = get_occi_os_compute(pptr->reference )))
-		 	return( rest_html_response( aptr, 801, "Bad Request (START COMPUTE)" ) );
+		 	return( rest_html_response( aptr, 806, "Bad Request (START COMPUTE)" ) );
 		else if (!( qptr = process_occi_os_attributes( qptr )))
-		 	return( rest_html_response( aptr, 801, "Bad Request (PROCESSING ATTRIBUTS)" ) );
+		 	return( rest_html_response( aptr, 807, "Bad Request (PROCESSING ATTRIBUTS)" ) );
 		else if (!( hptr = occi_os_locate_attribute( qptr, "occi.compute.state" ) ))
 			startcompute=1;
 		else if (!( vptr = occi_os_attribute_value( hptr ) ))
@@ -428,7 +432,7 @@ private	struct	rest_response * start_occi_openstack(
 			/* send OCCI START message */
 			/* ----------------------- */
 			if (!( qptr = start_occi_os_compute(pptr->reference )))
-			 	return( rest_html_response( aptr, 801, "Bad Request (START COMPUTE)" ) );
+			 	return( rest_html_response( aptr, 808, "Bad Request (START COMPUTE)" ) );
 			else if ((status = qptr->status) > 299 )
 			{
 				qptr = liberate_rest_response( qptr );
@@ -441,7 +445,7 @@ private	struct	rest_response * start_occi_openstack(
 		/* Allocate a Floating IP */
 		/* ---------------------- */
 		if (!( qptr = allocate_occi_os_floating_ip(pptr->reference)))
-		 	return( rest_html_response( aptr, 801, "Bad Request (ALLOCATE FLOATING IP)" ) );
+		 	return( rest_html_response( aptr, 809, "Bad Request (ALLOCATE FLOATING IP)" ) );
 		else if ((status = qptr->status) > 299 )
 		{
 			qptr = liberate_rest_response( qptr );
@@ -453,9 +457,9 @@ private	struct	rest_response * start_occi_openstack(
 		/* Retrieve the Floating IP address */
 		/* -------------------------------- */
 		if (!( qptr = get_occi_os_compute(pptr->reference)))
-		 	return( rest_html_response( aptr, 801, "Bad Request (RETRIEVE COMPUTE)" ) );
+		 	return( rest_html_response( aptr, 810, "Bad Request (RETRIEVE COMPUTE)" ) );
 		else if (!( qptr = process_occi_os_attributes( qptr )))
-		 	return( rest_html_response( aptr, 801, "Bad Request (PROCESSING ATTRIBUTS)" ) );
+		 	return( rest_html_response( aptr, 811, "Bad Request (PROCESSING ATTRIBUTS)" ) );
 		{
 			
 			/* --------------------------------------- */
@@ -479,7 +483,7 @@ private	struct	rest_response * start_occi_openstack(
 		if (!( strcasecmp( pptr->access , _CORDS_PRIVATE ) ))
 		{
 			if (!( qptr = release_occi_os_floating_ip(pptr->reference)))
-			 	return( rest_html_response( aptr, 801, "Bad Request (RELEASE FLOATING IP)" ) );
+			 	return( rest_html_response( aptr, 812, "Bad Request (RELEASE FLOATING IP)" ) );
 			else	qptr = liberate_rest_response( qptr );
 		}
 

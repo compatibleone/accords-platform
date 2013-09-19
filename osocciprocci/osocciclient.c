@@ -114,7 +114,7 @@ public	int	check_keystone_authorization()
 	char	buffer[1024];
 	if (!( OcciConfig.authorization ))
 	{
-		sprintf(buffer,"%s:35357/v2.0/tokens",OcciConfig.host);
+		sprintf(buffer,"%s/v2.0/tokens",OcciConfig.host);
 		if (!( hptr = occi_os_header( _HTTP_CONTENT_TYPE, OcciConfig.requestauth ) ))
 			return( 0 );
 		else if (!( hptr->next = occi_os_header( _HTTP_ACCEPT, OcciConfig.acceptauth ) ))
@@ -846,7 +846,7 @@ public int os_occi_initialise_client(char * user,char * password,char * host,cha
 	char * hptr=(char *) 0;
 	if (!( uptr = analyse_url( host )))
 		return( 0 );
-	else if (!( hptr = serialise_url_host_no_port( uptr ) ))
+	else if (!( hptr = serialise_url_host( uptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		return( 0 );
