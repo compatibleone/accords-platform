@@ -1,0 +1,18 @@
+rm -r $1 -f
+mkdir $1
+mkdir $1/rest
+mkdir $1/service
+mkdir $1/images
+cd $1
+cp ../accords-platform/scripts/accords-config .
+cp ../accords-platform/dashboard/* .
+chmod uog+x *.sh
+cp ../accords-platform/dashboard/images* ./images
+cp ../accords-platform/cordscripts/csp*.txt .
+cp ../accords-platform/manifests/cords_*.xml .
+cp ../accords-platform/manifests/cords_*.xml .
+cp ../accords-platform/manifests/*.cnf .
+cp ../accords-platform/*.xml .
+cp ../accords-platform/*.crt .
+./accords-config
+co-start
