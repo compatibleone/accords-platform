@@ -8,6 +8,7 @@
 #include "standard.h"
 //#include "broker.h"
 #include "restresponse.h"
+#include "restclient.h"
 #include "rest.h"
 //#include "occi.h"
 //#include "document.h"

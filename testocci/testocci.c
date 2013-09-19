@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "standard.h"
 //#include "broker.h"
+#include "cp.h" // cords_retrieve_named_instance_list()
 #include "restresponse.h"
 #include "rest.h"
 #include "occiclient.h"

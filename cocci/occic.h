@@ -23,5 +23,7 @@ struct	occi_client
 
 #endif
 
+public struct occi_client * liberate_occi_client(struct occi_client * sptr);
+
 #endif	
 
