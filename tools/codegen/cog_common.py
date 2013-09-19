@@ -41,8 +41,9 @@ def parse_models(model_dir):
     global models
     # Not re-parsing the models each time gives a massive speed-up
     if 'models' not in globals():
-        print "Parsing models"
-        models = parse([model_dir], None, None, None)    
+        print "Parsing models..."
+        models = parse([model_dir], None, None, None)
+        print "...done"    
 
 def init_models(model_dir, filename):
     global models
@@ -166,7 +167,7 @@ def occi_response():
                      "sprintf(cptr->buffer,\"%s.%s.{0}=%c%s%c\",optr->domain,optr->id,0x0022,pptr->{0},0x0022);",
                      "sprintf(cptr->buffer,\"%s.%s.{0}=%c%u%c\",optr->domain,optr->id,0x0022,pptr->{0},0x0022);",
                      ["if (!( hptr = rest_response_header( aptr, \"X-OCCI-Attribute\",cptr->buffer) ))",
-                     "    return( rest_html_response( aptr, 500, \"Server Failure\" ) );"],
+                     "    return(internal_failure_response(aptr));"],
                      include_id = False)    
     
 def occi_builder():
@@ -417,7 +418,7 @@ def count_filters():
                      "if (filter->{0}) count++;") 
          
 def riak_backend():
-    #return (_category_name() != 'cords_publication') #TODO Hardcoding switch for now
+    #return (_category_name() == 'cords_publication') or (_category_name() == "cords_xlink") #TODO Hardcoding switch for now
     return False
          
 def backend_include():    
@@ -425,7 +426,7 @@ def backend_include():
         cog.outl("#include \"{0}_node_backend.h\"".format(_filename_root()))
     else:
         cog.outl("#include \"{0}_riak_backend.h\"".format(_filename_root()))
-        
+
 def backend_init():
     cog.outl("//Backend is {0}".format(category.backend.plugin))
     cog.out("{0}_backend = ".format(_category_name()))

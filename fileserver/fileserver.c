@@ -205,7 +205,7 @@ private	struct rest_response * fileserver_get_capacities(
 		struct rest_request * rptr,
 		struct rest_response * aptr )
 {
-	return( rest_html_response( aptr, 500, "Server Failure" ) );
+	return( internal_failure_response(aptr) );
 }
 
 /*	------------------------------------------------------------------	*/
@@ -226,11 +226,11 @@ private	struct rest_response * fileserver_get_file(
 	{
 		sprintf(length,"%u",info.st_size);
 		if (!( rest_response_header(aptr,"Content-Length",length) ))
-			return( rest_html_response( aptr, 500, "Server Failure" ) );
+			return( internal_failure_response(aptr) );
 		else if (!( rest_response_header(aptr,"Content-Type","text/html") ))
-			return( rest_html_response( aptr, 500, "Server Failure" ) );
+			return( internal_failure_response(aptr) );
 		else if (!( nptr = allocate_string( rptr->object ) ))
-			return( rest_html_response( aptr, 500, "Server Failure" ) );
+			return( internal_failure_response(aptr) );
 		else
 		{
 			rest_response_body(aptr,nptr,0 );

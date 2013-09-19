@@ -66,6 +66,7 @@ public	struct	rest_client *
 public	struct	rest_response * 
 	rest_allocate_response( struct rest_client * cptr);
 
+// TODO What's the difference between a rest response and a rest html response?
 public	struct rest_response * 
 	rest_html_response( struct rest_response  * aptr, int status, char * message );
 
