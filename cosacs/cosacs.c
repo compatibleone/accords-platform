@@ -321,7 +321,7 @@ private	int	cosacs_probe_worker( struct cords_probe * pptr )
 		if ( rest_valid_string( pptr->expression) )
 			sprintf(buffer,"%s >> %s",pptr->expression, filename);
 		else	sprintf(buffer,"date >> %s",filename);
-		system( buffer );
+		if(system( buffer )){};
 		if ( ++sample >= pptr->samples )
 		{
 			cosacs_post_samples( pptr, sample,filename);
@@ -627,13 +627,13 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 		switch ( execmode )
 		{
 		case	0 :
-			system( tempname );
+			if(system( tempname )){};
 			pptr->result = errno;
 			break;
 		case 	1 :
 			if (!( pptr->result = fork() ))
 			{
-				system( tempname );
+				if(system( tempname )){};
 				exit(0);
 			}
 			break;

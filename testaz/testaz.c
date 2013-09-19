@@ -71,7 +71,7 @@ private	int	az_result( struct az_response * rptr )
 					if ( rptr->response->type == _FILE_BODY )
 					{
 						sprintf(buffer,"cat %s",rptr->response->body);
-						system( buffer );
+						if(system( buffer )){};
 					}
 					else 	printf("\n%s\n",rptr->response->body);
 					printf("\n");
