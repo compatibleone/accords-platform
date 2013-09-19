@@ -13,6 +13,7 @@
 /*								*/
 /*	-------------------------------------------------	*/
 /*	SSL Options : 						*/
+/*		2	force ssl debug				*/
 /*		4	use ssl					*/
 /*		8	verify peer				*/
 /*		16	fail if no peer certificate		*/
@@ -22,6 +23,7 @@
 /*		256	Inhibit Internal Certificate Check	*/
 /*	-------------------------------------------------	*/
 
+#define	_SSL_DEBUG		2
 #define	_USE_SSL		4
 #define	_REQUEST_PEER		8
 #define	_REQUIRE_PEER		16
@@ -36,6 +38,7 @@ private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 private	int	SSL_READY=0;
 private	int	ssl_contexts=0;
 private	int	total_contexts=0;
+private	int	ssl_debug;
 
 #define	Portable_srandom	srandom
 #define	SSL_debug 		check_debug()
@@ -75,7 +78,7 @@ private	void	tls_show_errors( char * message)
 {
 	char SSL_ErrorBuf[1024];
 	int	sslerr;
-	if ( check_debug() )
+	if (( check_debug() ) || ( ssl_debug ))
 	{
 		while ((sslerr = ERR_get_error())) 
 			if ( ERR_error_string( sslerr, SSL_ErrorBuf ) ) 
@@ -856,6 +859,7 @@ private	int	build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 {
 	int	status;
 	security_lock( 0, "build_context" );
+	ssl_debug = (mode & _SSL_DEBUG);
 	status = ll_build_ssl_context( cptr, mode, service );
 	security_unlock( 0, "build_context" );
 	return( status );
