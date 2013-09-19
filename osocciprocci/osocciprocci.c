@@ -357,7 +357,7 @@ private	int	OsOcciProcciLaunch(
 	if (!( command ))	return(30);
 	if (!( subject ))	return(30);
 
-	os_occi_initialise_client( user, pass, host, tenant, "osocciprocci/1.0a", (char *) 0);
+	os_occi_initialise_client( user, pass, host, tenant, "osocciprocci/1.0a", (char *) 0, host);
 
 	if (!( strcasecmp( command, "list" ) ))
 	{

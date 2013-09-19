@@ -113,6 +113,8 @@ public	struct	rest_header   * occi_client_authentication( char * aptr );
 public	struct	rest_header   * occi_client_accept( char * aptr );
 public	struct	rest_header   * occi_client_content_type( char * aptr );
 public 	struct	rest_header   * occi_add_default_header(struct rest_header  * hptr);
+public 	struct	rest_header   * occi_save_default_headers();
+public 	void			occi_restore_default_headers(struct rest_header  * hptr);
 public 	void			occi_drop_default_headers();
 public	struct	occi_response * occi_delete_links( char * from, char * agent, char * tls );
 public	struct	occi_response * occi_delete_link( char * from, char * to, char * agent, char * tls );

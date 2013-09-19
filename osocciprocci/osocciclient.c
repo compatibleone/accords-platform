@@ -34,6 +34,7 @@ struct	occi_os_configuration
 	char *	user;
 	char *	password;
 	char *	host;
+	char *	base;
 	int	port;
 };
 
@@ -311,6 +312,8 @@ public	int	liberate_occi_os_configuration(int status)
 {
 	if ( OcciConfig.host )
 		OcciConfig.host = liberate( OcciConfig.host );
+	if ( OcciConfig.base )
+		OcciConfig.base = liberate( OcciConfig.base );
 	if ( OcciConfig.tls )
 		OcciConfig.tls = liberate( OcciConfig.tls );
 	if ( OcciConfig.agent )
@@ -329,12 +332,15 @@ public	int	liberate_occi_os_configuration(int status)
 	return(status);
 }
 
-public	int	set_occi_os_configuration( char * host, int port, char * user, char * password, char * tenant, char * agent, char * tls )
+public	int	set_occi_os_configuration( char * host, int port, char * user, char * password, char * tenant, char * agent, char * tls , char * base)
 {
 	liberate_occi_os_configuration(0);
 
 	if ( host )
 		if (!( OcciConfig.host = allocate_string( host ) ))
+			return( liberate_occi_os_configuration(27) );
+	if ( base )
+		if (!( OcciConfig.base = allocate_string( base ) ))
 			return( liberate_occi_os_configuration(27) );
 	if ( user )
 		if (!( OcciConfig.user = allocate_string( user ) ))
@@ -518,14 +524,14 @@ private	struct rest_header * occi_os_network_interface_headers()
 public	char *	occi_os_category_url( char * term )
 {
 	char buffer[1024];
-	sprintf(buffer,"%s:%u%s",OcciConfig.host,OcciConfig.port,term);
+	sprintf(buffer,"%s%s",OcciConfig.base,term);
 	return( allocate_string( buffer ) );
 }
 
 private	char *	occi_os_instance_url( char * term, char * id )
 {
 	char buffer[1024];
-	sprintf(buffer,"%s:%u%s%s",OcciConfig.host,OcciConfig.port,term,id);
+	sprintf(buffer,"%s%s%s",OcciConfig.base,term,id);
 	return( allocate_string( buffer ) );
 }
 
@@ -839,7 +845,7 @@ public struct	rest_response * delete_occi_os_network(char * id)
  	else	return( rest_client_delete_request( id, OcciConfig.tls, OcciConfig.agent, hptr ) );
 }
 
-public int os_occi_initialise_client(char * user,char * password,char * host,char * version,char * agent,char * tls)
+public int os_occi_initialise_client(char * user,char * password,char * host,char * version,char * agent,char * tls,char * base)
 {
 	struct	url * uptr;
 	int	status;
@@ -854,7 +860,7 @@ public int os_occi_initialise_client(char * user,char * password,char * host,cha
 	else
 	{
 		liberate_occi_os_configuration(0);
-		status = set_occi_os_configuration( hptr, uptr->port, user, password, version, agent, tls );
+		status = set_occi_os_configuration( hptr, uptr->port, user, password, version, agent, tls, base );
 		uptr = liberate_url( uptr );
 		hptr = liberate( hptr );
 		if ( status )

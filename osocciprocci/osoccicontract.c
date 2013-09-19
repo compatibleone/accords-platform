@@ -92,7 +92,7 @@ private	struct	os_config * use_occi_openstack_configuration( char * sptr )
 	else if (!( 
 	 	os_occi_initialise_client( 
 			pptr->user, pptr->password, 
-			pptr->host, pptr->namespace, _CORDS_OS_AGENT, pptr->tls ) ))
+			pptr->host, pptr->namespace, _CORDS_OS_AGENT, pptr->tls, pptr->base ) ))
 			return((struct os_config *) 0);
 	else
 	{
@@ -139,19 +139,23 @@ private struct rest_header * occi_list_mixins( char * scheme, char * host )
 	struct	rest_header * foot=(struct rest_header *) 0;
 	struct	occi_client * cptr;
 	struct	occi_category * kptr;
-
+	struct	rest_header * holdhead;
 	if (!( hptr = keystone_credentials() ))
 		return( hptr );
-	else 	occi_add_default_header( hptr );
+	else 	
+	{
+		holdhead= occi_save_default_headers();
+		occi_add_default_header( hptr );
+	}
 
 	if (!( cptr = occi_create_client( host, _CORDS_OS_AGENT, default_tls() ) ))
 	{
-		occi_drop_default_headers();
+		occi_restore_default_headers(holdhead);
 		return( root );
 	}
 	else
 	{
-		occi_drop_default_headers();
+		occi_restore_default_headers(holdhead);
 		for (	kptr=cptr->firstcat;
 			kptr != (struct occi_category *) 0;
 			kptr = kptr->next )

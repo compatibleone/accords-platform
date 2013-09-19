@@ -290,6 +290,29 @@ public	void	occi_drop_default_headers()
 	return;
 }
 
+
+/*	------------------------------------------------------------	*/
+/*		   o c c i _ s a v e _ d e f a u l t _ h e a d e r	*/
+/*	------------------------------------------------------------	*/
+public	struct	rest_header * occi_save_default_headers()
+{
+	struct	rest_header * hptr;
+	hptr = OcciManager.headers;
+	OcciManager.headers = (struct rest_header *) 0;
+	return( hptr );
+}
+
+/*	------------------------------------------------------------	*/
+/*	   o c c i _ r e s t o r e _ d e f a u l t _ h e a d e r	*/
+/*	------------------------------------------------------------	*/
+public	void	occi_restore_default_headers( struct rest_header * hptr )
+{
+	occi_drop_default_headers();
+	OcciManager.headers = hptr;
+	return;
+}
+
+
 /*	------------------------------------------------------------	*/
 /*	    o c c i _ c l i e n t _ a u t h e n t i c a t i o n		*/
 /*	------------------------------------------------------------	*/
