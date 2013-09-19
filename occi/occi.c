@@ -70,7 +70,12 @@ public	struct	occi_category * occi_create_category( char * domain, char * name, 
 		return( occi_remove_category( cptr ) );
 	else if (!( cptr->class = allocate_string( klass ) ))
 		return( occi_remove_category( cptr ) );
-	else if (!( cptr->rel = allocate_string( rel ) ))
+	/* correct incorrect relation as for cloud plug fest madrid 19/09/2013 */
+	if (!( strcmp( rel, "http://scheme.ogf.org/occi/core/resource#" ) ))
+		rel = "http://scheme.ogf.org/occi/core#resource";
+	else if (!( strcmp( rel, "http://scheme.ogf.org/occi/resource#" ) ))
+		rel = "http://scheme.ogf.org/occi/core#resource";
+	if (!( cptr->rel = allocate_string( rel ) ))
 		return( occi_remove_category( cptr ) );
 	else if (!( cptr->title = allocate_string( title ) ))
 		return( occi_remove_category( cptr ) );
