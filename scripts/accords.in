@@ -783,7 +783,6 @@ _stop_service() {
 	kill $servicepid
 	rm -f  ~/.${service}.pid
     fi
-    sleep $tempo
 }
 
 _mksecs() {
