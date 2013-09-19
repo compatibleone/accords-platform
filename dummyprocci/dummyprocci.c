@@ -29,6 +29,11 @@
 #include "cosacsctrl.h"
 #include "stdnode.h"
 
+#include "dummyconfig.h"
+#include "dummy.h"
+#include "occi_rest_dummyconfig.h"
+#include "occi_rest_dummy.h"
+
 struct	accords_configuration Configuration = {
 	0,0,
 	0,0,0,0,
@@ -76,12 +81,6 @@ public	int	failure( int e, char * m1, char * m2 )
 /* 	----------------------------------------	*/	
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
-#include "dummyconfig.h"
-#include "dummyconfig.c"
-#include "occidummyconfig.c"
-#include "dummy.h"
-#include "dummy.c"
-#include "occidummy.c"
 #include "dummyclient.h"
 #include "dummyclient.c"
 #include "dummycontract.h"

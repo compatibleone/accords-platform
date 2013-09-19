@@ -407,7 +407,7 @@ char * get_http_body_length_string(char *buffer, size_t buffer_size, int type, c
      else
      {
        buffer[0] = '\0';
-       if (snprintf(buffer, buffer_size, "%lu", strlen(body)) < buffer_size)
+       if (snprintf(buffer, buffer_size, "%lu", (long unsigned)strlen(body)) < buffer_size)
        {
          body_length = buffer;
 

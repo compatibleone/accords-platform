@@ -36,6 +36,8 @@
 #include "onapp_helpers.h"
 #include "oaconfig_backend_interface.h"
 #include "oaconfig_occi_filter.h"
+#include "onapp_occi_filter.h"
+#include "onapp_backend_interface.h"
 
 #define _USE_OCCI_ONAPPEXTRAS
 
@@ -1218,14 +1220,14 @@ const struct oa_config * resolve_oa_configuration( char * sptr, int is_active, i
 	filter.attributes->deleted = 0;
 	filter.deleted = 1;
 	
-	oaconfig_list matches = oa_config_backend->retrieve_from_filter(&filter); 
+	oa_config_id_list matches = oa_config_backend->list(&filter); 
 	
 	liberate_oa_config(filter.attributes);
 	const struct oa_config *retVal = NULL;
-	if (matches.count > 0) {
-	    retVal = matches.oaconfigs[0];
+	if (matches.count > 0) {	    
+	    retVal = oa_config_backend->retrieve_from_id(matches.ids[0]);
 	}
-	free_oaconfig_list(&matches);	
+	oa_config_free_id_list(&matches);	
 	return (retVal);
 }
 

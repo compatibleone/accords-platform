@@ -30,10 +30,8 @@
 
 #include "osconfig.h"
 #include "openstack.h"
-#include "openstack.c"
-#include "occiopenstack.c"
-#include "osconfig.c"
-#include "occiosconfig.c"
+#include "occi_rest_osconfig.h"
+#include "occi_rest_openstack.h"
 
 struct	accords_configuration OsOcciProcci = {
 	0,0,

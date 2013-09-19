@@ -29,10 +29,8 @@
 
 #include "dcconfig.h"
 #include "deltacloud.h"
-#include "deltacloud.c"
-#include "occideltacloud.c"
-#include "dcconfig.c"
-#include "occidcconfig.c"
+#include "occi_rest_dcconfig.h"
+#include "occi_rest_deltacloud.h"
 
 struct	accords_configuration DcProcci = {
 	0,0,

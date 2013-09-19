@@ -32,6 +32,7 @@
 #include "cp.h"
 #include "cb.h"
 #include "coips.h"
+#include "occi_rest_saas.h"
 
 struct	accords_configuration Coips = {
 	0,0,
@@ -872,9 +873,6 @@ private	struct	occi_interface	cords_application_interface = {
 	};
 
 #include "saas.h"
-#include "saas.c"
-#include "occisaas.c"
-
 
 /*	------------------------------------------------------------------	*/
 /*			c o i p s _ o p e r a t i o n				*/

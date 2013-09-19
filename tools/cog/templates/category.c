@@ -22,9 +22,7 @@
 /*										*/
 /* ---------------------------------------------------------------------------- */
 
-/* STRUKT WARNING : this file has been generated and should not be modified by hand */
-#ifndef _FILENAME_ROOT_c_
-#define _FILENAME_ROOT_c_
+/* WARNING : this file has been generated and should not be modified by hand */
 
 #include "element.h"
 #include "standard.h"
@@ -80,8 +78,6 @@ public struct CATEGORY_NAME * allocate_CATEGORY_NAME()
 		return( sptr );
 	else	return( reset_CATEGORY_NAME(sptr) );
 }
-[[[cog t.authorization_special_code()]]]
-[[[end]]]
  
 /*	----------------------------------------------	*/
 /*	x m l i n _ 
@@ -125,4 +121,29 @@ public int rest_occi_CATEGORY_NAME(FILE * fh,struct CATEGORY_NAME * sptr,char * 
 
 }
 
-#endif	/* _FILENAME_ROOT_c_ */
+unsigned CATEGORY_NAME_count_filters(struct CATEGORY_NAME_occi_filter *filter) {
+    unsigned count = 0;
+    [[[cog t.count_filters()]]]
+    [[[end]]]
+    return count;
+}
+
+void CATEGORY_NAME_free_id_list(CATEGORY_NAME_id_list *list) {
+    int i;
+    for(i = 0; i < list->count; i++) {
+        liberate(list->ids[i]);
+    }
+    liberate(list->ids);
+    list->ids = NULL;
+    list->count = 0;
+}
+
+void free_CATEGORY_NAME_list(CATEGORY_NAME_list *list) {
+    int i;
+    for(i = 0; i < list->count; i++) {
+        liberate_CATEGORY_NAME(list->FILENAME_ROOTs[i]);
+    }
+    liberate(list->FILENAME_ROOTs);
+    list->FILENAME_ROOTs = NULL;
+    list->count = 0;
+}

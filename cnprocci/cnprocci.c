@@ -28,6 +28,8 @@
 #include "cordslang.h"
 #include "cosacsctrl.h"
 #include "stdnode.h"
+#include "occi_rest_cnconfig.h"
+#include "occi_rest_computenext.h"
 
 struct	accords_configuration Configuration = {
 	0,0,
@@ -77,11 +79,7 @@ public	int	failure( int e, char * m1, char * m2 )
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
 #include "cnconfig.h"
-#include "cnconfig.c"
-#include "occicnconfig.c"
 #include "computenext.h"
-#include "computenext.c"
-#include "occicomputenext.c"
 #include "cnclient.h"
 #include "cnclient.c"
 #include "cncontract.h"

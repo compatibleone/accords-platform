@@ -30,8 +30,7 @@
 /*	Prototype Contract Negotiation Functions	*/
 /* 	----------------------------------------	*/
 #include "exampleprocci.h"
-#include "exampleprocci.c"
-#include "occiexampleprocci.c"
+#include "occi_rest_exampleprocci.h"
 #include "example_contract.h"
 #include "example_contract.c"
 

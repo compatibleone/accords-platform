@@ -29,6 +29,8 @@
 #include "cordslang.h"
 #include "cb.h"
 
+#include "kindnode.h" // TODO Remove references directly to kind nodes
+
 struct	cords_vector
 {
 	char *	id;

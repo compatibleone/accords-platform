@@ -70,7 +70,7 @@ private	int	os_result( struct os_response * rptr )
 			&&  ( rptr->response->body ))
 			{
 				sprintf(buffer,"cat %s",rptr->response->body);
-				system( buffer );
+				if (system( buffer )){};
 				printf("\n");
 			}
 		}

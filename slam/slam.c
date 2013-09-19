@@ -30,6 +30,7 @@
 #include "cordslang.h"
 
 #include "link_backend.h"
+#include "occi_rest_penalty.h"
 
 struct	accords_configuration Slam = {
 	0,0,
@@ -143,8 +144,6 @@ private	struct rest_extension * slam_extension( void * v,struct rest_server * sp
 /*	------------------------------------------------------------------	*/
 #include "comonsconnection.c"
 #include "slamcontrol.c"
-#include "penalty.c"
-#include "occipenalty.c"
 
 /*	-------------------------------------------	*/
 /* 	    i n s t a n c e _ a g r e e m e n t		*/

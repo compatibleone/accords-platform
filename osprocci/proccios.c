@@ -24,7 +24,9 @@
 #include "cosacsctrl.h"
 #include "cp.h"
 #include "cb.h"
-#include "stdnode.h"
+#include "stdnode.h" 
+
+#include "kindnode.h" // TODO This should be removed, references to node backend should be abstractred via API
 
 public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,

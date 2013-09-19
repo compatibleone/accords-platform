@@ -23,6 +23,10 @@
 #include "cosacsctrl.h"
 #include "stdnode.h"
 
+#include "occi_rest_windowsazure.h"
+
+#include "kindnode.h" // TODO This should be removed, references to node backend should be abstractred via API
+
 #define	_AZURE_STATUS_POLL	5
 
 /* ---------------------------------------------------------------------------------- */

@@ -30,6 +30,8 @@
 #include "cnclient.h"
 #include "cb.h"
 
+#include "kindnode.h" // TODO This should be removed, references to node backend should be abstractred via API
+
 struct	cn_instancetype
 {
 	int	cores;

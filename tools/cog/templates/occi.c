@@ -30,14 +30,16 @@
 #include "rest.h"
 #include "occi.h"
 #include "document.h"
-#include "cordspublic.h"
 
 #include "backend_common.h"
  
 #include "FILENAME_ROOT_occi_filter.h"
 #include "FILENAME_ROOT.h"
 #include "FILENAME_ROOT_backend_interface.h"
-#include "FILENAME_ROOT_node_backend.h"
+[[[cog t.backend_include()]]]
+[[[end]]]
+
+#include "occi_rest_FILENAME_ROOT.h"
 
 /*	--------------------------------------------	*/
 /*	o c c i _ 
@@ -201,7 +203,6 @@ private struct rest_response * CATEGORY_NAME_post_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr)
 {
-	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct CATEGORY_NAME * initial_FILENAME_ROOT, *new_FILENAME_ROOT;
 	char * reqhost;
@@ -232,7 +233,7 @@ private struct rest_response * CATEGORY_NAME_post_item(
 	}
 	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,new_FILENAME_ROOT->id);
 	liberate_CATEGORY_NAME(new_FILENAME_ROOT);
-	if (!( hptr = rest_response_header( aptr, "X-OCCI-Location",cptr->buffer) ))
+	if (!rest_response_header( aptr, "X-OCCI-Location",cptr->buffer))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	else if (!( occi_success( aptr ) ))
 		return( rest_response_status( aptr, 500, "Server Failure" ) );
@@ -344,12 +345,12 @@ private struct rest_response * CATEGORY_NAME_delete_all(
 	iptr = optr->callback;
 	if (!( filter_CATEGORY_NAME_info(&filter, optr, rptr, aptr ) ))
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
-	FILENAME_ROOT_list item_list =  CATEGORY_NAME_backend->retrieve_from_filter(&filter);
+	CATEGORY_NAME_list item_list = CATEGORY_NAME_backend->retrieve_from_filter(&filter);
 	int index;
 	for(index = 0; index < item_list.count; index++) {
 		if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_delete, item_list.FILENAME_ROOTs[index], optr, rptr); }
 	}
-	free_FILENAME_ROOT_list(&item_list);
+	free_CATEGORY_NAME_list(&item_list);
 	CATEGORY_NAME_backend->delete_all_matching_filter(&filter);
 	liberate_CATEGORY_NAME(filter.attributes);
 	if (!( occi_success( aptr ) ))
@@ -508,7 +509,8 @@ public struct occi_category * occi_CATEGORY_NAME_builder(char * a,char * b) {
 [[[end]]]
 #";
 	char * f="CompatibleOne OCCI resource CATEGORY_NAME";
-	 CATEGORY_NAME_backend = CATEGORY_NAME_node_interface_func();	// TODO There's no obvious place to delete this pointer on completion.  Find somewhere!
+	[[[cog t.backend_init()]]]
+	[[[end]]]
 	struct occi_category * optr;
 	if (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }
 	else {
