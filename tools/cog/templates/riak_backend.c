@@ -13,10 +13,18 @@
 #include "FILENAME_ROOT_occi_filter.h"
 #include "FILENAME_ROOT.h"
 #include "FILENAME_ROOT_backend_interface.h"
+#include "backend_profiling.h"
 #include "riak_backend.h"
 #include "FILENAME_ROOT_riak_backend.h"
 
 #define CATEGORY_BUCKET "co_FILENAME_ROOT"
+
+// TODO Naughty copy and paste from node_backend.c
+#ifdef BACKEND_PROFILING
+static long long start_of_backend;
+static struct backend_profile FILENAME_ROOT_backend_profile;
+static void CATEGORY_NAME_record_filter_count(struct CATEGORY_NAME_occi_filter *filter, filter_count *counts);
+#endif
 
 union riak_object_list {
     CATEGORY_NAME_id_list ids_only;
@@ -65,6 +73,7 @@ struct FILENAME_ROOT_backend_interface *  CATEGORY_NAME_riak_backend_interface()
 
 
 void init() {
+    start_of_backend = profile_get_time();
     curl_global_init(CURL_GLOBAL_ALL);
     enable_riak_search(CATEGORY_BUCKET);
 }
@@ -155,7 +164,12 @@ static struct CATEGORY_NAME *create_or_update(const struct CATEGORY_NAME *initia
 }
 
 struct CATEGORY_NAME *create(struct CATEGORY_NAME *initial_FILENAME_ROOT) {
-    return create_or_update(initial_FILENAME_ROOT, NULL);
+[[[cog t.profile('creates', None, False)]]]
+[[[end]]]
+    struct CATEGORY_NAME *FILENAME_ROOT = create_or_update(initial_FILENAME_ROOT, NULL); 
+    [[[cog t.profile_end('creates')]]]
+    [[[end]]]
+    return FILENAME_ROOT;
 }
 
 struct FILENAME_ROOT_with_vclock {
@@ -192,13 +206,21 @@ static struct FILENAME_ROOT_with_vclock retrieve_with_vclock_from_id(const char 
 }
 
 struct CATEGORY_NAME * retrieve_from_id(char *id) {
+[[[cog t.profile('retrieve_from_ids', None, False)]]]
+[[[end]]]
     struct FILENAME_ROOT_with_vclock retrieved = retrieve_with_vclock_from_id(id);
-    free(retrieved.vclock);
+    free(retrieved.vclock); 
+    [[[cog t.profile_end('retrieve_from_ids')]]]
+    [[[end]]]
     return retrieved.FILENAME_ROOT;
 }
 
-CATEGORY_NAME_list retrieve_from_filter(struct CATEGORY_NAME_occi_filter *filter) { 
-    union riak_object_list list = list_from_filter(filter, RIAK_OPTION_RETURN_OBJECT); 
+CATEGORY_NAME_list retrieve_from_filter(struct CATEGORY_NAME_occi_filter *filter) {
+[[[cog t.profile('retrieve_from_filters', 'retrieve_from_counts', False)]]]
+[[[end]]]    
+    union riak_object_list list = list_from_filter(filter, RIAK_OPTION_RETURN_OBJECT);  
+    [[[cog t.profile_end('retrieve_from_filters')]]]
+    [[[end]]]
     return list.objects;
 }
 
@@ -206,7 +228,9 @@ CATEGORY_NAME_list retrieve_from_filter(struct CATEGORY_NAME_occi_filter *filter
 // consistency in the face of different database nodes having different versions.
 // In order to ensure Riak updates the correct node, we must first read it and 
 // use the vclock returned when sending our update.
-void update(char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT) { 
+void update(char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT) {
+[[[cog t.profile('updates', None, False)]]]
+[[[end]]]
     struct FILENAME_ROOT_with_vclock retrieved = retrieve_with_vclock_from_id(id);
     if (retrieved.vclock && retrieved.FILENAME_ROOT) {
         liberate_CATEGORY_NAME(create_or_update(updated_FILENAME_ROOT, retrieved.vclock));
@@ -215,10 +239,14 @@ void update(char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT) {
     }
     else {
         // This can happen e.g. during a 'delete' action...the object can be deleted before being passed to update. 
-    }
+    } 
+    [[[cog t.profile_end('updates')]]]
+    [[[end]]]
 }
 
 void del(char *id) {
+[[[cog t.profile('deletes', None, False)]]]
+[[[end]]]
     CURL *curl = init_curl_common();
     if(curl) {
         int success = 0;
@@ -232,16 +260,22 @@ void del(char *id) {
             }
         }
         curl_easy_cleanup(curl);
-    }    
+    }     
+    [[[cog t.profile_end('deletes')]]]
+    [[[end]]]
 }
 
 void  delete_all_matching_filter(struct CATEGORY_NAME_occi_filter *filter) {
+[[[cog t.profile('delete_from_filters', 'delete_from_counts', False)]]]
+[[[end]]]
     CATEGORY_NAME_id_list to_delete = list_ids(filter);
     unsigned i;
     for(i = 0; i < to_delete.count; i++) {
         del(to_delete.ids[i]);
     }
-    CATEGORY_NAME_free_id_list(&to_delete);
+    CATEGORY_NAME_free_id_list(&to_delete); 
+    [[[cog t.profile_end('delete_from_filters')]]]
+    [[[end]]]
 }
 
 static char *search_query(const struct CATEGORY_NAME_occi_filter *filter) {
@@ -408,6 +442,30 @@ union riak_object_list list_from_filter(struct CATEGORY_NAME_occi_filter *filter
 }
 
 CATEGORY_NAME_id_list list_ids(struct CATEGORY_NAME_occi_filter *filter) { 
-    union riak_object_list list = list_from_filter(filter, RIAK_OPTION_NO_OBJECT); 
-    return list.ids_only;
+[[[cog t.profile('lists', 'list_counts', False)]]]
+[[[end]]]
+    union riak_object_list list = list_from_filter(filter, RIAK_OPTION_NO_OBJECT);
+    [[[cog t.profile_end('lists')]]]
+    [[[end]]]    
+    return list.ids_only;    
 }
+
+#ifdef BACKEND_PROFILING
+void CATEGORY_NAME_record_filter_count(struct CATEGORY_NAME_occi_filter *filter, filter_count *counts) {
+    unsigned count = CATEGORY_NAME_count_filters(filter);
+    switch (count) {
+    case 0:
+        counts->zeros++;
+        break;
+    case 1:
+        counts->ones++;
+        break;
+    case 2:
+        counts->twos++;
+        break;
+    default:
+        counts->mores++;
+        break;
+    }
+}
+#endif

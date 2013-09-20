@@ -402,14 +402,24 @@ private struct {0}* {0}_retrieve_from_name(const char *name) {{
     return( retVal );
 }}""".format(_category_name()))           
         
-def profile(function_name, filter_name = None):
+def profile(function_name, filter_name = None, save = True):
     cog.outl(
 """#ifdef BACKEND_PROFILING
     {0}_backend_profile.{1}++;""".format(_filename_root(), function_name))
     if filter_name:
         cog.outl("    {2}_record_filter_count(filter, &{0}_backend_profile.{1});".format(
             _filename_root(), filter_name, _category_name()))
-    cog.outl("    save_backend_profile(autosave_{0}_name, &{1}_backend_profile);".format(_category_name(), _filename_root()))
+    if save:
+        cog.outl("    save_backend_profile(autosave_{0}_name, &{1}_backend_profile);".format(_category_name(), _filename_root()))
+    else:
+        cog.outl("    long long start = profile_get_time();")
+    cog.outl("#endif")
+    
+def profile_end(function_name):
+    cog.outl("#ifdef BACKEND_PROFILING")
+    cog.outl("    long long elapsed = profile_get_time() - start;")
+    cog.outl("    {0}_backend_profile.times.{1} += elapsed;".format(_filename_root(), function_name))
+    cog.outl("    profile_print(&{0}_backend_profile, CATEGORY_BUCKET, elapsed, start_of_backend);".format(_filename_root()))
     cog.outl("#endif")
 
 def count_filters():
@@ -417,8 +427,11 @@ def count_filters():
                      "if (filter->{0}) count++;",
                      "if (filter->{0}) count++;") 
          
+def link_backend():
+    return _category_name() == "cords_xlink"
+
 def riak_backend():
-    #return (_category_name() == 'cords_publication') or (_category_name() == "cords_xlink") #TODO Hardcoding switch for now
+    #return (_category_name() == 'cords_publication') or link_backend() #TODO Hardcoding switch for now
     return False
          
 def backend_include():    
@@ -435,3 +448,11 @@ def backend_init():
             _category_name()))
     else:
         cog.out("{0}_riak_backend_interface();".format(_category_name()))
+        
+def backend_pre_create():
+    if link_backend():
+        cog.outl("update_source_id(initial_{0});".format(_filename_root()))     
+
+def backend_pre_update():
+    if link_backend():
+        cog.outl("update_source_id({0});".format(_filename_root()))
