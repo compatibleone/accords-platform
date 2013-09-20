@@ -205,6 +205,38 @@ char * add_ec2_rule(struct ec2_subscription * subptr, char * group, char * rulen
 
 }
 
+char * delete_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * pptr)
+{
+ 	char srcdir[1024];
+	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
+	PyThreadState* pythr=NULL;
+	char * response;
+
+	//python interface	
+        sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	pythr = Py_NewInterpreter();
+	python_path(srcdir);
+	pName = PyString_FromString("ec2client");
+	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
+	else pModule = PyImport_Import(pName);
+	if(pModule == NULL) printf("error: failed to load ec2client module\n");
+	else pDict = PyModule_GetDict(pModule);
+	if(pDict == NULL) printf("error: failed to load dict name in ec2client module\n");
+	else pFunc = PyDict_GetItemString(pDict,"ec2_delete_secgroup");
+	if(pFunc == NULL) printf("error: failed to load ec2_delete_secgroup function in ec2client module\n");
+	else result=PyObject_CallFunction(pFunc,"ssss",subptr->accesskey,subptr->secretkey,subptr->zone,pptr->firewall);
+	if (!result || PyErr_Occurred())
+        {
+       		PyErr_Print();
+       		return (0);
+       	}
+
+	response=allocate_string(PyString_AsString( result ));
+	Py_DECREF(pModule);
+	Py_DECREF(pName);
+	Py_EndInterpreter(pythr);
+	return response;
+}
 
 char * build_ec2_firewall(struct ec2_subscription * subptr, struct amazonEc2 * pptr)
 {
@@ -923,6 +955,8 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	if(pelem){
 		pptr->state = atoi(pelem->value);
 	}
+
+	delete_ec2_secgroup(subptr, pptr);
 
 	return status;
 
