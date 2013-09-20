@@ -735,10 +735,13 @@ public	struct	rest_response * create_onapp_vm(
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 
+	// Set the created_at time.
+	pptr->created_at = onapp_current_timestamp_int();
+
 	/* ------------------------------------- */
 	/* retrieve the subscription information */
 	/* ------------------------------------- */
-	else if ( pptr->profile == NULL )
+	if ( pptr->profile == NULL )
 		return ( rest_html_response ( aptr, 500, "No Onapp Profile supplied" ) );
 	else if (!( config = use_onapp_configuration_crud( pptr->profile ) ))
 		return( rest_html_response( aptr, status, "Configuration Not Found" ) );
@@ -1148,6 +1151,10 @@ public	int	delete_onapp_contract(
 		result = 1;
 	}
 
+	if (pptr->deleted_at == 0)
+	{
+		pptr->deleted_at = onapp_current_timestamp_int();
+	}
 	pptr->state = _OCCI_IDLE;
 	pptr->build_state = allocate_string("deleted");
 	handle_onapp_action_context(pptr, &context);
@@ -1497,6 +1504,7 @@ private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr, st
 
 		if (oaptr != NULL && oaptr->response != NULL && oaptr->response->status < 400)
 		{
+			pptr->deleted_at = onapp_current_timestamp_int();
 			pptr->state = _OCCI_IDLE;
 			pptr->build_state = allocate_string("deleted");
 		}
