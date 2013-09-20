@@ -178,6 +178,8 @@ private struct rest_response * CATEGORY_NAME_get_item(
 		return( not_found_html_response(aptr) );
 	if (iptr && iptr->pre_retrieve) {
 		CATEGORY_NAME_execute_callback(iptr->pre_retrieve, FILENAME_ROOT, optr, rptr);
+		[[[cog t.backend_pre_update()]]]
+		[[[end]]]
 		CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	}
 	return make_response_and_liberate_FILENAME_ROOT(optr, cptr, rptr, aptr, FILENAME_ROOT);
@@ -223,6 +225,8 @@ private struct rest_response * CATEGORY_NAME_post_item(
 	if (iptr) {
 		CATEGORY_NAME_execute_callback(iptr->pre_create, initial_FILENAME_ROOT, optr, rptr);
 	}
+	[[[cog t.backend_pre_create()]]]
+	[[[end]]]
 	if (!( new_FILENAME_ROOT =  CATEGORY_NAME_backend->create(initial_FILENAME_ROOT))) {
 		liberate_CATEGORY_NAME(initial_FILENAME_ROOT);
 		return( internal_failure_response(aptr) );
@@ -258,6 +262,8 @@ private struct rest_response * CATEGORY_NAME_put_item(
 		return( internal_failure_response(aptr) );
 	}
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_update, FILENAME_ROOT, optr, rptr); }
+	[[[cog t.backend_pre_update()]]]
+	[[[end]]]
 	CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->post_update, FILENAME_ROOT, optr, rptr); }
 	struct rest_response *retVal = CATEGORY_NAME_occi_response(optr, cptr, rptr, aptr, FILENAME_ROOT);

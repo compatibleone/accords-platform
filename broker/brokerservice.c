@@ -191,7 +191,6 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	const struct cords_xlink	* lptr;
-	char			* mptr;
 	int			status=0;
 	FILE *			  h;
 	char			buffer[1024];
@@ -213,7 +212,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		lptr = initialise_and_get_first_link(id); NULL != lptr; lptr = next_link(id)) {
+		lptr = initialise_and_get_first_link(id); NULL != lptr; lptr = next_link()) {
 		/* --------------------------------------------------- */
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
@@ -336,7 +335,6 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	struct	occi_response * zptr;
 	struct	occi_element  * eptr;
 	const struct cords_xlink * lptr;
-	char			* mptr;
 	int			status;
 	FILE *			  h;
 	char			buffer[1024];
@@ -358,7 +356,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-	    lptr = initialise_and_get_last_link(id); lptr != NULL; lptr = previous_link(id)) {
+	    lptr = initialise_and_get_last_link(id); lptr != NULL; lptr = previous_link()) {
 		/* --------------------------------------------------- */
 		/* launch / invoke the required action on the contract */
 		/* --------------------------------------------------- */
@@ -502,9 +500,6 @@ private	struct	rest_response * suspend_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	const struct cords_xlink * lptr;
-	char			* mptr;
-	char 			* wptr;
 	struct	cords_service * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -531,9 +526,6 @@ private	struct	rest_response * restart_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	const struct cords_xlink * lptr;
-	char			* mptr;
-	char 			* wptr;
 	struct	cords_service * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -558,9 +550,6 @@ private	struct	rest_response * save_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	const struct cords_xlink * lptr;
-	char			* mptr;
-	char 			* wptr;
 	struct	cords_service * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -585,9 +574,6 @@ private	struct	rest_response * snapshot_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	const struct cords_xlink * lptr;
-	char			* mptr;
-	char 			* wptr;
 	struct	cords_service * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -612,9 +598,6 @@ private	struct	rest_response * stop_service(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	const struct cords_xlink * lptr;
-	char			* mptr;
-	char 			* wptr;
 	struct	cords_service * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -642,7 +625,7 @@ private	int	delete_service_contract(const struct occi_category * optr, const str
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	buffer[0] = 0;
-	for ( lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+	for ( lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link()) {
         if (!( buffer[0] ))
             strcpy( buffer, lptr->source );
         if ((zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
