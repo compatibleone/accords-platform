@@ -76,6 +76,10 @@ AC_SUBST([abs_top_srcdir])
 abs_top_builddir=$(pwd)/${top_buildir}
 AC_SUBST([abs_top_builddir])
 
+# Check for re-entrant (non-portable) time functions.
+AC_CHECK_FUNC(localtime_r, AC_DEFINE(HAVE_LOCALTIME_R, 1, [Defines if localtime_r is available on your system]))
+AC_CHECK_FUNC(gmtime_r, AC_DEFINE(HAVE_GMTIME_R, 1, [Defines if gmtime_r is available on your system]))
+
 ###
 ### Modules configuration
 ###
