@@ -71,6 +71,19 @@ extern int onapp_atoi(char *p);
 
 /// @}
 
+/// @defgroup oa_time_handling OnApp Time handling
+/// @brief Time handling functions used inside OnApp code.
+/// @{
+/// @brief Get the current time as an integer.
+/// @return Time stamp.
+extern int onapp_current_timestamp_int();
+
+/// @brief Get the current time in a string format.
+/// @return Newly allocated string containing current time.
+extern char * onapp_current_timestamp_string(char *default_value);
+
+/// @}
+
 /// @defgroup oa_http_handling OnApp HTTP handling
 /// @brief HTTP functions used inside OnApp code.
 /// @{

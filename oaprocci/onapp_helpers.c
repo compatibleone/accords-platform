@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <allocate.h> // allocate(), liberate(), allocate_string()
+#include <time.h> // time()
 
 #include "oaconfig.h"
 #include "onapp.h"
@@ -298,6 +299,69 @@ int onapp_atoi(char *p)
   int i = strtol(p, NULL, 10);
   liberate(p);
   return i;
+}
+
+/// OnApp Time functions.
+
+struct tm * attempt_gmtime_r(time_t convert, struct tm *time)
+{
+	struct tm *result = NULL;
+#ifdef HAVE_GMTIME_R
+	struct tm time_temp;
+	if (gmtime_r(&convert, &time_temp) != NULL)
+	{
+		*time = time_temp;
+		result = time;
+	}
+#else
+	struct tm *t = gmtime(&convert);
+	if (t != NULL)
+	{
+		*time = *t;
+		result = time;
+	}
+#endif
+	return result;
+}
+
+int onapp_current_timestamp_int()
+{
+	return (int)time(0);
+}
+
+char * onapp_current_timestamp_string(char *default_value)
+{
+	static size_t const buffer_size = 64;
+
+	char buffer[buffer_size];
+	char *result = default_value;
+	time_t const current = time(0);
+	struct tm current_tm = { 0 };
+	size_t const bytes = snprintf(buffer, buffer_size, "%lu", current);
+
+	buffer[bytes] = '\0';
+
+	// 20 for Time string. 4 for '( ' prefix and ')' and null-terminator.
+	if (bytes + 20 + 4 < buffer_size)
+	{
+		if (attempt_gmtime_r(current, &current_tm) == &current_tm)
+		{
+			buffer[bytes] = '\0';
+			strftime(buffer + bytes, 1024, "%FT%TZ)", &current_tm);
+			result = allocate_string(buffer);
+
+		}
+		else
+		{
+			result = allocate_string(buffer);
+		}
+	}
+	else if (bytes > 0)
+	{
+		result = allocate_string(buffer);
+	}
+
+	return result;
 }
 
 //#define OLD_GET_ZEROES
