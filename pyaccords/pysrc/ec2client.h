@@ -33,7 +33,7 @@ char * get_ec2_flavor(int memory, int cores, int speed, int storage, char * arch
 char * build_ec2_firewall(struct ec2_subscription * subptr, struct amazonEc2 * pptr);
 char * add_ec2_rule(struct ec2_subscription * subptr, char * group, char * rulename, int fport, int tport, char * protocol);
 char * create_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * pptr);
-
+char * delete_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * pptr);
 
 int	snapshot_ec2_instance( struct amazonEc2 * pptr );
 int	suspend_ec2_instance( struct amazonEc2 * pptr );

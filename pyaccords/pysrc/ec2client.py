@@ -122,7 +122,17 @@ def ec2_create_secgroup(accesskey,secretkey,zone,secname):
 				return sgname
 			else:
 				time.sleep(2.0)
-	return sgname 
+	return sgname
+
+def ec2_delete_secgroup(accesskey, secretkey, zone, secname):
+	secgname = secname.split("/")
+	sgname = secgname[4]
+	filtersg = {'group-name' : secgname}
+	conn = boto.ec2.connect_to_region(zone,aws_access_key_id=accesskey,aws_secret_access_key=secretkey)
+	for mysg in conn.get_all_security_groups(filters=filtersg):
+		mysg.delete()
+	return "succeeded"
+
 	
 def ec2_add_rule(accesskey,secretkey,zone,group,rname,fport,tport,protocol):
 	conn = boto.ec2.connect_to_region(zone,aws_access_key_id=accesskey,aws_secret_access_key=secretkey)
