@@ -71,7 +71,17 @@ public	struct	occi_category * occi_create_category( char * domain, char * name, 
 	else if (!( cptr->class = allocate_string( klass ) ))
 		return( occi_remove_category( cptr ) );
 	/* correct incorrect relation as for cloud plug fest madrid 19/09/2013 */
-	if (!( strcmp( rel, "http://scheme.ogf.org/occi/core/resource#" ) ))
+	if (!( rel ))
+	{
+		if (!( strcmp( klass, "kind" ) ))
+			rel = "http://scheme.ogf.org/occi/core#resource";
+		else if (!( strcmp( klass, "mixin" ) ))
+			rel = "http://scheme.ogf.org/occi/core#mixin";
+		else if (!( strcmp( klass, "action" ) ))
+			rel = "http://scheme.ogf.org/occi/core#action";
+		else	rel = "http://scheme.ogf.org/occi/core#resource";
+	}
+	else if (!( strcmp( rel, "http://scheme.ogf.org/occi/core/resource#" ) ))
 		rel = "http://scheme.ogf.org/occi/core#resource";
 	else if (!( strcmp( rel, "http://scheme.ogf.org/occi/resource#" ) ))
 		rel = "http://scheme.ogf.org/occi/core#resource";

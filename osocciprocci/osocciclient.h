@@ -33,7 +33,8 @@ public int	os_occi_initialise_client(
 			char * host,
 			char * domain,
 			char * agent,
-			char * tls);
+			char * tls,
+			char * base);
 
 #endif 	/* _occi_client_h */
 	/* -------------- */

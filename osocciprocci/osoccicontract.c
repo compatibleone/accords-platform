@@ -29,10 +29,12 @@ struct	cords_vector
 
 struct	cords_os_contract
 {
+	struct	os_subscription * subscription;
 	struct	cords_vector	node;
 	struct	cords_vector	infrastructure;
 	struct	cords_vector	compute;
 	struct	cords_vector	network;
+	struct	cords_vector	firewall;
 	struct	cords_vector	storage;
 	struct	cords_vector	image;
 	struct	cords_vector	system;
@@ -41,13 +43,16 @@ struct	cords_os_contract
 	struct	rest_header *	images;
 };
 
+
 struct	os_compute_infos
 {
 	int	cores;
 	int	speed;
 	int	memory;
 	int	storage;
+	char 	architecture[256];
 	char *	id;
+	char *	name;
 };
 
 struct	os_image_infos
@@ -227,6 +232,7 @@ private char * resolve_os_template( struct cords_os_contract * cptr )
 			continue;
 		if (!( hptr->value ))
 			continue;
+		printf("%s;%s\n",hptr->name,hptr->value);
 		if  (!( strncasecmp( sysname,  hptr->name, strlen( sysname  ) )))
 		{
 			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
@@ -262,13 +268,67 @@ private char * resolve_resource_template( struct cords_os_contract * cptr )
 {
 	struct	rest_header * hptr;
 	char *	vptr;
-	char *	machname;
+	char 	model[64];
 	char 	buffer[2048];
+	struct	os_compute_infos request;
+	memset(&request,0,sizeof(struct os_compute_infos));
+	/* -------------------------------------------------------------- */
+	/* retrieve appropriate parameters from infrastructure components */
+	/* -------------------------------------------------------------- */
 	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
-		_CORDS_COMPUTE, _CORDS_NAME ) ))
-		machname = "none";
-	else	machname = vptr;
+		_CORDS_COMPUTE, _CORDS_MEMORY ) ))
+		request.memory = 0;
+	else	request.memory = rest_normalise_value( vptr,'G' );
 
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_CORES ) ))
+		request.cores = 0;
+	else	request.cores = rest_normalise_value( vptr,'U' );
+
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_SPEED ) ))
+		request.speed = 0;
+	else	request.speed = rest_normalise_value(vptr,'G');
+	
+	if (!( vptr = occi_extract_atribut( cptr->storage.message, "occi", 
+		_CORDS_STORAGE, _CORDS_SIZE ) ))
+		request.storage = 0;
+	else	request.storage = rest_normalise_value(vptr,'G');
+
+	/* --------------------------------------------- */
+	/* collect and control the architecture required */
+	/* --------------------------------------------- */
+	if (!( vptr = occi_extract_atribut( cptr->compute.message, "occi", 
+		_CORDS_COMPUTE, _CORDS_ARCHITECTURE ) ))
+		strcpy(request.architecture,"blank" );
+	else if ((!(strcasecmp( vptr, "x86"    		) ))
+	     ||  (!(strcasecmp( vptr, "x86_32" 		) ))
+	     ||  (!(strcasecmp( vptr, "x86_64" 		) )))
+		strcpy(request.architecture,"untrusted" );
+	else if ((!(strcasecmp( vptr, "txt86"  		) ))
+	     ||  (!(strcasecmp( vptr, "txt86_32" 	) ))
+	     ||  (!(strcasecmp( vptr, "txt86_64"  	) )))
+		strcpy(request.architecture,"trusted" );
+	else	strcpy(request.architecture,"untrusted" );
+	if ( request.memory >= 1000000 )
+	{
+		request.memory /= 1000000;	
+	}
+	switch ( request.cores )
+	{
+		case	2 :
+		case	3 : sprintf(model,"m%u",request.memory); break;
+		case	4 : 
+		case	5 :
+		case	6 : sprintf(model,"l%u",request.memory); break;
+		case	7 :
+		case	8 : sprintf(model,"x%u",request.memory); break;
+		case	0 :
+		case	1 : 
+		default	  : sprintf(model,"s%u",request.memory); break;
+	}
+	sprintf(buffer,"osocciprocci-flavor model=%s, speed=%u,memory=%u, cores=%u",model,request.speed,request.memory,request.cores);
+	rest_log_message( buffer );
 	for ( 	hptr=cptr->flavors;
 		hptr != (struct rest_header * ) 0;
 		hptr = hptr->next )
@@ -277,7 +337,8 @@ private char * resolve_resource_template( struct cords_os_contract * cptr )
 			continue;
 		else if (!( hptr->value ))
 			continue;
-		else if (!( strcmp( hptr->name, machname ) ))
+		printf("%s;%s\n",hptr->name,hptr->value);
+		if (!( strcmp( hptr->name, model) ))
 		{
 			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
 			return( allocate_string( buffer ) );
@@ -358,7 +419,7 @@ private	int	create_openstack_contract(
 	/* --------------------------------------------------------- */
 	/* recover detailled list of OS Flavors and resolve contract */
 	/* --------------------------------------------------------- */
-	else if (!( contract.flavors = occi_list_resource_templates( kptr->host) ))
+	else if (!( contract.flavors = occi_list_resource_templates( kptr->base) ))
 		return( terminate_openstack_contract( 1180, &contract ) );
 	else if (!( pptr->flavor = resolve_resource_template( &contract ) ))
 		return( terminate_openstack_contract( 1181, &contract ) );
@@ -381,7 +442,7 @@ private	int	create_openstack_contract(
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-	else if (!( contract.images = occi_list_os_templates( kptr->host) ))
+	else if (!( contract.images = occi_list_os_templates( kptr->base) ))
 		return( terminate_openstack_contract( 1186, &contract ) );
 	else if (!( pptr->image = resolve_os_template( &contract ) ))
 		return( terminate_openstack_contract( 1187, &contract ) );
@@ -432,4 +493,3 @@ TODO
 	/* ------------------- */
 #endif	/* _os_occi_contract_c */
 	/* ------------------- */
-
