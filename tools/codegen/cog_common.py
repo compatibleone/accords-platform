@@ -432,7 +432,7 @@ def link_backend():
 
 def riak_backend():
     #return (_category_name() == 'cords_publication') or link_backend() #TODO Hardcoding switch for now
-    return False
+    return True
          
 def backend_include():    
     if not riak_backend():
