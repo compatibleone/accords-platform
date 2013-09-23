@@ -867,8 +867,8 @@ int	schema( char * nptr )
 
 private	int	banner()
 {
-	printf("\n Structure Constructor : Version 3.1a.0.0.2");
-	printf("\n Provisoire du 05/01/2013");
+	printf("\n Structure Constructor : Version 3.1a.0.0.3");
+	printf("\n Provisoire du 23/09/2013");
 	printf("\n Copyright (c) 2013 Iain James Marshall\n");
 	printf("\n Options : \n");
 	printf("\n --verbose                 activate verbose messages ");

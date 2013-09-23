@@ -653,6 +653,20 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"}\n");
 	}
 
+	/* -------------------- */
+	/* location preparation */
+	/* -------------------- */
+	fprintf(h,"private void prepare_%s_location(char *r,char *h,int port,char *l,char *i)\n",C.name);
+	fprintf(h,"{\n");
+	fprintf(h,"\tchar * sptr=h;\n");
+	fprintf(h,"\twhile ( *sptr ) { if (( *sptr == ':' ) && ( *(sptr+1) != '/' ))  break; else sptr++; }\n");
+	fprintf(h,"\tif ( *sptr != ':' )\n");
+	fprintf(h,"\t\tsprintf(r,%c%cs:%cu%cs%cs%c,h,port,l,i);\n",0x0022,0x0025,0x0025,0x0025,0x0025,0x0022);
+	fprintf(h,"\telse\n");
+	fprintf(h,"\t\tsprintf(r,%c%cs%cs%cs%c,h,l,i);\n",0x0022,0x0025,0x0025,0x0025,0x0022);
+
+	fprintf(h,"}\n");
+	
 	/* ------------------ */
 	/* generate post item */
 	/* ------------------ */
@@ -686,9 +700,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);\n");
 
 	fprintf(h,"\tautosave_%s_nodes();\n",C.name);
-
-	fprintf(h,"\tsprintf(cptr->buffer,%c%cs:%cu%cs%cs%c,reqhost,reqport,optr->location,pptr->id);\n",
-			0x0022,0x0025,0x0025,0x0025,0x0025,0x0022);
+	fprintf(h,"\tprepare_%s_location(cptr->buffer,reqhost,reqport,optr->location, pptr->id);\n",C.name);
 	fprintf(h,"\tif (!( hptr = rest_response_header( aptr, %cX-OCCI-Location%c,cptr->buffer) ))\n",
 			0x0022,0x0022);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500, %cServer Failure%c ) );\n",
@@ -801,8 +813,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\t\t\tcontinue;\n");
 	fprintf(h,"\t\tif (!( pass_%s_filter( pptr, &filter) ))\n",C.name);
 	fprintf(h,"\t\t\tcontinue;\n");
-	fprintf(h,"\t\tsprintf(cptr->buffer,%c%cs:%cu%cs%cs%c,reqhost,reqport,optr->location,pptr->id);\n",
-			0x0022,0x0025,0x0025,0x0025,0x0025,0x0022);
+	fprintf(h,"\tprepare_%s_location(cptr->buffer,reqhost,reqport,optr->location, pptr->id);\n",C.name);
 	fprintf(h,"\t\tif (!( hptr = rest_response_header( aptr, %cX-OCCI-Location%c,cptr->buffer) )) {\n",
 			0x0022,0x0022);
 	fprintf(h,"\t\t\tliberate_%s(filter.attributes);\n", C.name);
