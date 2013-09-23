@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+source=${1:-accords-platform}
+
+python ../${source}/tools/backend/xml_to_rest.py ../${source}/scripts/cords_user.xml user 8087
+python ../${source}/tools/backend/xml_to_rest.py ../${source}/manifests/cords_price.xml price 8091
