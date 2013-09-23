@@ -158,17 +158,17 @@ _co_platform() {
     _co_run_serv cosched "accords scheduling services" 
     _co_run_serv conets "accords networking services"
     _co_run_serv cops "accords placement services"
-    _co_run_serv coees "accords energy efficiency services"
+    #_co_run_serv coees "accords energy efficiency services"
     _co_run_serv ezvm "accords image storage services"
     _co_run_serv coips "accords image production services"
     _co_run_serv slam "accords sla services"
-    _co_run_serv copaas "accords paas services"
-    _co_run_serv coeasy "accords easiclouds services"
-    _co_run_serv conagios "accords nagios services"
+    #_co_run_serv copaas "accords paas services"
+    #_co_run_serv coeasy "accords easiclouds services"
+    #_co_run_serv conagios "accords nagios services"
     _co_run_serv parser "accords parser services"
     _co_run_serv broker "accords broker services"
     _co_run_serv procci "accords procci services"
-    _co_run_serv command "accords remote command server"
+    #_co_run_serv command "accords remote command server"
 }
 
 _co_prov_services() {
@@ -217,18 +217,18 @@ _co_provision()
           echo "Starting ACCORDS Provisioning"
     fi
 
-    _co_run_prov osprocci accords "accords open stack services" 30 30 1000 30 30
-    _co_run_prov onprocci accords "accords open nebula services" 20 20 1000 20 20
-    _co_run_prov paprocci accords "accords proactive services" 5 5 500 5 5
-    _co_run_prov azprocci accords "accords windows azure services" 10 10 1000 10 10
-    _co_run_prov ec2procci accords "accords amazonEc2 services" 10 10 1000 10 10
-    _co_run_prov dcprocci accords "accords delta cloud services" 10 10 1000 10 10
-    _co_run_prov cnprocci accords "accords compute next services" 10 10 1000 10 10
-    _co_run_prov eziprocci accords "accords easiclouds services" 10 10 1000 10 10
+    #_co_run_prov osprocci accords "accords open stack services" 30 30 1000 30 30
+    #_co_run_prov onprocci accords "accords open nebula services" 20 20 1000 20 20
+    #_co_run_prov paprocci accords "accords proactive services" 5 5 500 5 5
+    #_co_run_prov azprocci accords "accords windows azure services" 10 10 1000 10 10
+    #_co_run_prov ec2procci accords "accords amazonEc2 services" 10 10 1000 10 10
+    #_co_run_prov dcprocci accords "accords delta cloud services" 10 10 1000 10 10
+    #_co_run_prov cnprocci accords "accords compute next services" 10 10 1000 10 10
+    #_co_run_prov eziprocci accords "accords easiclouds services" 10 10 1000 10 10
     _co_run_prov oaprocci accords "accords on app services" 10 10 1000 10 10
-    _co_run_prov dummyprocci accords "accords dummy services" 10 10 1000 10 10
-    _co_run_prov paasprocci accords "accords paas procci services" 10 10 1000 10 10
-    _co_run_prov osocciprocci accords "accords os occi procci services" 10 10 1000 10 10
+    #_co_run_prov dummyprocci accords "accords dummy services" 10 10 1000 10 10
+    #_co_run_prov paasprocci accords "accords paas procci services" 10 10 1000 10 10
+    #_co_run_prov osocciprocci accords "accords os occi procci services" 10 10 1000 10 10
 
     _co_run_serv cosacs "accords software configuration services"
 
@@ -238,6 +238,7 @@ _co_provision()
 _co_start()
 {
 	_co_platform
+	#./seed_backend #Temporary convenience.  Tidy up
 	_co_prov_services
 	_co_provision
 	_nagios_start
