@@ -249,7 +249,7 @@ def riak_query_from_filter():
                       "    if(written > 0) {{",
                       "        written += sprintf(&buf[written], \"%%20AND%%20\");",
                       "    }}"],
-                     "    written += sprintf(&buf[written], \"{0}:%s\", filter->attributes->{0});",
+                     "    written += sprintf(&buf[written], \"{0}:\\\"%s\\\"\", filter->attributes->{0});",
                      "    written += sprintf(&buf[written], \"{0}:%d\", filter->attributes->{0});",
                      "}}")                                           
     
