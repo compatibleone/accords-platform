@@ -27,6 +27,15 @@ struct	cords_vector
 	struct occi_response * message;
 };
 
+struct	cords_mixin
+{
+	struct	cords_mixin * previous;
+	struct	cords_mixin * next;
+	char *	name;
+	char *	title;
+	char *	value;
+};
+
 struct	cords_os_contract
 {
 	struct	os_subscription * subscription;
@@ -39,10 +48,9 @@ struct	cords_os_contract
 	struct	cords_vector	image;
 	struct	cords_vector	system;
 	struct	cords_vector	package;
-	struct	rest_header *	flavors;
-	struct	rest_header *	images;
+	struct	cords_mixin *	flavors;
+	struct	cords_mixin *	images;
 };
-
 
 struct	os_compute_infos
 {
@@ -106,6 +114,39 @@ private	struct	os_config * use_occi_openstack_configuration( char * sptr )
 	}
 }
 
+/*	----------------------------------------------------------	*/
+/*		a l l o c a t e _ c o r d s _ m i x i n 		*/
+/*	----------------------------------------------------------	*/
+private	struct cords_mixin * allocate_cords_mixin()
+{
+	struct	cords_mixin * mptr;
+	if (!( mptr = (struct cords_mixin *) allocate( sizeof( struct cords_mixin ) ) ))
+		return(mptr);
+	else
+	{
+		memset( mptr, 0, sizeof( struct cords_mixin ) );
+		return( mptr );
+	}
+}
+
+/*	----------------------------------------------------------	*/
+/*		l i b e r a t e _ c o r d s _ m i x i n 		*/
+/*	----------------------------------------------------------	*/
+private	struct cords_mixin * liberate_cords_mixin(struct cords_mixin * mptr )
+{
+	if ( mptr )
+	{
+		if ( mptr->name )
+			mptr->name = liberate( mptr->name );
+		if ( mptr->title )
+			mptr->title = liberate( mptr->title );
+		if ( mptr->value )
+			mptr->value = liberate( mptr->value );
+		liberate( mptr );
+	}
+	return((struct cords_mixin *) 0);
+}
+
 /*	-----------------------------------------------------------------	*/
 /*	     t e r m i n a t e _ o p e n s t a c k _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
@@ -128,25 +169,27 @@ private	int	terminate_openstack_contract( int status, struct cords_os_contract *
 	if ( cptr->package.message )
 		cptr->package.message = occi_remove_response( cptr->package.message );
 	if ( cptr->flavors )
-		cptr->flavors = liberate_rest_header( cptr->flavors );
+		cptr->flavors = liberate_cords_mixin( cptr->flavors );
 	if ( cptr->images  )
-		cptr->images  = liberate_rest_header( cptr->images  );
+		cptr->images  = liberate_cords_mixin( cptr->images  );
 	return( status );
 }
 
 /*	----------------------------------------------------------	*/
 /*		o c c i _ l i s t _ m i x i n s 			*/
 /*	----------------------------------------------------------	*/
-private struct rest_header * occi_list_mixins( char * scheme, char * host )
+private struct cords_mixin * occi_list_mixins( char * scheme, char * host )
 {
-	struct	rest_header * root=(struct rest_header *) 0;
-	struct	rest_header * hptr=(struct rest_header *) 0;
-	struct	rest_header * foot=(struct rest_header *) 0;
+	struct	cords_mixin * root=(struct cords_mixin *) 0;
+	struct	cords_mixin * mptr=(struct cords_mixin *) 0;
+	struct	cords_mixin * foot=(struct cords_mixin *) 0;
 	struct	occi_client * cptr;
 	struct	occi_category * kptr;
+	struct	rest_header * hptr;
 	struct	rest_header * holdhead;
+
 	if (!( hptr = keystone_credentials() ))
-		return( hptr );
+		return( (struct cords_mixin *) 0);
 	else 	
 	{
 		holdhead= occi_save_default_headers();
@@ -160,6 +203,9 @@ private struct rest_header * occi_list_mixins( char * scheme, char * host )
 	}
 	else
 	{
+		if ( check_verbose() )
+			printf("List Mixins : %s\n",scheme);
+
 		occi_restore_default_headers(holdhead);
 		for (	kptr=cptr->firstcat;
 			kptr != (struct occi_category *) 0;
@@ -171,24 +217,30 @@ private struct rest_header * occi_list_mixins( char * scheme, char * host )
 				continue;
 			else if ( strcmp( kptr->rel, scheme ) )
 				continue;
-			else if (!( hptr = allocate_rest_header() ))
+			else if (!( mptr = allocate_cords_mixin() ))
 				continue;
-			else if (!( hptr->value = allocate_string( kptr->scheme ) ))
+			else if (!( mptr->value = allocate_string( kptr->scheme ) ))
 			{
-				hptr = liberate_rest_header( hptr );
+				mptr = liberate_cords_mixin( mptr );
 				continue;
 			}			
-			else if (!( hptr->name = allocate_string( kptr->id ) ))
+			else if (!( mptr->name = allocate_string( kptr->id ) ))
 			{
-				hptr = liberate_rest_header( hptr );
+				mptr = liberate_cords_mixin( mptr );
+				continue;
+			}			
+			else if (!( mptr->title = allocate_string( kptr->title ) ))
+			{
+				mptr = liberate_cords_mixin( mptr );
 				continue;
 			}			
 			else
 			{
-				if (!( hptr->previous = foot ))
-					root = hptr;
-				else	hptr->previous->next = hptr;
-				foot = hptr;
+				printf("id=%s, title=%s\n",mptr->name,mptr->title);
+				if (!( mptr->previous = foot ))
+					root = mptr;
+				else	mptr->previous->next = mptr;
+				foot = mptr;
 			}
 		}
 	}
@@ -198,7 +250,7 @@ private struct rest_header * occi_list_mixins( char * scheme, char * host )
 /*	----------------------------------------------------------	*/
 /*		o c c i _ l i s t _ o s _ t e m p l a t e s		*/
 /*	----------------------------------------------------------	*/
-private struct rest_header * occi_list_os_templates(char * host)
+private struct cords_mixin * occi_list_os_templates(char * host)
 {
 	return( occi_list_mixins( _OCCI_OS_TEMPLATE, host ) );
 }
@@ -208,7 +260,7 @@ private struct rest_header * occi_list_os_templates(char * host)
 /*	----------------------------------------------------------	*/
 private char * resolve_os_template( struct cords_os_contract * cptr )
 {
-	struct	rest_header * hptr;
+	struct	cords_mixin * hptr;
 	char *	vptr;
 	char *	sysname;
 	char *	bestcase=(char *) 0;
@@ -225,14 +277,14 @@ private char * resolve_os_template( struct cords_os_contract * cptr )
 	/* scan the list of os templates for a match */
 	/* ----------------------------------------- */
 	for ( 	hptr=cptr->images;
-		hptr != (struct rest_header * ) 0;
+		hptr != (struct cords_mixin * ) 0;
 		hptr = hptr->next )
 	{
 		if (!( hptr->name ))
 			continue;
 		if (!( hptr->value ))
 			continue;
-		printf("%s;%s\n",hptr->name,hptr->value);
+
 		if  (!( strncasecmp( sysname,  hptr->name, strlen( sysname  ) )))
 		{
 			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
@@ -256,7 +308,7 @@ private char * resolve_os_template( struct cords_os_contract * cptr )
 /*	----------------------------------------------------------	*/
 /*	 o c c i _ l i s t _ r e s o u r c e _ t e m p l a t e s	*/
 /*	----------------------------------------------------------	*/
-private struct rest_header * occi_list_resource_templates(char * host)
+private struct cords_mixin * occi_list_resource_templates(char * host)
 {
 	return( occi_list_mixins( _OCCI_RESOURCE_TEMPLATE, host ) );
 }
@@ -266,7 +318,7 @@ private struct rest_header * occi_list_resource_templates(char * host)
 /*	----------------------------------------------------------	*/
 private char * resolve_resource_template( struct cords_os_contract * cptr )
 {
-	struct	rest_header * hptr;
+	struct	cords_mixin * hptr;
 	char *	vptr;
 	char 	model[64];
 	char 	buffer[2048];
@@ -330,14 +382,14 @@ private char * resolve_resource_template( struct cords_os_contract * cptr )
 	sprintf(buffer,"osocciprocci-flavor model=%s, speed=%u,memory=%u, cores=%u",model,request.speed,request.memory,request.cores);
 	rest_log_message( buffer );
 	for ( 	hptr=cptr->flavors;
-		hptr != (struct rest_header * ) 0;
+		hptr != (struct cords_mixin * ) 0;
 		hptr = hptr->next )
 	{
 		if (!( hptr->name ))
 			continue;
 		else if (!( hptr->value ))
 			continue;
-		printf("%s;%s\n",hptr->name,hptr->value);
+
 		if (!( strcmp( hptr->name, model) ))
 		{
 			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
