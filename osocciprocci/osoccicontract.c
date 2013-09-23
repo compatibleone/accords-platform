@@ -262,6 +262,7 @@ private char * resolve_os_template( struct cords_os_contract * cptr )
 {
 	struct	cords_mixin * hptr;
 	char *	vptr;
+	char *	sptr;
 	char *	sysname;
 	char *	bestcase=(char *) 0;
 	char 	buffer[2048];
@@ -290,14 +291,29 @@ private char * resolve_os_template( struct cords_os_contract * cptr )
 			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
 			return( allocate_string( buffer ) );
 		}
-		else 
+		else if  (!( strncasecmp( hptr->name, sysname,  strlen(hptr->name)  ) ))
 		{
-			if  (!( strncasecmp( hptr->name, sysname,  strlen(hptr->name)  ) ))
+			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+			return( allocate_string( buffer ) );
+		}
+		else if (!( sptr = hptr->title ))
+			continue;
+		else if ( strncasecmp( sptr, "IMAGE:", strlen( "IMAGE:" ) ) != 0 )
+			continue;
+		else
+		{
+			sptr += strlen("IMAGE:");
+			while ( *sptr == ' ' ) sptr++;
+			if  (!( strncasecmp( sysname,  sptr, strlen( sysname  ) )))
 			{
 				sprintf(buffer,"%s;%s",hptr->name,hptr->value);
 				return( allocate_string( buffer ) );
 			}
-			else	continue;
+			else if  (!( strncasecmp( sptr, sysname,  strlen(sptr)  ) ))
+			{
+				sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+				return( allocate_string( buffer ) );
+			}
 		}
 	}
 	if (!( bestcase ))
@@ -320,6 +336,7 @@ private char * resolve_resource_template( struct cords_os_contract * cptr )
 {
 	struct	cords_mixin * hptr;
 	char *	vptr;
+	char *	sptr;
 	char 	model[64];
 	char 	buffer[2048];
 	struct	os_compute_infos request;
@@ -395,7 +412,21 @@ private char * resolve_resource_template( struct cords_os_contract * cptr )
 			sprintf(buffer,"%s;%s",hptr->name,hptr->value);
 			return( allocate_string( buffer ) );
 		}
-		else	continue;
+		else if (!( sptr = hptr->title ))
+			continue;
+		else if ( strncasecmp( sptr, "FLAVOR:", strlen("FLAVOR:")) != 0 )
+			continue;
+		else 
+		{
+			sptr += strlen("FLAVOR:");	
+			while ( *sptr == ' ') sptr++;
+			if (!( strncasecmp( sptr, model, strlen( model ) ) ))
+			{
+				sprintf(buffer,"%s;%s",hptr->name,hptr->value);
+				return( allocate_string( buffer ) );
+			}
+			else	continue;
+		}
 	}
 	return(allocate_string("(null)"));
 }
