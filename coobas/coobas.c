@@ -839,7 +839,7 @@ private	int	close_invoice_transactions( struct cords_invoice * pptr )
     /* ----------------------------------------------------- */
     /* for all defined contract nodes of the current service */
     /* ----------------------------------------------------- */
-    for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {        
+    for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link()) {        
         /* --------------------------------------------------- */
         /* launch / invoke the required action on the contract */
         /* --------------------------------------------------- */
