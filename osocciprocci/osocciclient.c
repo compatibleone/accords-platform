@@ -557,7 +557,7 @@ private	struct	rest_header * occi_os_add_mixin( struct rest_header * root, char 
 		while ( foot->next )
 			foot = foot->next;
 
-	sprintf(buffer, "%s; scheme=%c%s%c; class=%cmixin%c", mixin, 0x0022,schema,0x0022,0x0022,0x0022 );
+	sprintf(buffer, "%s; scheme=%c%s#%c; class=%cmixin%c", mixin, 0x0022,schema,0x0022,0x0022,0x0022 );
 	if (!( hptr = occi_os_header( "Category", buffer ) ))
 		return( liberate_rest_header( root ) );
 	else if (!( hptr->previous = foot ))
@@ -1071,9 +1071,13 @@ public	struct rest_response * create_occi_os_secure_compute(
 		return( occi_os_failure( hptr ) );
 	else if (!( hptr = occi_os_add_mixin( hptr, machine, "http://schemas.openstack.org/template/resource" )))
 		return( occi_os_failure( hptr ) );
-	else if (!( hptr = occi_os_add_mixin( hptr, g, _OCCI_OS_SECURITY )))
-		return( occi_os_failure( hptr ) );
-	else	return( rest_client_post_request( url, OcciConfig.tls, OcciConfig.agent, (char *) 0, hptr ) );
+	else
+	{
+		if ( rest_valid_string( g ) )
+			if (!( hptr = occi_os_add_mixin( hptr, g, _OCCI_OS_SECURITY )))
+				return( occi_os_failure( hptr ) );
+		return( rest_client_post_request( url, OcciConfig.tls, OcciConfig.agent, (char *) 0, hptr ) );
+	}
 }
 
 /*	OCCI ALLOCATE FLOATING IP FOR COMPUTE
