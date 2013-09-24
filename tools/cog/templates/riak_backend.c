@@ -151,7 +151,7 @@ static struct CATEGORY_NAME *create_or_update(const struct CATEGORY_NAME *initia
                 }            
                 headers = set_http_headers(curl, headers);
     
-                if(perform_curl_and_check(curl, headers)) {
+                if(perform_curl_and_check(curl, headers, retries)) {
                     new_FILENAME_ROOT = CATEGORY_NAME_from_json_string(response.data);
                 }
                 free(transfer.data);
@@ -192,7 +192,7 @@ static struct FILENAME_ROOT_with_vclock retrieve_with_vclock_from_id(const char 
             
             set_curl_query_url(curl, CATEGORY_BUCKET, id, RIAK_OPTION_NO_OBJECT);
                     
-            if(perform_curl_and_check(curl, NULL)) {
+            if(perform_curl_and_check(curl, NULL, retries)) {
                 retval.FILENAME_ROOT = CATEGORY_NAME_from_json_string(data.data);
                 retval.vclock = vclock_from_headers(header_data.data);
             }
@@ -254,9 +254,12 @@ void del(char *id) {
         for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {    
             curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
             set_curl_query_url(curl, CATEGORY_BUCKET, id, RIAK_OPTION_NO_OBJECT);                
-            long code = perform_curl_and_get_code(curl, NULL);
+            long code = perform_curl_and_get_code(curl, NULL, retries);
             if (204 == code || 404 == code) {
                 success = 1;
+            }
+            else {
+                exponential_backoff(retries);
             }
         }
         curl_easy_cleanup(curl);
@@ -429,7 +432,7 @@ union riak_object_list list_from_filter(struct CATEGORY_NAME_occi_filter *filter
             struct transfer_data response = {0};
             setup_download(curl, &response);
     
-            if(perform_curl_and_check(curl, NULL)) {
+            if(perform_curl_and_check(curl, NULL, retries)) {
                 success = 1;  // If we got data back from curl, we don't want to retry, even if parsing the
                               // data is unsuccessful
                 retVal = list_from_curl_response(response.data, n_filters, return_objects);                            
