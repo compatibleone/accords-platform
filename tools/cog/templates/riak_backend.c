@@ -73,7 +73,9 @@ struct FILENAME_ROOT_backend_interface *  CATEGORY_NAME_riak_backend_interface()
 
 
 void init() {
+#ifdef BACKEND_PROFILING
     start_of_backend = profile_get_time();
+#endif
     curl_global_init(CURL_GLOBAL_ALL);
     enable_riak_search(CATEGORY_BUCKET);
 }

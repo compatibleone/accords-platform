@@ -40,6 +40,6 @@ void save_backend_profile(const char *filename, const struct backend_profile *pr
 long long profile_get_time();
 void profile_print(struct backend_profile *profile, const char *bucket, long long elapsed, long long start);
 
-#define BACKEND_PROFILING
+//#define BACKEND_PROFILING
 
 #endif
