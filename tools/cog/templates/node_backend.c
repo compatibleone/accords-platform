@@ -410,8 +410,7 @@ private CATEGORY_NAME_list CATEGORY_NAME_retrieve_from_filter(struct CATEGORY_NA
 [[[cog t.profile('retrieve_from_filters', 'retrieve_from_counts')]]]
 [[[end]]]
     pthread_mutex_lock( &list_CATEGORY_NAME_control );
-	CATEGORY_NAME_list FILENAME_ROOTs;
-	FILENAME_ROOTs.count = 0;
+	CATEGORY_NAME_list FILENAME_ROOTs = {0};
 
 	int pub_count = CATEGORY_NAME_count_filter_matches(filter);
 
