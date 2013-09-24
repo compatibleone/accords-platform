@@ -1,6 +1,9 @@
 #ifndef _riak_backend_h
 #define _riak_backend_h
 
+#define RIAK_DEBUG_TRACE (0)
+#define RIAK_DEBUG_TRACE_VERBOSE (RIAK_DEBUG_TRACE && 1)
+
 #define CURL_RETRIES (6)
 
 typedef enum {
@@ -20,6 +23,7 @@ void set_search_url(CURL *curl, unsigned n_filters, const char *bucket, const ch
 long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers, unsigned retries);
 int perform_curl_and_check(CURL *curl, struct curl_slist *headers, unsigned retries);
 void exponential_backoff(unsigned retries);
+void debug_curl_failure(CURL* curl, CURLcode res, long http_code);
 void enable_riak_search(const char *bucket);
 void register_upload_data(CURL *curl, struct transfer_data *transfer, char *data);
 struct curl_slist *set_http_headers(CURL *curl, struct curl_slist *headers);

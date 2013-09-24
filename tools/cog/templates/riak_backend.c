@@ -125,6 +125,9 @@ static struct CATEGORY_NAME *CATEGORY_NAME_from_json_string(const char *input) {
 }
 
 static struct CATEGORY_NAME *create_or_update(const struct CATEGORY_NAME *initial_FILENAME_ROOT, const char *vclock) {
+    if (RIAK_DEBUG_TRACE) {
+        printf("Riak Backend: Create or update...");
+    }
     CURL *curl;
     struct CATEGORY_NAME *new_FILENAME_ROOT = NULL;    
     curl = init_curl_common();
@@ -160,6 +163,9 @@ static struct CATEGORY_NAME *create_or_update(const struct CATEGORY_NAME *initia
         }
         curl_easy_cleanup(curl);
     }
+    if (RIAK_DEBUG_TRACE) {
+        printf("done\n");
+    }
     return new_FILENAME_ROOT;    
 }
 
@@ -178,6 +184,9 @@ struct FILENAME_ROOT_with_vclock {
 };
 
 static struct FILENAME_ROOT_with_vclock retrieve_with_vclock_from_id(const char *id) {
+    if (RIAK_DEBUG_TRACE) {
+        printf("Riak Backend: Retrieving...");
+    }
     struct FILENAME_ROOT_with_vclock retval = {0};    
     CURL *curl = init_curl_common();
     if(curl) {
@@ -201,6 +210,9 @@ static struct FILENAME_ROOT_with_vclock retrieve_with_vclock_from_id(const char 
             free(header_data.data);
         }
         curl_easy_cleanup(curl);
+    }
+    if (RIAK_DEBUG_TRACE) {
+        printf("done\n");
     }
     return retval;     
 }
@@ -247,6 +259,9 @@ void update(char *id, struct CATEGORY_NAME *updated_FILENAME_ROOT) {
 void del(char *id) {
 [[[cog t.profile('deletes', None, False)]]]
 [[[end]]]
+    if (RIAK_DEBUG_TRACE) {
+        printf("Riak Backend: Deleting...");
+    }
     CURL *curl = init_curl_common();
     if(curl) {
         int success = 0;
@@ -259,11 +274,15 @@ void del(char *id) {
                 success = 1;
             }
             else {
+                debug_curl_failure(curl, CURLE_OK, code);
                 exponential_backoff(retries);
             }
         }
         curl_easy_cleanup(curl);
-    }     
+    }    
+    if (RIAK_DEBUG_TRACE) {
+        printf("done\n");
+    } 
     [[[cog t.profile_end('deletes')]]]
     [[[end]]]
 }
@@ -414,7 +433,10 @@ static union riak_object_list list_from_curl_response(const char *response, unsi
     return retVal;
 }
 
-union riak_object_list list_from_filter(struct CATEGORY_NAME_occi_filter *filter, riak_object_return return_objects) { 
+union riak_object_list list_from_filter(struct CATEGORY_NAME_occi_filter *filter, riak_object_return return_objects) {
+    if (RIAK_DEBUG_TRACE) {
+        printf("Riak Backend: Listing...");
+    } 
     union riak_object_list retVal = {0};
     CURL *curl = init_curl_common();
     if(curl) {
@@ -440,7 +462,10 @@ union riak_object_list list_from_filter(struct CATEGORY_NAME_occi_filter *filter
             free(response.data);
         }
     }
-    curl_easy_cleanup(curl);    
+    curl_easy_cleanup(curl);
+    if (RIAK_DEBUG_TRACE) {
+        printf("done\n");
+    }    
     return retVal; 
 }
 

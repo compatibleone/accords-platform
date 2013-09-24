@@ -8,9 +8,6 @@
 
 #include "riak_backend.h"
 
-#define DEBUG_TRACE (0)
-#define DEBUG_TRACE_VERBOSE (DEBUG_TRACE && 0)
-
 #define MIN(a,b) ((a < b) ? (a) : (b))
 
 static char ENABLE_SEARCH_CMD[] = "{\"props\":{\"precommit\":[{\"mod\":\"riak_search_kv_hook\",\"fun\":\"precommit\"}]}}";
@@ -21,7 +18,7 @@ CURL *init_curl_common() {
     CURL *curl = curl_easy_init();
     if(curl) {
         // CURLOPT_VERBOSE is useful to enable during debug
-        if (DEBUG_TRACE_VERBOSE) {
+        if (RIAK_DEBUG_TRACE_VERBOSE) {
             curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
         }
 
@@ -61,6 +58,21 @@ void set_search_url(CURL *curl, unsigned n_filters, const char *bucket, const ch
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
 }
 
+void debug_curl_failure(CURL* curl, CURLcode res, long http_code) {
+    if (RIAK_DEBUG_TRACE) {
+        char *url;
+        CURLcode url_retrieved;
+        url_retrieved = curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
+        if (CURLE_OK == url_retrieved) {
+            printf("Request to '%s' failed with http error code '%ld'\n", url,
+                    http_code);
+        } else {
+            printf("Failed to connect to riak server at unknown url\n");
+        }
+        printf("Curl reported error %d, see curl.h for details\n", res);
+    }
+}
+
 long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers, unsigned retries) {    
     CURLcode res;
     res = curl_easy_perform(curl);
@@ -73,26 +85,21 @@ long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers, unsigned 
         return http_code;
     }
     else {
-        if (DEBUG_TRACE) {
-            char *url;
-            CURLcode url_retrieved;
-            url_retrieved = curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
-            if (CURLE_OK == url_retrieved) {
-                printf("Request to '%s' failed with http error code '%ld'\n", url, http_code);
-            }
-            else {
-                printf("Failed to connect to riak server at unknown url\n");
-            }
-            printf("Curl reported error %d, see curl.h for details\n", res);
-        }
+        debug_curl_failure(curl, res, http_code);
         return http_code ? http_code : -1; // Curl returns 0 if no response retrieved from server
     }
 }
 
 int perform_curl_and_check(CURL *curl, struct curl_slist *headers, unsigned retries) {
-    int success = (200 == perform_curl_and_get_code(curl, headers, retries));
+    long http_code = perform_curl_and_get_code(curl, headers, retries);
+    int success = (200 == http_code);
     if (!success) {
-        exponential_backoff(retries);
+        debug_curl_failure(curl, CURLE_OK, http_code);
+        // Not found is likely to be a genuine result, there's nothing wrong with the server or comms,
+        // so no need to back off
+        if (404 != http_code) {
+            exponential_backoff(retries);
+        }
     }
     return success;
 }
@@ -104,7 +111,7 @@ void exponential_backoff(unsigned retries) {
         long long sleep_period = backoff ? 1000000ll << (3 * backoff) : 0;
         requested.tv_sec = sleep_period / 1000000000ll;
         requested.tv_nsec = sleep_period % 1000000000ll;
-        printf("*** Server failure when attempting to contact riak, backing off for %lums ***\n", requested.tv_sec * 1000 + requested.tv_nsec / 1000000l);
+        printf("*** Failure when attempting to contact riak, backing off for %lums ***\n", requested.tv_sec * 1000 + requested.tv_nsec / 1000000l);
         nanosleep(&requested, &elapsed);
         printf("Backoff complete\n");
     }
@@ -173,6 +180,10 @@ void register_upload_data(CURL *curl, struct transfer_data *transfer, char *data
 }
 
 void enable_riak_search(const char *bucket) {
+    if (RIAK_DEBUG_TRACE) {
+        printf("Riak Backend: Initialising search...");
+    }
+    
     int success = 0;
     unsigned retries;
     long http_code;
@@ -196,8 +207,12 @@ void enable_riak_search(const char *bucket) {
         }
         curl_easy_cleanup(curl);
     }     
-    if (!success && DEBUG_TRACE) {
+    if (!success && RIAK_DEBUG_TRACE) {
         printf("****** Failed to initialise riak search *******\n");
+    }
+    
+    if (RIAK_DEBUG_TRACE) {
+        printf("done\n");
     }
 }
 
