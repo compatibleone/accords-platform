@@ -1573,7 +1573,7 @@ private	struct	rest_response * save_openstack(
 private	struct os_response *	stop_openstack_provisioning( struct openstack * pptr )
 {
 	int	status;
-	struct	os_response * osptr;
+	struct	os_response * osptr=(struct os_response *) 0;
 	struct	os_subscription * subptr=(struct os_subscription *) 0;
 	char		reference[512];
 
