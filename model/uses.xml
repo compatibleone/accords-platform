@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
 	<uses>
+		<use backend="riak_db">
+			<includeall />
+		</use>
 		<use backend="default">
-			<includeall/>
+		    <excludeall />
 		</use>
 	</uses>
 </config>

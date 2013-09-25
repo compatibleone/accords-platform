@@ -101,7 +101,7 @@ private	int	connection_worker( struct cords_connection * pptr )
 	sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
 	while (!( rest_server_signal()))
 	{
-		for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+		for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link()) {
             purge_connection_packets( pptr, packets, lptr->target );
             sleep(inner);
 		}
@@ -212,7 +212,7 @@ private	struct rest_response * start_connection(
 	else
 	{
 	    pptr->probes=0;
-	    for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link(pptr->id)) {
+	    for (lptr = initialise_and_get_first_link(pptr->id); NULL != lptr; lptr = next_link()) {
             if (!(zptr = cords_invoke_action( lptr->target, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
                 return( rest_html_response( aptr, 801, "Probe Start Failure" ) );
             else if ( cords_check_invocation( zptr, aptr ) != 0 )

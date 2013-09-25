@@ -41,8 +41,9 @@ def parse_models(model_dir):
     global models
     # Not re-parsing the models each time gives a massive speed-up
     if 'models' not in globals():
-        print "Parsing models"
-        models = parse([model_dir], None, None, None)    
+        print "Parsing models..."
+        models = parse([model_dir], None, None, None)
+        print "...done"    
 
 def init_models(model_dir, filename):
     global models
@@ -166,7 +167,7 @@ def occi_response():
                      "sprintf(cptr->buffer,\"%s.%s.{0}=%c%s%c\",optr->domain,optr->id,0x0022,pptr->{0},0x0022);",
                      "sprintf(cptr->buffer,\"%s.%s.{0}=%c%u%c\",optr->domain,optr->id,0x0022,pptr->{0},0x0022);",
                      ["if (!( hptr = rest_response_header( aptr, \"X-OCCI-Attribute\",cptr->buffer) ))",
-                     "    return( rest_html_response( aptr, 500, \"Server Failure\" ) );"],
+                     "    return(internal_failure_response(aptr));"],
                      include_id = False)    
     
 def occi_builder():
@@ -248,7 +249,7 @@ def riak_query_from_filter():
                       "    if(written > 0) {{",
                       "        written += sprintf(&buf[written], \"%%20AND%%20\");",
                       "    }}"],
-                     "    written += sprintf(&buf[written], \"{0}:%s\", filter->attributes->{0});",
+                     "    written += sprintf(&buf[written], \"{0}:\\\"%s\\\"\", filter->attributes->{0});",
                      "    written += sprintf(&buf[written], \"{0}:%d\", filter->attributes->{0});",
                      "}}")                                           
     
@@ -401,14 +402,24 @@ private struct {0}* {0}_retrieve_from_name(const char *name) {{
     return( retVal );
 }}""".format(_category_name()))           
         
-def profile(function_name, filter_name = None):
+def profile(function_name, filter_name = None, save = True):
     cog.outl(
 """#ifdef BACKEND_PROFILING
     {0}_backend_profile.{1}++;""".format(_filename_root(), function_name))
     if filter_name:
         cog.outl("    {2}_record_filter_count(filter, &{0}_backend_profile.{1});".format(
             _filename_root(), filter_name, _category_name()))
-    cog.outl("    save_backend_profile(autosave_{0}_name, &{1}_backend_profile);".format(_category_name(), _filename_root()))
+    if save:
+        cog.outl("    save_backend_profile(autosave_{0}_name, &{1}_backend_profile);".format(_category_name(), _filename_root()))
+    else:
+        cog.outl("    long long start = profile_get_time();")
+    cog.outl("#endif")
+    
+def profile_end(function_name):
+    cog.outl("#ifdef BACKEND_PROFILING")
+    cog.outl("    long long elapsed = profile_get_time() - start;")
+    cog.outl("    {0}_backend_profile.times.{1} += elapsed;".format(_filename_root(), function_name))
+    cog.outl("    profile_print(&{0}_backend_profile, CATEGORY_BUCKET, elapsed, start_of_backend);".format(_filename_root()))
     cog.outl("#endif")
 
 def count_filters():
@@ -416,16 +427,18 @@ def count_filters():
                      "if (filter->{0}) count++;",
                      "if (filter->{0}) count++;") 
          
+def link_backend():
+    return _category_name() == "cords_xlink"
+
 def riak_backend():
-    #return (_category_name() != 'cords_publication') #TODO Hardcoding switch for now
-    return False
+    return category.backend.plugin == 'riak'
          
 def backend_include():    
     if not riak_backend():
         cog.outl("#include \"{0}_node_backend.h\"".format(_filename_root()))
     else:
         cog.outl("#include \"{0}_riak_backend.h\"".format(_filename_root()))
-        
+
 def backend_init():
     cog.outl("//Backend is {0}".format(category.backend.plugin))
     cog.out("{0}_backend = ".format(_category_name()))
@@ -434,3 +447,11 @@ def backend_init():
             _category_name()))
     else:
         cog.out("{0}_riak_backend_interface();".format(_category_name()))
+        
+def backend_pre_create():
+    if link_backend():
+        cog.outl("update_source_id(initial_{0});".format(_filename_root()))     
+
+def backend_pre_update():
+    if link_backend():
+        cog.outl("update_source_id({0});".format(_filename_root()))

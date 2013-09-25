@@ -616,7 +616,7 @@ public	char *	occi_html_body(
 			/* generate the list of links if available */
 			/* --------------------------------------- */
 			fprintf(h,"<tr><th>Links</th><td><div align=center><table>\n");
-			for ( lptr = initialise_and_get_first_link(id);	NULL != lptr; lptr = next_link(id)) {
+			for ( lptr = initialise_and_get_first_link(id);	NULL != lptr; lptr = next_link()) {
 				fprintf(h,"<tr><td><a href='%s'>%s</a>",lptr->target,lptr->target);
 			}
 			fprintf(h,"</table></div></td></tr>\n");
