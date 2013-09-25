@@ -33,7 +33,6 @@ private	struct	rest_response * instance_plan(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	occi_response * zptr;
 	char *	service=(char *) 0;
 	struct	cords_plan * pptr;
 

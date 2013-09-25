@@ -1533,11 +1533,11 @@ private	struct rest_response * commandserver_get_file(
 	{
 		sprintf(length,"%u",info.st_size);
 		if (!( rest_response_header(aptr,"Content-Length",length) ))
-			return( rest_html_response( aptr, 500, "Server Failure" ) );
+			return( internal_failure_response(aptr) );
 		else if (!( rest_response_header(aptr,"Content-Type","text/html") ))
-			return( rest_html_response( aptr, 500, "Server Failure" ) );
+			return( internal_failure_response(aptr) );
 		else if (!( nptr = allocate_string( filename ) ))
-			return( rest_html_response( aptr, 500, "Server Failure" ) );
+			return( internal_failure_response(aptr) );
 		else
 		{
 			rest_response_body(aptr,nptr,0 );

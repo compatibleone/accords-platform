@@ -274,4 +274,19 @@ class TestUsesParsing(unittest.TestCase):
         result = op.uses
         
         assert_that(result.backend_for(category), is_(None))
+            
+    def test_that_excluded_category_doesnt_exclude_other_categories(self):
+        root = ET.Element('config')
+        uses = ET.SubElement(root, 'uses')
+        backend = 'db'
+        use = ET.SubElement(uses, 'use', {'backend':backend})
+        ET.SubElement(use, 'includeall')
+        include = ET.SubElement(use, 'exclude')
+        category = 'publication'
+        ET.SubElement(include, 'category', {'name':category})
+        op = UsesParser()
         
+        op.parse(root)
+        result = op.uses
+        
+        assert_that(result.backend_for('something_else'), is_(backend))

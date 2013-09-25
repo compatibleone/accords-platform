@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <time.h>
 
 #include <curl/curl.h>
 
@@ -17,7 +18,9 @@ CURL *init_curl_common() {
     CURL *curl = curl_easy_init();
     if(curl) {
         // CURLOPT_VERBOSE is useful to enable during debug
-        //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        if (RIAK_DEBUG_TRACE_VERBOSE) {
+            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        }
 
         // In case of redirection, follow
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -27,10 +30,11 @@ CURL *init_curl_common() {
 
 void set_curl_query_url(CURL *curl, const char *bucket, const char *key, riak_object_return return_object) {
     char request_buffer[1024];
-    int written = sprintf(request_buffer, "http://devriak.market.onapp.com:10018/riak/%s/%s", bucket, key);
+    int written = snprintf(request_buffer, sizeof(request_buffer), "http://devriak.market.onapp.com:10018/riak/%s/%s", bucket, key);
     if (RIAK_OPTION_RETURN_OBJECT == return_object) {
-        sprintf(&request_buffer[written], "?returnbody=true");
+        snprintf(&request_buffer[written], sizeof(request_buffer) - written, "?returnbody=true");
     }
+    assert(strnlen(request_buffer, sizeof(request_buffer)) > 0);
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
 }
 
@@ -54,25 +58,63 @@ void set_search_url(CURL *curl, unsigned n_filters, const char *bucket, const ch
     curl_easy_setopt(curl, CURLOPT_URL, request_buffer);
 }
 
+void debug_curl_failure(CURL* curl, CURLcode res, long http_code) {
+    if (RIAK_DEBUG_TRACE) {
+        char *url;
+        CURLcode url_retrieved;
+        url_retrieved = curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
+        if (CURLE_OK == url_retrieved) {
+            printf("Request to '%s' failed with http error code '%ld'\n", url,
+                    http_code);
+        } else {
+            printf("Failed to connect to riak server at unknown url\n");
+        }
+        printf("Curl reported error %d, see curl.h for details\n", res);
+    }
+}
 
-long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers) {
+long perform_curl_and_get_code(CURL *curl, struct curl_slist *headers, unsigned retries) {    
     CURLcode res;
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
     
     long http_code = 0;
     curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
-            
+    
     if (CURLE_OK == res) {
         return http_code;
     }
     else {
+        debug_curl_failure(curl, res, http_code);
         return http_code ? http_code : -1; // Curl returns 0 if no response retrieved from server
     }
 }
 
-int perform_curl_and_check(CURL *curl, struct curl_slist *headers) {
-    return (200 == perform_curl_and_get_code(curl, headers));
+int perform_curl_and_check(CURL *curl, struct curl_slist *headers, unsigned retries) {
+    long http_code = perform_curl_and_get_code(curl, headers, retries);
+    int success = (200 == http_code);
+    if (!success) {
+        debug_curl_failure(curl, CURLE_OK, http_code);
+        // Not found is likely to be a genuine result, there's nothing wrong with the server or comms,
+        // so no need to back off
+        if (404 != http_code) {
+            exponential_backoff(retries);
+        }
+    }
+    return success;
+}
+
+void exponential_backoff(unsigned retries) {
+    unsigned backoff = CURL_RETRIES - retries;
+    if (retries > 1) { // No point in backing off if we're not going to retry again
+        struct timespec requested, elapsed;
+        long long sleep_period = backoff ? 1000000ll << (3 * backoff) : 0;
+        requested.tv_sec = sleep_period / 1000000000ll;
+        requested.tv_nsec = sleep_period % 1000000000ll;
+        printf("*** Failure when attempting to contact riak, backing off for %lums ***\n", requested.tv_sec * 1000 + requested.tv_nsec / 1000000l);
+        nanosleep(&requested, &elapsed);
+        printf("Backoff complete\n");
+    }
 }
 
 struct curl_slist *set_http_headers(CURL *curl, struct curl_slist *headers) {
@@ -138,12 +180,16 @@ void register_upload_data(CURL *curl, struct transfer_data *transfer, char *data
 }
 
 void enable_riak_search(const char *bucket) {
+    if (RIAK_DEBUG_TRACE) {
+        printf("Riak Backend: Initialising search...");
+    }
+    
+    int success = 0;
+    unsigned retries;
+    long http_code;
     CURL *curl = init_curl_common();
     if(curl) {
-        long http_code;
-        int success = 0;
-        unsigned retries;
-        for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {   
+        for(retries = CURL_RETRIES; retries > 0 && !success; retries--) {
             struct transfer_data transfer;
             register_upload_data(curl, &transfer, ENABLE_SEARCH_CMD);
 
@@ -153,21 +199,21 @@ void enable_riak_search(const char *bucket) {
             
             curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 
-            http_code = perform_curl_and_get_code(curl, headers);
+            http_code = perform_curl_and_get_code(curl, headers, retries);
             success = (204 == http_code);
-        }
-        if(!success) {
-            char *url;
-            CURLcode url_retrieved = curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
-            if (CURLE_OK == url_retrieved) {
-                printf("***** Failed to connect to riak server: url '%s': HTTP Code: %lu ************\n", url, http_code);
-            }
-            else {
-                printf("***** Failed to connect to riak server at unknown url for bucket: '%s'. Is it running and accessible? ************\n", bucket);
+            if (!success) {
+                exponential_backoff(retries);
             }
         }
         curl_easy_cleanup(curl);
-    } 
+    }     
+    if (!success && RIAK_DEBUG_TRACE) {
+        printf("****** Failed to initialise riak search *******\n");
+    }
+    
+    if (RIAK_DEBUG_TRACE) {
+        printf("done\n");
+    }
 }
 
 static const char VCLOCK_HEADER[] = "X-Riak-Vclock: ";

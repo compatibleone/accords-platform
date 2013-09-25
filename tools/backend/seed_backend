@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+python ./xml_to_rest.py cords_user.xml user 8087
+python ./xml_to_rest.py cords_price.xml price 8091

@@ -147,6 +147,21 @@ class TestPublication(unittest.TestCase):
         assert_that(responses, has_item(matching_id))
         assert_that(responses, is_not(has_item(non_matching_id)))
                 
+    def test_that_get_with_colon_in_filter_returns_only_matching_ids(self):
+        attr_name = 'operator'
+        operator = u"Bob:Biggins"        
+        post_headers = self._headers_with_attribute(attr_name, operator)        
+        r = self._post(_request_root, None, headers = post_headers)
+        matching_id = self._find_id_of_entry(r.text)        
+        post_headers = self._headers_with_attribute(attr_name, "Bob")        
+        r = self._post(_request_root, None, headers = post_headers)        
+        non_matching_id = self._find_id_of_entry(r.text)
+        
+        r = self._get(_request_root, self._headers_with_attribute(attr_name, operator))
+        
+        responses = self._find_ids_of_all_entries(r.text)
+        assert_that(responses, has_item(matching_id))
+        assert_that(responses, is_not(has_item(non_matching_id)))
     
     def test_that_get_with_single_int_filter_returns_only_matching_ids(self):
         attr_name = 'pid'
@@ -245,7 +260,19 @@ class TestPublication(unittest.TestCase):
         
         r = self._get(_root_with_id(id))
         response = r.text
-        assert_that(self._find_attribute(response, attr_name), is_(operator))        
+        assert_that(self._find_attribute(response, attr_name), is_(operator))  
+        
+    def test_that_post_succeeds_with_colon_in_attribute(self):
+        attr_name = 'operator'
+        operator = u"Bob:Bloggs"        
+        post_headers = self._headers_with_attribute(attr_name, operator)
+        
+        r = self._post(_request_root, None, headers = post_headers)
+        id = self._find_id_of_entry(r.text)
+        
+        r = self._get(_root_with_id(id))
+        response = r.text
+        assert_that(self._find_attribute(response, attr_name), is_(operator))              
     
     def test_that_post_with_integer_attribute_creates_correctly(self):
         attr_name = 'pid'
