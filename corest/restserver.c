@@ -502,7 +502,7 @@ private	struct rest_response * rest_transmit_response(
 
 	/* launch an alert if required and possible */
 	/* ---------------------------------------- */
-	if ( aptr->status >= 400 )
+	if ( is_alert_status( aptr->status ) )
 		if ( cptr->server != (struct rest_server *) 0)
 			if ( cptr->server->method.alert )
 				(void) (*cptr->server->method.alert )

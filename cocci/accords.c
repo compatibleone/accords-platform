@@ -31,6 +31,18 @@ private	char				* default_account		= (char *) 0;
 private	char				* default_account_id		= (char *) 0;
 private	char				* default_agent			= (char *) 0;
 private	char				* default_operator_profile	= (char *) 0;
+private	int				  alert_status=600;
+
+
+/*	---------------------------------------------------------	*/
+/*	  	    i s _ a l e r t _ s t a t u s 			*/
+/*	---------------------------------------------------------	*/
+public	int	is_alert_status( int status )
+{
+	if ( status >= alert_status )
+		return( 1 );
+	else	return( 0 );
+}
 
 /*	---------------------------------------------------------	*/
 /*			g e t _ i d e n t i t y				*/
@@ -285,6 +297,11 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 					configuration->resthost = document_atribut_string( aptr );
 				if ((aptr = document_atribut( vptr, "port" )) != (struct xml_atribut *) 0)
 					configuration->restport = document_atribut_value( aptr );
+
+				if ((aptr = document_atribut( vptr, "alert" )) != (struct xml_atribut *) 0)
+					if (!( alert_status = document_atribut_value( aptr ) ))
+						alert_status = 600;
+
 				if ((aptr = document_atribut( vptr, "storage" )) != (struct xml_atribut *) 0)
 					configuration->storage = document_atribut_string( aptr );
 			}
