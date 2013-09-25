@@ -238,7 +238,7 @@ _co_provision()
 _co_start()
 {
 	_co_platform
-	../accords-platform/tools/backend/seed_backend # This works, but is not the cleanest scripting in the world.  Production scripts should tidy up.
+	./seed_backend # This works, but is not the cleanest scripting in the world.  Production scripts should tidy up.
 	_co_prov_services
 	_co_provision
 	_nagios_start
