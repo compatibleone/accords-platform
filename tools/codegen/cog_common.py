@@ -324,7 +324,17 @@ void * vptr )
 def post_mixin_and_action():
     if not _link_special_case():
         cog.out(
-"""/*    --------------------------------------------------------------------------------------------    */
+"""/*     ------------------------------------------------------------------------------------------      */
+/*     o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k       */
+/*     ------------------------------------------------------------------------------------------      */
+private struct rest_response * {0}_post_link(
+       struct occi_category * optr, struct rest_client * cptr,
+       struct rest_request * rptr, struct rest_response * aptr,char * id)
+{{
+       return ({0}_bad_request_response(aptr, id));
+}}
+
+/*    --------------------------------------------------------------------------------------------    */
 /*    o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n     */
 /*    --------------------------------------------------------------------------------------------    */
 private struct rest_response * {0}_post_mixin(
@@ -341,11 +351,8 @@ private struct rest_response * {0}_post_action(
     struct occi_category * optr, struct rest_client * cptr,
     struct rest_request * rptr, struct rest_response * aptr,char * id)
 {{
-    struct rest_header * hptr;
-    struct occi_interface * iptr;
     struct occi_action * fptr;
     struct {0} * {1};
-    char * reqhost;
     char * mptr;
     if (!( {1} = {0}_backend->retrieve_from_id(id) ))
         return( not_found_html_response(aptr) );
@@ -434,6 +441,8 @@ def riak_backend():
     return category.backend.plugin == 'riak'
          
 def backend_include():    
+    if link_backend():
+        cog.outl("#include \"link_backend.h\"")
     if not riak_backend():
         cog.outl("#include \"{0}_node_backend.h\"".format(_filename_root()))
     else:

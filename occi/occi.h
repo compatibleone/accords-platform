@@ -186,6 +186,8 @@ public	char *	occi_category_id( char * sptr );
 public	char *	occi_json_capacity( struct occi_category * optr );
 public	char *	occi_json_capacities( struct occi_category * optr );
 public	char *	occi_json_category( struct occi_category * optr );
+int occi_render_links( struct rest_response * aptr, char * id );
+int occi_success( struct rest_response * aptr );
 public 	struct occi_category * occi_action_category( struct occi_category * cptr, char * action, char * scheme, char * rel );
 public	int	
 	occi_process_atributs(

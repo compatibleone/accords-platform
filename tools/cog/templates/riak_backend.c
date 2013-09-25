@@ -76,6 +76,7 @@ void init() {
 #ifdef BACKEND_PROFILING
     start_of_backend = profile_get_time();
 #endif
+    global_riak_init();
     curl_global_init(CURL_GLOBAL_ALL);
     enable_riak_search(CATEGORY_BUCKET);
 }

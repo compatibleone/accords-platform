@@ -111,7 +111,6 @@ public int xmlin_CATEGORY_NAME(struct CATEGORY_NAME * sptr,struct xml_element * 
 /*	------------------------------------------------------	*/
 public int rest_occi_CATEGORY_NAME(FILE * fh,struct CATEGORY_NAME * sptr,char * prefix, char * nptr)
 {
-	struct xml_element * wptr;
 	if (!( sptr )) return(0);
 	fprintf(fh,"POST /%s/ HTTP/1.1\r\n",nptr);
 	fprintf(fh,"Category: %s; scheme='http://scheme.%s.org/occi/%s#'; class='kind';\r\n",nptr,prefix,prefix);
