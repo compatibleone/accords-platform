@@ -170,7 +170,6 @@ private struct rest_response * CATEGORY_NAME_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
-	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	iptr = optr->callback;
 	struct CATEGORY_NAME * FILENAME_ROOT;
@@ -183,16 +182,6 @@ private struct rest_response * CATEGORY_NAME_get_item(
 		CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	}
 	return make_response_and_liberate_FILENAME_ROOT(optr, cptr, rptr, aptr, FILENAME_ROOT);
-}
-
-/*	------------------------------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
-/*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * CATEGORY_NAME_post_link(
-	struct occi_category * optr, struct rest_client * cptr,
-	struct rest_request * rptr, struct rest_response * aptr,char * id)
-{
-	return (CATEGORY_NAME_bad_request_response(aptr, id));
 }
 
 [[[cog t.post_mixin_and_action()]]]
@@ -251,7 +240,6 @@ private struct rest_response * CATEGORY_NAME_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
-	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct CATEGORY_NAME * FILENAME_ROOT;
 	iptr = optr->callback;
@@ -278,7 +266,7 @@ private struct rest_response * CATEGORY_NAME_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
-	CATEGORY_NAME_bad_request_response(aptr, id);
+	return CATEGORY_NAME_bad_request_response(aptr, id);
 }
 
 /*	----------------------------------------------------------------------------------------------	*/
@@ -288,9 +276,7 @@ private struct rest_response * CATEGORY_NAME_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
-	struct rest_header * hptr;
 	struct occi_interface * iptr;
-	struct CATEGORY_NAME * pptr;
 	iptr = optr->callback;
 	struct CATEGORY_NAME *target;
 	if (!( target =  CATEGORY_NAME_backend->retrieve_from_id(id)))
@@ -370,13 +356,8 @@ private struct rest_response * CATEGORY_NAME_delete_all(
 private struct rest_response * occi_CATEGORY_NAME_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
@@ -394,13 +375,8 @@ private struct rest_response * occi_CATEGORY_NAME_get(void * vptr, struct rest_c
 private struct rest_response * occi_CATEGORY_NAME_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
@@ -416,13 +392,8 @@ private struct rest_response * occi_CATEGORY_NAME_head(void * vptr, struct rest_
 private struct rest_response * occi_CATEGORY_NAME_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
@@ -444,13 +415,8 @@ private struct rest_response * occi_CATEGORY_NAME_post(void * vptr, struct rest_
 private struct rest_response * occi_CATEGORY_NAME_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
@@ -466,13 +432,8 @@ private struct rest_response * occi_CATEGORY_NAME_put(void * vptr, struct rest_c
 private struct rest_response * occi_CATEGORY_NAME_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))

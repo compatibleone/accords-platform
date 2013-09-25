@@ -97,10 +97,7 @@ void profile_print(struct backend_profile *profile, const char *bucket, long lon
         
         printf("\n***************** End of profiling ****************\n");
         
-    }
-    
-    long long usecs = elapsed / 1000 + (elapsed % 1000 >= 500); // round up halves
-    
+    }    
 }
 
 long long profile_get_time() {
