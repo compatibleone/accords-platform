@@ -141,22 +141,22 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<wsdl:output message=\"ResolverOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 		fprintf(h,"<wsdl:operation name=\"ParseManifest\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/parseManifest\" style=\"rpc\"/>\n",host);
+		fprintf(h,"<soap:operation soapAction=\"%s/ParseManifest\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"ParseManifestIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ParseManifestOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 		fprintf(h,"<wsdl:operation name=\"ParseSLA\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/parseSLA\" style=\"rpc\"/>\n",host);
+		fprintf(h,"<soap:operation soapAction=\"%s/ParseSLA\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"ParseSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ParseSLAOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 		fprintf(h,"<wsdl:operation name=\"BrokerManifest\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/brokerManifest\" style=\"rpc\"/>\n",host);
+		fprintf(h,"<soap:operation soapAction=\"%s/BrokerManifest\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"BrokerManifestIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 		fprintf(h,"<wsdl:operation name=\"BrokerSLA\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/brokerSLA\" style=\"rpc\"/>\n",host);
+		fprintf(h,"<soap:operation soapAction=\"%s/BrokerSLA\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"BrokerSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
@@ -191,10 +191,7 @@ private	char *	corcs_soap_wsdl(char * host)
 /*	---------------------------------------		*/
 private	struct	xml_element * 	liberate_xml_element( struct xml_element * sptr )
 {
-	if ( sptr )
-	{
-		liberate( sptr );
-	}
+	document_drop( sptr );
 	return((struct xml_element *) 0);
 }
 
@@ -241,7 +238,7 @@ private	struct	xml_element * 	corcs_xml_element( char * filename )
 /*	---------------------------------------		*/
 /*	s o a p _ r e s p o n s e _ f o o t e r		*/
 /*	---------------------------------------		*/
-private	void	soap_response_footer( FILE * h, char * nptr )
+private	void	soap_message_footer( FILE * h, char * nptr )
 {
 	fprintf(h,"</m:%s>\n",nptr);
 	fprintf(h,"</soapenv:Body>\n");
@@ -251,7 +248,7 @@ private	void	soap_response_footer( FILE * h, char * nptr )
 /*	---------------------------------------		*/
 /*	s o a p _ r e s p o n s e _ h e a d e r		*/
 /*	---------------------------------------		*/
-private	void	soap_response_header( FILE * h, char * nptr )
+private	void	soap_message_header( FILE * h, char * nptr )
 {
 	fprintf(h,"<?xml version=\"1.0\"?>\n");
 	fprintf(h,"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope\">\n");
@@ -275,7 +272,7 @@ private	char * corcs_resolver_soap_response( char * category, struct occi_respon
 		return( liberate( filename ) );
 	else
 	{
-		soap_response_header( h, "ResolveCategoryResponse" );
+		soap_message_header( h, "ResolveCategoryResponse" );
 		fprintf(h,"<m:category>%s</m:category>\n",category);
 		for (	eptr = rptr->first;
 			eptr != (struct occi_element *) 0;
@@ -285,7 +282,7 @@ private	char * corcs_resolver_soap_response( char * category, struct occi_respon
 				continue;
 			else 	fprintf(h,"<m:host>%s</m:host>\n",eptr->value);
 		}
-		soap_response_footer( h, "ResolveCategoryResponse" );
+		soap_message_footer( h, "ResolveCategoryResponse" );
 		fclose(h);
 		rptr = occi_remove_response( rptr );
 		return( filename );
@@ -305,9 +302,9 @@ private	struct rest_response * corcs_parser_response( struct rest_response * apt
 		return( liberate( filename ) );
 	else
 	{
-		soap_response_header( h, message );
+		soap_message_header( h, message );
 		fprintf(h,"<m:document>%s</m:document>\n",document);
-		soap_response_footer( h, message );
+		soap_message_footer( h, message );
 		fclose(h);
 		return( rest_file_response( aptr, filename, "text/xml" ) );
 	}
@@ -326,9 +323,9 @@ private	struct rest_response * corcs_broker_response( struct rest_response * apt
 		return( liberate( filename ) );
 	else
 	{
-		soap_response_header( h, message );
+		soap_message_header( h, message );
 		fprintf(h,"<m:service>%s</m:service>\n",service);
-		soap_response_footer( h, message );
+		soap_message_footer( h, message );
 		fclose(h);
 		return( rest_file_response( aptr, filename, "text/xml" ) );
 	}
@@ -591,13 +588,13 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 		return(rest_html_response(aptr, 400, "incorrect request body"));
 	else if (!( strcmp(  command, "/resolver" ) ))
 		return( corcs_soap_resolver( aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/parseManifest" ) ))
+	else if (!( strcmp(  command, "/ParseManifest" ) ))
 		return( corcs_soap_manifest_parser( aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/parseSLA" ) ))
+	else if (!( strcmp(  command, "/ParseSLA" ) ))
 		return( corcs_soap_sla_parser( aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/brokerManifest" ) ))
+	else if (!( strcmp(  command, "/BrokerManifest" ) ))
 		return( corcs_soap_manifest_broker( aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/brokerSLA" ) ))
+	else if (!( strcmp(  command, "/BrokerSLA" ) ))
 		return( corcs_soap_manifest_broker( aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/service" ) ))
 		return( corcs_soap_service( aptr, sptr, rptr ) );
@@ -612,6 +609,9 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 	}
 }
 
+/*	-------------------------------------	*/
+/*	c o r c s _ s o a p _ g e t _ w s s l 	*/
+/*	-------------------------------------	*/
 public	char * corcs_soap_get_wsdl()
 {
 	char 	host[1024];
@@ -619,7 +619,186 @@ public	char * corcs_soap_get_wsdl()
 	return( corcs_soap_wsdl(host) );
 }
 
+/*	-------------------------------------	*/
+/*	   s o a p _ i n l i n e _ x m l 	*/
+/*	-------------------------------------	*/
+private	int	soap_inline_xml( FILE * h, char * filename )
+{
+	struct	xml_element * eptr;
 
+	if (!( eptr = corcs_xml_element( filename )))
+		return( 0 );
+	else
+	{
+		document_serialise_element( h, eptr, 0 );
+		document_drop( eptr );
+		return( 0 );
+	}
+}
+
+/*	-------------------------------------	*/
+/*	   s o a p _ i n l i n e _ f i l e	*/
+/*	-------------------------------------	*/
+private	int	soap_inline_file( FILE * h, char * filename )
+{
+	FILE *	s;
+	int	c;
+	if (!( s = fopen( filename, "r" ) ))
+		return( 0 );
+	else
+	{
+		while ((c = fgetc(s)) > 0)
+			fputc(c,h);
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	-----------------------------------------------		*/
+/*	i n v o k e _ s o a p _ r e s o l v e r _ a p i		*/
+/*	-----------------------------------------------		*/
+private	int	invoke_soap_resolver_api( char * category )
+{
+	struct	rest_header * hptr;
+	struct	rest_response * rptr;
+	char *	message;
+	FILE *	h;
+	if (!( message = rest_temporary_filename("xml") ))
+		return(0);
+	else if (!( h = fopen( message, "w" ) ))
+		return(0);
+	else
+	{
+		soap_message_header( h, "ResolveCategory" );
+		fprintf(h,"<command>resolver</command>\n");
+		fprintf(h,"<category>%s</category>\n",category);
+		soap_message_footer( h, "ResolveCategory" );
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	i n v o k e _ s o a p _ p a r s e r _ a p i	*/
+/*	-------------------------------------------	*/
+private	int	invoke_soap_parser_api( char * type, char * filename )
+{
+	struct	rest_header * hptr;
+	struct	rest_response * rptr;
+	char *	message;
+	FILE *	h;
+	if (!( message = rest_temporary_filename("xml") ))
+		return(0);
+	else if (!( h = fopen( message, "w" ) ))
+		return(0);
+	else
+	{
+		if (!( strcasecmp( type, "MANIFEST" ) ))
+			type = "ParseManifest";
+		else	type = "ParseSLA";
+		soap_message_header( h, type );
+		fprintf(h,"<command>parser</command>\n");
+		soap_inline_xml(h,filename);
+		soap_message_footer( h, type );
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	i n v o k e _ s o a p _ b r o k e r _ a p i	*/
+/*	-------------------------------------------	*/
+private	int	invoke_soap_broker_api( char * type, char * filename )
+{
+	struct	rest_response * rptr;
+	char *	message;
+	FILE *	h;
+	if (!( message = rest_temporary_filename("xml") ))
+		return(0);
+	else if (!( h = fopen( message, "w" ) ))
+		return(0);
+	else
+	{
+		if (!( strcasecmp( type, "MANIFEST" ) ))
+			type = "BrokerManifest";
+		else	type = "BrokerSLA";
+		soap_message_header( h, type );
+		fprintf(h,"<command>broker</command>\n");
+		soap_inline_xml(h,filename);
+		soap_message_footer( h, type );
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	---------------------------------------------	*/
+/*	i n v o k e _ s o a p _ s e r v i c e _ a p i	*/
+/*	---------------------------------------------	*/
+private	int	invoke_soap_service_api( char * action, char * service )
+{
+	struct	rest_response * rptr;
+	char *	message;
+	FILE *	h;
+	if (!( message = rest_temporary_filename("xml") ))
+		return(0);
+	else if (!( h = fopen( message, "w" ) ))
+		return(0);
+	else
+	{
+		soap_message_header( h, "ServiceAction" );
+		fprintf(h,"<command>%s</command>\n",action);
+		fprintf(h,"<service>%s</service>\n",service);
+		soap_message_footer( h, "ServiceAction" );
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	i n v o k e _ s o a p _ s c r i p t _ a p i	*/
+/*	-------------------------------------------	*/
+private	int	invoke_soap_script_api( char * script, char * parameters )
+{
+	struct	rest_response * rptr;
+	char *	message;
+	FILE *	h;
+	if (!( message = rest_temporary_filename("xml") ))
+		return(0);
+	else if (!( h = fopen( message, "w" ) ))
+		return(0);
+	else
+	{
+		soap_message_header( h, "RunScript" );
+		fprintf(h,"<command>script</command>\n");
+		fprintf(h,"<parameters>%s</parameters>\n",parameters);
+		fprintf(h,"<script>\n");
+		soap_inline_file(h,script);
+		fprintf(h,"</script>\n");
+		soap_message_footer( h, "RunScript" );
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	-------------------------------------	*/
+/*	    i n v o k e _ s o a p _ a p i	*/
+/*	-------------------------------------	*/
+private	int	invoke_soap_api( char * command, char * subject, char * option )
+{
+	if (!( strcmp( command, "resolver" ) ))
+		return( invoke_soap_resolver_api( subject ) );
+	else if (!( strcmp( command, "parser" ) ))
+		return( invoke_soap_parser_api( subject, option ) );
+	else if (!( strcmp( command, "broker" ) ))
+		return( invoke_soap_broker_api( subject, option ) );
+	else if (!( strcmp( command, "service" ) ))
+		return( invoke_soap_service_api( subject, option ) );
+	else if (!( strcmp( command, "script" ) ))
+		return( invoke_soap_script_api( subject, option ) );
+	else	return(0);
+}
+
+	/* ------------- */
 #endif  /* _corcs_soap_c */
 	/* ------------- */
 

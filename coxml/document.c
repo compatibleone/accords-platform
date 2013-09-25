@@ -383,7 +383,7 @@ public	void	document_show_element( struct xml_element * eptr, int level )
 /*	---------------------------------------------------	*/
 /*	d o c u m e n t _ s e r i a l i s e _ e l e m e n t	*/
 /*	---------------------------------------------------	*/
-private	void	document_serialise_element( FILE * h, struct xml_element * eptr, int level )
+public	void	document_serialise_element( FILE * h, struct xml_element * eptr, int level )
 {
 	struct	xml_atribut * aptr;
 	struct	xml_element * cptr;
