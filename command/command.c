@@ -67,6 +67,8 @@ private	struct rest_response * cords_broker_response( struct rest_response * apt
 private	struct rest_response * cords_resolver_response( struct rest_response * aptr, char * filename );
 private	struct rest_response * cords_service_response( struct rest_response * aptr, char * filename );
 private	struct rest_response * cords_script_response( struct rest_response * aptr, char * filename );
+public	char *	corcs_soap_get_wsdl();
+private char * 	corcs_resolver_soap_response( char * category, struct occi_response * rptr );
 
 /*	-----------------------------------	*/
 /*		f a i l u r e			*/
@@ -115,6 +117,15 @@ private void	set_command_server_accept( struct rest_request * rptr )
 	else	CommandServerAccept = allocate_string(hptr->value);
 	return;
 }
+
+private	void	command_server_accept( char * vptr )
+{
+	
+	if ( CommandServerAccept ) liberate( CommandServerAccept );
+	CommandServerAccept = allocate_string(vptr);
+	return;
+}
+
 
 /*	-----------------------------------------------------	*/
 /*	   l l _ c o r d s _ s e r v i c e _ a c t i o n	*/
@@ -1315,6 +1326,8 @@ private	char * 	cords_resolver_operation( char * category )
 
 	if (!( rptr = occi_resolver( category, agent ) ))
 		return( (char *) 0 );
+	else if ((CommandServerAccept) && (!( strcmp(CommandServerAccept,"application/soap"))))
+		return( corcs_resolver_soap_response( category, rptr ) );
 	else if (!( filename = rest_temporary_filename( "html" ) ))
 		return( filename );
 	else if (!( h = fopen( filename, "w" ) ))
@@ -1334,6 +1347,7 @@ private	char * 	cords_resolver_operation( char * category )
 
 		fprintf(h,"</table></div></body></html>\n");
 		fclose(h);
+		rptr = occi_remove_response( rptr );
 		return( filename );
 	}
 
@@ -1591,8 +1605,11 @@ private	char *	command_get_filename( char * command )
 			return( filename );
 		else if ((filename = detect_command_file( command, "htm" ) ))
 			return( filename );
+		else	return((char *) 0);
 	}
-	return((char *) 0);
+	else if (!( strcasecmp( command, "wsdl" ) ))
+		return( corcs_soap_get_wsdl() );
+	else	return((char *) 0);
 }
 
 
@@ -1645,18 +1662,6 @@ private	struct rest_response * commandserver_get( void * v,struct rest_client * 
 		return( aptr );
 	else if ( rptr->body  )
 		return( rest_html_response( aptr, 400, "Unexpected Request Body" ) );
-	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_TYPE ) ))
-		return( rest_html_response( aptr, 400, "Incorrect request" ) );
-	else if (!( hptr->value ))
-		return( rest_html_response( aptr, 400, "Incorrect request" ) );
-	else if (!( strcmp( hptr->value, "application/soap") ))
-		return( corcs_soap_get( aptr, rptr ) );
-	else if (!( strcmp( hptr->value, "text/soap") ))
-		return( corcs_soap_get( aptr, rptr ) );
-	else if (!( strcmp( hptr->value, "application/wsdl") ))
-		return( corcs_soap_get( aptr, rptr ) );
-	else if (!( strcmp( hptr->value, "text/wsdl") ))
-		return( corcs_soap_get( aptr, rptr ) );
 	else
 	{
 		if (!( command = allocate_string( rptr->object ) ))
@@ -2021,7 +2026,10 @@ private	struct rest_response * cords_resolver_response( struct rest_response * a
 	char	buffer[2048];
 	char	filesize[256];
 
-	return( rest_file_response( aptr, filename, "text/html" ) );
+
+	if ((CommandServerAccept) && (!( strcmp(CommandServerAccept,"application/soap"))))
+		return( rest_file_response( aptr, filename, "text/xml" ) );
+	else	return( rest_file_response( aptr, filename, "text/html" ) );
 }
 
 /*	------------------------------------------------------------------	*/
@@ -2048,6 +2056,15 @@ private	struct rest_response * cords_script_response( struct rest_response * apt
 	return( rest_file_response( aptr, filename, "text/html" ) );
 }
 
+private	int	is_content_type( char * sptr, char * tptr )
+{
+	if (!( strcmp( sptr, tptr ) ))
+		return( 1 );
+	else if (!( strncmp( sptr, tptr, strlen(tptr) ) ))
+		return( 1 );
+	else	return(0);
+}
+	
 /*	------------------------------------------------------------------	*/
 /*		c o m m a n d s e r v e r_ p o s t 				*/
 /*	------------------------------------------------------------------	*/
@@ -2081,9 +2098,13 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 		return( rest_html_response( aptr, 400, "Incorrect request" ) );
 	else if (!( hptr->value ))
 		return( rest_html_response( aptr, 400, "Incorrect request" ) );
-	else if (!( strcmp( hptr->value, "application/soap") ))
+	else if ( is_content_type( hptr->value, "application/soap") )
 		return( corcs_soap_post( aptr, command, rptr ) );
-	else if (!( strcmp( hptr->value, "text/soap") ))
+	else if ( is_content_type( hptr->value, "text/soap") )
+		return( corcs_soap_post( aptr, command, rptr ) );
+	else if ( is_content_type( hptr->value, "text/xml") )
+		return( corcs_soap_post( aptr, command, rptr ) );
+	else if ( is_content_type( hptr->value, "application/xml") )
 		return( corcs_soap_post( aptr, command, rptr ) );
 
 	else if (!( strcasecmp( command, "parser" ) ))
