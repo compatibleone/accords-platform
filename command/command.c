@@ -2316,7 +2316,7 @@ private	int	operation( int argc, char * argv[] )
 			else if (!( strcasecmp( command, "INVOKE" ) ))
 				return( invoke_action( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "SOAP" ) ))
-				return( invoke_soap_api( aptr, argv[argi+1], argv[+2] ) );
+				return( invoke_soap_api( aptr, argv[argi+1], argv[argi+2] ) );
 			else if (!( strcasecmp( command, "ANALYSE" ) ))
 				return( colog_analysis( aptr ) );
 			else if (!( strcasecmp( command, "RUN" ) ))
