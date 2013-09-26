@@ -229,18 +229,49 @@ private	char *	document_element_xml( struct xml_element * xptr, char * nptr )
 /*	---------------------------------------------	*/
 private	char *	document_element_file( struct xml_element * xptr, char * nptr )
 {
+	char *	sptr;
+	int	c;
 	FILE * h;
 	struct	xml_element *eptr;
 	char *	filename;
 	if (!( eptr = nested_document_element( xptr, nptr )))
 		return((char *) 0);
+	else if (!( sptr = eptr->value ))
+		return( (char *) 0);
 	else if (!( filename = rest_temporary_filename( "txt" ) ))
 		return( filename );
 	else if (!( h = fopen( filename, "w" ) ))
 		return( liberate( filename ) );
 	else
 	{
-		fprintf(h,"%s\n",eptr->value);
+		while ( *sptr )
+		{
+			if ((c = *(sptr++)) != '&' )
+				fputc(c,h);
+			else
+			{
+				switch ((c = *(sptr++)))
+				{
+				case	'a'	:
+					sptr+= 3;
+					fputc('&',h);
+					continue;
+				case	'l'	:
+					sptr+= 2;
+					fputc('<',h);
+					continue;
+				case	'g'	:
+					sptr+= 2;
+					fputc('>',h);
+					continue;
+				default		:
+					fputc('&',h);
+					if ( c )
+						fputc(c,h);
+					continue;
+				}
+			}
+		}
 		fclose(h);
 		return( filename );
 	}
@@ -340,7 +371,16 @@ private	int	soap_inline_file( FILE * h, char * filename )
 	else
 	{
 		while ((c = fgetc(s)) > 0)
-			fputc(c,h);
+		{
+			switch ( c )
+			{
+			case	'&'	: fprintf(h,"&amp;"); continue;
+			case	'<'	: fprintf(h,"&lt;"); continue;
+			case	'>'	: fprintf(h,"&gt;"); continue;
+			default		:
+				fputc(c,h);
+			}
+		}
 		fclose(s);
 		return(0);
 	}
