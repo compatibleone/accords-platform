@@ -666,7 +666,7 @@ private	int	invoke_soap_request( char * action, char * host, char * wsdl, char *
 	if ( check_verbose() )
 		printf("   SOAP POST   %s %s \n",host, filename);
 
-	sprintf(buffer,"%s/%s",host,action);
+	sprintf(buffer,"%s%s",host,action);
 
 	if ( check_verbose() )
 		printf("   Soap Action %s \n",buffer);
