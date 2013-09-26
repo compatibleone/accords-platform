@@ -311,6 +311,41 @@ private	char * corcs_resolver_soap_response( char * category, struct occi_respon
 	}
 }
 
+/*	-------------------------------------	*/
+/*	   s o a p _ i n l i n e _ x m l 	*/
+/*	-------------------------------------	*/
+private	int	soap_inline_xml( FILE * h, char * filename )
+{
+	struct	xml_element * eptr;
+
+	if (!( eptr = corcs_xml_element( filename )))
+		return( 0 );
+	else
+	{
+		document_serialise_element( h, eptr, 0 );
+		document_drop( eptr );
+		return( 0 );
+	}
+}
+
+/*	-------------------------------------	*/
+/*	   s o a p _ i n l i n e _ f i l e	*/
+/*	-------------------------------------	*/
+private	int	soap_inline_file( FILE * h, char * filename )
+{
+	FILE *	s;
+	int	c;
+	if (!( s = fopen( filename, "r" ) ))
+		return( 0 );
+	else
+	{
+		while ((c = fgetc(s)) > 0)
+			fputc(c,h);
+		fclose(h);
+		return(0);
+	}
+}
+
 /*	-------------------------------------------------------		*/
 /*	      c o r c s _ p a r s e r _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
@@ -318,15 +353,17 @@ private	struct rest_response * corcs_parser_response( struct rest_response * apt
 {
 	FILE * h;
 	char *	filename;
+	char 	buffer[1024];
+	sprintf(buffer,"%sResponse",message);
 	if (!( filename = rest_temporary_filename( "xml" ) ))
 		return( aptr );
 	else if (!( h = fopen( filename, "w" ) ))
 		return( liberate( filename ) );
 	else
 	{
-		soap_message_header( h, message );
-		fprintf(h,"<m:document>%s</m:document>\n",document);
-		soap_message_footer( h, message );
+		soap_message_header( h, buffer );
+		soap_inline_xml( h, document );
+		soap_message_footer( h, buffer );
 		fclose(h);
 		return( rest_file_response( aptr, filename, "text/xml" ) );
 	}
@@ -339,15 +376,17 @@ private	struct rest_response * corcs_broker_response( struct rest_response * apt
 {
 	FILE * h;
 	char *	filename;
+	char 	buffer[1024];
+	sprintf(buffer,"%sResponse",message);
 	if (!( filename = rest_temporary_filename( "xml" ) ))
 		return( aptr );
 	else if (!( h = fopen( filename, "w" ) ))
 		return( liberate( filename ) );
 	else
 	{
-		soap_message_header( h, message );
+		soap_message_header( h, buffer );
 		fprintf(h,"<m:service>%s</m:service>\n",service);
-		soap_message_footer( h, message );
+		soap_message_footer( h, buffer );
 		fclose(h);
 		return( rest_file_response( aptr, filename, "text/xml" ) );
 	}
@@ -639,41 +678,6 @@ public	char * corcs_soap_get_wsdl()
 	char 	host[1024];
 	sprintf(host,"%s",get_identity());
 	return( corcs_soap_wsdl(host) );
-}
-
-/*	-------------------------------------	*/
-/*	   s o a p _ i n l i n e _ x m l 	*/
-/*	-------------------------------------	*/
-private	int	soap_inline_xml( FILE * h, char * filename )
-{
-	struct	xml_element * eptr;
-
-	if (!( eptr = corcs_xml_element( filename )))
-		return( 0 );
-	else
-	{
-		document_serialise_element( h, eptr, 0 );
-		document_drop( eptr );
-		return( 0 );
-	}
-}
-
-/*	-------------------------------------	*/
-/*	   s o a p _ i n l i n e _ f i l e	*/
-/*	-------------------------------------	*/
-private	int	soap_inline_file( FILE * h, char * filename )
-{
-	FILE *	s;
-	int	c;
-	if (!( s = fopen( filename, "r" ) ))
-		return( 0 );
-	else
-	{
-		while ((c = fgetc(s)) > 0)
-			fputc(c,h);
-		fclose(h);
-		return(0);
-	}
 }
 
 /*	-----------------------------------------------		*/
