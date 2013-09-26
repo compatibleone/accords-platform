@@ -195,8 +195,9 @@ libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c riak
     paas_node_backend.c paas_riak_backend.c occi_rest_paas.c paas.c \
     paasconfig_node_backend.c paasconfig_riak_backend.c occi_rest_paasconfig.c paasconfig.c 
     
-libbackend_la_CFLAGS = $(CFLAGS_BACKEND) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) -Werror
-libbackend_la_LIBADD = -lcurl
+libbackend_la_CFLAGS = $(CFLAGS_BACKEND) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) -Werror -Wall \
+                       -Wno-missing-braces # There's a gcc bug which causes this warning to fire on {0} initialisers
+libbackend_la_LIBADD = -lcurl 
 
 #json-c
 libbackend_la_CFLAGS += ${JSONC_CFLAGS}

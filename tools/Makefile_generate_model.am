@@ -9,7 +9,7 @@ TEMPLATE_DIR = $(top_srcdir)/tools/cog/templates/
 COG_TEMPLATES = $(TEMPLATE_DIR)template_
 
 ALL_PRE_COG_TEMPLATES = category_backend_interface.h category_filter.h category.c category.h  node_backend.c \
-                        node_backend.h occi.c occi.h riak_backend.c riak_backend.h
+                        node_backend.h occi.c occi.h riak_backend.c riak_backend.h schema.xsd
                         
 ALL_TEMPLATES = $(patsubst %,$(COG_TEMPLATES)%,$(ALL_PRE_COG_TEMPLATES))
 
@@ -19,10 +19,10 @@ model_c_files = $(patsubst %.h,%.c,$(model_h_files))
 
 model_all_files = $(model_backend_h_files) $(model_c_files) $(model_h_files) $(schema_files) $(occi_c_files) $(node_backend_c_files) $(node_backend_h_files) $(occi_filter_files) $(occi_rest_c_files) $(occi_rest_h_files) 
 
-$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h generator_input.txt
+$(model_h_files) : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN) $(COG_COMMON) $(COG_TEMPLATES)category.h $(ALL_TEMPLATES) generator_input.txt
 	$(MODEL_COG) @generator_input.txt
 	
-$(model_c_files) : %.c : $(COG_TEMPLATES)category.c generator_input.txt $(ALL_TEMPLATES)
+$(model_c_files) : %.c : $(ALL_TEMPLATES) generator_input.txt
 	$(MODEL_COG) @generator_input.txt
 	
 CLEANFILES = $(model_all_files)

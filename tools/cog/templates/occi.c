@@ -144,13 +144,13 @@ private struct rest_response * CATEGORY_NAME_occi_response(
 	struct rest_header * hptr;
 	sprintf(cptr->buffer,"occi.core.id=%c%s%c",0x0022,pptr->id,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
+		return( internal_failure_response(aptr) );
 	[[[cog t.occi_response()]]]
 	[[[end]]]
 	if ( occi_render_links( aptr, pptr->id ) != 0)
 		return( rest_html_response( aptr, 500, "Server Link Failure" ) );
 	else	if (!( occi_success( aptr ) ))
-		return( rest_response_status( aptr, 500, "Server Failure" ) );
+		return( rest_internal_failure_response(aptr) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
 }
 
@@ -170,7 +170,6 @@ private struct rest_response * CATEGORY_NAME_get_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
-	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	iptr = optr->callback;
 	struct CATEGORY_NAME * FILENAME_ROOT;
@@ -178,19 +177,11 @@ private struct rest_response * CATEGORY_NAME_get_item(
 		return( not_found_html_response(aptr) );
 	if (iptr && iptr->pre_retrieve) {
 		CATEGORY_NAME_execute_callback(iptr->pre_retrieve, FILENAME_ROOT, optr, rptr);
+		[[[cog t.backend_pre_update()]]]
+		[[[end]]]
 		CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	}
 	return make_response_and_liberate_FILENAME_ROOT(optr, cptr, rptr, aptr, FILENAME_ROOT);
-}
-
-/*	------------------------------------------------------------------------------------------	*/
-/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/
-/*	------------------------------------------------------------------------------------------	*/
-private struct rest_response * CATEGORY_NAME_post_link(
-	struct occi_category * optr, struct rest_client * cptr,
-	struct rest_request * rptr, struct rest_response * aptr,char * id)
-{
-	return (CATEGORY_NAME_bad_request_response(aptr, id));
 }
 
 [[[cog t.post_mixin_and_action()]]]
@@ -212,20 +203,22 @@ private struct rest_response * CATEGORY_NAME_post_item(
 		return( rest_html_response( aptr, 400, "Bad Request" ) );
 	else reqport = rptr->port;
 	if (!( initial_FILENAME_ROOT = allocate_CATEGORY_NAME()))
-		return( rest_html_response( aptr, 500, "Server Failure") );
+		return( internal_failure_response(aptr) );
 	if (!( occi_process_atributs( optr, rptr,aptr, initial_FILENAME_ROOT, set_CATEGORY_NAME_field ) ))
-		return( rest_html_response( aptr, 500, "Server Failure") );
+		return( internal_failure_response(aptr) );
 	char *id = generate_id();
 	if (!id) {
-	    return( rest_html_response( aptr, 500, "Server Failure") );
+	    return( internal_failure_response(aptr) );
 	}
 	initial_FILENAME_ROOT->id = id;
 	if (iptr) {
 		CATEGORY_NAME_execute_callback(iptr->pre_create, initial_FILENAME_ROOT, optr, rptr);
 	}
+	[[[cog t.backend_pre_create()]]]
+	[[[end]]]
 	if (!( new_FILENAME_ROOT =  CATEGORY_NAME_backend->create(initial_FILENAME_ROOT))) {
 		liberate_CATEGORY_NAME(initial_FILENAME_ROOT);
-		return( rest_html_response( aptr, 500, "Server Failure") );
+		return( internal_failure_response(aptr) );
 	}
 	liberate_CATEGORY_NAME(initial_FILENAME_ROOT);
 	if (iptr) {
@@ -234,9 +227,9 @@ private struct rest_response * CATEGORY_NAME_post_item(
 	sprintf(cptr->buffer,"%s:%u%s%s",reqhost,reqport,optr->location,new_FILENAME_ROOT->id);
 	liberate_CATEGORY_NAME(new_FILENAME_ROOT);
 	if (!rest_response_header( aptr, "X-OCCI-Location",cptr->buffer))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
+		return( internal_failure_response(aptr) );
 	else if (!( occi_success( aptr ) ))
-		return( rest_response_status( aptr, 500, "Server Failure" ) );
+		return( rest_internal_failure_response(aptr) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
 }
 
@@ -247,7 +240,6 @@ private struct rest_response * CATEGORY_NAME_put_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
-	struct rest_header * hptr;
 	struct occi_interface * iptr;
 	struct CATEGORY_NAME * FILENAME_ROOT;
 	iptr = optr->callback;
@@ -255,9 +247,11 @@ private struct rest_response * CATEGORY_NAME_put_item(
 		return( not_found_html_response(aptr) );
 	if (!( occi_process_atributs(optr,rptr,aptr, FILENAME_ROOT, set_CATEGORY_NAME_field ) )) {
 	    liberate_CATEGORY_NAME(FILENAME_ROOT);
-		return( rest_html_response( aptr, 500, "Server Failure") );
+		return( internal_failure_response(aptr) );
 	}
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->pre_update, FILENAME_ROOT, optr, rptr); }
+	[[[cog t.backend_pre_update()]]]
+	[[[end]]]
 	CATEGORY_NAME_backend->update(id, FILENAME_ROOT);
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->post_update, FILENAME_ROOT, optr, rptr); }
 	struct rest_response *retVal = CATEGORY_NAME_occi_response(optr, cptr, rptr, aptr, FILENAME_ROOT);
@@ -272,7 +266,7 @@ private struct rest_response * CATEGORY_NAME_head_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr,char * id)
 {
-	CATEGORY_NAME_bad_request_response(aptr, id);
+	return CATEGORY_NAME_bad_request_response(aptr, id);
 }
 
 /*	----------------------------------------------------------------------------------------------	*/
@@ -282,9 +276,7 @@ private struct rest_response * CATEGORY_NAME_delete_item(
 	struct occi_category * optr, struct rest_client * cptr,
 	struct rest_request * rptr, struct rest_response * aptr, char * id)
 {
-	struct rest_header * hptr;
 	struct occi_interface * iptr;
-	struct CATEGORY_NAME * pptr;
 	iptr = optr->callback;
 	struct CATEGORY_NAME *target;
 	if (!( target =  CATEGORY_NAME_backend->retrieve_from_id(id)))
@@ -294,7 +286,7 @@ private struct rest_response * CATEGORY_NAME_delete_item(
 	CATEGORY_NAME_backend->del(id);
 	if (iptr) {	CATEGORY_NAME_execute_callback(iptr->post_delete, NULL, optr, rptr); }
 	if (!( occi_success( aptr ) ))
-		return( rest_response_status( aptr, 500, "Server Failure" ) );
+		return( rest_internal_failure_response(aptr) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
 }
 
@@ -325,10 +317,10 @@ private struct rest_response * CATEGORY_NAME_get_list(
 	CATEGORY_NAME_free_id_list(&ids);
 	liberate_CATEGORY_NAME(filter.attributes);
 	if(failed) {
-		return (rest_html_response( aptr, 500, "Server Failure" ));
+		return (internal_failure_response(aptr));
 	}
 	if (!( occi_success( aptr ) ))
-		return( rest_response_status( aptr, 500, "Server Failure" ) );
+		return( rest_internal_failure_response(aptr) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
 }
 
@@ -354,7 +346,7 @@ private struct rest_response * CATEGORY_NAME_delete_all(
 	CATEGORY_NAME_backend->delete_all_matching_filter(&filter);
 	liberate_CATEGORY_NAME(filter.attributes);
 	if (!( occi_success( aptr ) ))
-		return( rest_response_status( aptr, 500, "Server Failure" ) );
+		return( rest_internal_failure_response(aptr) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
 }
 
@@ -364,13 +356,8 @@ private struct rest_response * CATEGORY_NAME_delete_all(
 private struct rest_response * occi_CATEGORY_NAME_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
@@ -388,13 +375,8 @@ private struct rest_response * occi_CATEGORY_NAME_get(void * vptr, struct rest_c
 private struct rest_response * occi_CATEGORY_NAME_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
@@ -410,13 +392,8 @@ private struct rest_response * occi_CATEGORY_NAME_head(void * vptr, struct rest_
 private struct rest_response * occi_CATEGORY_NAME_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
@@ -438,13 +415,8 @@ private struct rest_response * occi_CATEGORY_NAME_post(void * vptr, struct rest_
 private struct rest_response * occi_CATEGORY_NAME_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))
@@ -460,13 +432,8 @@ private struct rest_response * occi_CATEGORY_NAME_put(void * vptr, struct rest_c
 private struct rest_response * occi_CATEGORY_NAME_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
 	struct rest_response * aptr;
-	struct rest_header   * hptr;
 	struct occi_category * optr;
-	char * ctptr;
-	char * mptr;
-	if (!( hptr = rest_resolve_header( rptr->first, "Content-Type" ) ))
-		ctptr = "text/occi";
-	else	ctptr = hptr->value;
+	rest_resolve_header( rptr->first, "Content-Type" );
 	if (!( optr = vptr )) 
 		return( rest_bad_request(vptr,cptr,rptr) );
 	if(!(aptr = rest_allocate_response( cptr )))

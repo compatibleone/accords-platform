@@ -329,7 +329,7 @@ public	int	occi_render_links( struct rest_response * aptr, char * id )
 		return(0);
 	else if (!( id ))
 		return(0);
-	for (lptr = initialise_and_get_first_link(id); NULL != lptr; lptr = next_link(id)) {
+	for (lptr = initialise_and_get_first_link(id); NULL != lptr; lptr = next_link()) {
 		if (!( mptr = occi_http_link( OcciServerLinkManager, lptr->target, lptr->id ) ))
 			continue;
 		else if (!( hptr = rest_response_header( aptr, _OCCI_LINKHEAD, mptr )))
@@ -418,7 +418,7 @@ private	struct rest_response * occi_get_capacities(
 	struct	rest_header * hptr;
 
 	if (!( aptr = rest_allocate_response(cptr) ))
-		return( rest_html_response( aptr, 500, "Server Failure" ) );
+		return( internal_failure_response(aptr) );
 	else if (( hptr = rest_resolve_header( rptr->first, _HTTP_ACCEPT ))
 			!= (struct rest_header *) 0)
 		ctptr = hptr->value;
@@ -430,26 +430,26 @@ private	struct rest_response * occi_get_capacities(
 	||   (!( strcasecmp( ctptr, _OCCI_TEXT_JSON ) )))
 	{
 		if (!( mptr = occi_json_capacities( optr ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 
 		else	rest_response_body( aptr, mptr, _TEXT_BODY );
 
 		sprintf(clbuff,"%u",(unsigned) strlen(mptr));
 
 		if (!( hptr = occi_accept_header( aptr ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, ctptr) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_LENGTH, clbuff )))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else	return( rest_response_status( aptr, 200, "OK" ) );
 	}
 	else if ( accept_string_includes( ctptr, _OCCI_TEXT_HTML ) )
 	{
 		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_TEXT_HTML ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else if (!( mptr = occi_html_capacities( optr, aptr ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else
 		{
 			rest_response_body( aptr, mptr, _FILE_BODY );
@@ -461,9 +461,9 @@ private	struct rest_response * occi_get_capacities(
 	     ||  ( accept_string_includes( ctptr, _OCCI_X_APPLICATION_XML ) ))
 	{
 		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_APPLICATION_XML ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else if (!( mptr = occi_xml_capacities( optr, aptr ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else
 		{
 			rest_response_body( aptr, mptr, _FILE_BODY );
@@ -486,7 +486,7 @@ private	struct rest_response * occi_get_capacities(
 			else if (!( hptr = rest_response_header( aptr, "Category", mptr ) ))
 			{
 				liberate( mptr );
-				return( rest_html_response( aptr, 500, "Server Failure" ) );
+				return( internal_failure_response(aptr) );
 			}
 			else	liberate( mptr );
 			/* --------------------------------------- */
@@ -503,22 +503,22 @@ private	struct rest_response * occi_get_capacities(
 				else if (!( hptr = rest_response_header( aptr, "Category", mptr ) ))
 				{
 					liberate( mptr );
-					return( rest_html_response( aptr, 500, "Server Failure" ) );
+					return( internal_failure_response(aptr) );
 				}
 			}
 		}
 		optr = foot;
 		if (!( hptr = occi_accept_header( aptr ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 
 	}
 	else if (( accept_string_includes( ctptr, _OCCI_TEXT_PLAIN ) )
 	     ||  ( accept_string_includes( ctptr, "*/*" ) ))
 	{
 		if (!( hptr = rest_response_header( aptr, _HTTP_CONTENT_TYPE, _OCCI_TEXT_PLAIN ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else if (!( mptr = occi_text_capacities( optr, aptr ) ))
-			return( rest_response_status( aptr, 500, "Server Failure" ) );
+			return( rest_internal_failure_response(aptr) );
 		else
 		{
 			rest_response_body( aptr, mptr, _FILE_BODY );
@@ -533,9 +533,9 @@ private	struct rest_response * occi_get_capacities(
 				hptr = rest_response_header( aptr, "Category", mptr );
 #endif
 	if (!( aptr = occi_content_type( optr, rptr, aptr ) ))
-		return( rest_response_status( aptr, 500, "Server Failure" ) );
+		return( rest_internal_failure_response(aptr) );
 	else	if (!( occi_success( aptr ) ))
-		return( rest_response_status( aptr, 500, "Server Failure" ) );
+		return( rest_internal_failure_response(aptr) );
 	else	return( rest_response_status( aptr, 200, "OK" ) );
 
 }
