@@ -655,14 +655,35 @@ private	int	soap_inline_file( FILE * h, char * filename )
 }
 
 /*	-----------------------------------------------		*/
+/*	    i n v o k e _ s o a p _ r e q u e s t 		*/
+/*	-----------------------------------------------		*/
+private	int	invoke_soap_request( char * host, char * wsdl, char * filename )
+{
+	struct	rest_header * hptr;
+	struct	rest_response * rptr;
+	if ( check_verbose() )
+		printf("   SOAP POST %s %s \n",host, filename);
+
+	if (!( rptr = rest_client_post_request( host, default_tls(), get_default_agent(), filename, hptr ) ))
+		return( 0 );
+	else
+	{
+		liberate_rest_response( rptr );
+		return( 0 );
+	}
+}
+
+/*	-----------------------------------------------		*/
 /*	i n v o k e _ s o a p _ r e s o l v e r _ a p i		*/
 /*	-----------------------------------------------		*/
 private	int	invoke_soap_resolver_api( char * category )
 {
-	struct	rest_header * hptr;
-	struct	rest_response * rptr;
 	char *	message;
 	FILE *	h;
+
+	if ( check_verbose() )
+		printf("   SOAP API Resolver %s \n",category);
+
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
@@ -674,7 +695,7 @@ private	int	invoke_soap_resolver_api( char * category )
 		fprintf(h,"<category>%s</category>\n",category);
 		soap_message_footer( h, "ResolveCategory" );
 		fclose(h);
-		return(0);
+		return( invoke_soap_request( soap, wsdl, message ) );
 	}
 }
 
@@ -683,10 +704,10 @@ private	int	invoke_soap_resolver_api( char * category )
 /*	-------------------------------------------	*/
 private	int	invoke_soap_parser_api( char * type, char * filename )
 {
-	struct	rest_header * hptr;
-	struct	rest_response * rptr;
 	char *	message;
 	FILE *	h;
+	if ( check_verbose() )
+		printf("   SOAP API Parser %s %s \n",type,filename);
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
@@ -701,7 +722,7 @@ private	int	invoke_soap_parser_api( char * type, char * filename )
 		soap_inline_xml(h,filename);
 		soap_message_footer( h, type );
 		fclose(h);
-		return(0);
+		return( invoke_soap_request( soap, wsdl, message ) );
 	}
 }
 
@@ -710,9 +731,10 @@ private	int	invoke_soap_parser_api( char * type, char * filename )
 /*	-------------------------------------------	*/
 private	int	invoke_soap_broker_api( char * type, char * filename )
 {
-	struct	rest_response * rptr;
 	char *	message;
 	FILE *	h;
+	if ( check_verbose() )
+		printf("   SOAP API Broker %s %s \n",type,filename);
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
@@ -727,7 +749,7 @@ private	int	invoke_soap_broker_api( char * type, char * filename )
 		soap_inline_xml(h,filename);
 		soap_message_footer( h, type );
 		fclose(h);
-		return(0);
+		return( invoke_soap_request( soap, wsdl, message ) );
 	}
 }
 
@@ -736,9 +758,10 @@ private	int	invoke_soap_broker_api( char * type, char * filename )
 /*	---------------------------------------------	*/
 private	int	invoke_soap_service_api( char * action, char * service )
 {
-	struct	rest_response * rptr;
 	char *	message;
 	FILE *	h;
+	if ( check_verbose() )
+		printf("   SOAP API Service %s %s \n",action, service);
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
@@ -750,7 +773,7 @@ private	int	invoke_soap_service_api( char * action, char * service )
 		fprintf(h,"<service>%s</service>\n",service);
 		soap_message_footer( h, "ServiceAction" );
 		fclose(h);
-		return(0);
+		return( invoke_soap_request( soap, wsdl, message ) );
 	}
 }
 
@@ -759,9 +782,10 @@ private	int	invoke_soap_service_api( char * action, char * service )
 /*	-------------------------------------------	*/
 private	int	invoke_soap_script_api( char * script, char * parameters )
 {
-	struct	rest_response * rptr;
 	char *	message;
 	FILE *	h;
+	if ( check_verbose() )
+		printf("   SOAP API Script %s %s \n",script,(parameters ? parameters : "" ));
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
@@ -795,7 +819,12 @@ private	int	invoke_soap_api( char * command, char * subject, char * option )
 		return( invoke_soap_service_api( subject, option ) );
 	else if (!( strcmp( command, "script" ) ))
 		return( invoke_soap_script_api( subject, option ) );
-	else	return(0);
+	else
+	{
+		if ( check_verbose() )
+			printf("   SOAP API: Incorrect Command: \"%s\" \n",command);
+		return(0);
+	}
 }
 
 	/* ------------- */

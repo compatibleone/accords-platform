@@ -48,6 +48,8 @@ struct	accords_configuration Command = {
 	(struct occi_category *) 0
 	};
 
+private	char *	wsdl="none";
+private	char *	soap="none";
 private	char *	agent="CO-COMMAND/1.0";
 private	int	authorise=0;
 private	int	echo=0;
@@ -2357,10 +2359,14 @@ private	int	operation( int argc, char * argv[] )
 				aptr++;
 				if (!( strcmp( aptr, "noauth" ) ))
 					noauth = 1;
+				else if (!( strcmp( aptr, "wsdl" ) ))
+					wsdl = argv[++argi];
+				else if (!( strcmp( aptr, "soap" ) ))
+					soap = argv[++argi];
 				else if (!( strcmp( aptr, "echo") ))
 					csp_set_echo(1);
 				else if (!( strcmp( aptr, "agent" ) ))
-					agent = argv[argi++];
+					agent = argv[++argi];
 				else if (!( argi = accords_configuration_option( aptr, argi, argv )))
 					return( failure( 30, "incorrect command option", aptr ) );
 				continue;
@@ -2415,6 +2421,8 @@ private	int	banner()
 	printf("\n         --port <number>              set online port number \n");
 	printf("\n         --user <name>                set online user name \n");
 	printf("\n         --password <value>           set online password \n");
+	printf("\n         --wsdl <url>                 set wsdl document   \n");
+	printf("\n         --soap <url>                 set soap host       \n");
 	printf("\n         --debug                      activate debug messages \n");
 	return( 0 );
 }
