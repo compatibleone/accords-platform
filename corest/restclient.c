@@ -319,17 +319,16 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 	}
 	else if ((cptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )) < 0)
 	{
-		if ( check_debug() )
-			failure(errno,"socket_create","errno");
+		sprintf(buffer,"rest_open_client:failure:socket_create:%u:%s",
+			errno,strerror(errno));
+		rest_log_message( buffer );
 		return( rest_liberate_client( cptr ) );
 	}
 	else if (!( socket_connect( cptr->net.socket, host, port  ) ))
 	{
-		if ( check_debug() )
-		{
-			sprintf(buffer,"socket_connect(%s:%u)",host,port);
-		        failure(errno,buffer,strerror(errno));
-		}
+		sprintf(buffer,"rest_open_client:failure:socket_connect:%u:%s(%s:%u)",
+			errno,strerror(errno),host,port);
+		rest_log_message( buffer );
 		return( rest_liberate_client( cptr ) );
 	}
 	else if (!( tls ))
@@ -337,15 +336,20 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 
 	else if (!( cptr->tlsconf = tls_configuration_load( tls ) ))
 	{
-		if ( check_debug() )
-			failure(27,"rest","tls configuration");
+		sprintf(buffer,"rest_open_client:failure:tls_configuration_load:%s",tls);
+		rest_log_message( buffer );
 		return( rest_liberate_client( cptr ) );
 	}
 	else
 	{
 		tls_configuration_use( cptr->tlsconf );
 		if (!( tls_client_handshake( &cptr->net, cptr->tlsconf->option ) ))
+		{
+			sprintf(buffer,"rest_open_client:failure:tls_client_handshake:%u:%s",
+				errno,strerror(errno));
+			rest_log_message( buffer );
 			return( rest_liberate_client( cptr ) );
+		}
 		else	return( cptr );
 	}
 }
@@ -850,7 +854,7 @@ public	struct	rest_response * rest_client_get_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
 		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
@@ -905,7 +909,7 @@ public	struct	rest_response * rest_client_try_get_request(
 
 	else if (!( cptr = rest_try_open_client(uptr->host,uptr->port,tls, timeout, retry)))
 	{
-		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
 		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
@@ -954,7 +958,7 @@ public	struct	rest_response * rest_client_delete_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
 		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
@@ -1002,7 +1006,7 @@ public	struct	rest_response * rest_client_head_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
 		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
@@ -1050,7 +1054,7 @@ public	struct	rest_response * rest_client_post_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
 		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
@@ -1101,7 +1105,7 @@ public	struct	rest_response * rest_client_put_request(
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
 	{
-		sprintf(buffer,"Rest Client Failure to open : %s:%u \n",uptr->host,uptr->port);
+		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
 		rest_log_message( buffer );
 		liberate_url( uptr );
 		return( rest_client_response( 602, "Client Failure", agent ) );
