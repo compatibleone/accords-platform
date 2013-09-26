@@ -2366,7 +2366,7 @@ private	int	operation( int argc, char * argv[] )
 				else if (!( strcmp( aptr, "echo") ))
 					csp_set_echo(1);
 				else if (!( strcmp( aptr, "agent" ) ))
-					agent = argv[++argi];
+					set_default_agent( argv[++argi] );
 				else if (!( argi = accords_configuration_option( aptr, argi, argv )))
 					return( failure( 30, "incorrect command option", aptr ) );
 				continue;
