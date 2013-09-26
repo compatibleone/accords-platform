@@ -410,6 +410,31 @@ private	struct rest_response * corcs_parser_response( struct rest_response * apt
 }
 
 /*	-------------------------------------------------------		*/
+/*	      c o r c s _ s c i p t _ r e s p o n s e	 		*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * corcs_script_response( struct rest_response * aptr, char * document, char * message )
+{
+	FILE * h;
+	char *	filename;
+	char 	buffer[1024];
+	sprintf(buffer,"%sResponse",message);
+	if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( aptr );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		soap_message_header( h, buffer );
+		fprintf(h,"<m:output>\n");
+		soap_inline_file( h, document );
+		fprintf(h,"</m:output>\n");
+		soap_message_footer( h, buffer );
+		fclose(h);
+		return( rest_file_response( aptr, filename, "text/xml" ) );
+	}
+}
+
+/*	-------------------------------------------------------		*/
 /*	      c o r c s _ b r o k e r _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_broker_response( struct rest_response * aptr, char * service, char * message  )
@@ -625,7 +650,7 @@ private	struct	rest_response * corcs_soap_script( struct rest_response * aptr, s
 		/* run script */
 		/* ---------- */
 		if ((filename = cords_script_interpreter( filename, parameters )) != (char *) 0)
-			cords_script_response ( aptr, filename );
+			corcs_script_response ( aptr, filename, "RunScriptResponse" );
 		sptr = liberate_xml_element( sptr );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
