@@ -651,7 +651,7 @@ private	struct	rest_response * corcs_soap_script( struct rest_response * aptr, s
 		/* ---------- */
 		filename = cords_script_interpreter( filename, parameters, 0 );
 		sptr = liberate_xml_element( sptr );
-		return( corcs_script_response ( aptr, filename, "RunScriptResponse" ) );
+		return( corcs_script_response ( aptr, filename, "RunScript" ) );
 	}
 }
 
