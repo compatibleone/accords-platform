@@ -122,7 +122,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<wsdl:input message=\"BrokerSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"ServiceCommand\">\n");
+		fprintf(h,"<wsdl:operation name=\"ServiceAction\">\n");
 		fprintf(h,"<wsdl:input message=\"ServiceIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ServiceOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
@@ -160,7 +160,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<wsdl:input message=\"BrokerSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"ServiceCommand\">\n");
+		fprintf(h,"<wsdl:operation name=\"ServiceAction\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/service\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"ServiceIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ServiceOut\"/>\n");
@@ -657,14 +657,23 @@ private	int	soap_inline_file( FILE * h, char * filename )
 /*	-----------------------------------------------		*/
 /*	    i n v o k e _ s o a p _ r e q u e s t 		*/
 /*	-----------------------------------------------		*/
-private	int	invoke_soap_request( char * host, char * wsdl, char * filename )
+private	int	invoke_soap_request( char * action, char * host, char * wsdl, char * filename )
 {
 	struct	rest_header * hptr;
 	struct	rest_response * rptr;
-	if ( check_verbose() )
-		printf("   SOAP POST %s %s \n",host, filename);
+	char 	buffer[1024];
 
-	if (!( rptr = rest_client_post_request( host, default_tls(), get_default_agent(), filename, hptr ) ))
+	if ( check_verbose() )
+		printf("   SOAP POST   %s %s \n",host, filename);
+
+	sprintf(buffer,"%s/%s",host,action);
+
+	if ( check_verbose() )
+		printf("   Soap Action %s \n",buffer);
+
+	if (!( hptr = rest_create_header( "soapAction", buffer )))
+		return( 0 );
+	else if (!( rptr = rest_client_post_request( host, default_tls(), get_default_agent(), filename, hptr ) ))
 		return( 0 );
 	else
 	{
@@ -695,7 +704,7 @@ private	int	invoke_soap_resolver_api( char * category )
 		fprintf(h,"<category>%s</category>\n",category);
 		soap_message_footer( h, "ResolveCategory" );
 		fclose(h);
-		return( invoke_soap_request( soap, wsdl, message ) );
+		return( invoke_soap_request( "resolver", soap, wsdl, message ) );
 	}
 }
 
@@ -722,7 +731,7 @@ private	int	invoke_soap_parser_api( char * type, char * filename )
 		soap_inline_xml(h,filename);
 		soap_message_footer( h, type );
 		fclose(h);
-		return( invoke_soap_request( soap, wsdl, message ) );
+		return( invoke_soap_request( type, soap, wsdl, message ) );
 	}
 }
 
@@ -749,7 +758,7 @@ private	int	invoke_soap_broker_api( char * type, char * filename )
 		soap_inline_xml(h,filename);
 		soap_message_footer( h, type );
 		fclose(h);
-		return( invoke_soap_request( soap, wsdl, message ) );
+		return( invoke_soap_request( type, soap, wsdl, message ) );
 	}
 }
 
@@ -773,7 +782,7 @@ private	int	invoke_soap_service_api( char * action, char * service )
 		fprintf(h,"<service>%s</service>\n",service);
 		soap_message_footer( h, "ServiceAction" );
 		fclose(h);
-		return( invoke_soap_request( soap, wsdl, message ) );
+		return( invoke_soap_request( "service", soap, wsdl, message ) );
 	}
 }
 
@@ -800,7 +809,7 @@ private	int	invoke_soap_script_api( char * script, char * parameters )
 		fprintf(h,"</script>\n");
 		soap_message_footer( h, "RunScript" );
 		fclose(h);
-		return(0);
+		return( invoke_soap_request( "script", soap, wsdl, message ) );
 	}
 }
 
