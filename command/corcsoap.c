@@ -341,7 +341,7 @@ private	int	soap_inline_file( FILE * h, char * filename )
 	{
 		while ((c = fgetc(s)) > 0)
 			fputc(c,h);
-		fclose(h);
+		fclose(s);
 		return(0);
 	}
 }
