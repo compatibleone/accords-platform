@@ -393,16 +393,19 @@ private	struct rest_response * corcs_parser_response( struct rest_response * apt
 {
 	FILE * h;
 	char *	filename;
+	char *	plan;
 	char 	buffer[1024];
 	sprintf(buffer,"%sResponse",message);
-	if (!( filename = rest_temporary_filename( "xml" ) ))
+	if (!( plan = parser_name_plan(document) ))
+		return( aptr );
+	else if (!( filename = rest_temporary_filename( "xml" ) ))
 		return( aptr );
 	else if (!( h = fopen( filename, "w" ) ))
 		return( liberate( filename ) );
 	else
 	{
 		soap_message_header( h, buffer );
-		soap_inline_xml( h, document );
+		soap_inline_xml( h, plan );
 		soap_message_footer( h, buffer );
 		fclose(h);
 		return( rest_file_response( aptr, filename, "text/xml" ) );

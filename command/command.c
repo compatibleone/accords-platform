@@ -832,13 +832,61 @@ struct	cords_parser_config
 	};
 
 /*	-----------------------------------------------------	*/
+/*		p a r s e r _ n a m e _ p l a n 		*/
+/*	-----------------------------------------------------	*/
+public	char *	parser_name_plan( char * filename )
+{
+	char *directory, *bname, *dname;
+	char 	nameplan[1014];
+
+	if (!( directory = allocate_string( filename ) ))
+		return( (char *) 0 );
+	else if (!( filename = allocate_string( filename ) ))
+		return( (char *) 0 );
+	else
+	{
+		dname = dirname(directory);
+		bname = basename(filename);
+		sprintf(nameplan,"%s/plan_%s",dname, bname);
+		if ( directory )
+			directory = liberate( directory );
+		if ( filename )
+			filename = liberate( filename );
+		return( allocate_string( nameplan ) );
+	}
+}
+
+/*	-----------------------------------------------------	*/
+/*		b r o k e r _ n a m e _ i n s t a n c e		*/
+/*	-----------------------------------------------------	*/
+public	char *	broker_name_instance( char * filename )
+{
+	char *directory, *bname, *dname;
+	char 	nameplan[1014];
+
+	if (!( directory = allocate_string( filename ) ))
+		return( (char *) 0 );
+	else if (!( filename = allocate_string( filename ) ))
+		return( (char *) 0 );
+	else
+	{
+		dname = dirname(directory);
+		bname = basename(filename);
+		sprintf(nameplan,"%s/instance_%s",dname, bname);
+		if ( directory )
+			directory = liberate( directory );
+		if ( filename )
+			filename = liberate( filename );
+		return( allocate_string( nameplan ) );
+	}
+}
+
+/*	-----------------------------------------------------	*/
 /*	t e s t _ c o r d s _ p a r s e r _ o p e r a t i o n	*/
 /*	-----------------------------------------------------	*/
 private	int	ll_cords_parser_operation( char * filename )
 {
-	char *dirc, *basec, *bname, *dname;
 	struct	xml_element * dptr;
-	char	nameplan[512];
 	if (!( _DEFAULT_PUBLISHER ))
 		return( failure(1,"requires","publication host"));
 	else if (!( Cp.agent ))
@@ -849,17 +897,7 @@ private	int	ll_cords_parser_operation( char * filename )
 		return( failure(4,"parse error",filename));
 	else if (!( Cp.result ))
 	{
-		if (!( dirc = allocate_string( filename ) ))
-			return( failure(5,"allocation",filename));
-		else if (!( basec = allocate_string( filename ) ))
-			return( failure(6,"allocation",filename));
-
-		dname = dirname(dirc);
-		bname = basename(basec);
-		sprintf(nameplan,"%s/plan_%s",dname, bname);
-		dirc = liberate( dirc );
-		basec = liberate( basec );
-		if (!( Cp.result = allocate_string( nameplan ) ))
+		if (!( Cp.result = parser_name_plan( filename ) ))
 			return( failure(4,"allocation","result filename"));
 	}
 	dptr = cords_serialise_document( dptr, Cp.result );
@@ -1151,7 +1189,9 @@ private	int	ll_sla_broker_operation( char * filename )
 	/* validate parameters */
 	/* ------------------- */
 	if (!(nptr = Cb.result))
-		sprintf((nptr=nameplan),"instance_%s",filename);
+		if (!( nptr = broker_name_instance( filename ) ))
+			return( failure(1,"requires","instance name"));
+
 	if (!( default_publisher() ))
 		return( failure(1,"requires","publication host"));
 	else if (!( agent ))
@@ -2012,12 +2052,10 @@ private	struct rest_header * get_multipart_form( struct rest_request * rptr )
 /*	------------------------------------------------------------------	*/
 private	struct rest_response * cords_parser_response( struct rest_response * aptr, char * filename )
 {
-	struct	rest_header * hptr;
-	char	buffer[2048];
-	char	filesize[256];
-
-	sprintf(buffer,"plan_%s",filename);
-	return( rest_file_response( aptr, buffer, "application/xml" ) );
+	char *	plan;
+	if (!( plan = parser_name_plan( filename ) ))
+		return( rest_file_response( aptr, filename, "application/xml" ) );
+	else	return( rest_file_response( aptr, plan, "application/xml" ) );
 }
 
 /*	------------------------------------------------------------------	*/
@@ -2025,11 +2063,10 @@ private	struct rest_response * cords_parser_response( struct rest_response * apt
 /*	------------------------------------------------------------------	*/
 private	struct rest_response * cords_broker_response( struct rest_response * aptr, char * filename )
 {
-	struct	rest_header * hptr;
-	char	buffer[2048];
-	char	filesize[256];
-	sprintf(buffer,"instance_%s",filename);
-	return( rest_file_response( aptr, buffer, "application/json" ) );
+	char *	iname;
+	if (!( iname = broker_name_instance( filename ) ))
+		return( rest_file_response( aptr, filename, "application/json" ) );
+	else	return( rest_file_response( aptr, iname, "application/json" ) );
 }
 
 /*	------------------------------------------------------------------	*/
