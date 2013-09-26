@@ -215,7 +215,8 @@ paasprocci/src/paasprocci
 pyaccords/pysrc/pypacksrc/build/
 pyaccordsSDK/pycompdev/build/
 pyaccordsSDK/pycompmanager/build/
-build
+build/
+build*/
 .cproject
 .project
 .pydevproject
