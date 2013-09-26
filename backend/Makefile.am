@@ -197,11 +197,10 @@ libbackend_la_SOURCES = backend_common.c link_backend.c backend_profiling.c riak
     
 libbackend_la_CFLAGS = $(CFLAGS_BACKEND) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) -Werror -Wall \
                        -Wno-missing-braces # There's a gcc bug which causes this warning to fire on {0} initialisers
-libbackend_la_LDFLAGS = -lcurl 
+libbackend_la_LIBADD = -lcurl 
 
 #json-c
-JSON_C_DIR=/usr/local
-libbackend_la_CFLAGS += -I$(JSON_C_DIR)/include/json-c
-libbackend_la_LDFLAGS+= -L$(JSON_C_DIR)/lib -ljson-c
+libbackend_la_CFLAGS += ${JSONC_CFLAGS}
+libbackend_la_LIBADD += ${JSONC_LIBS}
 
 link_backend.c : $(model_c_files) generator_input.txt
