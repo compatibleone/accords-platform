@@ -207,9 +207,9 @@ private	char *	document_element_string( struct xml_element * xptr, char * nptr )
 }
 
 /*	---------------------------------------------	*/
-/*	d o c u m e n t _ e l e m e n t _ f i l e  	*/ 
+/*	d o c u m e n t _ e l e m e n t _ x m l   	*/ 
 /*	---------------------------------------------	*/
-private	char *	document_element_file( struct xml_element * xptr, char * nptr )
+private	char *	document_element_xml( struct xml_element * xptr, char * nptr )
 {
 	struct	xml_element *eptr;
 	char *	filename;
@@ -220,6 +220,28 @@ private	char *	document_element_file( struct xml_element * xptr, char * nptr )
 	else	
 	{
 		document_serialise_file( eptr, filename );
+		return( filename );
+	}
+}
+
+/*	---------------------------------------------	*/
+/*	d o c u m e n t _ e l e m e n t _ f i l e  	*/ 
+/*	---------------------------------------------	*/
+private	char *	document_element_file( struct xml_element * xptr, char * nptr )
+{
+	FILE * h;
+	struct	xml_element *eptr;
+	char *	filename;
+	if (!( eptr = nested_document_element( xptr, nptr )))
+		return((char *) 0);
+	else if (!( filename = rest_temporary_filename( "txt" ) ))
+		return( filename );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		fprintf(h,"%s\n",eptr->value);
+		fclose(h);
 		return( filename );
 	}
 }
@@ -372,9 +394,9 @@ private	struct	rest_response * corcs_soap_manifest_parser( struct rest_response 
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( rptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
-	else if (!( filename = document_element_file( sptr, "filename") ))
-		return(rest_html_response(aptr, 400, "missing filename"));
-	else if (!( command = document_element_string( sptr, "command") ))
+	else if (!( filename = document_element_xml( sptr, "manifest") ))
+		return(rest_html_response(aptr, 400, "missing manifest"));
+	if (!( command = document_element_string( sptr, "command") ))
 		return(rest_html_response(aptr, 400, "missing command"));
 	else if ( strcmp( command, "parser" ) != 0)
 		return(rest_html_response(aptr, 400, "incorrect command"));
@@ -400,8 +422,8 @@ private	struct	rest_response * corcs_soap_sla_parser( struct rest_response * apt
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( rptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
-	else if (!( filename = document_element_file( sptr, "filename") ))
-		return(rest_html_response(aptr, 400, "missing filename"));
+	else if (!( filename = document_element_xml( sptr, "agreement") ))
+		return(rest_html_response(aptr, 400, "missing agreement"));
 	else if (!( command = document_element_string( sptr, "command") ))
 		return(rest_html_response(aptr, 400, "missing command"));
 	else if ( strcmp( command, "parser" ) != 0)
@@ -428,8 +450,8 @@ private	struct	rest_response * corcs_soap_manifest_broker( struct rest_response 
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( rptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
-	else if (!( filename = document_element_file( sptr, "filename") ))
-		return(rest_html_response(aptr, 400, "missing filename"));
+	else if (!( filename = document_element_xml( sptr, "manifest") ))
+		return(rest_html_response(aptr, 400, "missing manifest"));
 	else if (!( command = document_element_string( sptr, "command") ))
 		return(rest_html_response(aptr, 400, "missing command"));
 	else if ( strcmp( command, "broker" ) != 0)
@@ -456,8 +478,8 @@ private	struct	rest_response * corcs_soap_sla_broker( struct rest_response * apt
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( rptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
-	else if (!( filename = document_element_file( sptr, "filename") ))
-		return(rest_html_response(aptr, 400, "missing filename"));
+	else if (!( filename = document_element_xml( sptr, "agreement") ))
+		return(rest_html_response(aptr, 400, "missing agreement"));
 	else if (!( command = document_element_string( sptr, "command") ))
 		return(rest_html_response(aptr, 400, "missing command"));
 	else if ( strcmp( command, "broker" ) != 0)
@@ -511,8 +533,8 @@ private	struct	rest_response * corcs_soap_script( struct rest_response * aptr, s
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( rptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
-	else if (!( filename = document_element_file( sptr, "filename") ))
-		return(rest_html_response(aptr, 400, "missing filename"));
+	else if (!( filename = document_element_file( sptr, "script") ))
+		return(rest_html_response(aptr, 400, "missing script"));
 	else if (!( command = document_element_string( sptr, "command") ))
 		return(rest_html_response(aptr, 400, "missing command"));
 	else if (!( parameters= document_element_string( sptr, "parameters") ))
