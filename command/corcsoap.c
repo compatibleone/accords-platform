@@ -661,6 +661,7 @@ private	int	invoke_soap_request( char * action, char * host, char * wsdl, char *
 {
 	struct	rest_header * hptr;
 	struct	rest_response * rptr;
+	struct	xml_element * eptr;
 	char 	buffer[1024];
 
 	if ( check_verbose() )
@@ -677,6 +678,13 @@ private	int	invoke_soap_request( char * action, char * host, char * wsdl, char *
 		return( 0 );
 	else
 	{
+		printf("   SOAP RESPONSE %u %s \n",rptr->status, (rptr->message ? rptr->message : "NO MESSAGE"));
+		if (( rptr->body )
+		&&  ((eptr = document_parse_file( rptr->body )) != (struct xml_element *) 0))
+		{
+			document_show_element( eptr, 0 );
+			eptr = document_drop( eptr );
+		}
 		liberate_rest_response( rptr );
 		return( 0 );
 	}
