@@ -1245,10 +1245,11 @@ private	void	cords_rcs_style( FILE * h, char * filename )
 /*	-------------------------------------------	*/
 /*	c o r d s _ p a r s e r _ o p e r a t i o n	*/
 /*	-------------------------------------------	*/
-private	char *	cords_script_interpreter( char * filename, char * parameters )
+private	char *	cords_script_interpreter( char * filename, char * parameters, int output )
 {
 	FILE *	h;
 	FILE *	rh;
+	char *	filetype;
 	int	holdout=-1;
 	int	newout=-1;
 	int	realout=-1;
@@ -1277,12 +1278,15 @@ private	char *	cords_script_interpreter( char * filename, char * parameters )
 		}
 	}
 
-	if (!( result = rest_temporary_filename( "html" )))
+	if ( output ) 	filetype = "html";
+	else		filetype = "txt";
+
+	if (!( result = rest_temporary_filename( filetype )))
 	{
 		if ( pararoot ) liberate( pararoot );
 		return( (char *) 0 );
 	}
-	else if (!( newfile = rest_temporary_filename( "html" )))
+	else if (!( newfile = rest_temporary_filename( filetype )))
 	{
 		if ( pararoot ) liberate( pararoot );
 		return( (char *) 0 );
@@ -1294,10 +1298,16 @@ private	char *	cords_script_interpreter( char * filename, char * parameters )
 	}
 	else
 	{
-		fprintf(h,"<html><head><title>corsdscript execution response</title>");
-		cords_rcs_style(h,"style.css");
-		fprintf(h,"</head><body><div align=center><h1>Script Execution</h1>\n");
-		fprintf(h,"<table><tr><th>%s</th><tr><td>\n",filename);
+		if ( output )
+		{
+			fprintf(h,"<html><head><title>corsdscript execution response</title>");
+			cords_rcs_style(h,"style.css");
+			fprintf(h,"</head><body><div align=center><h1>Script Execution</h1>\n");
+			fprintf(h,"<table><tr><th>%s</th><tr><td>\n",filename);
+			if ( output & 2 )
+				fprintf(h,"<pre>\n");
+		}
+
 		if ((rh = freopen( newfile, "w", stdout )) != (FILE *) 0)
 		{
 			run_cordscript_interpreter( filename, argc, argv );
@@ -1305,7 +1315,10 @@ private	char *	cords_script_interpreter( char * filename, char * parameters )
 			fclose(rh);
 			cords_copy_file( h, newfile );
 		}
-		fprintf(h,"</td></tr></table></div></body></html>\n");
+		if ( output & 2 )
+			fprintf(h,"\n</pre>");
+		if ( output )
+			fprintf(h,"</td></tr></table></div></body></html>\n");
 		fclose( h );
 		if ( pararoot ) liberate( pararoot );
 		return( result );
@@ -2176,7 +2189,7 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 		else
 		{
 			parameters = get_multipart_data( form, "parameters" );
-			if (!(filename = cords_script_interpreter( filename, parameters )))
+			if (!(filename = cords_script_interpreter( filename, parameters,1 )))
 				return( rest_html_response( aptr, status, "Incorrect request" ));
 			else	return( cords_service_response( aptr, filename ) );
 		}

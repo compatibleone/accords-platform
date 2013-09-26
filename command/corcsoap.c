@@ -649,10 +649,9 @@ private	struct	rest_response * corcs_soap_script( struct rest_response * aptr, s
 	{
 		/* run script */
 		/* ---------- */
-		if ((filename = cords_script_interpreter( filename, parameters )) != (char *) 0)
-			corcs_script_response ( aptr, filename, "RunScriptResponse" );
+		filename = cords_script_interpreter( filename, parameters, 0 );
 		sptr = liberate_xml_element( sptr );
-		return( rest_html_response( aptr, 200, "OK" ) );
+		return( corcs_script_response ( aptr, filename, "RunScriptResponse" ) );
 	}
 }
 
