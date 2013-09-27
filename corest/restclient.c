@@ -26,6 +26,18 @@
 #include "restclient.h"
 #include "restlog.h"
 
+/*	------------------------------------------	*/
+/*	this structure controls the socket connect 	*/
+/*	retry mechanism to avoid the socket timing	*/
+/*	issues, ie timeouts that can be encounterd	*/
+/*	------------------------------------------	*/
+private	struct	rest_client_behaviour
+{
+	int	retry;
+	int 	retries;
+	int	seconds;
+} RcB = { 1, 60, 1 };
+
 /*	-------------------------------------------------	*/
 /*		s e r v i c e _ p r e f i x _ u r l		*/
 /*	-------------------------------------------------	*/
@@ -307,31 +319,93 @@ private	struct	rest_client * rest_liberate_client( struct rest_client * cptr )
 /*	------------------------------------------------	*/
 private	struct rest_client * 	rest_open_client( char * host, int port, char * tls )
 {
-	struct rest_client *  cptr;
+	struct 	rest_client *  cptr;
 	char	buffer[1024]; 
+	int	lerrno;
+	int	retries=0;
 	if (!( port ))
 		return((struct rest_client*) 0); 
-	else if (!( cptr = rest_allocate_client() ))
+	else
 	{
-		if ( check_debug() )
-			failure(27,"rest","allocate client");
-		return( cptr );
+		retries=0;
+		while ( 1 )
+		{
+			/* ---------------------------------------- */
+			/* allocate a rest client control structure */
+			/* ---------------------------------------- */
+			if (!( cptr = rest_allocate_client() ))
+			{
+				rest_log_message("error allocating rest client");
+				return( cptr );
+			}
+
+			/* ------------------------------------------------ */
+			/* create a TCP socket for the REST/HTTP connection */
+			/* ------------------------------------------------ */
+			else if ((cptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )) < 0)
+			{
+				sprintf(buffer,"rest_open_client:failure:socket_create:%u:%s",
+					errno,strerror(errno));
+				rest_log_message( buffer );
+				return( rest_liberate_client( cptr ) );
+			}
+
+			/* --------------------------------------------------- */
+			/* attempt to connect the socket to the target address */
+			/* --------------------------------------------------- */
+			else if (!( lerrno = socket_connect( cptr->net.socket, host, port  ) ))
+				break;
+
+			else if ( lerrno ==-1 )
+			{
+				sprintf(buffer,"rest_open_client:failure:gethostbyname(%s:%u)",
+					host,port);
+				rest_log_message( buffer );
+				return( rest_liberate_client( cptr ) );
+			}
+			else
+			{
+				/* ---------------------------------- */
+				/* log the connection failure details */
+				/* ---------------------------------- */
+				sprintf(buffer,"rest_open_client:failure:socket_connect:%u:%s(%s:%u)",
+					lerrno,strerror(lerrno),host,port);
+				rest_log_message( buffer );
+
+				/* --------------------------------- */
+				/* drop the client control structure */
+				/* --------------------------------- */
+				cptr = rest_liberate_client( cptr );
+
+				/* -------------------------- */
+				/* check the error conditions */
+				/* -------------------------- */
+				switch( lerrno )
+				{
+				case	EAGAIN		:
+				case	EINTR		:
+				case	ETIMEDOUT	:
+					/* -------------------------- */
+					/* check the retry controller */
+					/* -------------------------- */
+					retries++;
+					if (!( RcB.retry ))
+						return( cptr );
+					else if ( retries >= RcB.retries )
+						return( cptr );
+					else if ( RcB.seconds )
+						sleep( RcB.seconds );
+					continue;
+				default			:
+					return( cptr );
+				}
+			}
+		}
 	}
-	else if ((cptr->net.socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )) < 0)
-	{
-		sprintf(buffer,"rest_open_client:failure:socket_create:%u:%s",
-			errno,strerror(errno));
-		rest_log_message( buffer );
-		return( rest_liberate_client( cptr ) );
-	}
-	else if (!( socket_connect( cptr->net.socket, host, port  ) ))
-	{
-		sprintf(buffer,"rest_open_client:failure:socket_connect:%u:%s(%s:%u)",
-			errno,strerror(errno),host,port);
-		rest_log_message( buffer );
-		return( rest_liberate_client( cptr ) );
-	}
-	else if (!( tls ))
+	/* -------------------------------------- */
+	/* a connected socket is now read for use */
+	/* -------------------------------------- */
+	if (!( tls ))
 		return( cptr );
 
 	else if (!( cptr->tlsconf = tls_configuration_load( tls ) ))

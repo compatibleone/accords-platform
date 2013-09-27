@@ -186,6 +186,8 @@ public	int	socket_connect( int h, char * u,int port )
 	struct sockaddr_in address;
 	struct sockaddr_in server;
 	int	retries=1000;
+	int	lerrno;
+	char	buffer[512];
 
 	if ( check_debug() & _DEBUG_SOCKET ) 
 	{
@@ -196,36 +198,25 @@ public	int	socket_connect( int h, char * u,int port )
 	address.sin_port = htons(0);
 	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) 
 	{
-		socket_close( h ) ;
-		return(0);
+		lerrno = errno;
+		return(lerrno);
 	}
      	if (!(hp = gethostbyname(u)))
-		return( 0 );
+		return(-1);
 	else 	
 	{
 		server.sin_family = get_socket_type();
 		memcpy(tempxfer, hp->h_addr_list[0],get_address_size());
 		memcpy(&server.sin_addr.s_addr,tempxfer,get_address_size());
 		server.sin_port = htons(port);
-		while (1)
+		if ( connect( h, 
+			(struct sockaddr *) & server,
+			sizeof( struct sockaddr ) ) < 0 )
 		{
-			if ( connect( h, 
-				(struct sockaddr *) & server,
-				sizeof( struct sockaddr ) ) < 0 )
-			{
-				if (!( retries ))
-					return(0);
-				else	retries--;
-				if ( errno == ETIMEDOUT )
-					continue;
-				else if ( errno == EAGAIN )
-					continue;
-				else if ( errno == EINTR )
-					continue;
-				else	return(0);
-			}
-			else	return(1);
+			lerrno = errno;
+			return( lerrno );
 		}
+		return(0);
 	}
 }
 
