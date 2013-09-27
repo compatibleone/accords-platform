@@ -73,10 +73,10 @@
 		switch ( $state )
 		{
 		case	1	:
-			"<input type=submit class=action name=action value='stop service'></form></tr>".display();
+			"<input type=submit class=redaction name=action value='stop service'></form></tr>".display();
 			break;
 		case	0	:
-			"<input type=submit class=action name=action value='start service'></form></tr>".display();
+			"<input type=submit class=greenaction name=action value='start service'></form></tr>".display();
 			break;
 		default		:
 			"<span class=action>working</span></form></tr>".display();
@@ -209,10 +209,10 @@
 				switch ( $state )
 				{
 				case	1	:
-					"<input type=submit class=action name=action value='stop service'></form></tr>".display();	
+					"<input type=submit class=redaction name=action value='stop service'></form></tr>".display();	
 					break;
 				case	0	:
-					"<input type=submit class=action name=action value='start service'></form>".display();
+					"<input type=submit class=greenaction name=action value='start service'></form>".display();
 					$m = $m#"</tr>";
 					$m.display();
 					break;

@@ -63,6 +63,26 @@ body	{
 	border-radius: 8px;
 	-moz-border-radius: 8px;
 	}
+.redaction {
+	width: 40mm;
+	padding: 1mm;
+	background-color: #C06040;
+	color: white;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	}
+.greenaction {
+	width: 40mm;
+	padding: 1mm;
+	background-color: #60C040;
+	color: white;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	}
 input 	{
 	width: 60mm;
 	padding: 1mm;
