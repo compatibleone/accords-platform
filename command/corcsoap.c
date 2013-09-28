@@ -1,315 +1,10 @@
 #ifndef	_corcs_soap_c
 #define	_corcs_soap_c
 #include "command.h"
-/*	-----------------------------------	*/
-/*	   c o r c s _ s o a p _ w s d l 	*/
-/*	-----------------------------------	*/
-/*	Reminder:				*/
-/*	Service defines ports which 		*/
-/*	define their binding which 		*/
-/*	in turn defines their port		*/
-/*	Type which defines the operation	*/
-/*	which indicate their messages		*/
-/*	which are described in terms of 	*/
-/*	their parts.				*/
-/*	S->P->B->PT->O->M->Part			*/
-/*	------------------------------------	*/
-private	char *	corcs_soap_wsdl(char * host)
-{
-	char * filename;
-	FILE * h;
-	if (!( filename = rest_temporary_filename("wsdl") ))
-		return( filename );
-	else if (!( h = fopen( filename, "w" ) ))
-		return( liberate( filename ) );
-	else
-	{
-		fprintf(h,"<?xml version=\"1.0\"?>\n");
-		fprintf(h,"<wsdl:definitions name=\"CompatibleOneRemoteCommandServer\"\n");
-		fprintf(h,"targetNamespace=\"%s/wsdl\"\n",host);
-		fprintf(h,"xmlns:cords=\"%s/manifest/\"\n",host);
-		fprintf(h,"xmlns:slam=\"%s/agreement/\"\n",host);
-		fprintf(h,"xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\"\n");
-		fprintf(h,"xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">\n");
 
-		fprintf(h,"<import namespace=\"%s/manifest/\"\n",host);
-		fprintf(h,"location=\"http://www.compatibleone.fr/schemes/manifest.xsd\"/>\n");
-		fprintf(h,"<import namespace=\"%s/agreement/\"\n",host);
-		fprintf(h,"location=\"http://www.compatibleone.fr/schemes/slam.xsd\"/>\n");
-
-		fprintf(h,"<wsdl:types/>\n");
-
-		fprintf(h,"<wsdl:message name=\"ResolverIn\">\n");
-		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"category\" type=\"string\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ResolverOut\">\n");
-		fprintf(h,"<wsdl:part name=\"category\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"host\" type=\"string\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ParseManifestIn\">\n");
-		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"document\" type=\"cords:manifest\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ParseManifestOut\">\n");
-		fprintf(h,"<wsdl:part name=\"document\" type=\"cords:manifest\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ParseSLAIn\">\n");
-		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"document\" type=\"slam:agreement\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ParseSLAOut\">\n");
-		fprintf(h,"<wsdl:part name=\"document\" type=\"slam:agreement\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"BrokerManifestIn\">\n");
-		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"document\" type=\"cords:manifest\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"BrokerSLAIn\">\n");
-		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"document\" type=\"slam:agreement\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"BrokerOut\">\n");
-		fprintf(h,"<wsdl:part name=\"service\" type=\"string\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ServiceIn\">\n");
-		fprintf(h,"<wsdl:part name=\"action\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"service\" type=\"string\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ServiceOut\">\n");
-		fprintf(h,"<wsdl:part name=\"service\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"state\" type=\"string\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ScriptIn\">\n");
-		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"script\" type=\"file\"/>\n");
-		fprintf(h,"<wsdl:part name=\"parameters\" type=\"string\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:message name=\"ScriptOut\">\n");
-		fprintf(h,"<wsdl:part name=\"output\" type=\"string\"/>\n");
-		fprintf(h,"</wsdl:message>\n");
-
-		fprintf(h,"<wsdl:portType name=\"CORCS\">\n");
-		fprintf(h,"<wsdl:operation name=\"ResolveCategory\">\n");
-		fprintf(h,"<wsdl:input message=\"ResolverIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ResolverOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"ParseManifest\">\n");
-		fprintf(h,"<wsdl:input message=\"ParseManifestIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ParseManifestOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"ParseSLA\">\n");
-		fprintf(h,"<wsdl:input message=\"ParseSLAIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ParseSLAOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"BrokerManifest\">\n");
-		fprintf(h,"<wsdl:input message=\"BrokerManifestIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"BrokerSLA\">\n");
-		fprintf(h,"<wsdl:input message=\"BrokerSLAIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"ServiceAction\">\n");
-		fprintf(h,"<wsdl:input message=\"ServiceIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ServiceOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"RunScript\">\n");
-		fprintf(h,"<wsdl:input message=\"ScriptIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ScriptOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"</wsdl:portType>\n");
-
-		fprintf(h,"<wsdl:binding name=\"SOAPCORCS\" type=\"CORCS\">\n");
-		fprintf(h,"<soap:binding style=\"rpc\" ");
-		fprintf(h,"transport=\"http://schemas.xmlsoap.org/soap/http\"/>\n");
-		fprintf(h,"<wsdl:operation name=\"ResolveCategory\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/resolver\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ResolverIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ResolverOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"ParseManifest\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/ParseManifest\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ParseManifestIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ParseManifestOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"ParseSLA\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/ParseSLA\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ParseSLAIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ParseSLAOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"BrokerManifest\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/BrokerManifest\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"BrokerManifestIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"BrokerSLA\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/BrokerSLA\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"BrokerSLAIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"ServiceAction\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/service\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ServiceIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ServiceOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"<wsdl:operation name=\"RunScript\">\n");
-		fprintf(h,"<soap:operation soapAction=\"%s/script\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ScriptIn\"/>\n");
-		fprintf(h,"<wsdl:output message=\"ScriptOut\"/>\n");
-		fprintf(h,"</wsdl:operation>\n");
-		fprintf(h,"</wsdl:binding>\n");
-
-		fprintf(h,"<wsdl:service name=\"CORCS\">\n");
-		fprintf(h,"<wsdl:documentation>The Accords Platform Remote Command Service SOAP API</wsdl:documentation>\n"); 
-		fprintf(h,"<wsdl:port name=\"AccordsPlatformRCS\"");
-		fprintf(h," binding=\"SOAPCORCS\">\n");
-		fprintf(h,"<soap:address location=\"%s\"/>\n",host);
-		fprintf(h,"</wsdl:port>\n");
-		fprintf(h,"</wsdl:service>\n");
-
-		fprintf(h,"</wsdl:definitions>\n");
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	---------------------------------------		*/
-/*	l i b e r a t e _ x m l _ e l e m e n t		*/ 
-/*	---------------------------------------		*/
-private	struct	xml_element * 	liberate_xml_element( struct xml_element * sptr )
-{
-	document_drop( sptr );
-	return((struct xml_element *) 0);
-}
-
-/*	---------------------------------------------	*/
-/*	d o c u m e n t _ e l e m e n t _ s t r i n g 	*/ 
-/*	---------------------------------------------	*/
-private	char *	document_element_string( struct xml_element * xptr, char * nptr )
-{
-	struct	xml_element *eptr;
-	if (!( eptr = nested_document_element( xptr, nptr )))
-		return((char *) 0);
-	else	return( allocate_string( eptr->value ) );
-}
-
-/*	---------------------------------------------	*/
-/*	d o c u m e n t _ e l e m e n t _ x m l   	*/ 
-/*	---------------------------------------------	*/
-private	char *	document_element_xml( struct xml_element * xptr, char * nptr )
-{
-	struct	xml_element *eptr;
-	char *	filename;
-	if (!( eptr = nested_document_element( xptr, nptr )))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename( "xml" ) ))
-		return( filename );
-	else	
-	{
-		document_serialise_file( eptr, filename );
-		return( filename );
-	}
-}
-
-/*	---------------------------------------------	*/
-/*	d o c u m e n t _ e l e m e n t _ f i l e  	*/ 
-/*	---------------------------------------------	*/
-private	char *	document_element_file( struct xml_element * xptr, char * nptr )
-{
-	char *	sptr;
-	int	c;
-	FILE * h;
-	struct	xml_element *eptr;
-	char *	filename;
-	if (!( eptr = nested_document_element( xptr, nptr )))
-		return((char *) 0);
-	else if (!( sptr = eptr->value ))
-		return( (char *) 0);
-	else if (!( filename = rest_temporary_filename( "txt" ) ))
-		return( filename );
-	else if (!( h = fopen( filename, "w" ) ))
-		return( liberate( filename ) );
-	else
-	{
-		while ( *sptr )
-		{
-			if ((c = *(sptr++)) != '&' )
-				fputc(c,h);
-			else
-			{
-				switch ((c = *(sptr++)))
-				{
-				case	'a'	:
-					sptr+= 3;
-					fputc('&',h);
-					continue;
-				case	'l'	:
-					sptr+= 2;
-					fputc('<',h);
-					continue;
-				case	'g'	:
-					sptr+= 2;
-					fputc('>',h);
-					continue;
-				default		:
-					fputc('&',h);
-					if ( c )
-						fputc(c,h);
-					continue;
-				}
-			}
-		}
-		fclose(h);
-		return( filename );
-	}
-}
-
-/*	---------------------------------	*/
-/*	c o r d s _ x m l _ e l e m e n t	*/ 
-/*	---------------------------------	*/
-private	struct	xml_element * 	corcs_xml_element( char * filename )
-{
-	if (!( filename ))
- 		return((struct xml_element *) 0);
-	else	return( document_parse_file( filename ) );
-}
-
-
-/*	---------------------------------------		*/
-/*	s o a p _ r e s p o n s e _ f o o t e r		*/
-/*	---------------------------------------		*/
-private	void	soap_message_footer( FILE * h, char * nptr )
-{
-	fprintf(h,"</m:%s>\n",nptr);
-	fprintf(h,"</soapenv:Body>\n");
-	fprintf(h,"</soapenv:Envelope>\n");
-}
-
-/*	---------------------------------------		*/
-/*	s o a p _ r e s p o n s e _ h e a d e r		*/
-/*	---------------------------------------		*/
-private	void	soap_message_header( FILE * h, char * nptr )
-{
-	fprintf(h,"<?xml version=\"1.0\"?>\n");
-	fprintf(h,"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope\">\n");
-
-	fprintf(h,"<soapenv:Body>\n");
-	fprintf(h,"<m:%s xmlns:m=\"%s/wsdl\">\n",nptr,get_identity());
-	return;
-}
+#include "corcasynch.c"
+#include "corcwsdl.c"
+#include "corcxml.c"
 
 /*	-------------------------------------------------------		*/
 /*	c o r c s _ r e s o l v e r _ s o a p _ r e s p o n s e		*/
@@ -342,50 +37,6 @@ private	char * corcs_resolver_soap_response( char * category, struct occi_respon
 	}
 }
 
-/*	-------------------------------------	*/
-/*	   s o a p _ i n l i n e _ x m l 	*/
-/*	-------------------------------------	*/
-private	int	soap_inline_xml( FILE * h, char * filename )
-{
-	struct	xml_element * eptr;
-
-	if (!( eptr = corcs_xml_element( filename )))
-		return( 0 );
-	else
-	{
-		document_serialise_element( h, eptr, 0 );
-		document_drop( eptr );
-		return( 0 );
-	}
-}
-
-/*	-------------------------------------	*/
-/*	   s o a p _ i n l i n e _ f i l e	*/
-/*	-------------------------------------	*/
-private	int	soap_inline_file( FILE * h, char * filename )
-{
-	FILE *	s;
-	int	c;
-	if (!( s = fopen( filename, "r" ) ))
-		return( 0 );
-	else
-	{
-		while ((c = fgetc(s)) > 0)
-		{
-			switch ( c )
-			{
-			case	'&'	: fprintf(h,"&amp;"); continue;
-			case	'<'	: fprintf(h,"&lt;"); continue;
-			case	'>'	: fprintf(h,"&gt;"); continue;
-			default		:
-				fputc(c,h);
-			}
-		}
-		fclose(s);
-		return(0);
-	}
-}
-
 /*	-------------------------------------------------------		*/
 /*	      c o r c s _ p a r s e r _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
@@ -406,6 +57,32 @@ private	struct rest_response * corcs_parser_response( struct rest_response * apt
 	{
 		soap_message_header( h, buffer );
 		soap_inline_xml( h, plan );
+		soap_message_footer( h, buffer );
+		fclose(h);
+		return( rest_file_response( aptr, filename, "text/xml" ) );
+	}
+}
+
+/*	-------------------------------------------------------		*/
+/*	      c o r c s _ p a r s e r _ r e s p o n s e	 		*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * corcs_asynch_response( struct rest_response * aptr, char * message, struct corcs_asynch_request * qptr )
+{
+	FILE * h;
+	char *	filename;
+	char *	plan;
+	char 	buffer[1024];
+	sprintf(buffer,"%sResponse",message);
+	if (!( qptr ))
+		return( aptr );
+	if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( aptr );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		soap_message_header( h, buffer );
+		fprintf(h,"<m:identity>%s</m:identity>\n",qptr->identity);
 		soap_message_footer( h, buffer );
 		fclose(h);
 		return( rest_file_response( aptr, filename, "text/xml" ) );
@@ -492,7 +169,11 @@ private	struct	rest_response * corcs_soap_resolver( struct rest_response * aptr,
 /*	-----------------------------------------------------	*/
 /*	  c o r d s _ s o a p _ m a n i f e s t _ p a r s e r 	*/
 /*	-----------------------------------------------------	*/
-private	struct	rest_response * corcs_soap_manifest_parser( struct rest_response * aptr,struct xml_element * sptr, struct rest_request * rptr )
+private	struct	rest_response * corcs_soap_manifest_parser( 
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
 {
 	char *	message="ParseManifest";
 	char *	command=(char *) 0;
@@ -513,14 +194,20 @@ private	struct	rest_response * corcs_soap_manifest_parser( struct rest_response 
 		/* -------------- */
 		cords_parser_operation( filename );
 		sptr = liberate_xml_element( sptr );
-		return( corcs_parser_response ( aptr, filename, message ) );
+		if ( qptr )
+			return( corcs_asynch_response( aptr, message, qptr ) );
+		else	return( corcs_parser_response ( aptr, filename, message ) );
 	}
 }
 
 /*	-------------------------------------	*/
 /*	  c o r d s _ s o a p _ p a r s e r 	*/
 /*	-------------------------------------	*/
-private	struct	rest_response * corcs_soap_sla_parser( struct rest_response * aptr,struct xml_element * sptr, struct rest_request * rptr )
+private	struct	rest_response * corcs_soap_sla_parser( 
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
 {
 	char *	message="ParseSLA";
 	char *	command=(char *) 0;
@@ -541,14 +228,20 @@ private	struct	rest_response * corcs_soap_sla_parser( struct rest_response * apt
 		/* -------------- */
 		cords_parser_operation( filename );
 		sptr = liberate_xml_element( sptr );
-		return( corcs_parser_response ( aptr, filename, message ) );
+		if ( qptr )
+			return( corcs_asynch_response( aptr, message, qptr ) );
+		else	return( corcs_parser_response ( aptr, filename, message ) );
 	}
 }
 
 /*	-----------------------------------------------------	*/
 /*	  c o r d s _ s o a p _ m a n i f e s t _ b r o k e r 	*/
 /*	-----------------------------------------------------	*/
-private	struct	rest_response * corcs_soap_manifest_broker( struct rest_response * aptr, struct xml_element * sptr, struct rest_request * rptr )
+private	struct	rest_response * corcs_soap_manifest_broker( 
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
 {
 	char *	message="BrokerManifest";
 	char *	filename=(char *) 0;
@@ -569,16 +262,22 @@ private	struct	rest_response * corcs_soap_manifest_broker( struct rest_response 
 		/* --------------- */
 		cords_broker_operation( filename );
 		sptr = liberate_xml_element( sptr );
-		return( corcs_broker_response ( aptr, filename, message ) );
+		if ( qptr )
+			return( corcs_asynch_response( aptr, message, qptr ) );
+		else	return( corcs_broker_response ( aptr, filename, message ) );
 	}
 }
 
 /*	-----------------------------------------------------	*/
 /*	      c o r d s _ s o a p _ s l a _ b r o k e r 	*/
 /*	-----------------------------------------------------	*/
-private	struct	rest_response * corcs_soap_sla_broker( struct rest_response * aptr, struct xml_element * sptr, struct rest_request * rptr )
+private	struct	rest_response * corcs_soap_sla_broker(
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
 {
-	char *	message="BokerSLA";
+	char *	message="BrokerSLA";
 	char *	filename=(char *) 0;
 	char *	command=(char *) 0;
 	if (!( sptr ))
@@ -597,14 +296,20 @@ private	struct	rest_response * corcs_soap_sla_broker( struct rest_response * apt
 		/* --------------- */
 		cords_broker_operation( filename );
 		sptr = liberate_xml_element( sptr );
-		return( corcs_broker_response ( aptr, filename, message ) );
+		if ( qptr )
+			return( corcs_asynch_response( aptr, message, qptr ) );
+		else	return( corcs_broker_response ( aptr, filename, message ) );
 	}
 }
 
 /*	-------------------------------------	*/
 /*	 c o r d s _ s o a p _ s e r v i c e 	*/
 /*	-------------------------------------	*/
-private	struct	rest_response * corcs_soap_service( struct rest_response * aptr, struct xml_element * sptr, struct rest_request * rptr )
+private	struct	rest_response * corcs_soap_service( 
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
 {
 	char *	service=(char *) 0;
 	char *	filename=(char *) 0;
@@ -621,17 +326,24 @@ private	struct	rest_response * corcs_soap_service( struct rest_response * aptr, 
 	{
 		/* invoke service action */
 		/* --------------------- */
-		if ((filename = cords_service_operation( service, action )) != (char *) 0)
-			cords_service_response ( aptr, filename );
+		filename = cords_service_operation( service, action );
 		sptr = liberate_xml_element( sptr );
-		return( rest_html_response( aptr, 200, "OK" ) );
+		if ( qptr )
+			return( corcs_asynch_response( aptr, "ServiceAction", qptr ) );
+		else if ( filename )
+			cords_service_response ( aptr, filename );
+		return( aptr );
 	}
 }
 
 /*	-------------------------------------	*/
 /*	  c o r d s _ s o a p _ s c r i p t 	*/
 /*	-------------------------------------	*/
-private	struct	rest_response * corcs_soap_script( struct rest_response * aptr, struct xml_element * sptr, struct rest_request * rptr )
+private	struct	rest_response * corcs_soap_script( 
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
 {
 	char *	filename=(char *) 0;
 	char *	command=(char *) 0;
@@ -654,14 +366,20 @@ private	struct	rest_response * corcs_soap_script( struct rest_response * aptr, s
 		/* ---------- */
 		filename = cords_script_interpreter( filename, parameters, 0 );
 		sptr = liberate_xml_element( sptr );
-		return( corcs_script_response ( aptr, filename, "RunScript" ) );
+		if ( qptr )
+			return( corcs_asynch_response( aptr, "RunScript", qptr ) );
+		else	return( corcs_script_response ( aptr, filename, "RunScript" ) );
 	}
 }
 
 /*	-------------------------------------	*/
 /*	    c o r d s _ s o a p _ o c c i 	*/
 /*	-------------------------------------	*/
-private	struct	rest_response * corcs_soap_occi( struct rest_response * aptr, struct xml_element * sptr, struct rest_request * rptr )
+private	struct	rest_response * corcs_soap_occi( 
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
 {
 	char *	category=(char *) 0;
 	char *	command=(char *) 0;
@@ -682,6 +400,53 @@ private	struct	rest_response * corcs_soap_occi( struct rest_response * aptr, str
 	}
 }
 
+/*	---------------------------------------------------	*/
+/*	c o r c s _ a s y n c h r o n o u s _ r e q u e s t	*/
+/*	---------------------------------------------------	*/
+private	struct	rest_response *	corcs_asynchronous_request(  
+	struct rest_response * (*method)( 
+		struct rest_response * aptr, 
+		struct xml_element * sptr, 
+		struct rest_request * rptr,
+		struct corcs_asynch_request * qptr ),
+	char *	action,
+	struct rest_response * aptr, 
+	struct xml_element * sptr, 
+	struct rest_request * rptr )
+{
+	struct	corcs_asynch_request * qptr;
+	if (!( qptr = add_corcs_asynch_request(action) ))
+		return(rest_html_response(aptr, 400, "asynch request not yet available"));
+	else	return((*method)(aptr,sptr,rptr,qptr));
+}
+
+/*	-----------------------------------------------------	*/
+/*	c o r c s _ a s y n c h r o n o u s _ r e s p o n s e	*/
+/*	-----------------------------------------------------	*/
+private	struct	rest_response *	corcs_asynchronous_response(  
+	char * soapaction,
+	struct rest_response * aptr, 
+	struct xml_element * sptr, 
+	struct rest_request * rptr )
+{
+	struct	corcs_asynch_request * qptr;
+	char *	identity=(char *) 0;
+	char 	buffer[1024];
+	sprintf(buffer,"%sResponse",soapaction);
+	if (!( sptr ))
+		return(rest_html_response(aptr, 400, "missing request"));
+	else if (!( rptr ))
+		return(rest_html_response(aptr, 400, "missing request"));
+	else if (!( identity = document_element_file( sptr, "identity") ))
+		return(rest_html_response(aptr, 400, "missing identity"));
+	else if (!( qptr = find_corcs_asynch_request( identity )))
+		return(rest_html_response(aptr, 400, "incorrect identity"));
+	else if (!( qptr->status ))
+		return(rest_html_response(aptr, 204, "asynch response not yet available"));
+	else	return(rest_html_response(aptr, qptr->status, qptr->message ) );
+
+}
+
 /*	-------------------------------------	*/
 /*	    c o r d s _ s o a p _ p o s t 	*/
 /*	-------------------------------------	*/
@@ -691,6 +456,10 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 	struct	rest_header * hptr;
 	char *	wptr;
 	struct	url * uptr;
+
+	/* ------------------------------------- */
+	/* check request and resolve soap action */
+	/* ------------------------------------- */
 	if (!( rptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( hptr = rest_resolve_header( rptr->first, "soapAction" )))
@@ -710,26 +479,57 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 
 	command_server_accept( "application/soap" );
 
+	/* ------------------------------------------- */
+	/* check request body and dispatch soap action */
+	/* ------------------------------------------- */
 	if (!( rptr->body ))
 		return(rest_html_response(aptr, 400, "missing request body"));
 	else if (!( sptr = corcs_xml_element( rptr->body ) ))
 		return(rest_html_response(aptr, 400, "incorrect request body"));
-	else if (!( strcmp(  command, "/resolver" ) ))
+	else if (!( strcmp(  command, "/Resolver" ) ))
 		return( corcs_soap_resolver( aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/ParseManifest" ) ))
-		return( corcs_soap_manifest_parser( aptr, sptr, rptr ) );
+		return( corcs_soap_manifest_parser( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "/ParseSLA" ) ))
-		return( corcs_soap_sla_parser( aptr, sptr, rptr ) );
+		return( corcs_soap_sla_parser( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "/BrokerManifest" ) ))
-		return( corcs_soap_manifest_broker( aptr, sptr, rptr ) );
+		return( corcs_soap_manifest_broker( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "/BrokerSLA" ) ))
-		return( corcs_soap_manifest_broker( aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/service" ) ))
-		return( corcs_soap_service( aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/script" ) ))
-		return( corcs_soap_script( aptr, sptr, rptr ) );
+		return( corcs_soap_sla_broker( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
+	else if (!( strcmp(  command, "/ServiceAction" ) ))
+		return( corcs_soap_service( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
+	else if (!( strcmp(  command, "/RunScript" ) ))
+		return( corcs_soap_script( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
+
 	else if (!( strcmp(  command, "/occi" ) ))
-		return( corcs_soap_occi( aptr, sptr, rptr ) );
+		return( corcs_soap_occi( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
+
+	else if (!( strcmp(  command, "/AsynchParseManifest" ) ))
+		return( corcs_asynchronous_request( corcs_soap_manifest_parser, command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchParseSLA" ) ))
+		return( corcs_asynchronous_request( corcs_soap_sla_parser, command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchBrokerManifest" ) ))
+		return( corcs_asynchronous_request( corcs_soap_manifest_broker, command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchBrokerSLA" ) ))
+		return( corcs_asynchronous_request( corcs_soap_sla_broker, command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchServiceAction" ) ))
+		return( corcs_asynchronous_request( corcs_soap_service, command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchRunScript" ) ))
+		return( corcs_asynchronous_request( corcs_soap_script, command, aptr, sptr, rptr ) );
+
+	else if (!( strcmp(  command, "/AsynchParseManifestResult" ) ))
+		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchParseSLAResult" ) ))
+		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchBrokerManifestResult" ) ))
+		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchBrokerSLAResult" ) ))
+		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchServiceActionResult" ) ))
+		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "/AsynchRunScriptResult" ) ))
+		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+
 	else
 	{
 		sptr = liberate_xml_element( sptr );
@@ -737,197 +537,7 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 	}
 }
 
-/*	-------------------------------------	*/
-/*	c o r c s _ s o a p _ g e t _ w s s l 	*/
-/*	-------------------------------------	*/
-public	char * corcs_soap_get_wsdl()
-{
-	char 	host[1024];
-	sprintf(host,"%s",get_identity());
-	return( corcs_soap_wsdl(host) );
-}
-
-/*	-----------------------------------------------		*/
-/*	    i n v o k e _ s o a p _ r e q u e s t 		*/
-/*	-----------------------------------------------		*/
-private	int	invoke_soap_request( char * action, char * host, char * wsdl, char * filename )
-{
-	struct	rest_header * hptr;
-	struct	rest_response * rptr;
-	struct	xml_element * eptr;
-	char 	buffer[1024];
-
-	printf("SOAP API REQUEST POST %s %s \n",host, filename);
-
-	sprintf(buffer,"%s%s",host,action);
-
-	printf("SOAP ACTION %s \n",buffer);
-
-	if (!( hptr = rest_create_header( "soapAction", buffer )))
-		return( 0 );
-	else if (!( rptr = rest_client_post_request( host, default_tls(), get_default_agent(), filename, hptr ) ))
-		return( 0 );
-	else
-	{
-		printf("SOAP API RESPONSE %u %s \n",rptr->status, (rptr->message ? rptr->message : "NO MESSAGE"));
-		if (( rptr->body )
-		&&  ((eptr = document_parse_file( rptr->body )) != (struct xml_element *) 0))
-		{
-			document_show_element( eptr, 0 );
-			eptr = document_drop( eptr );
-		}
-		liberate_rest_response( rptr );
-		return( 0 );
-	}
-}
-
-/*	-----------------------------------------------		*/
-/*	i n v o k e _ s o a p _ r e s o l v e r _ a p i		*/
-/*	-----------------------------------------------		*/
-private	int	invoke_soap_resolver_api( char * category )
-{
-	char *	message;
-	FILE *	h;
-
-	printf("SOAP API Resolver %s \n",category);
-
-	if (!( message = rest_temporary_filename("xml") ))
-		return(0);
-	else if (!( h = fopen( message, "w" ) ))
-		return(0);
-	else
-	{
-		soap_message_header( h, "ResolveCategory" );
-		fprintf(h,"<command>resolver</command>\n");
-		fprintf(h,"<category>%s</category>\n",category);
-		soap_message_footer( h, "ResolveCategory" );
-		fclose(h);
-		return( invoke_soap_request( "resolver", soap, wsdl, message ) );
-	}
-}
-
-/*	-------------------------------------------	*/
-/*	i n v o k e _ s o a p _ p a r s e r _ a p i	*/
-/*	-------------------------------------------	*/
-private	int	invoke_soap_parser_api( char * type, char * filename )
-{
-	char *	message;
-	FILE *	h;
-	printf("SOAP API Parser %s %s \n",type,filename);
-	if (!( message = rest_temporary_filename("xml") ))
-		return(0);
-	else if (!( h = fopen( message, "w" ) ))
-		return(0);
-	else
-	{
-		if (!( strcasecmp( type, "MANIFEST" ) ))
-			type = "ParseManifest";
-		else	type = "ParseSLA";
-		soap_message_header( h, type );
-		fprintf(h,"<command>parser</command>\n");
-		soap_inline_xml(h,filename);
-		soap_message_footer( h, type );
-		fclose(h);
-		return( invoke_soap_request( type, soap, wsdl, message ) );
-	}
-}
-
-/*	-------------------------------------------	*/
-/*	i n v o k e _ s o a p _ b r o k e r _ a p i	*/
-/*	-------------------------------------------	*/
-private	int	invoke_soap_broker_api( char * type, char * filename )
-{
-	char *	message;
-	FILE *	h;
-	printf("SOAP API Broker %s %s \n",type,filename);
-	if (!( message = rest_temporary_filename("xml") ))
-		return(0);
-	else if (!( h = fopen( message, "w" ) ))
-		return(0);
-	else
-	{
-		if (!( strcasecmp( type, "MANIFEST" ) ))
-			type = "BrokerManifest";
-		else	type = "BrokerSLA";
-		soap_message_header( h, type );
-		fprintf(h,"<command>broker</command>\n");
-		soap_inline_xml(h,filename);
-		soap_message_footer( h, type );
-		fclose(h);
-		return( invoke_soap_request( type, soap, wsdl, message ) );
-	}
-}
-
-/*	---------------------------------------------	*/
-/*	i n v o k e _ s o a p _ s e r v i c e _ a p i	*/
-/*	---------------------------------------------	*/
-private	int	invoke_soap_service_api( char * action, char * service )
-{
-	char *	message;
-	FILE *	h;
-	printf("SOAP API Service %s %s \n",action, service);
-	if (!( message = rest_temporary_filename("xml") ))
-		return(0);
-	else if (!( h = fopen( message, "w" ) ))
-		return(0);
-	else
-	{
-		soap_message_header( h, "ServiceAction" );
-		fprintf(h,"<command>%s</command>\n",action);
-		fprintf(h,"<service>%s</service>\n",service);
-		soap_message_footer( h, "ServiceAction" );
-		fclose(h);
-		return( invoke_soap_request( "service", soap, wsdl, message ) );
-	}
-}
-
-/*	-------------------------------------------	*/
-/*	i n v o k e _ s o a p _ s c r i p t _ a p i	*/
-/*	-------------------------------------------	*/
-private	int	invoke_soap_script_api( char * script, char * parameters )
-{
-	char *	message;
-	FILE *	h;
-	printf("SOAP API Script %s %s \n",script,(parameters ? parameters : "" ));
-	if (!( message = rest_temporary_filename("xml") ))
-		return(0);
-	else if (!( h = fopen( message, "w" ) ))
-		return(0);
-	else
-	{
-		soap_message_header( h, "RunScript" );
-		fprintf(h,"<command>script</command>\n");
-		fprintf(h,"<parameters>%s</parameters>\n",parameters);
-		fprintf(h,"<script>\n");
-		soap_inline_file(h,script);
-		fprintf(h,"</script>\n");
-		soap_message_footer( h, "RunScript" );
-		fclose(h);
-		return( invoke_soap_request( "script", soap, wsdl, message ) );
-	}
-}
-
-/*	-------------------------------------	*/
-/*	    i n v o k e _ s o a p _ a p i	*/
-/*	-------------------------------------	*/
-private	int	invoke_soap_api( char * command, char * subject, char * option )
-{
-	if (!( strcmp( command, "resolver" ) ))
-		return( invoke_soap_resolver_api( subject ) );
-	else if (!( strcmp( command, "parser" ) ))
-		return( invoke_soap_parser_api( subject, option ) );
-	else if (!( strcmp( command, "broker" ) ))
-		return( invoke_soap_broker_api( subject, option ) );
-	else if (!( strcmp( command, "service" ) ))
-		return( invoke_soap_service_api( subject, option ) );
-	else if (!( strcmp( command, "script" ) ))
-		return( invoke_soap_script_api( subject, option ) );
-	else
-	{
-		printf("SOAP API: Incorrect Command: \"%s\" \n",command);
-		return(0);
-	}
-}
+#include "soapapi.c"
 
 	/* ------------- */
 #endif  /* _corcs_soap_c */
