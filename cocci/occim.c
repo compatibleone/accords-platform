@@ -25,11 +25,16 @@
 /*	------------------------------------------	*/
 public struct occi_manager * liberate_occi_manager(struct occi_manager * sptr)
 {
-	struct occi_client * mptr;
+	struct 	occi_client * mptr;
+	struct	occi_header_manager * hptr;
 	if ( sptr )
 	{
-		if ( sptr->headers )
-			 sptr->headers = liberate_rest_header(sptr->headers);
+		while (( hptr = sptr->headers) != (struct occi_header_manager*) 0)
+		{
+			sptr->headers = hptr->next;
+			hptr = liberate_occi_header_manager(hptr);
+		}
+
 		while ((mptr = sptr->first) != (struct occi_client *) 0)
 		{
 			sptr->first = mptr->next;
@@ -56,7 +61,7 @@ public struct occi_manager * reset_occi_manager(struct occi_manager * sptr)
 {
 	if ( sptr )
 	{
-		sptr->headers = (struct rest_header*) 0;
+		sptr->headers = (struct occi_header_manager*) 0;
 		sptr->first = (struct occi_client*) 0;
 		sptr->last = (struct occi_client*) 0;
 		sptr->name = (char*) 0;

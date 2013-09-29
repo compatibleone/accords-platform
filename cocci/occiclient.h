@@ -14,6 +14,7 @@ struct	occi_client;
 struct	occi_manager;
 
 #include "occic.h"
+#include "occihm.h"
 #include "occim.h"
 
 struct	occi_client	

@@ -5,13 +5,13 @@
 
 struct	occi_manager	
 {
-	struct	rest_header 	* headers;
-	struct	occi_client 	* first;
-	struct	occi_client 	* last;
-	char 			* name;
-	char			* mimetype;
-	char			* accepts;
-	char			* eventlog;
+	struct	occi_header_manager 	* headers;
+	struct	occi_client 		* first;
+	struct	occi_client 		* last;
+	char 				* name;
+	char				* mimetype;
+	char				* accepts;
+	char				* eventlog;
 	int			  clients;
 	int			  optimise;
 };

@@ -20,6 +20,7 @@
 
 #include "occiclient.h"
 #include "occic.c"
+#include "occihm.c"
 #include "occim.c"
 #include "occiauth.h"
 #include "occibody.h"
@@ -32,9 +33,11 @@
 /*	------------------------------------------------------------	*/
 /*		o c c i    m a n a g e r    s t r u c t u r e		*/
 /*	------------------------------------------------------------	*/
+private	pthread_mutex_t ThreadLock;
+
 private	struct	occi_manager OcciManager = 
 {
-	(struct rest_header *) 0,
+	(struct occi_header_manager *) 0,
 	(struct occi_client *) 0,
 	(struct occi_client *) 0,
 	"CO-OCCI-MAN",
@@ -62,6 +65,57 @@ public	void	occi_optimise_client( int v )
 	else	OcciManager.optimise &= ~_OCCI_OPTIMISE_CLIENT;
 	return;
 }
+
+/*	------------------------------------------------------------	*/
+/*		g e t _ t h r e a d _ o c c i _ h e a d e r s		*/
+/*	------------------------------------------------------------	*/
+private	struct rest_header * get_thread_occi_headers()
+{
+	pthread_t	tid;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	struct	occi_header_manager * mptr=(struct occi_header_manager *) 0;
+	tid = pthread_self();
+	pthread_mutex_lock( &ThreadLock );
+	for (	mptr = OcciManager.headers;
+		mptr != (struct occi_header_manager *) 0;
+		mptr = mptr->next )
+		if ( mptr->tid == tid )
+			hptr = mptr->headers;
+	pthread_mutex_unlock( &ThreadLock );
+	return(hptr);
+}
+
+/*	------------------------------------------------------------	*/
+/*		s e t _ t h r e a d _ o c c i _ h e a d e r s		*/
+/*	------------------------------------------------------------	*/
+private	struct rest_header * set_thread_occi_headers( struct rest_header * hptr)
+{
+	struct	occi_header_manager * mptr;
+	struct	rest_header * wptr=(struct rest_header *) 0;
+	if (!( wptr = get_thread_occi_headers() ))
+	{
+		if (!( mptr = allocate_occi_header_manager()))
+			return( hptr );
+		else
+		{
+			mptr->tid = pthread_self();
+			mptr->headers = hptr;
+			pthread_mutex_lock( &ThreadLock );
+			if ((mptr->next = OcciManager.headers) != (struct occi_header_manager *) 0)
+				mptr->next->previous = mptr;
+			OcciManager.headers = mptr;
+			pthread_mutex_unlock( &ThreadLock );
+		}
+	}
+	else
+	{
+		while ( wptr->next ) wptr = wptr->next;
+		wptr->next = hptr;
+		hptr->previous = wptr;
+	}
+	return( hptr );
+}
+
 
 /*	------------------------------------------------------------	*/
 /*		   o c c i _ a p p e n d _ h e a d e r			*/
@@ -262,8 +316,8 @@ public 	struct	rest_header * occi_add_default_header(struct rest_header  * hptr)
 {
 	struct	rest_header * rptr;
 
-	if (!( rptr = OcciManager.headers ))
-		OcciManager.headers = hptr;
+	if (!( rptr = get_thread_occi_headers() ))
+		set_thread_occi_headers( hptr );
 	else
 	{
 		while ( rptr->next != (struct rest_header *) 0)
@@ -281,9 +335,9 @@ public	void	occi_drop_default_headers()
 {
 	struct	rest_header * rptr;
 
-	while (( rptr = OcciManager.headers ) != (struct rest_header *) 0)
+	while (( rptr = get_thread_occi_headers() ) != (struct rest_header *) 0)
 	{
-		OcciManager.headers = rptr->next;
+		set_thread_occi_headers(rptr->next);
 		rptr->next = rptr->previous = (struct rest_header *) 0;
 		liberate_rest_header( rptr );
 	}
@@ -297,8 +351,8 @@ public	void	occi_drop_default_headers()
 public	struct	rest_header * occi_save_default_headers()
 {
 	struct	rest_header * hptr;
-	hptr = OcciManager.headers;
-	OcciManager.headers = (struct rest_header *) 0;
+	hptr = get_thread_occi_headers();
+	set_thread_occi_headers((struct rest_header *) 0);
 	return( hptr );
 }
 
@@ -308,10 +362,9 @@ public	struct	rest_header * occi_save_default_headers()
 public	void	occi_restore_default_headers( struct rest_header * hptr )
 {
 	occi_drop_default_headers();
-	OcciManager.headers = hptr;
+	set_thread_occi_headers(hptr);
 	return;
 }
-
 
 /*	------------------------------------------------------------	*/
 /*	    o c c i _ c l i e n t _ a u t h e n t i c a t i o n		*/
@@ -319,7 +372,7 @@ public	void	occi_restore_default_headers( struct rest_header * hptr )
 public	struct	rest_header * occi_client_authentication( char * aptr )
 {
 	struct	rest_header * hptr;
-	if (!( hptr = rest_resolve_header( OcciManager.headers, _OCCI_AUTHORIZE ) ))
+	if (!( hptr = rest_resolve_header( get_thread_occi_headers(), _OCCI_AUTHORIZE ) ))
 	{
 		if (!( hptr = rest_create_header( _OCCI_AUTHORIZE, aptr ) ))
 			return( hptr );
@@ -341,7 +394,7 @@ public	struct	rest_header * occi_client_accept( char * aptr )
 {
 	struct	rest_header * hptr;
 
-	if (!( hptr = rest_resolve_header( OcciManager.headers, _HTTP_ACCEPT ) ))
+	if (!( hptr = rest_resolve_header( get_thread_occi_headers(), _HTTP_ACCEPT ) ))
 	{
 		if (!( hptr = rest_create_header( _HTTP_ACCEPT, aptr ) ))
 			return( hptr );
@@ -363,7 +416,7 @@ public	struct	rest_header * occi_client_content_type( char * aptr )
 {
 	struct	rest_header * hptr;
 
-	if (!( hptr = rest_resolve_header( OcciManager.headers, _HTTP_CONTENT_TYPE ) ))
+	if (!( hptr = rest_resolve_header( get_thread_occi_headers(), _HTTP_CONTENT_TYPE ) ))
 	{
 		if (!( hptr = rest_create_header( _HTTP_CONTENT_TYPE, aptr ) ))
 			return( hptr );
@@ -1580,8 +1633,8 @@ public	struct	occi_client *	occi_load_categories( struct occi_client * cptr )
 	if (!( uri = occi_client_uri( cptr, "/-/" ) ))
 		return( occi_delete_client( cptr ) );
 
-	else if ((OcciManager.headers)
-	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+	else if (( get_thread_occi_headers() )
+	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
 		return( occi_delete_client( cptr ) );
 
 	else if (!( rptr = rest_client_get_request(uri,cptr->tls,cptr->agent,hptr ) ))
@@ -1876,8 +1929,8 @@ public	struct	occi_response *	occi_client_get( struct occi_client * cptr, struct
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ) )))
 		return((struct occi_response *) 0);
-	else if ((OcciManager.headers)
-	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+	else if ((get_thread_occi_headers())
+	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
 		return((struct occi_response *) 0);
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
@@ -2033,8 +2086,8 @@ public	struct	occi_response *	occi_client_put( struct occi_client * cptr, struct
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
 		return((struct occi_response *) 0);
-	else if ((OcciManager.headers)
-	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+	else if ((get_thread_occi_headers())
+	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
 		return((struct occi_response *) 0);
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
@@ -2064,8 +2117,8 @@ public	struct	occi_response *	occi_client_delete( struct occi_client * cptr, str
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
 		return((struct occi_response *) 0);
-	else if ((OcciManager.headers)
-	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+	else if ((get_thread_occi_headers())
+	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
 		return((struct occi_response *) 0);
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
@@ -2119,8 +2172,8 @@ public	struct	occi_response *	occi_client_post( struct occi_client * cptr, struc
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
 		return((struct occi_response *) 0);
-	else if ((OcciManager.headers)
-	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+	else if ((get_thread_occi_headers())
+	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
 		return((struct occi_response *) 0);
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
@@ -2158,8 +2211,8 @@ public	struct	occi_response *	occi_action_post( struct occi_client * cptr, struc
 		return((struct occi_response *) 0);
 	else if  (!( hptr = occi_request_headers( cptr, rptr )))
 		return((struct occi_response *) 0);
-	else if ((OcciManager.headers)
-	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+	else if ((get_thread_occi_headers())
+	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
 		return((struct occi_response *) 0);
 
 	/* -------------------------------------------- */
@@ -2200,8 +2253,8 @@ public	struct	occi_response *	occi_client_head( struct occi_client * cptr, struc
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
 		return((struct occi_response *) 0);
-	else if ((OcciManager.headers)
-	     &&  (!( hptr = occi_append_default( cptr, hptr, OcciManager.headers ) )))
+	else if ((get_thread_occi_headers())
+	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
 		return((struct occi_response *) 0);
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
