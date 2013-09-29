@@ -1846,7 +1846,9 @@ private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 	{	"open",		_OPEN_FUNCTION,		-1 },
 	{	"eval",		_EVAL_FUNCTION,		-1 },
 	{	"time",		_TIME_FUNCTION,		-1 },
-	{	"send",		_SEND_FUNCTION,		-1 }
+	{	"send",		_SEND_FUNCTION,		-1 },
+	{	"system",	_SYSTEM_FUNCTION,	-1 },
+	{	"fork",		_FORK_FUNCTION,		-1 }
 };
 
 int	prepare_hashcodes=3;
@@ -2070,6 +2072,57 @@ private	void	send_operation( struct cordscript_instruction * iptr, struct cordsc
 	}
 }
 
+/*	---------------------------------	*/
+/*	 s y s t e m _ o p e r a t i o n	*/
+/*	---------------------------------	*/
+private	void	system_operation( struct cordscript_instruction * iptr, struct cordscript_value * uptr, struct cordscript_value * bptr )
+{
+	struct	rest_response * aptr;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	char *	filename;
+	FILE * h;
+	char * cmd;
+	char * body;
+	int	contentlength=0;
+	if (!( uptr ))
+		push_value( iptr->context, string_value("expected command") );
+	else if (!( cmd = uptr->value ))
+		push_value( iptr->context, string_value("expected command") );
+	else 	push_value( iptr->context, integer_value( system(cmd) ) );
+}
+/*	---------------------------------	*/
+/*	   f o r k _ o p e r a t i o n		*/
+/*	---------------------------------	*/
+private	void	fork_operation( struct cordscript_instruction * iptr, struct cordscript_value * uptr, struct cordscript_value * bptr )
+{
+	struct	rest_response * aptr;
+	struct	rest_header * hptr=(struct rest_header *) 0;
+	char *	filename;
+	int	pid;
+	FILE * h;
+	char * cmd;
+	char * body;
+	int	contentlength=0;
+	if (!( uptr ))
+		push_value( iptr->context, string_value("expected command") );
+	else if (!( cmd = uptr->value ))
+		push_value( iptr->context, string_value("expected command") );
+	else
+	{
+		switch ((pid = fork()))
+		{
+		case	-1	:
+			push_value( iptr->context, string_value("process failure") );
+			return;
+		case	0	:
+		 	exit( system(cmd) );
+		default		:
+			push_value( iptr->context, integer_value( pid ) );
+			return;
+		}
+	}
+}
+
 /*	---------------		*/
 /*	 eval_operation		*/
 /*	---------------		*/
@@ -2166,6 +2219,12 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 		{
 		case	_SEND_FUNCTION		:
 			send_operation( iptr, vptr, argv[0] );
+			return( eval_next( iptr,argv ) );
+		case	_SYSTEM_FUNCTION		:
+			system_operation( iptr, vptr, argv[0] );
+			return( eval_next( iptr,argv ) );
+		case	_FORK_FUNCTION		:
+			fork_operation( iptr, vptr, argv[0] );
 			return( eval_next( iptr,argv ) );
 		case	_OPEN_FUNCTION		:
 			OpenScriptOutput( vptr->value );
