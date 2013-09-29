@@ -1337,6 +1337,7 @@ private	char *	cords_script_interpreter( char * filename, char * parameters, int
 			run_cordscript_interpreter( filename, argc, argv );
 			printf("\n");
 			fclose(rh);
+			stdout = fdopen(1,"w");
 			cords_copy_file( h, newfile );
 		}
 		if ( output & 2 )
