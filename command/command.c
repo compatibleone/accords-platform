@@ -1340,6 +1340,9 @@ private	char *	cords_script_interpreter( char * filename, char * parameters, int
 			fflush(stdout);
 			fclose(stdout);
 			stdout = fdopen(savestdout,"w");
+			close(1);
+			(void) dup(savestdout);
+			close(savestdout);
 			cords_copy_file( h, newfile );
 		}
 		else	close(savestdout);
