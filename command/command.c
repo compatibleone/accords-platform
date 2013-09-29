@@ -1269,6 +1269,7 @@ private	void	cords_rcs_style( FILE * h, char * filename )
 /*	-------------------------------------------	*/
 /*	c o r d s _ p a r s e r _ o p e r a t i o n	*/
 /*	-------------------------------------------	*/
+private	int	savestdout=1;
 private	char *	cords_script_interpreter( char * filename, char * parameters, int output )
 {
 	FILE *	h;
@@ -1281,7 +1282,6 @@ private	char *	cords_script_interpreter( char * filename, char * parameters, int
 	char *	newfile;
 	char *	argv[64];
 	int	argc=0;
-	int	savestdout;
 	char * 	pararoot=(char *) 0;
 	argv[0] = (char *) 0;
 	if ( parameters )
@@ -1332,7 +1332,7 @@ private	char *	cords_script_interpreter( char * filename, char * parameters, int
 			if ( output & 2 )
 				fprintf(h,"<pre>\n");
 		}
-		savestdout = dup(1);
+		savestdout = dup(savestdout);
 		if ((rh = freopen( newfile, "w", stdout )) != (FILE *) 0)
 		{
 			run_cordscript_interpreter( filename, argc, argv );
@@ -1340,9 +1340,6 @@ private	char *	cords_script_interpreter( char * filename, char * parameters, int
 			fflush(stdout);
 			fclose(stdout);
 			stdout = fdopen(savestdout,"w");
-			close(1);
-			(void) dup(savestdout);
-			close(savestdout);
 			cords_copy_file( h, newfile );
 		}
 		else	close(savestdout);
