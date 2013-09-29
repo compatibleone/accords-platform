@@ -1281,6 +1281,7 @@ private	char *	cords_script_interpreter( char * filename, char * parameters, int
 	char *	newfile;
 	char *	argv[64];
 	int	argc=0;
+	int	savestdout;
 	char * 	pararoot=(char *) 0;
 	argv[0] = (char *) 0;
 	if ( parameters )
@@ -1331,15 +1332,18 @@ private	char *	cords_script_interpreter( char * filename, char * parameters, int
 			if ( output & 2 )
 				fprintf(h,"<pre>\n");
 		}
-
+		savestdout = dup(1);
 		if ((rh = freopen( newfile, "w", stdout )) != (FILE *) 0)
 		{
 			run_cordscript_interpreter( filename, argc, argv );
-			printf("\n");
-			fclose(rh);
-			stdout = fdopen(1,"w");
+			printf("\n");	
+			fflush(stdout);
+			fclose(stdout);
+			stdout = fdopen(savestdout,"w");
 			cords_copy_file( h, newfile );
 		}
+		else	close(savestdout);
+
 		if ( output & 2 )
 			fprintf(h,"\n</pre>");
 		if ( output )
