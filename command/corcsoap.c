@@ -497,6 +497,7 @@ private	struct	rest_response *	corcs_asynchronous_request(
 	struct	corcs_asynch_request * qptr;
 	struct	corcs_asynch_context * cptr;
 	struct	rest_response * xptr;
+	if (( action ) &&  ( *action == '/' )) action++;
 	if (!( qptr = add_corcs_asynch_request(action) ))
 		return(rest_html_response(aptr, 400, "asynch request not yet available"));
 	else if (!( cptr = allocate_asynch_context( qptr ) ))
