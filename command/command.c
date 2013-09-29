@@ -2448,8 +2448,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.04");
-	printf("\n   Beta Version : 25/09/2013 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.05");
+	printf("\n   Beta Version : 29/09/2013 ");
 	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
@@ -2478,6 +2478,7 @@ private	int	banner()
 	printf("\n         command <options> SOAP SERVICE START <service> ");
 	printf("\n         command <options> SOAP SERVICE STOP <service> ");
 	printf("\n         command <options> SOAP SCRIPT <filename> <parameters> ");
+	printf("\n         command <options> SOAP RESULT <identity> \n");
 	printf("\n   Options: ");
 	printf("\n         --publisher <publisher>      specify publisher identity ");
 	printf("\n         --agent     <agent>          specify agent identity ");

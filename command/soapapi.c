@@ -204,10 +204,27 @@ private	int	invoke_soap_script_api( char * script, char * parameters, int asynch
 /*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ r e s u l t _ a p i	*/
 /*	-------------------------------------------	*/
-private	int	invoke_soap_result_api( char * script, char * parameters )
+private	int	invoke_soap_result_api( char * identity )
 {
-	return(0);
+	char *	type="AsynchResult";
+	char *	message;
+	FILE *	h;
+		
+	if ( check_verbose() )
+		printf("SOAP API Result %s \n",identity);
 
+	if (!( message = rest_temporary_filename("xml") ))
+		return(0);
+	else if (!( h = fopen( message, "w" ) ))
+		return(0);
+	else
+	{
+		soap_message_header( h, type );
+		fprintf(h,"<identity>%s</identity>\n",identity);
+		soap_message_footer( h, type );
+		fclose(h);
+		return( invoke_soap_request( type, soap, wsdl, message ) );
+	}
 }
 
 /*	-------------------------------------	*/
@@ -226,7 +243,7 @@ private	int	invoke_soap_api( char * command, char * subject, char * option, int 
 	else if (!( strcmp( command, "script" ) ))
 		return( invoke_soap_script_api( subject, option, asynch ) );
 	else if (!( strcmp( command, "result" ) ))
-		return( invoke_soap_result_api( subject, option ) );
+		return( invoke_soap_result_api( subject ) );
 	else
 	{
 		printf("SOAP API: Incorrect Command: \"%s\" \n",command);

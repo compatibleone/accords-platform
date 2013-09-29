@@ -72,24 +72,17 @@ private	struct rest_response * corcs_parser_response( struct rest_response * apt
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_asynch_response( struct rest_response * aptr, char * message, struct corcs_asynch_request * qptr )
 {
-	FILE * h;
-	char *	filename;
-	char *	plan;
 	char 	buffer[1024];
 	sprintf(buffer,"%sResponse",message);
 	if (!( qptr ))
 		return( aptr );
-	if (!( filename = rest_temporary_filename( "xml" ) ))
+	else if (!( qptr->message = allocate_string( buffer ) ))
 		return( aptr );
-	else if (!( h = fopen( filename, "w" ) ))
-		return( liberate( filename ) );
 	else
 	{
-		soap_message_header( h, buffer );
-		fprintf(h,"<m:identity>%s</m:identity>\n",qptr->identity);
-		soap_message_footer( h, buffer );
-		fclose(h);
-		return( rest_file_response( aptr, filename, "text/xml" ) );
+		qptr->response = aptr;
+		qptr->status = 200;
+		return( aptr );
 	}
 }
 
@@ -122,6 +115,29 @@ private	struct rest_response * corcs_script_response( struct rest_response * apt
 /*	      c o r c s _ b r o k e r _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_broker_response( struct rest_response * aptr, char * service, char * message  )
+{
+	FILE * h;
+	char *	filename;
+	char 	buffer[1024];
+	sprintf(buffer,"%sResponse",message);
+	if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( aptr );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		soap_message_header( h, buffer );
+		fprintf(h,"<m:service>%s</m:service>\n",service);
+		soap_message_footer( h, buffer );
+		fclose(h);
+		return( rest_file_response( aptr, filename, "text/xml" ) );
+	}
+}
+
+/*	-------------------------------------------------------		*/
+/*	      c o r c s _  s e r v i c e _ r e s p o n s e	 	*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * corcs_service_response( struct rest_response * aptr, char * service, char * message  )
 {
 	FILE * h;
 	char *	filename;
@@ -198,9 +214,11 @@ private	struct	rest_response * corcs_soap_manifest_parser(
 		/* -------------- */
 		cords_parser_operation( filename );
 		sptr = liberate_xml_element( sptr );
-		if ( qptr )
-			return( corcs_asynch_response( aptr, message, qptr ) );
-		else	return( corcs_parser_response ( aptr, filename, message ) );
+		if (!( aptr = corcs_parser_response ( aptr, filename, message ) ))
+			return( aptr );
+		else if (!( qptr ))
+			return( aptr );
+		else	return( corcs_asynch_response( aptr, message, qptr ) );
 	}
 }
 
@@ -232,9 +250,11 @@ private	struct	rest_response * corcs_soap_sla_parser(
 		/* -------------- */
 		cords_parser_operation( filename );
 		sptr = liberate_xml_element( sptr );
-		if ( qptr )
-			return( corcs_asynch_response( aptr, message, qptr ) );
-		else	return( corcs_parser_response ( aptr, filename, message ) );
+		if (!( aptr = corcs_parser_response ( aptr, filename, message ) ))
+			return( aptr );
+		else if (!( qptr ))
+			return( aptr );
+		else	return( corcs_asynch_response( aptr, message, qptr ) );
 	}
 }
 
@@ -266,9 +286,11 @@ private	struct	rest_response * corcs_soap_manifest_broker(
 		/* --------------- */
 		cords_broker_operation( filename );
 		sptr = liberate_xml_element( sptr );
-		if ( qptr )
-			return( corcs_asynch_response( aptr, message, qptr ) );
-		else	return( corcs_broker_response ( aptr, filename, message ) );
+		if (!( aptr = corcs_broker_response ( aptr, filename, message ) ))
+			return( aptr );
+		else if (!( qptr ))
+			return( aptr );
+		else	return( corcs_asynch_response( aptr, message, qptr ) );
 	}
 }
 
@@ -300,9 +322,11 @@ private	struct	rest_response * corcs_soap_sla_broker(
 		/* --------------- */
 		cords_broker_operation( filename );
 		sptr = liberate_xml_element( sptr );
-		if ( qptr )
-			return( corcs_asynch_response( aptr, message, qptr ) );
-		else	return( corcs_broker_response ( aptr, filename, message ) );
+		if (!( aptr = corcs_broker_response ( aptr, filename, message ) ))
+			return( aptr );
+		else if (!( qptr ))
+			return( aptr );
+		else	return( corcs_asynch_response( aptr, message, qptr ) );
 	}
 }
 
@@ -318,6 +342,7 @@ private	struct	rest_response * corcs_soap_service(
 	char *	service=(char *) 0;
 	char *	filename=(char *) 0;
 	char *	action=(char *) 0;
+	char *	message="ServiceAction";
 	if (!( sptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( rptr ))
@@ -332,11 +357,11 @@ private	struct	rest_response * corcs_soap_service(
 		/* --------------------- */
 		filename = cords_service_operation( service, action );
 		sptr = liberate_xml_element( sptr );
-		if ( qptr )
-			return( corcs_asynch_response( aptr, "ServiceAction", qptr ) );
-		else if ( filename )
-			cords_service_response ( aptr, filename );
-		return( aptr );
+		if (!( aptr = corcs_service_response ( aptr, filename, message ) ))
+			return( aptr );
+		else if (!( qptr ))
+			return( aptr );
+		else	return( corcs_asynch_response( aptr, message, qptr ) );
 	}
 }
 
@@ -352,6 +377,7 @@ private	struct	rest_response * corcs_soap_script(
 	char *	filename=(char *) 0;
 	char *	command=(char *) 0;
 	char *	parameters=(char *) 0;
+	char *	message="RunScript";
 	if (!( sptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( rptr ))
@@ -370,9 +396,11 @@ private	struct	rest_response * corcs_soap_script(
 		/* ---------- */
 		filename = cords_script_interpreter( filename, parameters, 0 );
 		sptr = liberate_xml_element( sptr );
-		if ( qptr )
-			return( corcs_asynch_response( aptr, "RunScript", qptr ) );
-		else	return( corcs_script_response ( aptr, filename, "RunScript" ) );
+		if (!( aptr = corcs_script_response ( aptr, filename, message ) ))
+			return( aptr );
+		else if (!( qptr ))
+			return( aptr );
+		else	return( corcs_asynch_response( aptr, message, qptr ) );
 	}
 }
 
@@ -524,6 +552,7 @@ private	struct	rest_response *	corcs_asynchronous_result(
 	struct rest_request * rptr )
 {
 	struct	corcs_asynch_request * qptr;
+	struct	rest_response * wptr;
 	char *	identity=(char *) 0;
 	char 	buffer[1024];
 	sprintf(buffer,"%sResponse",soapaction);
@@ -535,7 +564,14 @@ private	struct	rest_response *	corcs_asynchronous_result(
 		return(rest_html_response(aptr, 400, "missing identity"));
 	else if (!( qptr = find_corcs_asynch_request( identity )))
 		return(rest_html_response(aptr, 400, "incorrect identity"));
-	else if (!( qptr->response ))
+	else if ((wptr = qptr->response) != (struct rest_response *) 0)
+	{
+		qptr->response = (struct rest_response *) 0;
+		qptr->status = 201;
+		qptr->message = allocate_string("Already Consumed");
+		return( wptr );
+	}
+	else if (!( qptr->status ))
 		return(rest_html_response(aptr, 204, "asynch response not yet available"));
 	else	return(rest_html_response(aptr, qptr->status, qptr->message ) );
 
@@ -611,6 +647,8 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 	else if (!( strcmp(  command, "/AsynchRunScript" ) ))
 		return( corcs_asynchronous_request( corcs_soap_script, command, aptr, sptr, rptr ) );
 
+	else if (!( strcmp(  command, "/AsynchResult" ) ))
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchParseManifestResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchParseSLAResult" ) ))
