@@ -38,7 +38,7 @@ private	int	invoke_soap_request( char * action, char * host, char * wsdl, char *
 /*	-----------------------------------------------		*/
 /*	i n v o k e _ s o a p _ r e s o l v e r _ a p i		*/
 /*	-----------------------------------------------		*/
-private	int	invoke_soap_resolver_api( char * category )
+private	int	invoke_soap_resolver_api( char * category, int asynch )
 {
 	char *	message;
 	FILE *	h;
@@ -63,7 +63,7 @@ private	int	invoke_soap_resolver_api( char * category )
 /*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ p a r s e r _ a p i	*/
 /*	-------------------------------------------	*/
-private	int	invoke_soap_parser_api( char * type, char * filename )
+private	int	invoke_soap_parser_api( char * type, char * filename, int asynch )
 {
 	char *	message;
 	FILE *	h;
@@ -74,9 +74,18 @@ private	int	invoke_soap_parser_api( char * type, char * filename )
 		return(0);
 	else
 	{
-		if (!( strcasecmp( type, "MANIFEST" ) ))
-			type = "ParseManifest";
-		else	type = "ParseSLA";
+		if ( asynch )
+		{
+			if (!( strcasecmp( type, "MANIFEST" ) ))
+				type = "AsynchParseManifest";
+			else	type = "AsynchParseSLA";
+		}
+		else
+		{
+			if (!( strcasecmp( type, "MANIFEST" ) ))
+				type = "ParseManifest";
+			else	type = "ParseSLA";
+		}
 		soap_message_header( h, type );
 		fprintf(h,"<command>parser</command>\n");
 		soap_inline_xml(h,filename);
@@ -89,7 +98,7 @@ private	int	invoke_soap_parser_api( char * type, char * filename )
 /*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ b r o k e r _ a p i	*/
 /*	-------------------------------------------	*/
-private	int	invoke_soap_broker_api( char * type, char * filename )
+private	int	invoke_soap_broker_api( char * type, char * filename, int asynch )
 {
 	char *	message;
 	FILE *	h;
@@ -100,9 +109,18 @@ private	int	invoke_soap_broker_api( char * type, char * filename )
 		return(0);
 	else
 	{
-		if (!( strcasecmp( type, "MANIFEST" ) ))
-			type = "BrokerManifest";
-		else	type = "BrokerSLA";
+		if ( asynch )
+		{
+			if (!( strcasecmp( type, "MANIFEST" ) ))
+				type = "AsynchBrokerManifest";
+			else	type = "AsynchBrokerSLA";
+		}
+		else
+		{
+			if (!( strcasecmp( type, "MANIFEST" ) ))
+				type = "BrokerManifest";
+			else	type = "BrokerSLA";
+		}
 		soap_message_header( h, type );
 		fprintf(h,"<command>broker</command>\n");
 		soap_inline_xml(h,filename);
@@ -115,8 +133,9 @@ private	int	invoke_soap_broker_api( char * type, char * filename )
 /*	---------------------------------------------	*/
 /*	i n v o k e _ s o a p _ s e r v i c e _ a p i	*/
 /*	---------------------------------------------	*/
-private	int	invoke_soap_service_api( char * action, char * service )
+private	int	invoke_soap_service_api( char * action, char * service, int asynch )
 {
+	char *	type;
 	char *	message;
 	FILE *	h;
 	printf("SOAP API Service %s %s \n",action, service);
@@ -126,22 +145,28 @@ private	int	invoke_soap_service_api( char * action, char * service )
 		return(0);
 	else
 	{
-		soap_message_header( h, "ServiceAction" );
+		if ( asynch )
+			type = "AsynchServiceAction";
+		else	type = "ServiceAction";
+			
+		soap_message_header( h, type );
 		fprintf(h,"<command>%s</command>\n",action);
 		fprintf(h,"<service>%s</service>\n",service);
-		soap_message_footer( h, "ServiceAction" );
+		soap_message_footer( h, type );
 		fclose(h);
-		return( invoke_soap_request( "ServiceAction", soap, wsdl, message ) );
+		return( invoke_soap_request( type, soap, wsdl, message ) );
 	}
 }
 
 /*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ s c r i p t _ a p i	*/
 /*	-------------------------------------------	*/
-private	int	invoke_soap_script_api( char * script, char * parameters )
+private	int	invoke_soap_script_api( char * script, char * parameters, int asynch )
 {
+	char *	type;
 	char *	message;
 	FILE *	h;
+
 	printf("SOAP API Script %s %s \n",script,(parameters ? parameters : "" ));
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
@@ -149,15 +174,19 @@ private	int	invoke_soap_script_api( char * script, char * parameters )
 		return(0);
 	else
 	{
-		soap_message_header( h, "RunScript" );
+		if ( asynch )
+			type = "AsynchRunScript";
+		else	type = "RunScript";
+			
+		soap_message_header( h, type );
 		fprintf(h,"<command>script</command>\n");
 		fprintf(h,"<parameters>%s</parameters>\n",parameters);
 		fprintf(h,"<script>\n");
 		soap_inline_file(h,script);
 		fprintf(h,"</script>\n");
-		soap_message_footer( h, "RunScript" );
+		soap_message_footer( h, type );
 		fclose(h);
-		return( invoke_soap_request( "RunScript", soap, wsdl, message ) );
+		return( invoke_soap_request( type, soap, wsdl, message ) );
 	}
 }
 
@@ -170,32 +199,21 @@ private	int	invoke_soap_result_api( char * script, char * parameters )
 
 }
 
-/*	-------------------------------------------	*/
-/*	i n v o k e _ s o a p _ r e s u l t _ a p i	*/
-/*	-------------------------------------------	*/
-private	int	invoke_soap_asynch_api( char * script, char * parameters )
-{
-	return(0);
-
-}
-
 /*	-------------------------------------	*/
 /*	    i n v o k e _ s o a p _ a p i	*/
 /*	-------------------------------------	*/
-private	int	invoke_soap_api( char * command, char * subject, char * option )
+private	int	invoke_soap_api( char * command, char * subject, char * option, int asynch )
 {
 	if (!( strcmp( command, "resolver" ) ))
-		return( invoke_soap_resolver_api( subject ) );
+		return( invoke_soap_resolver_api( subject, asynch ) );
 	else if (!( strcmp( command, "parser" ) ))
-		return( invoke_soap_parser_api( subject, option ) );
+		return( invoke_soap_parser_api( subject, option, asynch ) );
 	else if (!( strcmp( command, "broker" ) ))
-		return( invoke_soap_broker_api( subject, option ) );
+		return( invoke_soap_broker_api( subject, option, asynch ) );
 	else if (!( strcmp( command, "service" ) ))
-		return( invoke_soap_service_api( subject, option ) );
+		return( invoke_soap_service_api( subject, option, asynch ) );
 	else if (!( strcmp( command, "script" ) ))
-		return( invoke_soap_script_api( subject, option ) );
-	else if (!( strcmp( command, "asynch" ) ))
-		return( invoke_soap_asynch_api( subject, option ) );
+		return( invoke_soap_script_api( subject, option, asynch ) );
 	else if (!( strcmp( command, "result" ) ))
 		return( invoke_soap_result_api( subject, option ) );
 	else

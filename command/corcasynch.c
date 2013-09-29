@@ -5,10 +5,25 @@ struct	corcs_asynch_request
 {
 	struct	corcs_asynch_request * previous;
 	struct	corcs_asynch_request * next;
+	struct	rest_response * response;
 	char *	identity;
 	char *	message;
 	char *	action;
 	int	status;
+};
+
+struct	corcs_asynch_context
+{
+	struct rest_response * (*method)( 
+		struct rest_response * aptr, 
+		struct xml_element * sptr, 
+		struct rest_request * rptr,
+		struct corcs_asynch_request * qptr );
+
+	struct	corcs_asynch_request * result;
+	struct	rest_request  * request;
+	struct	rest_response * response;
+	struct xml_element    * message;
 };
 
 private	struct	corcs_asynch_request * AsynchRoot=(struct corcs_asynch_request *) 0;
@@ -71,6 +86,22 @@ private	struct	corcs_asynch_request * find_corcs_asynch_request( char * id )
 		else	continue;
 	}
 	return( qptr );
+}
+
+/*	-------------------------------------------------	*/
+/*	 a d d _ c o r c s _ a s y n c h _ r e q u e s t	*/
+/*	-------------------------------------------------	*/
+private	struct	corcs_asynch_context * allocate_asynch_context( struct corcs_asynch_request * rptr )
+{
+	struct	corcs_asynch_context * qptr;
+	if (!( qptr = allocate( sizeof( struct corcs_asynch_context ) ) ))
+		return( qptr );
+	else 
+	{
+		memset( qptr, 0, sizeof( struct corcs_asynch_context ));
+		qptr->result = rptr;
+		return( qptr );
+	}
 }
 
 

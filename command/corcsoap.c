@@ -6,6 +6,10 @@
 #include "corcwsdl.c"
 #include "corcxml.c"
 
+private	void *	corcs_thread_message( void * vptr );
+
+#include "corcsthread.c"
+
 /*	-------------------------------------------------------		*/
 /*	c o r c s _ r e s o l v e r _ s o a p _ r e s p o n s e		*/
 /*	-------------------------------------------------------		*/
@@ -400,6 +404,81 @@ private	struct	rest_response * corcs_soap_occi(
 	}
 }
 
+/*	---------------------------------------		*/
+/*	c o r c s _ t h r e a d _ m e s s a g e 	*/
+/*	---------------------------------------		*/
+private	void *	corcs_thread_message( void * vptr )
+{
+	struct corcs_thread * tptr=vptr;
+	int	status;
+	struct corcs_asynch_context * rptr;
+
+	rest_log_message("thread: pthread detach");
+	pthread_detach( tptr->id );
+	while(tptr->status)
+	{
+		/* await job for thread */
+		/* -------------------- */
+		rest_log_message("thread: awaiting job message");
+		while(1)
+		{
+			lock_corcs_thread(tptr);
+			rptr = tptr->request;
+			unlock_corcs_thread( tptr );
+			if (!( rptr ))
+				wait_corcs_thread(tptr);
+			else	break;
+		}
+		
+		/* process thread job */
+		/* ------------------ */
+		rest_log_message("thread: corcs process message start");
+		rptr->result->response = (*rptr->method)(rptr->response, rptr->message,rptr->request, rptr->result);
+		rest_log_message("thread: corcs process message exit");
+
+		/* terminate thread job */
+		/* -------------------- */
+		lock_corcs_thread( tptr );
+		tptr->request = (struct corcs_asynch_context *) 0;
+		unlock_corcs_thread( tptr );
+		liberate( rptr );
+	}
+	tptr->status = 0;
+	rest_log_message("thread: corcs pthread exit");
+	pthread_exit((void *) 0);
+}
+
+/*	-----------------------------------------------------	*/
+/*	c o r c s _ a s y n c h r o n o u s _ r e s p o n s e	*/
+/*	-----------------------------------------------------	*/
+private	struct	rest_response *	corcs_asynchronous_response(
+	char *	action,
+	struct corcs_asynch_request * qptr 
+	)
+{
+	FILE * h;	
+	char	buffer[1024];
+	char *	filename;
+	struct	rest_response * aptr;
+
+	sprintf(buffer,"%sResponse",action);
+
+	if (!( aptr = allocate_rest_response(202,"Accepted") ))
+		return( aptr );
+	else if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( aptr );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		soap_message_header( h, buffer );
+		fprintf(h,"<m:identity>%s</m:identity>\n",qptr->identity);
+		soap_message_footer( h, buffer );
+		fclose(h);
+		return( rest_file_response( aptr, filename, "text/xml" ) );
+	}
+}
+
 /*	---------------------------------------------------	*/
 /*	c o r c s _ a s y n c h r o n o u s _ r e q u e s t	*/
 /*	---------------------------------------------------	*/
@@ -414,16 +493,30 @@ private	struct	rest_response *	corcs_asynchronous_request(
 	struct xml_element * sptr, 
 	struct rest_request * rptr )
 {
+	struct	corcs_thread * tptr;
 	struct	corcs_asynch_request * qptr;
+	struct	corcs_asynch_context * cptr;
+	struct	rest_response * xptr;
 	if (!( qptr = add_corcs_asynch_request(action) ))
 		return(rest_html_response(aptr, 400, "asynch request not yet available"));
-	else	return((*method)(aptr,sptr,rptr,qptr));
+	else if (!( cptr = allocate_asynch_context( qptr ) ))
+		return(rest_html_response(aptr, 400, "asynch request not yet available"));
+
+	{
+		cptr->method  = method;
+		cptr->message = sptr;
+		cptr->request = rptr;
+		cptr->response= aptr;
+		if (!( tptr = corcs_start_thread( cptr ) ))
+			return(rest_html_response(aptr, 501, "asynch request start failure"));
+		else	return(corcs_asynchronous_response( action, qptr ));
+	}
 }
 
 /*	-----------------------------------------------------	*/
 /*	c o r c s _ a s y n c h r o n o u s _ r e s p o n s e	*/
 /*	-----------------------------------------------------	*/
-private	struct	rest_response *	corcs_asynchronous_response(  
+private	struct	rest_response *	corcs_asynchronous_result(
 	char * soapaction,
 	struct rest_response * aptr, 
 	struct xml_element * sptr, 
@@ -441,7 +534,7 @@ private	struct	rest_response *	corcs_asynchronous_response(
 		return(rest_html_response(aptr, 400, "missing identity"));
 	else if (!( qptr = find_corcs_asynch_request( identity )))
 		return(rest_html_response(aptr, 400, "incorrect identity"));
-	else if (!( qptr->status ))
+	else if (!( qptr->response ))
 		return(rest_html_response(aptr, 204, "asynch response not yet available"));
 	else	return(rest_html_response(aptr, qptr->status, qptr->message ) );
 
@@ -518,17 +611,17 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 		return( corcs_asynchronous_request( corcs_soap_script, command, aptr, sptr, rptr ) );
 
 	else if (!( strcmp(  command, "/AsynchParseManifestResult" ) ))
-		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchParseSLAResult" ) ))
-		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchBrokerManifestResult" ) ))
-		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchBrokerSLAResult" ) ))
-		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchServiceActionResult" ) ))
-		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchRunScriptResult" ) ))
-		return( corcs_asynchronous_response( command, aptr, sptr, rptr ) );
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 
 	else
 	{

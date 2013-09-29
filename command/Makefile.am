@@ -12,7 +12,7 @@ bin_PROGRAMS = command
 EXTRA_DIST = 
 
 command_SOURCES = command.c command.h
-extra_DIST = corcsoap.c soapapi.c corcasynch.c corcwsdl.c corcxml.c
+extra_DIST = corcsoap.c soapapi.c corcasynch.c corcwsdl.c corcxml.c corcsthread.c corcsthread.h
 
 command_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) $(CFLAGS_COCCI) \
 	$(CFLAGS_PUBOCCI) $(CFLAGS_CORDS) $(CFLAGS_COCARRIER) $(CFLAGS_COPABR) $(CFLAGS_COCSPI)
