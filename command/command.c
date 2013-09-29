@@ -105,6 +105,15 @@ private	void	command_load()
 #include "cspi.h"
 #include "colog.c"
 
+private	CommandStarted=0;
+private	command_initialise_resolver( char * p, char * r, char * h, char * s )
+{
+	if (!( CommandStarted++ ))
+		initialise_occi_resolver( p, r, h, s );
+	else	CommandStarted--;		
+	return;
+}
+
 /*	-------------------------	*/
 /*	set_command_server_accept	*/
 /*	-------------------------	*/
@@ -129,7 +138,6 @@ private	void	command_server_accept( char * vptr )
 	return;
 }
 
-
 /*	-----------------------------------------------------	*/
 /*	   l l _ c o r d s _ s e r v i c e _ a c t i o n	*/
 /*	-----------------------------------------------------	*/
@@ -140,7 +148,7 @@ private	int	ll_cords_service_action( char * id, char * action )
 	char *	result;
 	char *	sptr;
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, default_tls() ) ))
 		return( 500 );
@@ -163,7 +171,7 @@ private	int	cords_service_action( char * id, char * action )
 	int	status;
 	char *	auth;
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( noauth ))
 	{
@@ -192,7 +200,7 @@ private	int	ll_cords_service_delete( char * id )
 	char *	result;
 	char *	sptr;
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( sptr = occi_resolve_category_provider( _CORDS_SERVICE, agent, default_tls() ) ))
 		return( 500 );
@@ -215,7 +223,7 @@ private	int	cords_service_delete( char * id )
 	int	status;
 	char *	auth;
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( noauth ))
 	{
@@ -514,7 +522,7 @@ private	int	ll_invoice_operation( char * account, char * other )
 	struct	occi_response * yptr;
 	char *	sptr;
 	char	buffer[2048];
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( accountid = occi_resolve_account( account, agent, default_tls() ) ))
 		return(failure(40,"unknown account",account));
@@ -563,7 +571,7 @@ private	int	cords_invoice_action( char * account, char * other )
 	int	status;
 	char *	auth;
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( noauth ))
 	{
@@ -642,7 +650,7 @@ private	int	ll_command_transaction( char * account, char * price, char * referen
 	char *	accountid=(char *) 0;
 	char *	priceid=(char *) 0;
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( accountid = occi_resolve_account( account, agent, default_tls() ) ))
 		return(failure(78,"unknown account",account));
@@ -682,7 +690,7 @@ private	int	command_transaction( char * account, char * price, char * reference,
 		return( 33 );
 	else
 	{
-		initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+		command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 		if (!( noauth ))
 		{
@@ -737,7 +745,7 @@ private	int	invoke_action( char * action, char * instance )
 		return( 31 );
 	else
 	{
-		initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+		command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 		if (!( noauth ))
 		{
@@ -773,7 +781,7 @@ private	int	run_cordscript_interpreter( char * filename, int argc, char * argv[]
 	char 			* auth=(char *) 0;
 	struct occi_response 	* zptr;
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( noauth ))
 	{
@@ -809,28 +817,6 @@ private	int	run_json_verification( char * filename )
 	}
 }
 
-struct	cords_parser_config
-{
-	char *	accept;
-	char *	publisher;
-	char *	host;
-	char *	agent;
-	char *	result;
-	char *	tls;
-	char *	zone;
-	char *	operator;
-	int	xsd;
-} Cp = 	{
-	(char *) 0,
-	_CORDS_DEFAULT_PUBLISHER,
-	_CORDS_DEFAULT_PUBLISHER,
-	_CORDS_PARSER_AGENT,
-	(char *) 0,
-	(char *) 0,
-	"europe",
-	"accords",
-	1
-	};
 
 /*	-----------------------------------------------------	*/
 /*		p a r s e r _ n a m e _ p l a n 		*/
@@ -885,24 +871,24 @@ public	char *	broker_name_instance( char * filename )
 /*	-----------------------------------------------------	*/
 /*	t e s t _ c o r d s _ p a r s e r _ o p e r a t i o n	*/
 /*	-----------------------------------------------------	*/
-private	int	ll_cords_parser_operation( char * filename )
+private	int	ll_cords_parser_operation( char * filename, char * agent, char ** result, int xsd )
 {
 	struct	xml_element * dptr;
 	if (!( _DEFAULT_PUBLISHER ))
 		return( failure(1,"requires","publication host"));
-	else if (!( Cp.agent ))
+	else if (!( agent ))
 		return( failure(2,"requires","parser agent name"));
 	else if (!( filename ))
 		return( failure(3,"requires","cords filename"));
-	else if (!( dptr = cords_document_parser( _DEFAULT_PUBLISHER, filename, agent, default_tls(), Cp.xsd ) ))
+	else if (!( dptr = cords_document_parser( _DEFAULT_PUBLISHER, filename, agent, default_tls(), xsd ) ))
 		return( failure(4,"parse error",filename));
-	else if (!( Cp.result ))
+	else if (!( *result ))
 	{
-		if (!( Cp.result = parser_name_plan( filename ) ))
+		if (!( *result = parser_name_plan( filename ) ))
 			return( failure(4,"allocation","result filename"));
 	}
-	dptr = cords_serialise_document( dptr, Cp.result );
-	return( cords_check_parser_errors( Cp.result ) );
+	dptr = cords_serialise_document( dptr, *result );
+	return( cords_check_parser_errors( *result ) );
 }
 
 /*	-----------------------------------------------------	*/
@@ -912,8 +898,30 @@ private	int	cords_parser_operation( char * filename )
 {
 	int	status;
 	char *	auth;
+	struct	cords_parser_config
+	{
+		char *	accept;
+		char *	publisher;
+		char *	host;
+		char *	agent;
+		char *	result;
+		char *	tls;
+		char *	zone;
+		char *	operator;
+		int	xsd;
+	} Cp = 	{
+		(char *) 0,
+		_CORDS_DEFAULT_PUBLISHER,
+		_CORDS_DEFAULT_PUBLISHER,
+		_CORDS_PARSER_AGENT,
+		(char *) 0,
+		(char *) 0,
+		"europe",
+		"accords",
+		1
+		};
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	set_xml_echo(echo);
 
@@ -923,7 +931,7 @@ private	int	cords_parser_operation( char * filename )
 
 	if ( Cp.result ) { Cp.result = liberate( Cp.result ); }
 
-	status = ll_cords_parser_operation( filename );
+	status = ll_cords_parser_operation( filename, Cp.agent, &Cp.result, Cp.xsd );
 
 	(void) logout_occi_user( "test-parser",Command.password,agent, auth, default_tls() );	
 
@@ -938,31 +946,6 @@ private	int	command_parser( char * filename, char * instance )
 	return( cords_parser_operation( filename ) );
 }
 
-struct	cords_broker_config
-{
-	char *	accept;
-	char *	publisher;
-	char *	host;
-	char *	agent;
-	char *	result;
-	char *	tls;
-	char *	zone;
-	char *	operator;
-	char *	security;
-	int	deployment;
-} Cb = 	{
-	(char * ) 0,
-	_CORDS_DEFAULT_PUBLISHER,
-	_CORDS_DEFAULT_PUBLISHER,
-	_CORDS_BROKER_AGENT,
-	(char *) 0,
-	(char *) 0,
-	(char *) 0,
-	(char *) 0,
-	(char *) 0,
-	1
-	};
-
 
 
 /*	-----------------------------------------------------	*/
@@ -972,7 +955,7 @@ private	int	cords_instance_plan( char * host, char * plan, char * agent, char * 
 {
 	struct	occi_response * zptr;
 	char	*	sptr;
-	initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 	if (!( sptr = occi_unquoted_value( plan )))
 		return(500);
 	else if (!( zptr =  cords_invoke_action( sptr, _CORDS_INSTANCE, agent, default_tls() ) ))
@@ -1006,7 +989,7 @@ private	void	append_service_report(FILE * h, char * sid )
 /*	-----------------------------------------------------	*/
 /*	   c o r d s _ i n s t a n c e _ a g r e e m e n t	*/
 /*	-----------------------------------------------------	*/
-private	int	cords_instance_agreement( char * host, char * name, char * sla, char * manifest, char * plan,  char * agent, char * result )
+private	int	cords_instance_agreement( char * host, char * name, char * sla, char * manifest, char * plan,  char * agent, char * result, int deployment )
 {
 	struct	occi_response * zptr;
 	char	*	namev;
@@ -1029,7 +1012,7 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 	/* ------------------- */
 	/* prepare environment */
 	/* ------------------- */
-	initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 
 	/* ------------------- */
 	/* validate parameters */
@@ -1124,7 +1107,7 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 			fprintf(rh,"{ 'instance':'%s', 'service':",buffer);
 		}
 	
-		if (!( Cb.deployment ))
+		if (!( deployment ))
 		{
 			/* ------------------------------------------- */
 			/* create empty service report if not deployed */
@@ -1170,7 +1153,7 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 /*	can be initated on either a manifest document type or	*/
 /*	for the new agreement document type under sla control	*/
 /*	-----------------------------------------------------	*/
-private	int	ll_sla_broker_operation( char * filename )
+private	int	ll_sla_broker_operation( char * filename, char ** result, int deployment )
 {
 	struct	occi_response * zptr;
 	struct	xml_element * dptr;
@@ -1189,7 +1172,7 @@ private	int	ll_sla_broker_operation( char * filename )
 	/* ------------------- */
 	/* validate parameters */
 	/* ------------------- */
-	if (!(nptr = Cb.result))
+	if (!(nptr = *result))
 		if (!( nptr = broker_name_instance( filename ) ))
 			return( failure(1,"requires","instance name"));
 
@@ -1246,7 +1229,7 @@ private	int	ll_sla_broker_operation( char * filename )
 			return( failure(5,"missing manifest name",filename));
 		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"missing plan identifier",filename));
-		else if ((status = cords_instance_agreement( default_publisher(), pptr->value, gptr->value, mptr->value, aptr->value, agent, nptr )) != 0)
+		else if ((status = cords_instance_agreement( default_publisher(), pptr->value, gptr->value, mptr->value, aptr->value, agent, nptr, deployment )) != 0)
 			return( failure(status,"failure to provision plan",aptr->value));
 		else	return( 0 );
 	}
@@ -1378,7 +1361,7 @@ private	char * 	cords_resolver_operation( char * category )
 	FILE * h;
 	struct	occi_element * eptr;
 
-	initialise_occi_resolver( default_publisher(), (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( default_publisher(), (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( rptr = occi_resolver( category, agent ) ))
 		return( (char *) 0 );
@@ -1421,7 +1404,7 @@ private char * 	cords_service_operation( char * command, char * service )
 	char 	buffer[4096];
 	FILE *	h;
 	struct	occi_element * eptr;
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( auth = login_occi_user( Command.user,Command.password,agent, default_tls() ) ))
 		return((char *)0);
@@ -1470,13 +1453,38 @@ private	int	cords_broker_operation( char * filename )
 	int	status;
 	char *	auth;
 
-	initialise_occi_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
+	struct	cords_broker_config
+	{
+		char *	accept;
+		char *	publisher;
+		char *	host;
+		char *	agent;
+		char *	result;
+		char *	tls;
+		char *	zone;
+		char *	operator;
+		char *	security;
+		int	deployment;
+	} Cb = 	{
+		(char * ) 0,
+		_CORDS_DEFAULT_PUBLISHER,
+		_CORDS_DEFAULT_PUBLISHER,
+		_CORDS_BROKER_AGENT,
+		(char *) 0,
+		(char *) 0,
+		(char *) 0,
+		(char *) 0,
+		(char *) 0,
+		1
+		};
+
+	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
 
 	if (!( auth = login_occi_user( Command.user,Command.password,agent, default_tls() ) ))
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
-	if (!( status = ll_sla_broker_operation( filename ) ))
+	if (!( status = ll_sla_broker_operation( filename, &Cb.result, Cb.deployment ) ))
 		status = 200;
 	else	status = 500;
 

@@ -26,6 +26,7 @@ struct	corcs_asynch_context
 	struct xml_element    * message;
 };
 
+private	pthread_mutex_t AsynchLock;
 private	struct	corcs_asynch_request * AsynchRoot=(struct corcs_asynch_request *) 0;
 private	struct	corcs_asynch_request * AsynchFoot=(struct corcs_asynch_request *) 0;
 
@@ -36,11 +37,13 @@ private	struct	corcs_asynch_request * drop_corcs_asynch_request( struct corcs_as
 {
 	if ( qptr )
 	{
+		pthread_mutex_lock( &AsynchLock );
 		if ( qptr->action )
 			qptr->action = liberate( qptr->action );
 		if ( qptr->message )
 			qptr->message = liberate( qptr->message );
 		liberate( qptr );
+		pthread_mutex_unlock(  &AsynchLock );
 	}
 	return((struct corcs_asynch_request *) 0);
 }
@@ -55,10 +58,12 @@ private	struct	corcs_asynch_request * add_corcs_asynch_request( char * action )
 		return( qptr );
 	else 	memset( qptr, 0, sizeof( struct corcs_asynch_request ));
 
+	pthread_mutex_lock( &AsynchLock );
 	if (!( qptr->previous = AsynchFoot ))
 		AsynchRoot = qptr;
 	else	qptr->previous->next = qptr;
 	AsynchFoot = qptr;
+	pthread_mutex_unlock( &AsynchLock );
 
 	if (!( qptr->identity = rest_allocate_uuid() ))
 		return( drop_corcs_asynch_request( qptr ) );
@@ -75,6 +80,7 @@ private	struct	corcs_asynch_request * add_corcs_asynch_request( char * action )
 private	struct	corcs_asynch_request * find_corcs_asynch_request( char * id )
 {
 	struct	corcs_asynch_request * qptr;
+	pthread_mutex_lock( &AsynchLock );
 	for (	qptr=AsynchRoot;
 		qptr != (struct corcs_asynch_request *) 0;
 		qptr = qptr->next )
@@ -85,6 +91,7 @@ private	struct	corcs_asynch_request * find_corcs_asynch_request( char * id )
 			break;
 		else	continue;
 	}
+	pthread_mutex_unlock( &AsynchLock );
 	return( qptr );
 }
 

@@ -3107,7 +3107,7 @@ public	struct	xml_element * cords_document_parser(
 
 		initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 
-		(void) cords_parse_element( (char *) 0,xst, document, agent, tls, 0 );
+		(void) cords_parse_element( (char *) 0, xst, document, agent, tls, 0 );
 
 		xsd = cords_drop_document( xsd );
 		cords_document_xsd( xsd );
