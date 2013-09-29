@@ -11,11 +11,13 @@ private	int	invoke_soap_request( char * action, char * host, char * wsdl, char *
 	struct	xml_element * eptr;
 	char 	buffer[1024];
 
-	printf("SOAP API REQUEST POST %s %s \n",host, filename);
+	if ( check_verbose() )
+		printf("SOAP API REQUEST POST %s %s \n",host, filename);
 
 	sprintf(buffer,"%s%s",host,action);
 
-	printf("SOAP ACTION %s \n",buffer);
+	if ( check_verbose() )
+		printf("SOAP ACTION %s \n",buffer);
 
 	if (!( hptr = rest_create_header( "soapAction", buffer )))
 		return( 0 );
@@ -23,11 +25,13 @@ private	int	invoke_soap_request( char * action, char * host, char * wsdl, char *
 		return( 0 );
 	else
 	{
-		printf("SOAP API RESPONSE %u %s \n",rptr->status, (rptr->message ? rptr->message : "NO MESSAGE"));
+		if ( check_verbose() )
+			printf("SOAP API RESPONSE %u %s \n",rptr->status, (rptr->message ? rptr->message : "NO MESSAGE"));
 		if (( rptr->body )
 		&&  ((eptr = document_parse_file( rptr->body )) != (struct xml_element *) 0))
 		{
-			document_show_element( eptr, 0 );
+			if ( check_verbose() )
+				document_show_element( eptr, 0 );
 			eptr = document_drop( eptr );
 		}
 		liberate_rest_response( rptr );
@@ -43,7 +47,8 @@ private	int	invoke_soap_resolver_api( char * category, int asynch )
 	char *	message;
 	FILE *	h;
 
-	printf("SOAP API Resolver %s \n",category);
+	if ( check_verbose() )
+		printf("SOAP API Resolver %s \n",category);
 
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
@@ -67,7 +72,9 @@ private	int	invoke_soap_parser_api( char * type, char * filename, int asynch )
 {
 	char *	message;
 	FILE *	h;
-	printf("SOAP API Parser %s %s \n",type,filename);
+
+	if ( check_verbose() )
+		printf("SOAP API Parser %s %s \n",type,filename);
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
@@ -102,7 +109,8 @@ private	int	invoke_soap_broker_api( char * type, char * filename, int asynch )
 {
 	char *	message;
 	FILE *	h;
-	printf("SOAP API Broker %s %s \n",type,filename);
+	if ( check_verbose() )
+		printf("SOAP API Broker %s %s \n",type,filename);
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
@@ -138,7 +146,8 @@ private	int	invoke_soap_service_api( char * action, char * service, int asynch )
 	char *	type;
 	char *	message;
 	FILE *	h;
-	printf("SOAP API Service %s %s \n",action, service);
+	if ( check_verbose() )
+		printf("SOAP API Service %s %s \n",action, service);
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
@@ -167,7 +176,9 @@ private	int	invoke_soap_script_api( char * script, char * parameters, int asynch
 	char *	message;
 	FILE *	h;
 
-	printf("SOAP API Script %s %s \n",script,(parameters ? parameters : "" ));
+	if ( check_verbose() )
+		printf("SOAP API Script %s %s \n",script,(parameters ? parameters : "" ));
+
 	if (!( message = rest_temporary_filename("xml") ))
 		return(0);
 	else if (!( h = fopen( message, "w" ) ))
