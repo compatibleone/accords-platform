@@ -20,17 +20,6 @@
 
 #include "cpxsd.h"
 
-private	struct	xml_element * enforceXsd=(struct xml_element *) 0;
-
-/*	---------------------------------------------------	*/
-/*		c o r d s _ d o c u m e n t _ x s d 		*/
-/*	---------------------------------------------------	*/
-public	void	cords_document_xsd( struct xml_element * xsd )
-{
-	enforceXsd = xsd;
-	return;
-}
-
 /*	---------------------------------------------------	*/
 /*			x s d _ t y p e 			*/
 /*	---------------------------------------------------	*/
@@ -94,7 +83,7 @@ public	struct	xml_element * first_xsd_element( struct xml_element * xsd )
 /*	---------------------------------------------------	*/
 /*		x s d _ e l e m e n t _ t y p e 		*/
 /*	---------------------------------------------------	*/
-public	struct	xml_element * xsd_element_type( struct xml_element * wptr )
+public	struct	xml_element * xsd_element_type( struct xml_element * wptr, struct xml_element * xsdroot )
 {
 	struct	xml_element * tptr;
 	struct	xml_atribut * aptr;
@@ -112,7 +101,7 @@ public	struct	xml_element * xsd_element_type( struct xml_element * wptr )
 	}
 	else
 	{
-		tptr = xsd_type( enforceXsd, vptr );
+		tptr = xsd_type( xsdroot, vptr );
 		liberate( vptr );
 		return( tptr );
 	}
@@ -124,7 +113,7 @@ public	struct	xml_element * xsd_element_type( struct xml_element * wptr )
 /*	returns the type description structure of a named	*/
 /*	element of the xsd 					*/
 /*	---------------------------------------------------	*/
-public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr )
+public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr,struct xml_element * xsdroot )
 {
 	struct	xml_element * wptr=(struct xml_element *) 0;
 	struct	xml_element * tptr=(struct xml_element *) 0;
@@ -155,7 +144,7 @@ public	struct	xml_element * xsd_element( struct xml_element * xsd, char * nptr )
 		else if (!( strcmp( vptr, nptr ) ))
 		{
 			liberate(vptr);
-			return( xsd_element_type( wptr ) );
+			return( xsd_element_type( wptr, xsdroot ) );
 		}
 		else 	continue;
 
@@ -202,7 +191,8 @@ public	struct	xml_element *	xsd_atribut( struct xml_element * xsd, char * nptr )
 /*	---------------------------------------------------	*/
 public	struct xml_element * xsd_validate_element( 
 	struct xml_element * xsd,
-	struct xml_element * eptr )
+	struct xml_element * eptr,
+	struct xml_element * xsdroot )
 {
 	struct	xml_atribut * aptr;
 	struct	xml_element * wptr;
@@ -211,7 +201,7 @@ public	struct xml_element * xsd_validate_element(
 		return( eptr );
 	else if (!( eptr ))
 		return( eptr );
-	else if (!( wptr = xsd_element( xsd, eptr->name ) ))
+	else if (!( wptr = xsd_element( xsd, eptr->name, xsdroot ) ))
 		return( wptr );
 	else
 	{

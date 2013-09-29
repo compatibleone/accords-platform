@@ -49,7 +49,7 @@ public	int 	cords_parse_element(
 		char * domain,
 		struct xml_element * xst, 
 		struct xml_element * document, 
-		char * agent, char * tls, int level);
+		char * agent, char * tls, int level, struct xml_element * xsdroot);
 public	int	cords_terminate_level( struct xml_element * dptr, char * agent, char * tls );
 
 public	struct	xml_element  * 	cords_serialise_document( struct xml_element * document, char * result );

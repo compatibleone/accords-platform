@@ -2509,7 +2509,8 @@ private	int	cords_parse_filter( struct xml_element * document )
 private	int	xsd_builder=1;
 private	int	cords_terminate_xsd( 
 	struct xml_element * wptr,
-	struct xml_element * dptr, char * agent,char * tls )
+	struct xml_element * dptr, char * agent,char * tls,
+	struct xml_element * xsdroot )
 {
 	struct	occi_response * zptr;
 	int	status;
@@ -2876,7 +2877,9 @@ private	int	cords_simple_manifest( struct xml_element * document, struct xml_atr
 private	int 	ll_cords_parse_element( 
 	char *	domain,
 	struct	xml_element * xst, 
-	struct 	xml_element * document, char * agent, char * tls, int level )
+	struct 	xml_element * document, char * agent, char * tls, int level,
+	struct	xml_element * xsdroot
+	)
 {
 	int	status;
 	struct	rest_header * 	hptr;
@@ -3023,14 +3026,14 @@ private	int 	ll_cords_parse_element(
 	for (	eptr=document->first;
 		eptr != (struct xml_element *) 0;
 		eptr = eptr->next )
-		if ((status = cords_parse_element( domain, xst, eptr, agent,tls,(level+1) )) != 0)
+		if ((status = cords_parse_element( domain, xst, eptr, agent,tls,(level+1),xsdroot )) != 0)
 			return( status );
 
 	/* --------------------------------------------- */
 	/* this level of processing can now be completed */
 	/* --------------------------------------------- */
 	if ( xst )
-		return( cords_terminate_xsd( xst, document, agent, tls ) );
+		return( cords_terminate_xsd( xst, document, agent, tls, xsdroot ) );
 	else	return( cords_terminate_level( document, agent,tls ) );
 
 }
@@ -3044,19 +3047,21 @@ private	int 	ll_cords_parse_element(
 public	int 	cords_parse_element( 
 		char *	domain,
 		struct xml_element * xst, 
-		struct xml_element * document, char * agent, char * tls, int level )
+		struct xml_element * document, char * agent, char * tls, int level,
+		struct xml_element * xsdroot
+		)
 {
 	int	status;
 	if ( check_debug() )
 		printf("\n#enter: cords_parse_element(%s,%u, %s, %s )\n",(domain ? domain : _CORDS_NULL),level,document->name,agent);
 
 	if (!( xst ))
-		status = ll_cords_parse_element( domain, xst, document, agent, tls, level );
+		status = ll_cords_parse_element( domain, xst, document, agent, tls, level, xsdroot );
 
-	else if (!( xst = xsd_element( xst, document->name ) ))
+	else if (!( xst = xsd_element( xst, document->name, xsdroot ) ))
 		status = cords_append_error(document,798,"xsd:incorrect element");
 
-	else	status = ll_cords_parse_element( domain, xst, document, agent, tls, level );
+	else	status = ll_cords_parse_element( domain, xst, document, agent, tls, level, xsdroot );
 
 	if ( check_debug() )
 		printf("#leave: cords_parse_element(%u, %s, %s )\n",level,document->name,agent);
@@ -3102,12 +3107,12 @@ public	struct	xml_element * cords_document_parser(
 			printf("   CORDS Request Parser Phase 2\n");
 
 		if ( usexsd )
-			cords_document_xsd((xst = xsd));
-		else	cords_document_xsd((xst = (struct xml_element *) 0));
+			xst = xsd;
+		else	xst = (struct xml_element *) 0;
 
 		initialise_occi_resolver( host, (char *) 0, (char *) 0, (char *) 0 );
 
-		(void) cords_parse_element( (char *) 0, xst, document, agent, tls, 0 );
+		(void) cords_parse_element( (char *) 0, xst, document, agent, tls, 0, xst );
 
 		xsd = cords_drop_document( xsd );
 		cords_document_xsd( xsd );
