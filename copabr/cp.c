@@ -3115,7 +3115,7 @@ public	struct	xml_element * cords_document_parser(
 		(void) cords_parse_element( (char *) 0, xst, document, agent, tls, 0, xst );
 
 		xsd = cords_drop_document( xsd );
-		cords_document_xsd( xsd );
+
 		return( document );
 
 	}
