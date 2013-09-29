@@ -560,7 +560,7 @@ private	struct	rest_response *	corcs_asynchronous_result(
 		return(rest_html_response(aptr, 400, "missing request"));
 	else if (!( rptr ))
 		return(rest_html_response(aptr, 400, "missing request"));
-	else if (!( identity = document_element_file( sptr, "identity") ))
+	else if (!( identity = document_element_string( sptr, "identity") ))
 		return(rest_html_response(aptr, 400, "missing identity"));
 	else if (!( qptr = find_corcs_asynch_request( identity )))
 		return(rest_html_response(aptr, 400, "incorrect identity"));

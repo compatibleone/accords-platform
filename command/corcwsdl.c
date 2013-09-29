@@ -158,7 +158,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		/* Asynchronous Messages */
 		/* --------------------- */
 
-		fprintf(h,"<wsdl:operation name=\"AynchParseManifest\">\n");
+		fprintf(h,"<wsdl:operation name=\"AsynchParseManifest\">\n");
 		fprintf(h,"<wsdl:input message=\"ParseManifestIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
