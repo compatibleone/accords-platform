@@ -23,6 +23,8 @@ struct	corcs_thread
 	struct	corcs_thread 		* 	previous;
 	struct	corcs_thread 		* 	next;
 	struct 	corcs_asynch_context 	*	request;
+	int			number;
+	pid_t			tid;
 	int			status;
 	int			started;
 	int			item;

@@ -20,8 +20,9 @@
 
 #include "corcsthread.h"
 
-private	struct	corcs_thread * firstCorcsThread=(struct corcs_thread *) 0;
-private	struct	corcs_thread * lastCorcsThread=(struct corcs_thread *) 0;
+private	struct	corcs_thread * 	firstCorcsThread=(struct corcs_thread *) 0;
+private	struct	corcs_thread * 	lastCorcsThread=(struct corcs_thread *) 0;
+private	int			corcsThreadCounter=0;
 
 /*	-----------------------------------------------------------	*/
 /*		   l o c k _ t h r e a d _ c o n t r o l		*/
@@ -120,6 +121,8 @@ public struct corcs_thread * reset_corcs_thread(struct corcs_thread * sptr)
 		sptr->id =  (pthread_t) 0;
 		memset(&sptr->lock,0,sizeof( sptr->lock));
 		sptr->request = (struct corcs_asynch_context *) 0;
+		sptr->number = ++corcsThreadCounter;
+		sptr->tid    = 0;
 		sptr->item   = 1;
 		sptr->status = 1;
 		sptr->started = 0;
@@ -166,6 +169,7 @@ public	struct corcs_thread * corcs_start_thread( struct corcs_asynch_context * r
 	int	status;
 	struct	corcs_thread * tptr;
 	struct	corcs_asynch_context * wptr;
+	char 	buffer[1024];
 	/* ------------------------------- */
 	/* attempt to locate a free thread */
 	/* ------------------------------- */
@@ -220,6 +224,7 @@ public	struct corcs_thread * corcs_start_thread( struct corcs_asynch_context * r
 	/* ------------------------------ */
 	/* prepare the job for the thread */
 	/* ------------------------------ */
+	if ( check_verbose() )	{	printf("CORCS Thread : %u \n", tptr->id ); 	}
 	lock_corcs_thread( tptr );
 
 	tptr->request = rptr;
