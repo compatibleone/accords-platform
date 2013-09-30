@@ -66,6 +66,15 @@ private	int	invoke_soap_resolver_api( char * category )
 }
 
 /*	-------------------------------------------	*/
+/*	    s o a p _ a p i _ c a l l b a c k		*/
+/*	-------------------------------------------	*/
+private	void	soap_api_callback( FILE * h, int asynch, char * callback )
+{
+	if (( asynch ) && ( callback )) { fprintf(h,"<callback>include '%s';</callback>",callback); }
+	return;
+}
+
+/*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ p a r s e r _ a p i	*/
 /*	-------------------------------------------	*/
 private	int	invoke_soap_parser_api( char * type, char * filename, int asynch, char * callback )
@@ -95,7 +104,7 @@ private	int	invoke_soap_parser_api( char * type, char * filename, int asynch, ch
 		}
 		soap_message_header( h, type );
 		fprintf(h,"<command>parser</command>\n");
-		if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
+		soap_api_callback(h,asynch,callback);
 		soap_inline_xml(h,filename);
 		soap_message_footer( h, type );
 		fclose(h);
@@ -123,7 +132,7 @@ private	int	invoke_soap_broker_api( char * type, char * filename, int asynch, ch
 		else	type = "BrokerSLA";
 		soap_message_header( h, type );
 		fprintf(h,"<command>broker</command>\n");
-		if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
+		soap_api_callback(h,asynch,callback);
 		soap_inline_xml(h,filename);
 		soap_message_footer( h, type );
 		fclose(h);
@@ -155,7 +164,7 @@ private	int	invoke_soap_service_api( char * action, char * service, int asynch, 
 		fprintf(h,"<command>service</command>\n",action);
 		fprintf(h,"<service>%s</service>\n",service);
 		fprintf(h,"<action>%s</action>\n",action);
-		if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
+		soap_api_callback(h,asynch,callback);
 		soap_message_footer( h, type );
 		fclose(h);
 		return( invoke_soap_request( type, soap, wsdl, message ) );
@@ -190,7 +199,7 @@ private	int	invoke_soap_script_api( char * script, char * parameters, int asynch
 		fprintf(h,"<script>\n");
 		soap_inline_file(h,script);
 		fprintf(h,"</script>\n");
-		if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
+		soap_api_callback(h,asynch,callback);
 		soap_message_footer( h, type );
 		fclose(h);
 		return( invoke_soap_request( type, soap, wsdl, message ) );
