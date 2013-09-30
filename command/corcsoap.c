@@ -140,11 +140,11 @@ private	char *	corcs_json_service_identity( char * filename )
 /*	-------------------------------------------------------		*/
 /*	      c o r c s _ b r o k e r _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
-private	struct rest_response * corcs_broker_response( struct rest_response * aptr, char * service, char * message  )
+private	struct rest_response * corcs_broker_response( struct rest_response * aptr, char * document, char * message  )
 {
 	FILE * h;
 	char *	filename;
-	char *	identity;
+	char *	service;
 	char 	buffer[1024];
 	sprintf(buffer,"%sResponse",message);
 	if (!( filename = rest_temporary_filename( "xml" ) ))
@@ -154,12 +154,16 @@ private	struct rest_response * corcs_broker_response( struct rest_response * apt
 	else
 	{
 		soap_message_header( h, buffer );
-		if (!( identity = corcs_json_service_identity( service )))
-			fprintf(h,"<m:service>%s</m:service>\n",service);
+		if (!( service = corcs_json_service_identity( document )))
+		{
+			fprintf(h,"<m:json>\n");
+			soap_inline_file( h, document );
+			fprintf(h,"</m:json>\n");
+		}
 		else
 		{
-			fprintf(h,"<m:service>%s</m:service>\n",identity);
-			identity = liberate( identity );
+			fprintf(h,"<m:service>%s</m:service>\n",service);
+			service = liberate( service );
 		}
 		soap_message_footer( h, buffer );
 		fclose(h);
