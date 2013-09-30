@@ -59,7 +59,8 @@
 #define	_SEND_FUNCTION		13
 #define	_SYSTEM_FUNCTION	14
 #define	_FORK_FUNCTION		15
-#define	_MAX_FUNCTIONS		16
+#define	_READ_FUNCTION		16
+#define	_MAX_FUNCTIONS		17
 
 #define	_MAX_KEYWORDS	20
 #define	_KEYWORD_HASH	57

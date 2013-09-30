@@ -81,7 +81,7 @@ private	struct rest_response * corcs_asynch_callback( struct rest_response * apt
 	filename = cords_script_interpreter( qptr->callback, buffer, 1 );
 	qptr->response = (struct rest_response *) 0;
 	qptr->status = 201;
-	qptr->message = allocate_string("Already Consumed");
+	qptr->message = allocate_string("result delivered by callback");
 	return( aptr );
 }
 
@@ -603,7 +603,7 @@ private	struct	rest_response *	corcs_asynchronous_result(
 	{
 		qptr->response = (struct rest_response *) 0;
 		qptr->status = 201;
-		qptr->message = allocate_string("Already Consumed");
+		qptr->message = allocate_string("result already consumed");
 		return( wptr );
 	}
 	else if (!( qptr->status ))

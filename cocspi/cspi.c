@@ -1848,7 +1848,8 @@ private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 	{	"time",		_TIME_FUNCTION,		-1 },
 	{	"send",		_SEND_FUNCTION,		-1 },
 	{	"system",	_SYSTEM_FUNCTION,	-1 },
-	{	"fork",		_FORK_FUNCTION,		-1 }
+	{	"fork",		_FORK_FUNCTION,		-1 },
+	{	"read",		_READ_FUNCTION,		-1 }
 };
 
 int	prepare_hashcodes=3;
@@ -2090,6 +2091,48 @@ private	void	system_operation( struct cordscript_instruction * iptr, struct cord
 		push_value( iptr->context, string_value("expected command") );
 	else 	push_value( iptr->context, integer_value( system(cmd) ) );
 }
+
+/*	---------------------------------	*/
+/*	   r e a d _ o p e r a t i o n		*/
+/*	---------------------------------	*/
+private	void	read_operation( struct cordscript_instruction * iptr, struct cordscript_value * uptr, struct cordscript_value * bptr )
+{
+	struct stat buf;
+	char *	buffer;
+	char *	filename;
+	FILE * 	h;
+
+	if (!( uptr ))
+		push_value( iptr->context, string_value("{'error':'expected url'}") );
+	else if (!( filename = uptr->value ))
+		push_value( iptr->context, string_value("{'error':'expected url'}") );
+	else if ( stat( filename, &buf ) < 0)
+		push_value( iptr->context, string_value("{'error':'expected url'}") );
+	else if (!( buf.st_size ))
+		push_value( iptr->context, string_value("") );
+	else if (!( buffer = allocate( buf.st_size + 1 ) ))
+		push_value( iptr->context, string_value("") );
+	else if (!( h = fopen( filename, "r" ) ))
+	{
+		push_value( iptr->context, string_value("") );
+		liberate( buffer );
+	}
+	else if ( fread( buffer, buf.st_size,1, h) != 1 )
+	{
+		push_value( iptr->context, string_value("") );
+		liberate( buffer );
+		fclose(h);
+	}
+	else
+	{
+		*(buffer+buf.st_size) = 0;
+		push_value( iptr->context, string_value( buffer ) );
+		liberate( buffer );
+		fclose(h);
+	}
+	return;
+}
+
 /*	---------------------------------	*/
 /*	   f o r k _ o p e r a t i o n		*/
 /*	---------------------------------	*/
@@ -2225,6 +2268,9 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			return( eval_next( iptr,argv ) );
 		case	_FORK_FUNCTION		:
 			fork_operation( iptr, vptr, argv[0] );
+			return( eval_next( iptr,argv ) );
+		case	_READ_FUNCTION		:
+			read_operation( iptr, vptr, argv[0] );
 			return( eval_next( iptr,argv ) );
 		case	_OPEN_FUNCTION		:
 			OpenScriptOutput( vptr->value );
