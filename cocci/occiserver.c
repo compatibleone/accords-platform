@@ -1358,6 +1358,56 @@ private	struct rest_response * occi_invoke_put(
 }
 
 /*	---------------------------------------------------------	*/
+/*		o c c i _ t r a c k _ d e l e t e			*/
+/*	---------------------------------------------------------	*/
+/*	double deletion is a complicated issue that causes havoc	*/
+/*	so it needs special attention.					*/
+/*	---------------------------------------------------------	*/
+private	pthread_mutex_t DeleteLock;
+private	struct	occi_element * TrackRoot=(struct occi_element *) 0;
+private	struct	occi_element * occi_track_double_delete( char * url )
+{
+	struct	occi_element * eptr;
+	pthread_mutex_lock( &DeleteLock );
+	for (	eptr=TrackRoot;
+		eptr != (struct occi_element *) 0;
+		eptr = eptr->next)
+	{
+		if (!( eptr->value ))
+			continue;
+		else if (!( strcmp( eptr->value, url ) ))
+		{
+			pthread_mutex_unlock( &DeleteLock );
+			return((struct occi_element *) 0);
+		}
+	}
+	if (( eptr = occi_create_element("DELETE",url) ) != (struct occi_element *) 0)
+	{
+		if (( eptr->next = TrackRoot) != (struct occi_element *) 0)
+			eptr->next->previous = eptr;
+		TrackRoot = eptr;
+	}
+	pthread_mutex_unlock( &DeleteLock );
+	return( eptr );
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ u n t r a c k _ d e l e t e			*/
+/*	---------------------------------------------------------	*/
+private	int	occi_untrack_double_delete( struct occi_element * eptr )
+{
+	pthread_mutex_lock( &DeleteLock );
+	if (!( eptr->previous ))
+		TrackRoot = eptr->next;
+	else	eptr->previous->next = eptr->next;
+	if ( eptr->next )
+		eptr->next->previous = eptr->previous;
+	liberate_occi_element( eptr );
+	pthread_mutex_unlock( &DeleteLock );
+	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
 /*		   o c c i _ i n v o k e _ d e l e t e			*/
 /*	---------------------------------------------------------	*/
 /*	this function performs invocation of DELETE of a category	*/
@@ -1367,16 +1417,19 @@ private	struct rest_response * occi_invoke_delete(
 	struct rest_client   * cptr, 
 	struct rest_request  * rptr )
 {
+	struct	occi_element * eptr;
 	struct	rest_response * aptr;
 	struct	rest_interface * iptr;
 	if (!( iptr = optr->interface ))
 		return( occi_failure(cptr,  400, "Bad Request : No Methods" ) );
-	else
+	else if (!( eptr = occi_track_double_delete( rptr->object ) ))
+		return( occi_failure(cptr,  200, "OK" ) );
 	{	
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);
 		if ( iptr->delete )	aptr = (*iptr->delete)(optr,cptr,rptr);
 		else			aptr = occi_failure(cptr,  405, "Bad Request : No Category Method" );
 		if ( iptr->after )	(*iptr->after)(optr,cptr,rptr);
+		occi_untrack_double_delete( eptr );
 		return( occi_content_type( optr, rptr, aptr ) );
 	}
 }
