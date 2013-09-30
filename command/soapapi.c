@@ -70,7 +70,7 @@ private	int	invoke_soap_resolver_api( char * category )
 /*	-------------------------------------------	*/
 private	void	soap_api_callback( FILE * h, int asynch, char * callback )
 {
-	if (( asynch ) && ( callback )) { fprintf(h,"<callback>include '%s';</callback>",callback); }
+	if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
 	return;
 }
 
