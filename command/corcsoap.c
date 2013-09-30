@@ -154,11 +154,14 @@ private	struct rest_response * corcs_broker_response( struct rest_response * apt
 	else
 	{
 		soap_message_header( h, buffer );
-		if (!( service = corcs_json_service_identity( document )))
+		if (!( document = broker_name_instance( document ) ))
+			fprintf(h,"<m:fault>internal error</m:fault>\n");
+		else if (!( service = corcs_json_service_identity( document )))
 		{
 			fprintf(h,"<m:json>\n");
 			soap_inline_file( h, document );
 			fprintf(h,"</m:json>\n");
+			document = liberate( document );
 		}
 		else
 		{
