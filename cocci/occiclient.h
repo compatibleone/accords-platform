@@ -111,6 +111,7 @@ public	struct	occi_element  * occi_append_headers(struct occi_request * rptr,str
 public	struct	occi_element  * occi_remove_elements( struct occi_element * eptr );
 public	struct	occi_element  *	occi_request_from_response(struct occi_request * qptr,struct occi_response * rptr);
 public	struct	rest_header   * occi_client_authentication( char * aptr );
+public	struct	rest_header   * occi_server_authentication( char * aptr );
 public	struct	rest_header   * occi_client_accept( char * aptr );
 public	struct	rest_header   * occi_client_content_type( char * aptr );
 public 	struct	rest_header   * occi_add_default_header(struct rest_header  * hptr);

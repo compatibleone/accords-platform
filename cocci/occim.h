@@ -6,6 +6,7 @@
 struct	occi_manager	
 {
 	struct	occi_header_manager 	* headers;
+	int				mode;
 	struct	occi_client 		* first;
 	struct	occi_client 		* last;
 	char 				* name;

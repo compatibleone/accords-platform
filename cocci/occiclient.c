@@ -38,6 +38,7 @@ private	pthread_mutex_t ThreadLock;
 private	struct	occi_manager OcciManager = 
 {
 	(struct occi_header_manager *) 0,
+	0,			/* 0: client thread mode, 1: server pid mode */
 	(struct occi_client *) 0,
 	(struct occi_client *) 0,
 	"CO-OCCI-MAN",
@@ -72,15 +73,32 @@ public	void	occi_optimise_client( int v )
 private	struct rest_header * get_thread_occi_headers()
 {
 	pthread_t	tid;
+	pid_t		pid;
+
 	struct	rest_header * hptr=(struct rest_header *) 0;
 	struct	occi_header_manager * mptr=(struct occi_header_manager *) 0;
-	tid = pthread_self();
+	if ( OcciManager.mode )
+		pid = getpid();
+	else	tid = pthread_self();
 	pthread_mutex_lock( &ThreadLock );
 	for (	mptr = OcciManager.headers;
 		mptr != (struct occi_header_manager *) 0;
 		mptr = mptr->next )
-		if ( mptr->tid == tid )
+	{
+		if ( OcciManager.mode )
+		{
+			if ( mptr->pid == pid )
+			{
+				hptr = mptr->headers;
+				break;
+			}
+		}
+		else if ( mptr->tid == tid )
+		{
 			hptr = mptr->headers;
+			break;
+		}
+	}
 	pthread_mutex_unlock( &ThreadLock );
 	return(hptr);
 }
@@ -98,7 +116,9 @@ private	struct rest_header * set_thread_occi_headers( struct rest_header * hptr)
 			return( hptr );
 		else
 		{
-			mptr->tid = pthread_self();
+			if ( OcciManager.mode )
+				mptr->pid = pthread_self();
+			else	mptr->tid = pthread_self();
 			mptr->headers = hptr;
 			pthread_mutex_lock( &ThreadLock );
 			if ((mptr->next = OcciManager.headers) != (struct occi_header_manager *) 0)
@@ -372,6 +392,32 @@ public	void	occi_restore_default_headers( struct rest_header * hptr )
 public	struct	rest_header * occi_client_authentication( char * aptr )
 {
 	struct	rest_header * hptr;
+	if (!( hptr = rest_resolve_header( get_thread_occi_headers(), _OCCI_AUTHORIZE ) ))
+	{
+		if (!( hptr = rest_create_header( _OCCI_AUTHORIZE, aptr ) ))
+			return( hptr );
+		else	return( occi_add_default_header( hptr ) );
+	}
+	else
+	{
+		if ( hptr->value )
+			hptr->value = liberate( hptr->value );
+		hptr->value = allocate_string( aptr );
+		return( hptr );
+	}
+}
+
+/*	------------------------------------------------------------	*/
+/*	    o c c i _ c l i e n t _ a u t h e n t i c a t i o n		*/
+/*	------------------------------------------------------------	*/
+public	struct	rest_header * occi_server_authentication( char * aptr )
+{
+	struct	rest_header * hptr;
+
+	OcciManager.mode=1;
+
+	return( occi_client_authentication( aptr ) );
+
 	if (!( hptr = rest_resolve_header( get_thread_occi_headers(), _OCCI_AUTHORIZE ) ))
 	{
 		if (!( hptr = rest_create_header( _OCCI_AUTHORIZE, aptr ) ))

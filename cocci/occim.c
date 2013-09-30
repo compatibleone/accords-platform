@@ -62,6 +62,7 @@ public struct occi_manager * reset_occi_manager(struct occi_manager * sptr)
 	if ( sptr )
 	{
 		sptr->headers = (struct occi_header_manager*) 0;
+		sptr->mode = 0;
 		sptr->first = (struct occi_client*) 0;
 		sptr->last = (struct occi_client*) 0;
 		sptr->name = (char*) 0;

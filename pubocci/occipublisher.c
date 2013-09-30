@@ -1110,7 +1110,7 @@ public	int	occi_secure_AAA( char * user, char * password, char * agent, char * t
 		return( 0 );
 	else if (!(Publisher.authorization = login_occi_user( user, password, agent, tls )))
 		return( 403 );
-	else if (!( hptr = occi_client_authentication( Publisher.authorization )))
+	else if (!( hptr = occi_server_authentication( Publisher.authorization )))
 		return( 503 );
 	else	return( 0 );
 }
