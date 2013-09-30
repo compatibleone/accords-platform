@@ -112,12 +112,39 @@ private	struct rest_response * corcs_script_response( struct rest_response * apt
 }
 
 /*	-------------------------------------------------------		*/
+/*	 c o r c s _ j s o n _ s e r v i c e _ i d e n t i t y		*/
+/*	-------------------------------------------------------		*/
+private	char *	corcs_json_service_identity( char * filename )
+{
+	char *	eptr;
+	struct	data_element * dptr;
+	if (!( dptr = json_parse_file( filename )))
+		return((char *) 0);
+	else if (!( eptr = json_atribut( dptr, "instance" ) ))
+	{
+		dptr = drop_data_element( dptr );
+		return((char *) 0);
+	}
+	else if (!( eptr = allocate_string( eptr ) ))
+	{
+		dptr = drop_data_element( dptr );
+		return((char *) 0);
+	}
+	else
+	{
+		dptr = drop_data_element( dptr );
+		return(eptr);
+	}
+}
+
+/*	-------------------------------------------------------		*/
 /*	      c o r c s _ b r o k e r _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_broker_response( struct rest_response * aptr, char * service, char * message  )
 {
 	FILE * h;
 	char *	filename;
+	char *	identity;
 	char 	buffer[1024];
 	sprintf(buffer,"%sResponse",message);
 	if (!( filename = rest_temporary_filename( "xml" ) ))
@@ -127,7 +154,13 @@ private	struct rest_response * corcs_broker_response( struct rest_response * apt
 	else
 	{
 		soap_message_header( h, buffer );
-		fprintf(h,"<m:service>%s</m:service>\n",service);
+		if (!( identity = corcs_json_service_identity( service )))
+			fprintf(h,"<m:service>%s</m:service>\n",service);
+		else
+		{
+			fprintf(h,"<m:service>%s</m:service>\n",identity);
+			identity = liberate( identity );
+		}
 		soap_message_footer( h, buffer );
 		fclose(h);
 		return( rest_file_response( aptr, filename, "text/xml" ) );
