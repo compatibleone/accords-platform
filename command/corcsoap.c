@@ -99,8 +99,9 @@ private	char * corcs_persistent_result( struct rest_response * aptr, char * mess
 	struct	xml_element * eptr;
 	char  *	result=(char *) 0;
 	char	buffer[2048];
-	char	work1[256];
-	char	work2[256];
+	char	work1[64];
+	char	work2[64];
+	char 	when[64];
 
 	if (!( ihost = occi_resolve_category_provider( "result", get_default_agent(), default_tls() ) ))
 		return((char *) 0);
@@ -122,10 +123,12 @@ private	char * corcs_persistent_result( struct rest_response * aptr, char * mess
 	{
 		sprintf(work1,"%u",aptr->status);
 		sprintf(work2,"%u",qqptr->status);
+		sprintf(when,"%u",time((long*) 0));
 		if ((!(dptr=occi_request_element(qptr,"occi.result.code"    , work1 			   	) ))
 	     	||  (!(dptr=occi_request_element(qptr,"occi.result.name"    , qqptr->identity			) ))
 	     	||  (!(dptr=occi_request_element(qptr,"occi.result.action"  , qqptr->action			) ))
 	     	||  (!(dptr=occi_request_element(qptr,"occi.result.state"   , work2				) ))
+	     	||  (!(dptr=occi_request_element(qptr,"occi.result.created" , when				) ))
 	     	||  (!(dptr=occi_request_element(qptr,"occi.result.message" , (aptr->message?aptr->message:"") 	) ))
 	     	||  (!(dptr=occi_request_element(qptr,"occi.result.body"    , (aptr->body?aptr->body:"")       	) ))
 	     	||  (!(dptr=occi_request_element(qptr,"occi.result.callback", (qqptr->callback?qqptr->callback:"")) ))
