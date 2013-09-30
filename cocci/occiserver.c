@@ -1423,7 +1423,11 @@ private	struct rest_response * occi_invoke_delete(
 	if (!( iptr = optr->interface ))
 		return( occi_failure(cptr,  400, "Bad Request : No Methods" ) );
 	else if (!( eptr = occi_track_double_delete( rptr->object ) ))
+	{
+		rest_log_message("double delete protection");
 		return( occi_failure(cptr,  200, "OK" ) );
+	}
+	else
 	{	
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);
 		if ( iptr->delete )	aptr = (*iptr->delete)(optr,cptr,rptr);
