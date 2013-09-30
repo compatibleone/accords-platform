@@ -11,8 +11,10 @@ cp ../accords-platform/dashboard/images/* ./images
 cp ../accords-platform/cordscripts/csp*.txt .
 cp ../accords-platform/manifests/cords_*.xml .
 cp ../accords-platform/manifests/cords_*.xml .
+cp ../accords-platform/manifests/*.css .
 cp ../accords-platform/manifests/*.cnf .
 cp ../accords-platform/*.xml .
+cp ../accords-platform/*.css .
 cp ../accords-platform/*.crt .
 ./accords-config
 co-start
