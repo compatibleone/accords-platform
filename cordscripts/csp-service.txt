@@ -22,7 +22,7 @@
 		{	$m = $m#"<td>&nbsp;";		}
 		$n = $contract["occi.contract.when"];
 		$n = $n.date();
-		$m = $m#"<td>"#$n;
+		$m = $m#"<td colspan=2>"#$n;
 		$m.display();
 		$pr = $provider.get();
 		$pp = "occi."#$pn#".price";
@@ -61,12 +61,12 @@
 		$record = $service.get();
 		$sid    = $record["occi.core.id"];
 
-		$m = "<tr><td class=title colspan=6>Service</td></tr>";
+		$m = "<tr><td class=title colspan=7>Service</td></tr>";
 		$m.display();
 		$m = "<tr><td><b>Reference</b><td colspan=4>"#$service#"</td>";
 		$m.display();
 		$state = $record["occi.service.state"];
-		$m = "<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
+		$m = "<td>&nbsp;<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
 		$m.display();
 		if ( $record.length() > 0 )
 		{
@@ -107,7 +107,7 @@
 		$value = $record["occi.service.initiation"];
 		if ( $value == "now" )   { $value = "now".date();  }
 		else			 { $value = $value.date(); }
-		$m = "<td><b>Initiation</b><td>"#$value;
+		$m = "<td colspan=2><b>Initiation</b><td>"#$value;
 		$m.display()
 
 
@@ -122,7 +122,7 @@
 
 		$value = $record["occi.service.expiration"];
 		if ( $value != "never" ) { $value = $value.date(); }
-		$m = "<td><b>Expires</b><td>"#$value;
+		$m = "<td colspan=2><b>Expires</b><td>"#$value;
 		$m.display();
 		"<tr><td colspan=4>&nbsp;".display();
 		$value = $record["occi.service.when"];
@@ -131,17 +131,17 @@
 		switch ( $state )
 		{
 		case	1	:
-		 	$m = "<td><b>Deployed Since</b><td>"#$value;
+		 	$m = "<td colspan=2><b>Deployed Since</b><td>"#$value;
 			break;
 		case	0	:
-		 	$m = "<td><b>Un-deployed Since</b><td>"#$value;	
+		 	$m = "<td colspan=2><b>Un-deployed Since</b><td>"#$value;	
 			break;
 		default		:
-			$m = "<td><b>working Since</b><td>"#$value;
+			$m = "<td colspan=2><b>working Since</b><td>"#$value;
 		}
 		$m.display();
 
-		$m = "<tr><td class=title>Contract<td class=title>Provider<td class=title>Host<td class=title>State<td class=title>Date<td class=title>Price</tr>";
+		$m = "<tr><td class=title>Contract<td class=title>Provider<td class=title>Host<td class=title>State<td colspan=2 class=title>Date<td class=title>Price</tr>";
 		$m.display();
 
 		foreach ( $record as $tuple )
@@ -181,7 +181,7 @@
 			}
 		}
 	}
-	$m = "<tr><td class=title colspan=6>List of Primary Services</td></tr>";
+	$m = "<tr><td class=title colspan=7>List of Primary Services</td></tr>";
 	$m.display();
 	$list = service.list();
 	foreach ( $list as $sid )
@@ -198,6 +198,18 @@
 				$agreement = $sla.get();
 				$aname = $agreement["occi.agreement.name"];
 				$m = "<tr><td colspan=2>"#$aname#"<td colspan=3><a href='dashboard.php?action=compile&script=csp-service.txt&output=HTML&option="#$sid#"'>"#$sid#"</a></td>";
+				$m.display();
+				$holdrecord = $record;
+				$links = 0;
+				foreach ( $record as $linklook )
+				{
+					forboth ( $linklook as $linkname and $linkvalue )
+					{
+						if ( $linkname == "link" ) { $links = $links+1; }
+					}
+				}
+				$record = $holdrecord;
+				$m = "<td>"#$links;
 				$m.display();
 				$ssid = $sid;
 				$sid = $record["occi.core.id"];
