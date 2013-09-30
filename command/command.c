@@ -2516,6 +2516,7 @@ private	int	banner()
 	printf("\n         --tls       <security>       specify security configuration ");
 	printf("\n         --verbose                    activate verbose messages");
 	printf("\n         --asynch                     activate asynchronous operation ");
+	printf("\n         --callback                   specify callback operations");
 	printf("\n         --noauth                     inhibit authentication for test purposes");
 	printf("\n         --echo                       activate source echo ");
 	printf("\n         --port <number>              set online port number \n");
