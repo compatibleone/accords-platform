@@ -74,7 +74,8 @@ private	struct rest_response * corcs_asynch_callback( struct rest_response * apt
 {
 	char	buffer[2048];
 	char *	filename;
-	sprintf(buffer,"%u %s %s",
+	sprintf(buffer,"%s %u %s %s",
+		qptr->identity,
 		aptr->status,
 		(aptr->message ? aptr->message : "MSG"),
 		(aptr->body ? aptr->body : "" ));
