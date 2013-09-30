@@ -42,7 +42,7 @@ private	int	invoke_soap_request( char * action, char * host, char * wsdl, char *
 /*	-----------------------------------------------		*/
 /*	i n v o k e _ s o a p _ r e s o l v e r _ a p i		*/
 /*	-----------------------------------------------		*/
-private	int	invoke_soap_resolver_api( char * category, int asynch )
+private	int	invoke_soap_resolver_api( char * category )
 {
 	char *	message;
 	FILE *	h;
@@ -68,7 +68,7 @@ private	int	invoke_soap_resolver_api( char * category, int asynch )
 /*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ p a r s e r _ a p i	*/
 /*	-------------------------------------------	*/
-private	int	invoke_soap_parser_api( char * type, char * filename, int asynch )
+private	int	invoke_soap_parser_api( char * type, char * filename, int asynch, char * callback )
 {
 	char *	message;
 	FILE *	h;
@@ -95,6 +95,7 @@ private	int	invoke_soap_parser_api( char * type, char * filename, int asynch )
 		}
 		soap_message_header( h, type );
 		fprintf(h,"<command>parser</command>\n");
+		if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
 		soap_inline_xml(h,filename);
 		soap_message_footer( h, type );
 		fclose(h);
@@ -105,7 +106,7 @@ private	int	invoke_soap_parser_api( char * type, char * filename, int asynch )
 /*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ b r o k e r _ a p i	*/
 /*	-------------------------------------------	*/
-private	int	invoke_soap_broker_api( char * type, char * filename, int asynch )
+private	int	invoke_soap_broker_api( char * type, char * filename, int asynch, char * callback )
 {
 	char *	message;
 	FILE *	h;
@@ -122,6 +123,7 @@ private	int	invoke_soap_broker_api( char * type, char * filename, int asynch )
 		else	type = "BrokerSLA";
 		soap_message_header( h, type );
 		fprintf(h,"<command>broker</command>\n");
+		if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
 		soap_inline_xml(h,filename);
 		soap_message_footer( h, type );
 		fclose(h);
@@ -132,7 +134,7 @@ private	int	invoke_soap_broker_api( char * type, char * filename, int asynch )
 /*	---------------------------------------------	*/
 /*	i n v o k e _ s o a p _ s e r v i c e _ a p i	*/
 /*	---------------------------------------------	*/
-private	int	invoke_soap_service_api( char * action, char * service, int asynch )
+private	int	invoke_soap_service_api( char * action, char * service, int asynch, char * callback )
 {
 	char *	type;
 	char *	message;
@@ -153,6 +155,7 @@ private	int	invoke_soap_service_api( char * action, char * service, int asynch )
 		fprintf(h,"<command>service</command>\n",action);
 		fprintf(h,"<service>%s</service>\n",service);
 		fprintf(h,"<action>%s</action>\n",action);
+		if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
 		soap_message_footer( h, type );
 		fclose(h);
 		return( invoke_soap_request( type, soap, wsdl, message ) );
@@ -162,7 +165,7 @@ private	int	invoke_soap_service_api( char * action, char * service, int asynch )
 /*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ s c r i p t _ a p i	*/
 /*	-------------------------------------------	*/
-private	int	invoke_soap_script_api( char * script, char * parameters, int asynch )
+private	int	invoke_soap_script_api( char * script, char * parameters, int asynch, char * callback )
 {
 	char *	type;
 	char *	message;
@@ -187,6 +190,7 @@ private	int	invoke_soap_script_api( char * script, char * parameters, int asynch
 		fprintf(h,"<script>\n");
 		soap_inline_file(h,script);
 		fprintf(h,"</script>\n");
+		if (( asynch ) && ( callback )) { fprintf(h,"<callback>%s</callback>",callback); }
 		soap_message_footer( h, type );
 		fclose(h);
 		return( invoke_soap_request( type, soap, wsdl, message ) );
@@ -222,18 +226,18 @@ private	int	invoke_soap_result_api( char * identity )
 /*	-------------------------------------	*/
 /*	    i n v o k e _ s o a p _ a p i	*/
 /*	-------------------------------------	*/
-private	int	invoke_soap_api( char * command, char * subject, char * option, int asynch )
+private	int	invoke_soap_api( char * command, char * subject, char * option, int asynch, char * callback )
 {
 	if (!( strcmp( command, "resolver" ) ))
-		return( invoke_soap_resolver_api( subject, asynch ) );
+		return( invoke_soap_resolver_api( subject ) );
 	else if (!( strcmp( command, "parser" ) ))
-		return( invoke_soap_parser_api( subject, option, asynch ) );
+		return( invoke_soap_parser_api( subject, option, asynch, callback ) );
 	else if (!( strcmp( command, "broker" ) ))
-		return( invoke_soap_broker_api( subject, option, asynch ) );
+		return( invoke_soap_broker_api( subject, option, asynch, callback ) );
 	else if (!( strcmp( command, "service" ) ))
-		return( invoke_soap_service_api( subject, option, asynch ) );
+		return( invoke_soap_service_api( subject, option, asynch, callback ) );
 	else if (!( strcmp( command, "script" ) ))
-		return( invoke_soap_script_api( subject, option, asynch ) );
+		return( invoke_soap_script_api( subject, option, asynch, callback ) );
 	else if (!( strcmp( command, "result" ) ))
 		return( invoke_soap_result_api( subject ) );
 	else

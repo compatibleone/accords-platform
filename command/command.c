@@ -54,6 +54,7 @@ private	char *	agent="CO-COMMAND/1.0";
 private	int	authorise=0;
 private	int	echo=0;
 private	int	asynch=0;
+private	char *	callback=(char *) 0;
 
 public	int	check_debug()		{	return(Command.debug);		}
 public	int	check_verbose()		{	return(Command.verbose);	}
@@ -2409,7 +2410,7 @@ private	int	operation( int argc, char * argv[] )
 			else if (!( strcasecmp( command, "INVOKE" ) ))
 				return( invoke_action( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "SOAP" ) ))
-				return( invoke_soap_api( aptr, argv[argi+1], argv[argi+2], asynch ) );
+				return( invoke_soap_api( aptr, argv[argi+1], argv[argi+2], asynch, callback ) );
 			else if (!( strcasecmp( command, "ANALYSE" ) ))
 				return( colog_analysis( aptr ) );
 			else if (!( strcasecmp( command, "RUN" ) ))
@@ -2454,6 +2455,8 @@ private	int	operation( int argc, char * argv[] )
 					noauth = 1;
 				else if (!( strcmp( aptr, "asynch" ) ))
 					asynch = 1;
+				else if (!( strcmp( aptr, "callback" ) ))
+					callback = argv[++argi];
 				else if (!( strcmp( aptr, "wsdl" ) ))
 					wsdl = argv[++argi];
 				else if (!( strcmp( aptr, "soap" ) ))
