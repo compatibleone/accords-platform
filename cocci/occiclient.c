@@ -117,7 +117,7 @@ private	struct rest_header * set_thread_occi_headers( struct rest_header * hptr)
 		else
 		{
 			if ( OcciManager.mode )
-				mptr->pid = pthread_self();
+				mptr->pid = getpid();
 			else	mptr->tid = pthread_self();
 			mptr->headers = hptr;
 			pthread_mutex_lock( &ThreadLock );
