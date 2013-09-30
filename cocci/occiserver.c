@@ -1402,7 +1402,7 @@ private	int	occi_untrack_double_delete( struct occi_element * eptr )
 	else	eptr->previous->next = eptr->next;
 	if ( eptr->next )
 		eptr->next->previous = eptr->previous;
-	liberate_occi_element( eptr );
+	occi_liberate_element( eptr );
 	pthread_mutex_unlock( &DeleteLock );
 	return( 0 );
 }
