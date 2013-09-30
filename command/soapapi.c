@@ -118,17 +118,8 @@ private	int	invoke_soap_broker_api( char * type, char * filename, int asynch )
 	else
 	{
 		if ( asynch )
-		{
-			if (!( strcasecmp( type, "MANIFEST" ) ))
-				type = "AsynchBrokerManifest";
-			else	type = "AsynchBrokerSLA";
-		}
-		else
-		{
-			if (!( strcasecmp( type, "MANIFEST" ) ))
-				type = "BrokerManifest";
-			else	type = "BrokerSLA";
-		}
+			type = "AsynchBrokerSLA";
+		else	type = "BrokerSLA";
 		soap_message_header( h, type );
 		fprintf(h,"<command>broker</command>\n");
 		soap_inline_xml(h,filename);

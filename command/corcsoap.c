@@ -259,42 +259,6 @@ private	struct	rest_response * corcs_soap_sla_parser(
 }
 
 /*	-----------------------------------------------------	*/
-/*	  c o r d s _ s o a p _ m a n i f e s t _ b r o k e r 	*/
-/*	-----------------------------------------------------	*/
-private	struct	rest_response * corcs_soap_manifest_broker( 
-	struct 	rest_response * aptr, 
-	struct 	xml_element * sptr, 
-	struct 	rest_request * rptr,
-	struct	corcs_asynch_request * qptr )
-{
-	char *	message="BrokerManifest";
-	char *	filename=(char *) 0;
-	char *	command=(char *) 0;
-	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
-	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
-	else if (!( filename = document_element_xml( sptr, "manifest") ))
-		return(rest_html_response(aptr, 400, "missing manifest"));
-	else if (!( command = document_element_string( sptr, "command") ))
-		return(rest_html_response(aptr, 400, "missing command"));
-	else if ( strcmp( command, "broker" ) != 0)
-		return(rest_html_response(aptr, 400, "incorrect command"));
-	else
-	{
-		/* broker filename */
-		/* --------------- */
-		cords_broker_operation( filename );
-		sptr = liberate_xml_element( sptr );
-		if (!( aptr = corcs_broker_response ( aptr, filename, message ) ))
-			return( aptr );
-		else if (!( qptr ))
-			return( aptr );
-		else	return( corcs_asynch_response( aptr, message, qptr ) );
-	}
-}
-
-/*	-----------------------------------------------------	*/
 /*	      c o r d s _ s o a p _ s l a _ b r o k e r 	*/
 /*	-----------------------------------------------------	*/
 private	struct	rest_response * corcs_soap_sla_broker(
@@ -622,8 +586,6 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 		return( corcs_soap_manifest_parser( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "/ParseSLA" ) ))
 		return( corcs_soap_sla_parser( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
-	else if (!( strcmp(  command, "/BrokerManifest" ) ))
-		return( corcs_soap_manifest_broker( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "/BrokerSLA" ) ))
 		return( corcs_soap_sla_broker( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "/ServiceAction" ) ))
@@ -638,8 +600,6 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 		return( corcs_asynchronous_request( corcs_soap_manifest_parser, command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchParseSLA" ) ))
 		return( corcs_asynchronous_request( corcs_soap_sla_parser, command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchBrokerManifest" ) ))
-		return( corcs_asynchronous_request( corcs_soap_manifest_broker, command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchBrokerSLA" ) ))
 		return( corcs_asynchronous_request( corcs_soap_sla_broker, command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchServiceAction" ) ))
@@ -652,8 +612,6 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 	else if (!( strcmp(  command, "/AsynchParseManifestResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchParseSLAResult" ) ))
-		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchBrokerManifestResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "/AsynchBrokerSLAResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
