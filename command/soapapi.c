@@ -150,8 +150,9 @@ private	int	invoke_soap_service_api( char * action, char * service, int asynch )
 		else	type = "ServiceAction";
 			
 		soap_message_header( h, type );
-		fprintf(h,"<command>%s</command>\n",action);
+		fprintf(h,"<command>service</command>\n",action);
 		fprintf(h,"<service>%s</service>\n",service);
+		fprintf(h,"<action>%s</action>\n",action);
 		soap_message_footer( h, type );
 		fclose(h);
 		return( invoke_soap_request( type, soap, wsdl, message ) );
