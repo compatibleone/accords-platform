@@ -1425,10 +1425,13 @@ private char * 	cords_service_operation( char * command, char * service )
 		if ((CommandServerAccept) 
 		&& (!( strcmp(CommandServerAccept,"application/soap"))))
 		{
-			if (!( eptr = occi_locate_element( zptr->first, "occi.service.state" ) ))
-				message = "unknown";
+			zptr = occi_remove_response( zptr );
+			if (!(zptr = occi_simple_get( service, agent, default_tls())))
+				message = "deleted";
+			else if (!( eptr = occi_locate_element( zptr->first, "occi.service.state" ) ))
+				message = "failure";
 			else if (!( sptr = eptr->value ))
-				message = "unknown";
+				message = "failure";
 			else 
 			{
 				if (( *sptr == '"' ) || ( *sptr == 0x0027))
@@ -1438,7 +1441,7 @@ private char * 	cords_service_operation( char * command, char * service )
 				case	0 : message = "idle"; 	break;
 				case	1 : message = "started"; break;
 				case	2 : message = "working"; break;
-				default	  : message = "enexpected"; break;
+				default	  : message = "unknown"; break;
 				}
 			}
 			filename = corcs_soap_service_response( command, service, message );
@@ -1465,7 +1468,8 @@ private char * 	cords_service_operation( char * command, char * service )
 				fclose(h);
 			}
 		}
-		zptr = occi_remove_response( zptr );
+		if ( zptr )
+			zptr = occi_remove_response( zptr );
 	}
 	else 	filename = (char *) 0;
 
