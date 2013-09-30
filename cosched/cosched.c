@@ -152,6 +152,10 @@ private	void	cosched_synchronise()
 #include "counter.c"
 #include "occicounter.c"
 
+#include "result.h"
+#include "result.c"
+#include "occiresult.c"
+
 #include "timer.h"
 #include "timer.c"
 #include "occitimer.c"
@@ -335,6 +339,13 @@ private	int	cosched_operation( char * nptr )
 	initialise_timer_control();
 
 	if (!( optr = occi_cords_counter_builder( Cosched.domain, "counter" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_cords_result_builder( Cosched.domain, "result" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;

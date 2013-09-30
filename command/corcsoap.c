@@ -86,6 +86,82 @@ private	struct rest_response * corcs_asynch_callback( struct rest_response * apt
 }
 
 /*	-------------------------------------------------------		*/
+/*	    c o r c s _ p e r s i s t e n t _ r e s u l t 	 	*/
+/*	-------------------------------------------------------		*/
+private	char * corcs_persistent_result( struct rest_response * aptr, char * message, struct corcs_asynch_request * qqptr )
+{
+	char	*	ihost;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	xml_element * eptr;
+	char  *	result=(char *) 0;
+	char	buffer[2048];
+	char	work1[256];
+	char	work2[256];
+
+	if (!( ihost = occi_resolve_category_provider( "result", get_default_agent(), default_tls() ) ))
+		return((char *) 0);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,"result");
+		liberate( ihost );
+	}
+
+	if (!( kptr = occi_create_client( buffer, get_default_agent(), default_tls()) ))
+		return((char *) 0);
+
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else 
+	{
+		sprintf(work1,"%u",aptr->status);
+		sprintf(work2,"%u",qqptr->status);
+		if ((!(dptr=occi_request_element(qptr,"occi.result.code"    , work1 			   	) ))
+	     	||  (!(dptr=occi_request_element(qptr,"occi.result.name"    , qqptr->identity			) ))
+	     	||  (!(dptr=occi_request_element(qptr,"occi.result.action"  , qqptr->action			) ))
+	     	||  (!(dptr=occi_request_element(qptr,"occi.result.state"   , work2				) ))
+	     	||  (!(dptr=occi_request_element(qptr,"occi.result.message" , (aptr->message?aptr->message:"") 	) ))
+	     	||  (!(dptr=occi_request_element(qptr,"occi.result.body"    , (aptr->body?aptr->body:"")       	) ))
+	     	||  (!(dptr=occi_request_element(qptr,"occi.result.callback", (qqptr->callback?qqptr->callback:"")) ))
+	     	||  (!(dptr=occi_request_element(qptr,"occi.result.request" , message	 		        ) )))
+		{
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			return((char *) 0);
+		}
+		else if (!( yptr = occi_client_post( kptr, qptr ) ))
+		{
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			return((char *) 0);
+		}
+		else if (!( ihost = occi_extract_location( yptr ) ))
+		{
+			yptr = occi_remove_response( yptr );
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			return((char *) 0);
+		}
+		else
+		{
+			rest_add_http_prefix(buffer,2048,ihost);
+			yptr = occi_remove_response( yptr );
+			qptr = occi_remove_request( qptr );
+			kptr = occi_remove_client( kptr );
+			if (!( result = allocate_string( buffer ) ))
+				return( result );
+			else	return( result );
+		}
+	}	
+}
+
+/*	-------------------------------------------------------		*/
 /*	      c o r c s _ a s y n c h _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_asynch_response( struct rest_response * aptr, char * message, struct corcs_asynch_request * qptr )
@@ -100,6 +176,7 @@ private	struct rest_response * corcs_asynch_response( struct rest_response * apt
 	{
 		qptr->response = aptr;
 		qptr->status = 200;
+		corcs_persistent_result( aptr, message, qptr );
 		if (!( qptr->callback ))
 			return( aptr );
 		else	return( corcs_asynch_callback( aptr, qptr ) );
