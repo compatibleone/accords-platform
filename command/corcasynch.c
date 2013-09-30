@@ -9,6 +9,7 @@ struct	corcs_asynch_request
 	char *	identity;
 	char *	message;
 	char *	action;
+	char *	callback;
 	int	status;
 };
 
@@ -42,6 +43,8 @@ private	struct	corcs_asynch_request * drop_corcs_asynch_request( struct corcs_as
 			qptr->action = liberate( qptr->action );
 		if ( qptr->message )
 			qptr->message = liberate( qptr->message );
+		if ( qptr->callback )
+			qptr->callback = liberate( qptr->callback );
 		liberate( qptr );
 		pthread_mutex_unlock(  &AsynchLock );
 	}

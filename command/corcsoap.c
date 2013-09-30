@@ -68,7 +68,25 @@ private	struct rest_response * corcs_parser_response( struct rest_response * apt
 }
 
 /*	-------------------------------------------------------		*/
-/*	      c o r c s _ p a r s e r _ r e s p o n s e	 		*/
+/*	      c o r c s _ a s y n c h _ c a l l b a c k  		*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * corcs_asynch_callback( struct rest_response * aptr, struct corcs_asynch_request * qptr )
+{
+	char	buffer[2048];
+	char *	filename;
+	sprintf(buffer,"%u %s %s",
+		aptr->status,
+		(aptr->message ? aptr->message : "MSG"),
+		(aptr->body ? aptr->body : "" ));
+	filename = cords_script_interpreter( qptr->callback, buffer, 1 );
+	qptr->response = (struct rest_response *) 0;
+	qptr->status = 201;
+	qptr->message = allocate_string("Already Consumed");
+	return( aptr );
+}
+
+/*	-------------------------------------------------------		*/
+/*	      c o r c s _ a s y n c h _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_asynch_response( struct rest_response * aptr, char * message, struct corcs_asynch_request * qptr )
 {
@@ -82,12 +100,14 @@ private	struct rest_response * corcs_asynch_response( struct rest_response * apt
 	{
 		qptr->response = aptr;
 		qptr->status = 200;
-		return( aptr );
+		if (!( qptr->callback ))
+			return( aptr );
+		else	return( corcs_asynch_callback( aptr, qptr ) );
 	}
 }
 
 /*	-------------------------------------------------------		*/
-/*	      c o r c s _ s c i p t _ r e s p o n s e	 		*/
+/*	      c o r c s _ s c r i p t _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_script_response( struct rest_response * aptr, char * document, char * message )
 {
@@ -545,8 +565,8 @@ private	struct	rest_response *	corcs_asynchronous_request(
 		return(rest_html_response(aptr, 400, "asynch request not yet available"));
 	else if (!( cptr = allocate_asynch_context( qptr ) ))
 		return(rest_html_response(aptr, 400, "asynch request not yet available"));
-
 	{
+		qptr->callback= document_element_string( sptr, "callback");
 		cptr->method  = method;
 		cptr->message = sptr;
 		cptr->request = rptr;

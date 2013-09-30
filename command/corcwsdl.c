@@ -62,6 +62,12 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<wsdl:part name=\"document\" type=\"cords:manifest\"/>\n");
 		fprintf(h,"</wsdl:message>\n");
 
+		fprintf(h,"<wsdl:message name=\"AsynchParseManifestIn\">\n");
+		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"document\" type=\"cords:manifest\"/>\n");
+		fprintf(h,"<wsdl:part name=\"callback\" type=\"string\"/>\n");
+		fprintf(h,"</wsdl:message>\n");
+
 		fprintf(h,"<wsdl:message name=\"ParseManifestOut\">\n");
 		fprintf(h,"<wsdl:part name=\"document\" type=\"cords:manifest\"/>\n");
 		fprintf(h,"</wsdl:message>\n");
@@ -69,6 +75,12 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<wsdl:message name=\"ParseSLAIn\">\n");
 		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
 		fprintf(h,"<wsdl:part name=\"document\" type=\"slam:agreement\"/>\n");
+		fprintf(h,"</wsdl:message>\n");
+
+		fprintf(h,"<wsdl:message name=\"AsynchParseSLAIn\">\n");
+		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"document\" type=\"slam:agreement\"/>\n");
+		fprintf(h,"<wsdl:part name=\"callback\" type=\"string\"/>\n");
 		fprintf(h,"</wsdl:message>\n");
 
 		fprintf(h,"<wsdl:message name=\"ParseSLAOut\">\n");
@@ -80,6 +92,12 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<wsdl:part name=\"document\" type=\"slam:agreement\"/>\n");
 		fprintf(h,"</wsdl:message>\n");
 
+		fprintf(h,"<wsdl:message name=\"AsynchBrokerSLAIn\">\n");
+		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"document\" type=\"slam:agreement\"/>\n");
+		fprintf(h,"<wsdl:part name=\"callback\" type=\"string\"/>\n");
+		fprintf(h,"</wsdl:message>\n");
+
 		fprintf(h,"<wsdl:message name=\"BrokerOut\">\n");
 		fprintf(h,"<wsdl:part name=\"service\" type=\"string\"/>\n");
 		fprintf(h,"</wsdl:message>\n");
@@ -87,6 +105,12 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<wsdl:message name=\"ServiceIn\">\n");
 		fprintf(h,"<wsdl:part name=\"action\" type=\"string\"/>\n");
 		fprintf(h,"<wsdl:part name=\"service\" type=\"string\"/>\n");
+		fprintf(h,"</wsdl:message>\n");
+
+		fprintf(h,"<wsdl:message name=\"AsynchServiceIn\">\n");
+		fprintf(h,"<wsdl:part name=\"action\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"service\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"callback\" type=\"string\"/>\n");
 		fprintf(h,"</wsdl:message>\n");
 
 		fprintf(h,"<wsdl:message name=\"ServiceOut\">\n");
@@ -99,6 +123,13 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
 		fprintf(h,"<wsdl:part name=\"script\" type=\"file\"/>\n");
 		fprintf(h,"<wsdl:part name=\"parameters\" type=\"string\"/>\n");
+		fprintf(h,"</wsdl:message>\n");
+
+		fprintf(h,"<wsdl:message name=\"AsynchScriptIn\">\n");
+		fprintf(h,"<wsdl:part name=\"command\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"script\" type=\"file\"/>\n");
+		fprintf(h,"<wsdl:part name=\"parameters\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"callback\" type=\"string\"/>\n");
 		fprintf(h,"</wsdl:message>\n");
 
 		fprintf(h,"<wsdl:message name=\"ScriptOut\">\n");
@@ -150,7 +181,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		/* --------------------- */
 
 		fprintf(h,"<wsdl:operation name=\"AsynchParseManifest\">\n");
-		fprintf(h,"<wsdl:input message=\"ParseManifestIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchParseManifestIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -160,7 +191,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchParseSLA\">\n");
-		fprintf(h,"<wsdl:input message=\"ParseSLAIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchParseSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -170,7 +201,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchBrokerSLA\">\n");
-		fprintf(h,"<wsdl:input message=\"BrokerSLAIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchBrokerSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -180,7 +211,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchServiceAction\">\n");
-		fprintf(h,"<wsdl:input message=\"ServiceIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchServiceIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -190,7 +221,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchRunScript\">\n");
-		fprintf(h,"<wsdl:input message=\"ScriptIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchScriptIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -254,7 +285,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		/* --------------------- */
 		fprintf(h,"<wsdl:operation name=\"AsynchParseManifest\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchParseManifest\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ParseManifestIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchParseManifestIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -266,7 +297,7 @@ private	char *	corcs_soap_wsdl(char * host)
 
 		fprintf(h,"<wsdl:operation name=\"AsynchParseSLA\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchParseSLA\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ParseSLAIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchParseSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -278,7 +309,7 @@ private	char *	corcs_soap_wsdl(char * host)
 
 		fprintf(h,"<wsdl:operation name=\"AsynchBrokerSLA\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchBrokerSLA\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"BrokerSLAIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchBrokerSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -290,7 +321,7 @@ private	char *	corcs_soap_wsdl(char * host)
 
 		fprintf(h,"<wsdl:operation name=\"AsynchServiceAction\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchServiceAction\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ServiceIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchServiceIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
@@ -302,7 +333,7 @@ private	char *	corcs_soap_wsdl(char * host)
 
 		fprintf(h,"<wsdl:operation name=\"AsynchRunScript\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchRunScript\" style=\"rpc\"/>\n",host);
-		fprintf(h,"<wsdl:input message=\"ScriptIn\"/>\n");
+		fprintf(h,"<wsdl:input message=\"AsynchScriptIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
