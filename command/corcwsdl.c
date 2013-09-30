@@ -91,7 +91,8 @@ private	char *	corcs_soap_wsdl(char * host)
 
 		fprintf(h,"<wsdl:message name=\"ServiceOut\">\n");
 		fprintf(h,"<wsdl:part name=\"service\" type=\"string\"/>\n");
-		fprintf(h,"<wsdl:part name=\"state\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"action\" type=\"string\"/>\n");
+		fprintf(h,"<wsdl:part name=\"status\" type=\"string\"/>\n");
 		fprintf(h,"</wsdl:message>\n");
 
 		fprintf(h,"<wsdl:message name=\"ScriptIn\">\n");
