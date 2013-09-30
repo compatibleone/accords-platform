@@ -174,27 +174,38 @@ private	struct rest_response * corcs_broker_response( struct rest_response * apt
 	}
 }
 
-/*	-------------------------------------------------------		*/
-/*	      c o r c s _  s e r v i c e _ r e s p o n s e	 	*/
-/*	-------------------------------------------------------		*/
-private	struct rest_response * corcs_service_response( struct rest_response * aptr, char * service, char * message  )
+/*	--------------------------------------------------------	*/
+/*	 c o r c s _  s o a p _ s e r v i c e _ r e s p o n s e	 	*/
+/*	--------------------------------------------------------	*/
+private	char *	corcs_soap_service_response( char * action, char * service, char * message )
 {
 	FILE * h;
 	char *	filename;
 	char 	buffer[1024];
-	sprintf(buffer,"%sResponse",message);
+	strcpy(buffer,"ServiceActionResponse");
+
 	if (!( filename = rest_temporary_filename( "xml" ) ))
-		return( aptr );
+		return( (char *) 0);
 	else if (!( h = fopen( filename, "w" ) ))
 		return( liberate( filename ) );
 	else
 	{
 		soap_message_header( h, buffer );
 		fprintf(h,"<m:service>%s</m:service>\n",service);
+		fprintf(h,"<m:action>%s</m:action>\n",action);
+		fprintf(h,"<m:state>%s</m:state>\n",message);
 		soap_message_footer( h, buffer );
 		fclose(h);
-		return( rest_file_response( aptr, filename, "text/xml" ) );
+		return( filename );
 	}
+}
+
+/*	-------------------------------------------------------		*/
+/*	      c o r c s _  s e r v i c e _ r e s p o n s e	 	*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * corcs_service_response( struct rest_response * aptr, char * filename )
+{
+	return( rest_file_response( aptr, filename, "text/xml" ) );
 }
 
 /*	-------------------------------------	*/
@@ -359,9 +370,9 @@ private	struct	rest_response * corcs_soap_service(
 	{
 		/* invoke service action */
 		/* --------------------- */
-		filename = cords_service_operation( service, action );
+		filename = cords_service_operation( action, service );
 		sptr = liberate_xml_element( sptr );
-		if (!( aptr = corcs_service_response ( aptr, filename, message ) ))
+		if (!( aptr = corcs_service_response ( aptr, filename ) ))
 			return( aptr );
 		else if (!( qptr ))
 			return( aptr );

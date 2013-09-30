@@ -70,6 +70,7 @@ private	struct rest_response * cords_broker_response( struct rest_response * apt
 private	struct rest_response * cords_resolver_response( struct rest_response * aptr, char * filename );
 private	struct rest_response * cords_service_response( struct rest_response * aptr, char * filename );
 private	struct rest_response * cords_script_response( struct rest_response * aptr, char * filename );
+private	char *	corcs_soap_service_response( char * action, char * service, char * message );
 public	char *	corcs_soap_get_wsdl();
 private char * 	corcs_resolver_soap_response( char * category, struct occi_response * rptr );
 
@@ -1402,11 +1403,13 @@ private	char * 	cords_resolver_operation( char * category )
 /*	------------------------------------------------	*/
 private char * 	cords_service_operation( char * command, char * service )
 {
+	char *	message;
 	int	status;
 	char *	auth;
 	struct	occi_response * zptr;
 	char *	filename;
 	char 	buffer[4096];
+	char * 	sptr;
 	FILE *	h;
 	struct	occi_element * eptr;
 	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
@@ -1419,7 +1422,28 @@ private char * 	cords_service_operation( char * command, char * service )
 
 	if (( zptr =  cords_invoke_action( buffer, command, agent, default_tls())) != (struct occi_response *) 0)
 	{
-		if ((filename = rest_temporary_filename( "tmp" )) != (char *) 0)
+		if ((CommandServerAccept) 
+		&& (!( strcmp(CommandServerAccept,"application/soap"))))
+		{
+			if (!( eptr = occi_locate_element( zptr->first, "occi.service.state" ) ))
+				message = "unknown";
+			else if (!( sptr = eptr->value ))
+				message = "unknown";
+			else 
+			{
+				if (( *sptr == '"' ) || ( *sptr == 0x0027))
+					sptr++;
+				switch( atoi( sptr ) )
+				{
+				case	0 : message = "idle"; 	break;
+				case	1 : message = "started"; break;
+				case	2 : message = "working"; break;
+				default	  : message = "enexpected"; break;
+				}
+			}
+			filename = corcs_soap_service_response( command, service, message );
+		}
+		else if ((filename = rest_temporary_filename( "tmp" )) != (char *) 0)
 		{
 			if ((h = fopen( filename, "w")) != (FILE *) 0)
 			{
