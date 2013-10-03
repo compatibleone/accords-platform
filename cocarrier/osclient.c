@@ -28,6 +28,7 @@ private	int	usejson=0;		/* forces use of json message for server create	*/
 private	int	quantum_xml=0;		/* use xml for quantum otherwise json		*/
 private	int	compute_v2=0;		/* allows use of nova compute v2 messages	*/
 private	int    	use_personality_file=1;	/* forces the use of PERSONALITY FILE in XML	*/
+private	int	generate_personality=0;	/* allows generation of personailty section	*/
 
 public	void	os_use_json( int v )
 {
@@ -1772,7 +1773,8 @@ private	char * os_create_server_xml_request(
 			}
 		}
 		fprintf(h,"\t</metadata>\n");
-
+		if ( generate_personality )
+		{
 		/* ---------------------------- */
 		/* generate personality section */
 		/* ---------------------------- */
@@ -1798,6 +1800,7 @@ private	char * os_create_server_xml_request(
 				fprintf(h,"</file>\n");
 				fprintf(h,"</personality>\n");
 			}
+		}
 		}
 		if ( subptr->KeyStone.quantum )
 		{

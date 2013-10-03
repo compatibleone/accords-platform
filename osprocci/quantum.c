@@ -34,6 +34,40 @@ private	char * resolve_json_id( struct os_response * zptr )
 	return( resolve_json_atb( zptr, "id" ) );
 }
 
+/*	-------------------------------------------	*/
+/*	r e s o l v e _ p u b l i c _ n e t w o r k 	*/
+/*	-------------------------------------------	*/
+private	char *	resolve_public_network( struct os_response * zptr )
+{
+	struct data_element * dptr;
+	struct data_element * eptr;
+	char * vptr;
+
+	if (!( zptr ))
+		return( (char *) 0 );
+	else if (!( zptr->jsonroot ))
+		return( (char *) 0 );
+	else if (!( eptr = json_element( zptr->jsonroot, "networks" ) ))
+		return( (char *) 0 );
+	else
+	{
+		for ( 	dptr=eptr->first;
+			dptr != ( struct data_element *) 0;
+			dptr = dptr->next )
+		{	
+			if (!( vptr = json_atribut( dptr, "router:external" ) ))
+				continue;
+			else if ( strcmp( vptr, "true" ) != 0 )
+				continue;
+			else if (!( vptr = json_atribut( dptr, "id" ) ))
+				continue;
+			else 	return( allocate_string( vptr ) );
+		}
+		return((char *) 0);
+	}
+}
+
+
 /*	-----------------------------------------	*/
 /*	r e s o l v e _ n a m e d _ n e t w o r k 	*/
 /*	-----------------------------------------	*/
@@ -215,10 +249,13 @@ public	int resolve_quantum_network( struct os_subscription * sptr, struct openst
 		/* ------------------------ */
 		/* first the public network */
 		/* ------------------------ */
-		else if (!( pptr->publicnet = resolve_named_network( zptr, "public" ) ))
+		else if (!( pptr->publicnet = resolve_public_network( zptr ) ))
 		{
-			zptr = liberate_os_response( zptr );
-			return( 0 );
+			if (!( pptr->publicnet = resolve_named_network( zptr, "public" ) ))
+			{
+				zptr = liberate_os_response( zptr );
+				return( 0 );
+			}
 		}
 
 		if (!( pptr->privatenet ))
