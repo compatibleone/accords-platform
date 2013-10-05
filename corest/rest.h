@@ -56,10 +56,25 @@
 #define	_HTTP_CHUNKED		"Chunked"
 #define	_HTTP_BASIC		"Basic realm=*"
 
+#define	_HTTP_OK  		200
+#define	_HTTP_CREATED		201
+#define	_HTTP_ACCEPTED		202
+#define	_HTTP_NO_CONTENT	204
+#define	_HTTP_RESET_CONTENT	204
+
 #define	_HTTP_MOVED		301
 #define	_HTTP_TEMPORARY		302
 #define	_HTTP_TEMPORARY_GET	303
 #define	_HTTP_TEMPORARY_NEW	307
+
+#define	_HTTP_BAD_REQUEST	400
+#define	_HTTP_UNAUTHORISED	401
+#define	_HTTP_PAYMENT_REQUIRED	402
+#define	_HTTP_FORBIDDEN		403
+#define	_HTTP_NOT_FOUND		404
+#define	_HTTP_NOT_ALLOWED	405
+#define	_HTTP_NOT_ACCEPTABLE	406
+#define	_HTTP_PROXY_AUTHENTICATION	407
 
 struct	rest_server;
 struct	rest_client;

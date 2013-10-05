@@ -104,8 +104,8 @@ private	struct rest_response * corcs_asynch_callback( struct rest_response * apt
 		(aptr->body ? aptr->body : "" ));
 	filename = cords_script_interpreter( qptr->callback, buffer, 1 );
 	qptr->response = (struct rest_response *) 0;
-	qptr->status = 201;
-	qptr->message = allocate_string("result delivered by callback");
+	qptr->status   = _HTTP_NO_CONTENT;
+	qptr->message  = allocate_string("response delivered by callback");
 	return( aptr );
 }
 
@@ -202,7 +202,7 @@ private	struct rest_response * corcs_asynch_response( struct rest_response * apt
 	else
 	{
 		qptr->response = aptr;
-		qptr->status = 200;
+		qptr->status   = _HTTP_OK;
 		corcs_persistent_result( aptr, message, qptr );
 		if (!( qptr->callback ))
 			return( aptr );
@@ -567,7 +567,7 @@ private	struct	rest_response * corcs_soap_occi(
 	else
 	{
 		sptr = liberate_xml_element( sptr );
-		return( rest_html_response( aptr, 200, "OK" ) );
+		return( rest_html_response( aptr, _HTTP_OK, "OK" ) );
 	}
 }
 
@@ -666,9 +666,9 @@ private	struct	rest_response *	corcs_asynchronous_request(
 	struct	rest_response * xptr;
 	if (( action ) &&  ( *action == '/' )) action++;
 	if (!( qptr = add_corcs_asynch_request(action) ))
-		return(rest_html_response(aptr, 400, "asynch request not yet available"));
+		return(rest_html_response(aptr, _HTTP_BAD_REQUEST, "asynch request not yet available"));
 	else if (!( cptr = allocate_asynch_context( qptr ) ))
-		return(rest_html_response(aptr, 400, "asynch request not yet available"));
+		return(rest_html_response(aptr, _HTTP_BAD_REQUEST, "asynch request not yet available"));
 	{
 		qptr->callback= document_element_string( sptr, "callback");
 		cptr->method  = method;
@@ -707,12 +707,12 @@ private	struct	rest_response *	corcs_asynchronous_result(
 	else if ((wptr = qptr->response) != (struct rest_response *) 0)
 	{
 		qptr->response = (struct rest_response *) 0;
-		qptr->status = 201;
-		qptr->message = allocate_string("result already consumed");
+		qptr->status   = _HTTP_NO_CONTENT;
+		qptr->message  = allocate_string("response already consumed");
 		return( wptr );
 	}
 	else if (!( qptr->status ))
-		return(rest_html_response(aptr, 204, "asynch response not yet available"));
+		return(rest_html_response(aptr, _HTTP_NO_CONTENT, "response not yet available"));
 	else	return(rest_html_response(aptr, qptr->status, qptr->message ) );
 
 }
