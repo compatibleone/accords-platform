@@ -244,6 +244,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<soap:operation soapAction=\"%s/Resolver\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"ResolverIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ResolverOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		/* -------------------- */
@@ -254,30 +255,35 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<soap:operation soapAction=\"%s/ParseManifest\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"ParseManifestIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ParseManifestOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"ParseSLA\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/ParseSLA\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"ParseSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ParseSLAOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"BrokerSLA\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/BrokerSLA\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"BrokerSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"ServiceAction\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/ServiceAction\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"ServiceIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ServiceOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"RunScript\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/RunScript\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"ScriptIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ScriptOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		/* --------------------- */
@@ -287,60 +293,70 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchParseManifest\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchParseManifestIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchParserManifestResult\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchParserManifestResult\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchMessageIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ParserManifestOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchParseSLA\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchParseSLA\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchParseSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchParserSLAResult\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchParserSLAResult\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchMessageIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ParserSLAOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchBrokerSLA\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchBrokerSLA\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchBrokerSLAIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchBrokerSLAResult\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchBrokerSLAResult\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchMessageIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"BrokerOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchServiceAction\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchServiceAction\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchServiceIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchServiceActionResult\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchServiceActionResult\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchMessageIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ServiceOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchRunScript\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchRunScript\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchScriptIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"AsynchMessageOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"<wsdl:operation name=\"AsynchRunScriptResult\">\n");
 		fprintf(h,"<soap:operation soapAction=\"%s/AsynchRunScriptResult\" style=\"rpc\"/>\n",host);
 		fprintf(h,"<wsdl:input message=\"AsynchMessageIn\"/>\n");
 		fprintf(h,"<wsdl:output message=\"ScriptOut\"/>\n");
+		fprintf(h,"<wsdl:fault><soap:fault name=\"fault\"/></wsdl:fault>\n");
 		fprintf(h,"</wsdl:operation>\n");
 
 		fprintf(h,"</wsdl:binding>\n");

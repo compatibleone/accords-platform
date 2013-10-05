@@ -42,6 +42,29 @@ private	char * corcs_resolver_soap_response( char * category, struct occi_respon
 }
 
 /*	-------------------------------------------------------		*/
+/*	      c o r c s _ f a u l t _ r e s p o n s e	 		*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * corcs_fault_response( 
+	struct rest_response * aptr, 
+	int status, 
+	char * reason, 
+	char * detail )
+{
+	FILE * h;
+	char *	filename;
+	if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( aptr );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		soap_fault_message( h, status, reason, detail );
+		fclose(h);
+		return( rest_file_response( aptr, filename, "text/xml" ) );
+	}
+}
+
+/*	-------------------------------------------------------		*/
 /*	      c o r c s _ p a r s e r _ r e s p o n s e	 		*/
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_parser_response( struct rest_response * aptr, char * document, char * message )
@@ -317,16 +340,17 @@ private	struct	rest_response * corcs_soap_resolver( struct rest_response * aptr,
 	char *	category=(char *) 0;
 	char *	command=(char *) 0;
 	char *	filename=(char *) 0;
+	char *	message="ResolveCategory";
 	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( category = document_element_string( sptr, "category") ))
-		return(rest_html_response(aptr, 400, "missing category"));
+		return(corcs_fault_response(aptr,801,message,"missing category"));
 	else if (!( command = document_element_string( sptr, "command") ))
-		return(rest_html_response(aptr, 400, "missing command"));
+		return(corcs_fault_response(aptr,802,message,"missing command"));
 	else if ( strcmp( command, "resolver" ) != 0)
-		return(rest_html_response(aptr, 400, "incorrect command"));
+		return(corcs_fault_response(aptr,803,message,"incorrect command"));
 	else
 	{
 		/* resolve category */
@@ -351,15 +375,15 @@ private	struct	rest_response * corcs_soap_manifest_parser(
 	char *	command=(char *) 0;
 	char *	filename=(char *) 0;
 	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( filename = document_element_xml( sptr, "manifest") ))
-		return(rest_html_response(aptr, 400, "missing manifest"));
+		return(corcs_fault_response(aptr,801,message,"missing manifest"));
 	if (!( command = document_element_string( sptr, "command") ))
-		return(rest_html_response(aptr, 400, "missing command"));
+		return(corcs_fault_response(aptr,802,message,"missing command"));
 	else if ( strcmp( command, "parser" ) != 0)
-		return(rest_html_response(aptr, 400, "incorrect command"));
+		return(corcs_fault_response(aptr,803,message,"incorrect command"));
 	else
 	{
 		/* parse filename */
@@ -387,15 +411,15 @@ private	struct	rest_response * corcs_soap_sla_parser(
 	char *	command=(char *) 0;
 	char *	filename=(char *) 0;
 	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( filename = document_element_xml( sptr, "agreement") ))
-		return(rest_html_response(aptr, 400, "missing agreement"));
+		return(corcs_fault_response(aptr,801,message,"missing agreement"));
 	else if (!( command = document_element_string( sptr, "command") ))
-		return(rest_html_response(aptr, 400, "missing command"));
+		return(corcs_fault_response(aptr,802,message,"missing command"));
 	else if ( strcmp( command, "parser" ) != 0)
-		return(rest_html_response(aptr, 400, "incorrect command"));
+		return(corcs_fault_response(aptr,803,message,"incorrect command"));
 	else
 	{
 		/* parse filename */
@@ -423,15 +447,15 @@ private	struct	rest_response * corcs_soap_sla_broker(
 	char *	filename=(char *) 0;
 	char *	command=(char *) 0;
 	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( filename = document_element_xml( sptr, "agreement") ))
-		return(rest_html_response(aptr, 400, "missing agreement"));
+		return(corcs_fault_response(aptr,801,message,"missing agreement"));
 	else if (!( command = document_element_string( sptr, "command") ))
-		return(rest_html_response(aptr, 400, "missing command"));
+		return(corcs_fault_response(aptr,802,message,"missing command"));
 	else if ( strcmp( command, "broker" ) != 0)
-		return(rest_html_response(aptr, 400, "incorrect command"));
+		return(corcs_fault_response(aptr,802,message,"incorrect command"));
 	else
 	{
 		/* broker filename */
@@ -460,13 +484,13 @@ private	struct	rest_response * corcs_soap_service(
 	char *	action=(char *) 0;
 	char *	message="ServiceAction";
 	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( service = document_element_string( sptr, "service") ))
-		return(rest_html_response(aptr, 400, "missing service"));
+		return(corcs_fault_response(aptr,801,message,"missing service"));
 	else if (!( action = document_element_string( sptr, "action") ))
-		return(rest_html_response(aptr, 400, "missing action"));
+		return(corcs_fault_response(aptr,802,message,"missing action"));
 	else
 	{
 		/* invoke service action */
@@ -495,17 +519,17 @@ private	struct	rest_response * corcs_soap_script(
 	char *	parameters=(char *) 0;
 	char *	message="RunScript";
 	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( filename = document_element_file( sptr, "script") ))
-		return(rest_html_response(aptr, 400, "missing script"));
+		return(corcs_fault_response(aptr,801,message,"missing script"));
 	else if (!( command = document_element_string( sptr, "command") ))
-		return(rest_html_response(aptr, 400, "missing command"));
+		return(corcs_fault_response(aptr,802,message,"missing command"));
 	else if (!( parameters= document_element_string( sptr, "parameters") ))
-		return(rest_html_response(aptr, 400, "missing parameters"));
+		return(corcs_fault_response(aptr,803,message,"missing parameters"));
 	else if ( strcmp( command, "script" ) != 0)
-		return(rest_html_response(aptr, 400, "incorrect command"));
+		return(corcs_fault_response(aptr,804,message,"incorrect command"));
 	else
 	{
 		/* run script */
@@ -531,16 +555,15 @@ private	struct	rest_response * corcs_soap_occi(
 {
 	char *	category=(char *) 0;
 	char *	command=(char *) 0;
+	char *	message="OCCI";
 	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( category = document_element_string( sptr, "category") ))
-		return(rest_html_response(aptr, 400, "missing category"));
+		return(corcs_fault_response(aptr,801,message,"missing category"));
 	else if (!( command = document_element_string( sptr, "command") ))
-		return(rest_html_response(aptr, 400, "missing command"));
-	else if ( strcmp( command, "resolver" ) != 0)
-		return(rest_html_response(aptr, 400, "incorrect command"));
+		return(corcs_fault_response(aptr,802,message,"missing command"));
 	else
 	{
 		sptr = liberate_xml_element( sptr );
@@ -671,15 +694,16 @@ private	struct	rest_response *	corcs_asynchronous_result(
 	struct	rest_response * wptr;
 	char *	identity=(char *) 0;
 	char 	buffer[1024];
+	char *	message="AynchResult";
 	sprintf(buffer,"%sResponse",soapaction);
 	if (!( sptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
-		return(rest_html_response(aptr, 400, "missing request"));
+		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( identity = document_element_string( sptr, "identity") ))
-		return(rest_html_response(aptr, 400, "missing identity"));
+		return(corcs_fault_response(aptr,801,message,"missing identity"));
 	else if (!( qptr = find_corcs_asynch_request( identity )))
-		return(rest_html_response(aptr, 400, "incorrect identity"));
+		return(corcs_fault_response(aptr,802,message,"incorrect identity"));
 	else if ((wptr = qptr->response) != (struct rest_response *) 0)
 	{
 		qptr->response = (struct rest_response *) 0;

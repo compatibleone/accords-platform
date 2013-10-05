@@ -125,6 +125,30 @@ private	void	soap_message_header( FILE * h, char * nptr )
 	return;
 }
 
+/*	---------------------------------------		*/
+/*	  s o a p _ f a u l t _ m e s s a g e 		*/
+/*	---------------------------------------		*/
+private	void	soap_fault_message( FILE * h, int status, char * reason, char * detail )
+{
+	fprintf(h,"<?xml version=\"1.0\"?>\n");
+	fprintf(h,"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope\">\n");
+	fprintf(h,"<soapenv:Body>\n");
+	fprintf(h,"<soapenv:Fault>\n");
+	fprintf(h,"<soapenv:Code>\n");
+	fprintf(h,"<soapenv:Value>%u</soapenv:Value>\n",status);
+	fprintf(h,"</soapenv:Code>\n");
+	fprintf(h,"<soapenv:Reason>\n");
+	fprintf(h,"<soapenv:Text>%s</soapenv:Text>\n",reason);
+	fprintf(h,"</soapenv:Reason>\n");
+	fprintf(h,"<soapenv:Detail>\n");
+	fprintf(h,"<soapenv:Text>%s</soapenv:Text>\n",detail);
+	fprintf(h,"</soapenv:Detail>\n");
+	fprintf(h,"</soapenv:Fault>\n");
+	fprintf(h,"</soapenv:Body>\n");
+	fprintf(h,"</soapenv:Envelope>\n");
+	return;
+}
+
 /*	-------------------------------------	*/
 /*	   s o a p _ i n l i n e _ x m l 	*/
 /*	-------------------------------------	*/
