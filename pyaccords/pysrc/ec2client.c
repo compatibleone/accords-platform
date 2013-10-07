@@ -38,8 +38,11 @@ char * get_ec2_zone(struct ec2_subscription* subptr, char * zone)
 	char * response;
 
 	//python interface	
-        sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("ec2client");
 	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
@@ -59,10 +62,13 @@ char * get_ec2_zone(struct ec2_subscription* subptr, char * zone)
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+
+        PyEval_ReleaseThread(pythr); 
+        PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+        PyEval_ReleaseLock();
+
 	return response;
-
-
 }
 
 /* ---------------------------------------------------------------------------*/
@@ -76,7 +82,10 @@ char * get_ec2_imgname(struct ec2_subscription* subptr, char *imgname,char * zon
 	char * response;
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("ec2client");
 	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
@@ -96,10 +105,13 @@ char * get_ec2_imgname(struct ec2_subscription* subptr, char *imgname,char * zon
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+	
+        PyEval_ReleaseThread(pythr); 
+        PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+        PyEval_ReleaseLock();
+
 	return response;
-
-
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -114,7 +126,10 @@ char * get_ec2_flavor(int memory, int cores, int speed, int storage, char * arch
 
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("ec2client");
 	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
@@ -134,7 +149,12 @@ char * get_ec2_flavor(int memory, int cores, int speed, int storage, char * arch
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+
+	PyEval_ReleaseThread(pythr); 
+        PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+        PyEval_ReleaseLock();
+
 	return response;
 }
 
@@ -147,7 +167,10 @@ char * create_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * 
 
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("ec2client");
 	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
@@ -167,7 +190,12 @@ char * create_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * 
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+
+	PyEval_ReleaseThread(pythr); 
+        PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+        PyEval_ReleaseLock();
+
 	return response;
 }
 
@@ -180,7 +208,10 @@ char * add_ec2_rule(struct ec2_subscription * subptr, char * group, char * rulen
 
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("ec2client");
 	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
@@ -200,9 +231,13 @@ char * add_ec2_rule(struct ec2_subscription * subptr, char * group, char * rulen
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+	
+	PyEval_ReleaseThread(pythr); 
+        PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
-	return response;
+        PyEval_ReleaseLock();
 
+	return response;
 }
 
 char * delete_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * pptr)
@@ -214,7 +249,10 @@ char * delete_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * 
 
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("ec2client");
 	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
@@ -234,7 +272,12 @@ char * delete_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * 
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+	
+	PyEval_ReleaseThread(pythr); 
+        PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+        PyEval_ReleaseLock();
+	
 	return response;
 }
 
@@ -477,7 +520,10 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 	
 	//           python interface
 	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("amazonEc2Act");
 	if(pName == NULL) printf("erro: in amazonEc2Act.py no such file name\n");
@@ -498,7 +544,11 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+	
+	PyEval_ReleaseThread(pythr); 
+	PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+	PyEval_ReleaseLock(); 
 
 	resetListe(&categoryAtr);
 	token= strtok(response,",");
@@ -643,7 +693,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 		return(118);
 	else if ( pptr->state == _OCCI_IDLE )
 		return(0);
-	else if (!(subptr = use_ec2_configuration( get_default_agent(),default_tls(),pptr->profile )))
+	else if (!(subptr = use_ec2_configuration( pptr->profile )))
 		return(118);
 	else	sprintf(reference,"%s/%s/%s",get_identity(),_CORDS_EC2,pptr->id);
 
@@ -817,7 +867,10 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 
 	//           python interface
 	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("amazonEc2Act");
 	if(pName == NULL) printf("erro: in amazonEc2Act.py no such file name\n");
@@ -838,7 +891,11 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+
+	PyEval_ReleaseThread(pythr); 
+	PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+	PyEval_ReleaseLock();  
 
 	resetListe(&categoryAtr);
 	token= strtok(response,",");
@@ -1007,7 +1064,7 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	/* ------------------------ */
 	if (!( pptr ))
 		return(118);
-	else if (!(subptr = use_ec2_configuration( get_default_agent(),default_tls(),pptr->profile )))
+	else if (!(subptr = use_ec2_configuration(pptr->profile )))
 		return(118);
 		
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
@@ -1167,7 +1224,10 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 
 	//           python interface
 	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("amazonEc2Act");
 	if(pName == NULL) printf("erro: in amazonEc2Act.py no such file name\n");
@@ -1188,7 +1248,11 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+
+	PyEval_ReleaseThread(pythr); 
+	PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+	PyEval_ReleaseLock(); 
 
 	resetListe(&categoryAtr);
 	token= strtok(response,",");
@@ -1331,7 +1395,7 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	/* ------------------------ */
 	if (!( pptr ))
 		return(118);
-	else if (!(subptr = use_ec2_configuration( get_default_agent(),default_tls(),pptr->profile )))
+	else if (!(subptr = use_ec2_configuration(pptr->profile )))
 		return(118);
 		
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
@@ -1491,7 +1555,10 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 
 	//           python interface
 	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
+	PyEval_AcquireLock();
 	pythr = Py_NewInterpreter();
+        if(pythr == NULL) printf("interpreter init error \n");
+	PyThreadState_Swap(pythr);
 	python_path(srcdir);
 	pName = PyString_FromString("amazonEc2Act");
 	if(pName == NULL) printf("erro: in amazonEc2Act.py no such file name\n");
@@ -1512,7 +1579,11 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	response=allocate_string(PyString_AsString( result ));
 	Py_DECREF(pModule);
 	Py_DECREF(pName);
+	
+	PyEval_ReleaseThread(pythr); 
+	PyEval_AcquireThread(pythr);
 	Py_EndInterpreter(pythr);
+	PyEval_ReleaseLock();  
 
 	resetListe(&categoryAtr);
 	token= strtok(response,",");
@@ -1657,7 +1728,7 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 	/* ------------------------ */
 	if (!( pptr ))
 		return(118);
-	else if (!(subptr = use_ec2_configuration( get_default_agent(),default_tls(),pptr->profile )))
+	else if (!(subptr = use_ec2_configuration(pptr->profile )))
 		return(118);
 	else if(!(uuid = rest_allocate_uuid()))
 		return 11;
@@ -1822,7 +1893,10 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 
 		//           python interface
 		sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
+		PyEval_AcquireLock();
 		pythr = Py_NewInterpreter();
+       		if(pythr == NULL) printf("interpreter init error \n");
+		PyThreadState_Swap(pythr);
 		python_path(srcdir);
 		pName = PyString_FromString("amazonEc2Act");
 		if(pName == NULL) printf("erro: in amazonEc2Act.py no such file name\n");
@@ -1843,7 +1917,11 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		response=allocate_string(PyString_AsString( result ));
 		Py_DECREF(pModule);
 		Py_DECREF(pName);
+
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
 		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();  
 
 		resetListe(&categoryAtr);
 		token= strtok(response,",");

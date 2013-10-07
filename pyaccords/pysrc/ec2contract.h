@@ -66,13 +66,14 @@ struct	ec2_image_infos
 struct	ec2config * resolve_ec2_configuration( char * sptr );
 struct ec2config * resolve_ec2_configurationb(char * agent, char * tls, char * sptr);
 struct ec2_subscription * initialise_ec2_subscription(char * accesskey, char * secretkey, char * zone, char * keypair);
-struct ec2_subscription * use_ec2_configuration( char * agent, char * tls, char * sptr );
+struct ec2_subscription * use_ec2_configuration( char * sptr );
 char * resolve_ec2_location(struct cords_ec2_contract * cptr,struct ec2config * cfptr);
 char *	resolve_ec2_image( struct ec2_subscription * subptr, struct cords_ec2_contract * cptr );
 char *	resolve_ec2_flavor(struct cords_ec2_contract * cptr);
 int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, char * agent, char * tls);
 int terminate_ec2_contract( int status, struct cords_ec2_contract * cptr );
 int delete_ec2_contract(struct occi_category * optr,struct amazonEc2 * pptr,char * agent,char * tls );
+struct ec2_subscription * ll_use_ec2_configuration( char * sptr );
 
 #endif
 
