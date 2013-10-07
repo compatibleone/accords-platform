@@ -50,7 +50,7 @@ struct rest_response * start_amazonEc2(
 	}
 	else if (pptr->state != _OCCI_IDLE )
 		return( rest_html_response(aptr, 200, "ok ") );
-	else if (!(subptr = use_ec2_configuration(get_default_agent(),default_tls(),pptr->profile)))
+	else if (!(subptr = use_ec2_configuration(pptr->profile)))
 		return( rest_html_response (aptr, 404, "ac2 configuration not found"));
 	else if(!(secgroup = build_ec2_firewall( subptr,pptr )))
 		return ( rest_html_response( aptr, 888, "ec2 firewall failure"));

@@ -20,7 +20,6 @@
 #include "ec2contract.h"
 #include "amazonEc2.h"
 #include "ec2config.h"
-
 #define BIGBUFF 4096
 #define SMALLBUFF 1024
 
@@ -49,6 +48,15 @@ struct	ec2config * resolve_ec2_configuration( char * sptr )
 	return((struct ec2config *) 0);
 }
 
+private	struct	ec2config * solve_ec2_configuration( char * sptr )
+{
+	struct	ec2config * cptr;
+	if ((cptr = resolve_ec2_configuration( sptr )) != (struct ec2config *) 0)
+		return( cptr );
+	else if (!( sptr = get_operator_profile() ))
+		return( cptr );
+	else 	return( resolve_ec2_configuration( sptr ) );
+}
 
 
 struct ec2config * resolve_ec2_configurationb(char * agent, char * tls, char * sptr)
@@ -224,19 +232,28 @@ struct ec2_subscription * initialise_ec2_subscription(char * accesskey, char * s
 	return subptr;
 }
 
-struct ec2_subscription * use_ec2_configuration( char * agent, char * tls, char * sptr )
+/*	------------------------------------------------------------	*/
+/* 	l l _ u s e _ o p e n s t a c k _ c o n f i g u r a t i o n 	*/
+/*	------------------------------------------------------------	*/
+struct ec2_subscription * ll_use_ec2_configuration( char * sptr )
 {
-        struct	ec2config * pptr;
-        struct  ec2_subscription * subptr = (struct ec2_subscription *) 0;
-	if (!( pptr = resolve_ec2_configuration(sptr)))
-	{
+	struct	ec2config * pptr;
+
+	if (!( pptr = resolve_ec2_configuration( sptr )))
 	 	return((struct ec2_subscription *) 0);
-	}
-        else
-        {
-		subptr = initialise_ec2_subscription(pptr->accesskey, pptr->secretkey, pptr->location, pptr->authenticate);
-        	return subptr;
-	}
+
+	else 	return(initialise_ec2_subscription(pptr->accesskey, pptr->secretkey, pptr->location, pptr->authenticate));
+}
+
+struct ec2_subscription * use_ec2_configuration( char * nptr )
+{
+        struct  ec2_subscription * subptr = (struct ec2_subscription *) 0;
+	if (( subptr = ll_use_ec2_configuration( nptr )) != (struct ec2_subscription *) 0)
+		return( subptr );
+	else if (!( nptr = get_operator_profile() ))
+		return( subptr );
+	else 	return( ll_use_ec2_configuration( nptr ) );
+
 }
 
 char * resolve_ec2_location(struct cords_ec2_contract * cptr,struct ec2config * cfptr)
@@ -400,15 +417,18 @@ int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, ch
 	char *	vptr;
 
 	//resolve the user credentials and configuration
-	if (!(subptr = use_ec2_configuration(agent, tls, pptr->profile)))
-		return (terminate_ec2_contract(404,&contract ));
-	else if (!(cfptr = resolve_ec2_configuration(pptr->profile)))
-		return (terminate_ec2_contract(404, &contract));
+	if(!rest_valid_string(pptr->profile))
+		return (777);
+	if (!(subptr = use_ec2_configuration(pptr->profile)))
+		return (778);
+	else if (!(cfptr = solve_ec2_configuration(pptr->profile)))
+		return (779);
 	else
 	{
         	memset( &contract, 0, sizeof( struct cords_ec2_contract ));
 		contract.subscription = subptr;
 	}
+	
 	/*----------------------------------------------------*/
 	/* resolve the required Geolocalisation               */
 	/*----------------------------------------------------*/
@@ -519,6 +539,7 @@ int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, ch
 		/* resolve any price informatino for this category */
 		/* ----------------------------------------------- */
 		pptr->price = occi_resolve_category_price( _CORDS_EC2, default_operator(), agent, tls );
+		//py_finalize();
 		return( terminate_ec2_contract( 0, &contract ) );
 	}
 }
@@ -571,7 +592,7 @@ public	int	delete_ec2_contract(
 
 	if ( pptr->reference )
 	{
-		if ((subptr = use_ec2_configuration( agent, tls, pptr->profile )) != (struct az_subscription *) 0)
+		if ((subptr = use_ec2_configuration(pptr->profile )) != (struct az_subscription *) 0)
 		{
 
 			/* ------------------------- */
