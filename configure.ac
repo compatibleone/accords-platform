@@ -44,6 +44,14 @@ AC_SUBST([AM_LDFLAGS])
 
 AC_CHECK_SSL
 
+AC_CHECK_HEADERS([ldap.h],
+                [break],
+		[AC_MSG_ERROR([You are missing ldap development files])])
+
+if test "$(uname -s)" = 'Linux' ; then
+	AC_SUBST([LDFLAGS_LDAP], ["-lldap"])
+fi
+
 AC_CHECK_HEADERS([uuid/uuid.h uuid.h],
                 [break],
 		[AC_MSG_ERROR([You are missing uuid development files])])

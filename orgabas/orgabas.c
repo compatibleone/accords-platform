@@ -33,6 +33,8 @@
 #include "cspi.h"
 #include <time.h>
 
+#include "ldapclient.c"
+
 struct	accords_configuration OrgaBas = {
 	0,0,
 	0,0,0,0,
@@ -346,6 +348,15 @@ private	int	orgabas_operation( char * nptr )
 	last = optr;
 
 	optr->callback  = &transaction_interface;
+	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_cords_user_builder( OrgaBas.domain, "user" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
 	if (!( optr = occi_cords_price_builder( OrgaBas.domain, "price" ) ))
