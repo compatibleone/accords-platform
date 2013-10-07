@@ -32,6 +32,7 @@
 #include "../../pyaccords/pysrc/categactionnumber.h"
 #include "../../pyaccords/pysrc/categaccess.h"
 #include "../../pyaccords/pysrc/listoccibuilder.h"
+#include "../../pyaccords/pysrc/pythread.h"
 
 struct accords_configuration moduleConfig;
 private	struct rest_extension * module_extension( void * v,struct rest_server * sptr, struct rest_extension * xptr);
@@ -274,14 +275,14 @@ struct occi_category * callocciCategoryBuilder(const char *name, char *a,char *b
 struct occi_interface * callocciCategoryInterface(const char *name)
 {
   int i;
-  for (i=0; i<= (sizeof(occiCategoryInterface_map)/ sizeof(occiCategoryInterface_map[0])); i++)
+  for (i=0; i< (sizeof(occiCategoryInterface_map)/ sizeof(occiCategoryInterface_map[0])); i++)
   {
     if(!strcmp(occiCategoryInterface_map[i].name,name))
     {
       return occiCategoryInterface_map[i].interface_Func();
     }
   }
-  return 0;
+  return (struct occi_interface*) 0;
 }
 
 
@@ -382,7 +383,7 @@ private	int	module(int argc, char * argv[],char *moduleName,char * categoryList)
         }
         else
         {
-  
+           py_initialize(); 
            resetList(&categoryLst);
            token= strtok(categoryList," ");
            for(; token != NULL ;)

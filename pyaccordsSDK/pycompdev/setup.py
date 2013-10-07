@@ -1,8 +1,8 @@
 from distutils.core import setup, Extension
  
 module1 = Extension('pycompdev', 
-                     sources = ['pycompdev.c','list.c','../../pyaccords/pysrc/ctools.c','../../pyaccords/pysrc/pytools.c'],
-                     depends = ['component.c','list.c','../../pyaccords/pysrc/listoccibuilder.h','../../pyaccords/pysrc/*','../../pyaccords/pygen'],
+                     sources = ['pycompdev.c','list.c','../../pyaccords/pysrc/ctools.c','../../pyaccords/pysrc/pythread.c','../../pyaccords/pysrc/pytools.c'],
+                     depends = ['component.c','list.c','../../pyaccords/pysrc/listoccibuilder.h','../../pyaccords/pysrc/*','../../pyaccords/pygen/*'],
                      include_dirs=['../../occi/','../../cocarrier/','../../cocci/','../../coes/','../../command/','../../copabr/','../../cords/','../../corest/','../../coxml/','../../pubocci/','../../pyaccords/pysrc/','../pyaccords/pygen/'],
                      libraries=['occi','pubocci','coxml','corest','cords','cocci','cocarrier','copabr'],
                      library_dirs=['../../occi/.libs/','../../pubocci/.libs/','../../coxml/.libs/','../../corest/.libs/',
