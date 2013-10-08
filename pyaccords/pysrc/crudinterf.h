@@ -48,7 +48,6 @@ struct{
 	struct occi_interface *(*interface_Func)();
 }occiCategoryInterface_map[]={
 	{ "amazonEc2" , amazonEc2_interface_Func },
-	{ "ec2config" , ec2config_interface_Func },
 	{ "gw" , gw_interface_Func },
 	{ "linkgw" , linkgw_interface_Func },
 	{ "intercloudGW" , intercloudGW_interface_Func },
