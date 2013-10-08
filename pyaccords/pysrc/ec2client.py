@@ -127,10 +127,13 @@ def ec2_create_secgroup(accesskey,secretkey,zone,secname):
 def ec2_delete_secgroup(accesskey, secretkey, zone, secname):
 	secgname = secname.split("/")
 	sgname = secgname[4]
-	filtersg = {'group-name' : secgname}
+	filtersg = {'group-name' : sgname}
 	conn = boto.ec2.connect_to_region(zone,aws_access_key_id=accesskey,aws_secret_access_key=secretkey)
-	for mysg in conn.get_all_security_groups(filters=filtersg):
-		mysg.delete()
+	try:
+		for mysg in conn.get_all_security_groups(filters=filtersg):
+			mysg.delete()
+	except:
+		print "exception in deletion of security group: "+sgname
 	return "succeeded"
 
 	
