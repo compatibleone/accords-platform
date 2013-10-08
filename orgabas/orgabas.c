@@ -33,8 +33,6 @@
 #include "cspi.h"
 #include <time.h>
 
-#include "ldapclient.c"
-
 struct	accords_configuration OrgaBas = {
 	0,0,
 	0,0,0,0,
@@ -55,8 +53,12 @@ struct	accords_configuration OrgaBas = {
 	(struct occi_category *) 0
 	};
 
+public	char *	set_ldap_host(char * v);
+public	char *	set_ldap_user(char * v);
+public	char *	set_ldap_pass(char * v);
+
 public	int	check_debug()		{	return(OrgaBas.debug);		}
-public	int	check_verbose()		{	return(OrgaBas.verbose);		}
+public	int	check_verbose()		{	return(OrgaBas.verbose);	}
 public	char *	default_publisher()	{	return(OrgaBas.publisher);	}
 public	char *	default_operator()	{	return(OrgaBas.operator);	}
 public	char *	default_tls()		{	return(OrgaBas.tls);		}
@@ -77,7 +79,7 @@ public	int	failure( int e, char * m1, char * m2 )
 }
 
 /*	---------------------------------------------	*/  
-/*		o r g a b a s _ l o a d 			*/
+/*		o r g a b a s _ l o a d 		*/
 /*	---------------------------------------------	*/
 /*	this function loads orgabas configuration	*/
 /*	from the xml configuration file.		*/
@@ -85,6 +87,9 @@ public	int	failure( int e, char * m1, char * m2 )
 private	void	orgabas_load()
 {
 	load_accords_configuration( &OrgaBas, "orgabas" );
+	set_ldap_host(OrgaBas.chathost);
+	set_ldap_user(OrgaBas.user);
+	set_ldap_pass(OrgaBas.password);
 	return;
 }
 
@@ -92,9 +97,9 @@ private	void	orgabas_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Ordering, Billing and Accounting ORGABAS : Version 1.0a.0.06");
-	printf("\n   Beta Version : 27/01/2013");
-	printf("\n   Copyright (c) 2012, 2013 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Ordering, Billing and Accounting ORGABAS : Version 1.1a.0.01");
+	printf("\n   Beta Version : 08/10/2013");
+	printf("\n   Copyright (c) 2012, 2013 Iain James Marshall");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -320,8 +325,13 @@ private	struct rest_response * close_invoice(
 	else	return( rest_html_response( aptr, 200, "OK" ) );
 }
 
+/*	-------------------------------------------	*/
+/*	  U s e r   L d a p   M a n a g e m e n t 	*/
+/*	-------------------------------------------	*/
+#include "ldapuser.c"
+
 /*	------------------------------------------------------------------	*/
-/*			o r g a b a s _ o p e r a t i o n				*/
+/*			o r g a b a s _ o p e r a t i o n			*/
 /*	------------------------------------------------------------------	*/
 private	int	orgabas_operation( char * nptr )
 {
@@ -350,7 +360,7 @@ private	int	orgabas_operation( char * nptr )
 	optr->callback  = &transaction_interface;
 	optr->access |= _OCCI_NO_PRICING;
 
-	if (!( optr = occi_cords_user_builder( OrgaBas.domain, "user" ) ))
+	if (!( optr = occi_ldap_user_builder( OrgaBas.domain, "user" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
@@ -461,6 +471,6 @@ public	int	main(int argc, char * argv[] )
 }
 
 
-	/* --------- */
+	/* ---------- */
 #endif	/* _orgabas_c */
-	/* --------- */
+	/* ---------- */

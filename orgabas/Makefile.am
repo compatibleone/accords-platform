@@ -9,7 +9,7 @@
 bin_PROGRAMS = orgabas
 
 orgabas_SOURCES = orgabas.c
-extra_DISTRIB = ldapclient.c
+extra_DISTRIB = ldapclient.c ldapclient.h ldapuser.c
 
 orgabas_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML)\
 	 $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_PUBOCCI) $(CFLAGS_COPABR) $(CFLAGS_COMONS) $(CFLAGS_COCSPI)
