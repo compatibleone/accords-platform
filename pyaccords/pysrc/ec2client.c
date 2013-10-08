@@ -1013,7 +1013,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 		pptr->state = atoi(pelem->value);
 	}
 
-	//delete_ec2_secgroup(subptr, pptr);
+	delete_ec2_secgroup(subptr, pptr);
 
 	return status;
 
