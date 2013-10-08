@@ -54,6 +54,7 @@ struct	accords_configuration OrgaBas = {
 	};
 
 public	char *	set_ldap_host(char * v);
+public	char *	set_ldap_base(char * v);
 public	char *	set_ldap_user(char * v);
 public	char *	set_ldap_pass(char * v);
 
@@ -90,6 +91,7 @@ private	void	orgabas_load()
 	set_ldap_host(OrgaBas.chathost);
 	set_ldap_user(OrgaBas.user);
 	set_ldap_pass(OrgaBas.password);
+	set_ldap_base("ou=users,dc=easi-clouds,dc=eu");
 	return;
 }
 

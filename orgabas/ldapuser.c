@@ -7,6 +7,7 @@
 struct	ldap_configuration
 {
 	char *	host;
+	char *	base;
 	char *	user;
 	char *	pass;
 } LdapConfig = 	{
@@ -15,6 +16,18 @@ struct	ldap_configuration
 	(char *) 0
 	};
 
+struct	ldap_user
+{
+	char *	id;
+	char *	name;
+	char *	password;
+	char *	email;
+	char *	role;
+	int	state;
+};
+
+#define	_LDAP_USERS "ou=users,dc=easi-clouds,dc=eu"
+
 /*	-------------------------	*/
 /*	s e t _ l d a p _ h o s t 	*/
 /*	-------------------------	*/
@@ -22,6 +35,18 @@ public	char *	set_ldap_host(char * v)
 {
 	if ( LdapConfig.host )
 		LdapConfig.host = liberate( LdapConfig.host );
+	if (!( v ))
+		return( v );
+	else	return((LdapConfig.host=allocate_string(v)));
+} 
+
+/*	-------------------------	*/
+/*	s e t _ l d a p _ b a s e  	*/
+/*	-------------------------	*/
+public	char *	set_ldap_base(char * v)	
+{
+	if ( LdapConfig.base )
+		LdapConfig.base = liberate( LdapConfig.base );
 	if (!( v ))
 		return( v );
 	else	return((LdapConfig.host=allocate_string(v)));
@@ -52,7 +77,12 @@ public	char *	set_ldap_pass(char * v)
 } 
 
 /*	-------------------------	*/
-/*	g e t _ l d a p _ u s e r 	*/
+/*	g e t _ l d a p _ b a s e 	*/
+/*	-------------------------	*/
+private	char * get_ldap_base()	{	return( LdapConfig.base );	}
+
+/*	-------------------------	*/
+/*	g e t _ l d a p _ h o s t 	*/
 /*	-------------------------	*/
 private	char * get_ldap_host()	{	return( LdapConfig.host );	}
 
@@ -62,10 +92,129 @@ private	char * get_ldap_host()	{	return( LdapConfig.host );	}
 private	char * get_ldap_user()	{	return( LdapConfig.user );	}
 
 /*	-------------------------	*/
-/*	g e t _ l d a p _ u s e r 	*/
+/*	g e t _ l d a p _ p a s s 	*/
 /*	-------------------------	*/
 private	char * get_ldap_pass()	{	return( LdapConfig.pass );	}
 	
+/*	-----------------------------------	*/
+/*	l i b e r a t e _ l d a p _ u s e r	*/
+/*	-----------------------------------	*/
+private	struct ldap_user * liberate_ldap_user(struct	ldap_user * uptr)
+{
+	if ( uptr )
+	{
+		if ( uptr->id )
+			uptr->id = liberate( uptr->id );
+		if ( uptr->name )
+			uptr->name = liberate( uptr->name );
+		if ( uptr->password )
+			uptr->password = liberate( uptr->password );
+		if ( uptr->email )
+			uptr->email = liberate( uptr->email );
+		if ( uptr->role )
+			uptr->role = liberate( uptr->role );
+		liberate( uptr );
+	}
+	return((struct ldap_user *) 0);
+}
+
+/*	-----------------------------------	*/
+/*	a l l o c a t e _ l d a p _ u s e r	*/
+/*	-----------------------------------	*/
+private	struct ldap_user * allocate_ldap_user()
+{
+	struct	ldap_user * uptr;
+	if (!( uptr = (struct ldap_user *) allocate( sizeof( struct ldap_user ) ) ))
+		return( uptr );
+	else
+	{
+		memset( uptr, 0, sizeof(struct ldap_user ) );
+		return( uptr );
+	}
+}
+
+/*	-------------------------------		*/
+/*	R e t r i e v e L d a p U s e r 	*/
+/*	-------------------------------		*/
+private	struct	ldap_user * RetrieveLdapUser( struct ldap_controller * lptr, char * id )
+{
+	char *	bptr;
+	struct	ldap_user * uptr;
+	char 	criteria[1024];
+	if (!( bptr = get_ldap_base()))
+		return((struct ldap_user *) 0);
+	else	sprintf(criteria,"cn=%s, %s",id, bptr );
+	if (!( lptr = FirstLdapAtb( lptr,criteria )))
+		return((struct ldap_user *) 0);
+	else if (!( uptr = allocate_ldap_user()))
+		return( uptr );
+	else
+	{
+		do	
+		{
+			if (!( lptr->atbname ))
+				break;
+			else if (!( strcmp( lptr->atbname, "givenName") ))
+			{
+				if (!( uptr->name = allocate_string( lptr->atbvalue ) ))
+					break;
+				else	continue;
+			}
+			else if (!( strcmp( lptr->atbname, "cn") ))
+			{
+				if (!( uptr->id = allocate_string( lptr->atbvalue ) ))
+					break;
+				else	continue;
+			}
+			else if (!( strcmp( lptr->atbname, "userPassword") ))
+			{
+				if (!( uptr->password = allocate_string( lptr->atbvalue ) ))
+					break;
+				else	continue;
+			}
+			else if (!( strcmp( lptr->atbname, "mail") ))
+			{
+				if (!( uptr->email = allocate_string( lptr->atbvalue ) ))
+					break;
+				else	continue;
+			}
+			else if (!( strcmp( lptr->atbname, "sn") ))
+			{
+				if (!( uptr->role = allocate_string( lptr->atbvalue ) ))
+					break;
+				else	continue;
+			}
+			else if (!( strcmp( lptr->atbname, "state") ))
+			{
+				uptr->state = atoi( lptr->atbvalue );
+				continue;
+			}
+		}
+		while (( lptr = NextLdapAtb( lptr )) != (struct ldap_controller *) 0);
+		return( uptr );
+	}
+}
+
+/*	-------------------------------		*/
+/*	D e l e t e   L d a p   U s e r 	*/
+/*	-------------------------------		*/
+private	int	DeleteLdapUser( struct ldap_controller * lptr, char * id )
+{
+	int	e;
+	char *	bptr;
+	struct	ldap_user * uptr;
+	char 	criteria[1024];
+	if (!( bptr = get_ldap_base()))
+		return(78);
+	else
+	{
+		sprintf(criteria,"cn=%s, %s",id, bptr );
+		if ((e = ldap_delete_s( lptr->handle, criteria )) != LDAP_SUCCESS ) 
+			return( e );
+		else	return(0);
+	}
+}
+
 /*	------------------------------------------------------------------	*/
 /*			o c c i _ o r g a _ u s e r _ g e t			*/
 /*	------------------------------------------------------------------	*/
@@ -73,14 +222,21 @@ private struct rest_response * occi_ldap_user_get(void * vptr, struct rest_clien
 {
 	struct	ldap_controller * lptr=(struct ldap_controller *) 0;
 	struct rest_response * aptr=(struct rest_response *) 0;
+	struct	ldap_user * uptr;
 
 	if (!(aptr = rest_allocate_response( cptr )))
 		return( aptr );
 	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_user(), get_ldap_pass() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
+	else if (!( uptr = RetrieveLdapUser( lptr, "id" ) ))
+	{
+		CloseLdap( lptr );
+		return( rest_html_response( aptr, 404, "Not Found") );
+	}
 	else
 	{
 		CloseLdap( lptr );
+		uptr = liberate_ldap_user( uptr );
 		return( rest_html_response( aptr, 405, "Not Supported") );
 	}
 }
@@ -109,6 +265,7 @@ private struct rest_response * occi_ldap_user_post(void * vptr, struct rest_clie
 /*	------------------------------------------------------------------	*/
 private struct rest_response * occi_ldap_user_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
+	struct	ldap_user * uptr;
 	struct	ldap_controller * lptr=(struct ldap_controller *) 0;
 	struct rest_response * aptr=(struct rest_response *) 0;
 
@@ -116,9 +273,15 @@ private struct rest_response * occi_ldap_user_put(void * vptr, struct rest_clien
 		return( aptr );
 	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_user(), get_ldap_pass() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
+	else if (!( uptr = RetrieveLdapUser( lptr, "id" ) ))
+	{
+		CloseLdap( lptr );
+		return( rest_html_response( aptr, 404, "Not Found") );
+	}
 	else
 	{
 		CloseLdap( lptr );
+		uptr = liberate_ldap_user( uptr );
 		return( rest_html_response( aptr, 405, "Not Supported") );
 	}
 }
@@ -128,6 +291,7 @@ private struct rest_response * occi_ldap_user_put(void * vptr, struct rest_clien
 /*	------------------------------------------------------------------	*/
 private struct rest_response * occi_ldap_user_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
 {
+	int	status;
 	struct	ldap_controller * lptr=(struct ldap_controller *) 0;
 	struct rest_response * aptr=(struct rest_response *) 0;
 
@@ -135,6 +299,11 @@ private struct rest_response * occi_ldap_user_delete(void * vptr, struct rest_cl
 		return( aptr );
 	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_user(), get_ldap_pass() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
+	else if (( status = DeleteLdapUser( lptr, "id" )) != 0)
+	{
+		CloseLdap( lptr );
+		return( rest_html_response( aptr, 404, "Not Found") );
+	}
 	else
 	{
 		CloseLdap( lptr );
