@@ -133,7 +133,7 @@ def ec2_delete_secgroup(accesskey, secretkey, zone, secname):
 		for mysg in conn.get_all_security_groups(filters=filtersg):
 			mysg.delete()
 	except:
-		print "exception in deletion of security group: "+sgname
+		return "exception"
 	return "succeeded"
 
 	
