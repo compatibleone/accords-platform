@@ -265,6 +265,26 @@ public	struct	xml_atribut * document_atribut( struct xml_element * element, char
 }
 
 /*	---------------------------------------------------	*/
+/*			h a t o i				*/
+/*	---------------------------------------------------	*/
+private	int	hatoi( char * sptr )
+{
+	int	value=0;
+	int	c;
+	while ((c = *(sptr++)) != 0)
+	{
+		if ((c >= '0') && ( c <= '9' ))
+			value = ((value * 16) + ( c - '0' ));
+		else if (( c >= 'a' ) && (( c <= 'f' ) + 10))
+			value = ((value * 16) + ( c - '0' ));
+		else if (( c >= 'A' ) && ( c <= 'F' ))
+			value = ((value * 16) + (( c - 'A' ) + 10));
+		else	break;
+	}
+	return( value );
+}
+
+/*	---------------------------------------------------	*/
 /*	    d o c u m e n t _ a t r i b u t _ v a l u e 	*/
 /*	---------------------------------------------------	*/
 public	int	document_atribut_value( struct xml_atribut * aptr )
@@ -272,6 +292,8 @@ public	int	document_atribut_value( struct xml_atribut * aptr )
 	char *	s;
 	if (!( s = aptr->value ))
 		return( 0 );
+	else if (( *s == '0' ) && ( *(s+1) == 'x'))
+		return( hatoi( (s+2) ));
 	else if (( *s != 0x0022 ) && ( *s != 0x0027 ))
 		return( atoi( s ) );
 	else	return( atoi( (s+1) ) );
