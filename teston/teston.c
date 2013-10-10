@@ -97,6 +97,7 @@ private	int	on_result( struct on_response * rptr )
 /*			o n _ c l i e n t _ l i s t _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_list_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent, 
@@ -116,18 +117,18 @@ private	struct	on_response * on_list_object(
 	else if ((!( strcasecmp( keyword, "compute" ) ))
 	     ||  (!( strcasecmp( keyword, "servers" ) )))
 	{
-		return( on_get_request( "/compute" ) );
+		return( on_get_request( subptr, "/compute" ) );
 	}
 
 	else if ((!( strcasecmp( keyword, "storage" ) ))
 	     ||  (!( strcasecmp( keyword, "images"  ) )))
 	{
-		return( on_get_request( "/storage" ) );
+		return( on_get_request( subptr, "/storage" ) );
 	}
 
 	else if (!( strcasecmp( keyword, "network" ) ))
 	{
-		return( on_get_request( "/network" ) );
+		return( on_get_request( subptr, "/network" ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -136,6 +137,7 @@ private	struct	on_response * on_list_object(
 /*			o n _ c l i e n t _ p o s t _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_post_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -157,9 +159,9 @@ private	struct	on_response * on_post_object(
 			||  (!( strcmp( p7, "any"  ) )))
 				p7 = (char *) 0;
 		}
-		if (!( filename = on_create_server_request( p3, p4, p5, p6,(char *) 0, "x86_64", p7 )))
+		if (!( filename = on_create_server_request(subptr,  p3, p4, p5, p6,(char *) 0, "x86_64", p7 )))
 			return((struct on_response *) 0);
-		else 	return( on_post_request( "/compute", filename ) );
+		else 	return( on_post_request( subptr, "/compute", filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
@@ -170,21 +172,21 @@ private	struct	on_response * on_post_object(
 				p7 = (char *) 0;
 		}
 
-		if (!( filename = on_create_compute_request( p3, p4, p5, p6,(char *) 0, "x86_64", p7 )))
+		if (!( filename = on_create_compute_request(subptr,  p3, p4, p5, p6,(char *) 0, "x86_64", p7 )))
 			return((struct on_response *) 0);
-		else	return( on_post_request( "/compute", filename ) );
+		else	return( on_post_request( subptr, "/compute", filename ) );
 	}
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
-		if (!( filename = on_create_storage_request( p3, p4, "OS", p5 ) ))
+		if (!( filename = on_create_storage_request(subptr,  p3, p4, "OS", p5 ) ))
 			return((struct on_response *) 0);
-		else	return( on_post_request( "/storage", filename ) );
+		else	return( on_post_request( subptr, "/storage", filename ) );
 	}
 	else if (!( strcasecmp( keyword, "network" ) ))
 	{
-		if (!( filename = on_create_network_request( p3, p4, p5, p6 )))
+		if (!( filename = on_create_network_request(subptr,  p3, p4, p5, p6 )))
 			return((struct on_response *) 0);
-		else	return( on_post_request( "/network", filename ) );
+		else	return( on_post_request( subptr, "/network", filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -193,6 +195,7 @@ private	struct	on_response * on_post_object(
 /*			o n _ c l i e n t _ s a v e _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_save_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -207,15 +210,15 @@ private	struct	on_response * on_save_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
-		if (!( filename = on_create_image_request( p3, p4, p5, p6 )))
+		if (!( filename = on_create_image_request(subptr,  p3, p4, p5, p6 )))
 			return((struct on_response *) 0);
-		else 	return( on_create_image( p3, filename ) );
+		else 	return( on_create_image(subptr,  p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
-		if (!( filename = on_create_image_request( p3, p4, p5, p6 )))
+		if (!( filename = on_create_image_request(subptr,  p3, p4, p5, p6 )))
 			return((struct on_response *) 0);
-		else 	return( on_create_image( p3, filename ) );
+		else 	return( on_create_image(subptr,  p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -224,6 +227,7 @@ private	struct	on_response * on_save_object(
 /*			o n _ c l i e n t _ s t o p _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_stop_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -235,15 +239,15 @@ private	struct	on_response * on_stop_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
-		if (!( filename = on_stop_compute_request( p3 )))
+		if (!( filename = on_stop_compute_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_stop_compute( p3, filename ) );
+		else 	return( on_stop_compute(subptr,  p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
-		if (!( filename = on_stop_compute_request( p3 )))
+		if (!( filename = on_stop_compute_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_stop_compute( p3, filename ) );
+		else 	return( on_stop_compute(subptr,  p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -252,6 +256,7 @@ private	struct	on_response * on_stop_object(
 /*			o n _ c l i e n t _ s h u t d o w n _ o b j e c t		*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_shutdown_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -263,15 +268,15 @@ private	struct	on_response * on_shutdown_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
-		if (!( filename = on_shutdown_compute_request( p3 )))
+		if (!( filename = on_shutdown_compute_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_shutdown_compute( p3, filename ) );
+		else 	return( on_shutdown_compute(subptr,  p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
-		if (!( filename = on_shutdown_compute_request( p3 )))
+		if (!( filename = on_shutdown_compute_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_shutdown_compute( p3, filename ) );
+		else 	return( on_shutdown_compute(subptr,  p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -280,6 +285,7 @@ private	struct	on_response * on_shutdown_object(
 /*			o n _ c l i e n t _ p u b l i c _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_public_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -291,15 +297,15 @@ private	struct	on_response * on_public_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
-		if (!( filename = on_public_image_request( p3 )))
+		if (!( filename = on_public_image_request(subptr, p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_public_image( p3, filename ) );
+		else 	return( on_public_image( subptr, p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "image" ) ))
 	{
-		if (!( filename = on_public_image_request( p3 )))
+		if (!( filename = on_public_image_request( subptr, p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_public_image( p3, filename ) );
+		else 	return( on_public_image(subptr,  p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -308,6 +314,7 @@ private	struct	on_response * on_public_object(
 /*		o n _ c l i e n t _ p e r s i s t e n t _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_persistent_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -319,15 +326,15 @@ private	struct	on_response * on_persistent_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
-		if (!( filename = on_persistent_image_request( p3 )))
+		if (!( filename = on_persistent_image_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_persistent_image( p3, filename ) );
+		else 	return( on_persistent_image(subptr,  p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "image" ) ))
 	{
-		if (!( filename = on_persistent_image_request( p3 )))
+		if (!( filename = on_persistent_image_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_persistent_image( p3, filename ) );
+		else 	return( on_persistent_image(subptr,  p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -336,6 +343,7 @@ private	struct	on_response * on_persistent_object(
 /*		o n _ c l i e n t _ v o l a t i l e _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_volatile_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -347,15 +355,15 @@ private	struct	on_response * on_volatile_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
-		if (!( filename = on_volatile_image_request( p3 )))
+		if (!( filename = on_volatile_image_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_volatile_image( p3, filename ) );
+		else 	return( on_volatile_image(subptr,  p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "image" ) ))
 	{
-		if (!( filename = on_volatile_image_request( p3 )))
+		if (!( filename = on_volatile_image_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_volatile_image( p3, filename ) );
+		else 	return( on_volatile_image(subptr,  p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -364,6 +372,7 @@ private	struct	on_response * on_volatile_object(
 /*			o n _ c l i e n t _ p u b l i c _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_rename_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -375,15 +384,15 @@ private	struct	on_response * on_rename_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
-		if (!( filename = on_rename_image_request( p3, p4 )))
+		if (!( filename = on_rename_image_request( subptr, p3, p4 )))
 			return((struct on_response *) 0);
-		else 	return( on_rename_image( p3, filename ) );
+		else 	return( on_rename_image(subptr,  p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "image" ) ))
 	{
-		if (!( filename = on_rename_image_request( p3, p4 )))
+		if (!( filename = on_rename_image_request(subptr,  p3, p4 )))
 			return((struct on_response *) 0);
-		else 	return( on_rename_image( p3, filename ) );
+		else 	return( on_rename_image(subptr,  p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -392,6 +401,7 @@ private	struct	on_response * on_rename_object(
 /*			o n _ c l i e n t _ p r i v a t e _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_private_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -403,15 +413,15 @@ private	struct	on_response * on_private_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
-		if (!( filename = on_private_image_request( p3 )))
+		if (!( filename = on_private_image_request(subptr,  p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_private_image( p3, filename ) );
+		else 	return( on_private_image( subptr, p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "image" ) ))
 	{
-		if (!( filename = on_private_image_request( p3 )))
+		if (!( filename = on_private_image_request( subptr, p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_private_image( p3, filename ) );
+		else 	return( on_private_image(subptr,  p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -420,6 +430,7 @@ private	struct	on_response * on_private_object(
 /*			o n _ c l i e n t _ s t a r t _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_start_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent,
@@ -431,15 +442,15 @@ private	struct	on_response * on_start_object(
 		return((struct on_response *) 0);
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
-		if (!( filename = on_start_compute_request( p3 )))
+		if (!( filename = on_start_compute_request(subptr, p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_start_compute( p3, filename ) );
+		else 	return( on_start_compute( subptr,p3, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
-		if (!( filename = on_start_compute_request( p3 )))
+		if (!( filename = on_start_compute_request( subptr,p3 )))
 			return((struct on_response *) 0);
-		else 	return( on_start_compute( p3, filename ) );
+		else 	return( on_start_compute(subptr, p3, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -448,6 +459,7 @@ private	struct	on_response * on_start_object(
 /*			o n _ c l i e n t _ g e t _ o b j e c t				*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_get_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent, 
@@ -460,22 +472,22 @@ private	struct	on_response * on_get_object(
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
 		sprintf(buffer,"%s/%s","/compute",parameter );
-		return( on_get_request( buffer ) );
+		return( on_get_request( subptr, buffer ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
 		sprintf(buffer,"%s/%s","/compute",parameter );
-		return( on_get_request( buffer ) );
+		return( on_get_request( subptr, buffer ) );
 	}
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
 		sprintf(buffer,"%s/%s","/storage",parameter );
-		return( on_get_request( buffer ) );
+		return( on_get_request( subptr, buffer ) );
 	}
 	else if (!( strcasecmp( keyword, "network" ) ))
 	{
 		sprintf(buffer,"%s/%s","/network",parameter );
-		return( on_get_request( buffer ) );
+		return( on_get_request( subptr, buffer ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -484,6 +496,7 @@ private	struct	on_response * on_get_object(
 /*			o n _ c l i e n t _ p u t _ o b j e c t				*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_put_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent, 
@@ -497,22 +510,22 @@ private	struct	on_response * on_put_object(
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
 		sprintf(buffer,"%s/%s","/compute",parameter );
-		return( on_put_request( buffer, filename ) );
+		return( on_put_request( subptr, buffer, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
 		sprintf(buffer,"%s/%s","/compute",parameter );
-		return( on_put_request( buffer, filename ) );
+		return( on_put_request( subptr, buffer, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
 		sprintf(buffer,"%s/%s","/storage",parameter );
-		return( on_put_request( buffer, filename ) );
+		return( on_put_request( subptr, buffer, filename ) );
 	}
 	else if (!( strcasecmp( keyword, "network" ) ))
 	{
 		sprintf(buffer,"%s/%s","/network",parameter );
-		return( on_put_request( buffer, filename ) );
+		return( on_put_request( subptr, buffer, filename ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -521,6 +534,7 @@ private	struct	on_response * on_put_object(
 /*			o n _ c l i e n t _ d e l e t e _ o b j e c t			*/
 /* ------------------------------------------------------------------------------------ */
 private	struct	on_response * on_delete_object( 
+	struct on_subscription * subptr,
 		char * keyword, 
 		char * tls, 
 		char * agent, 
@@ -533,27 +547,27 @@ private	struct	on_response * on_delete_object(
 	else if (!( strcasecmp( keyword, "server" ) ))
 	{
 		sprintf(buffer,"%s/%s","/compute",parameter );
-		return( on_delete_request( buffer ) );
+		return( on_delete_request( subptr, buffer ) );
 	}
 	else if (!( strcasecmp( keyword, "compute" ) ))
 	{
 		sprintf(buffer,"%s/%s","/compute",parameter );
-		return( on_delete_request( buffer ) );
+		return( on_delete_request( subptr, buffer ) );
 	}
 	else if (!( strcasecmp( keyword, "storage" ) ))
 	{
 		sprintf(buffer,"%s/%s","/storage",parameter );
-		return( on_delete_request( buffer ) );
+		return( on_delete_request( subptr, buffer ) );
 	}
 	else if (!( strcasecmp( keyword, "image" ) ))
 	{
 		sprintf(buffer,"%s/%s","/storage",parameter );
-		return( on_delete_request( buffer ) );
+		return( on_delete_request( subptr, buffer ) );
 	}
 	else if (!( strcasecmp( keyword, "network" ) ))
 	{
 		sprintf(buffer,"%s/%s","/network",parameter );
-		return( on_delete_request( buffer ) );
+		return( on_delete_request( subptr, buffer ) );
 	}
 	else	return((struct on_response *) 0);
 }
@@ -562,7 +576,9 @@ private	struct	on_response * on_delete_object(
 /* ------------------------------------------------------------------------------------ */
 /*				o n _ o p e r a t i o n					*/
 /* ------------------------------------------------------------------------------------ */
-private	int	on_operation( char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7 )
+private	int	on_operation( 
+	struct on_subscription * subptr,
+	char * p1, char * p2, char * p3, char * p4, char * p5, char * p6, char * p7 )
 {
 	struct	rest_header * hptr = (struct rest_header *) 0;
 	char	*	agent = "ON-CLIENT/1.0";
@@ -572,41 +588,41 @@ private	int	on_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 	else if (!( p2 ))
 		return( failure( 30,"p2", "required") );
 	else if (!( strcasecmp(p1,"LIST" ) ))
-		return( on_result( on_list_object( p2, default_tls(), agent, hptr ) ) );
+		return( on_result( on_list_object( subptr, p2, default_tls(), agent, hptr ) ) );
 	else if (!( p3 ))
 		return( failure( 30,"p3", "required") );
 	else if (!( strcasecmp(p1,"GET" ) ))
-		return( on_result( on_get_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_get_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"DELETE" ) ))
-		return( on_result( on_delete_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_delete_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"STOP" ) ))
-		return( on_result( on_stop_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_stop_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"SHUTDOWN" ) ))
-		return( on_result( on_shutdown_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_shutdown_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"PUBLIC" ) ))
-		return( on_result( on_public_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_public_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"PRIVATE" ) ))
-		return( on_result( on_private_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_private_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"PERSISTENT" ) ))
-		return( on_result( on_persistent_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_persistent_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"VOLATILE" ) ))
-		return( on_result( on_volatile_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_volatile_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( strcasecmp(p1,"RENAME" ) ))
-		return( on_result( on_rename_object( p2, default_tls(), agent, p3, p4 ) ) );
+		return( on_result( on_rename_object( subptr,p2, default_tls(), agent, p3, p4 ) ) );
 	else if (!( strcasecmp(p1,"START" ) ))
-		return( on_result( on_start_object( p2, default_tls(), agent, p3, hptr ) ) );
+		return( on_result( on_start_object( subptr,p2, default_tls(), agent, p3, hptr ) ) );
 	else if (!( p4 ))
 		return( failure( 30,"p4", "required") );
 	else if (!( strcasecmp(p1,"PUT" ) ))
-		return( on_result( on_put_object( p2, default_tls(), agent, p3, p4, hptr ) ) );
+		return( on_result( on_put_object(subptr, p2, default_tls(), agent, p3, p4, hptr ) ) );
 	else if (!( p5 ))
 		return( failure( 30,"p5", "required") );
 	else if (!( p6 ))
 		return( failure( 30,"p6", "required") );
 	else if (!( strcasecmp(p1,"SAVE" ) ))
-		return( on_result( on_save_object( p2, default_tls(), agent, hptr, p3, p4, p5, p6 ) ) );
+		return( on_result( on_save_object( subptr,p2, default_tls(), agent, hptr, p3, p4, p5, p6 ) ) );
 	else if (!( strcasecmp(p1,"POST" ) ))
-		return( on_result( on_post_object( p2, default_tls(), agent, hptr, p3, p4, p5, p6, p7 ) ) );
+		return( on_result( on_post_object( subptr,p2, default_tls(), agent, hptr, p3, p4, p5, p6, p7 ) ) );
 	else	return( failure(32, "incorrect value for p1: ", p1 ) );
 }
 
@@ -615,6 +631,7 @@ private	int	on_operation( char * p1, char * p2, char * p3, char * p4, char * p5,
 /* ------------------------------------------------------------------------------------ */
 private	int	on_command(int argc, char * argv[] )
 {
+	struct	on_subscription * subptr;
 	int	status;
 	int	argi=1;
 	char *	aptr;
@@ -635,9 +652,9 @@ private	int	on_command(int argc, char * argv[] )
 				return( failure( status, "requires value for", "--user" ) );
 			else if (!( password ))
 				return( failure( status, "requires value for", "--password" ) );
-			else if ((status = on_initialise_client( user, password, host, agent, version, tls )) != 0)
+			else if (!(subptr = on_initialise_client( user, password, host, agent, version, tls )))
 				return( failure( status, "initialising", "client" ) );
-			else	return( on_operation( aptr, argv[argi], argv[argi+1], argv[argi+2], argv[argi+ 3], argv[argi+ 4], argv[argi+ 5] ) );
+			else	return( on_operation( subptr, aptr, argv[argi], argv[argi+1], argv[argi+2], argv[argi+ 3], argv[argi+ 4], argv[argi+ 5] ) );
 		}
 		else if (  *(++aptr) == '-' )
 		{

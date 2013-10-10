@@ -134,12 +134,12 @@ private	int	resolve_on_addresses( struct on_response * yptr, struct opennebula *
 /*	-------------------------------------------------------------	*/
 /* 	l l _ u s e _ o p e n n e b u l a _ c o n f i g u r a t i o n 	*/
 /*	-------------------------------------------------------------	*/
-private	int	ll_use_opennebula_configuration( char * sptr )
+private	struct	on_subscription * ll_use_opennebula_configuration( char * sptr )
 {
 	struct	on_config * pptr;
 
 	if (!( pptr = resolve_on_configuration( sptr )))
-	 	return( 404 );
+	 	return((struct on_subscription *) 0);
 
 	else 	return( on_initialise_client( 
 			pptr->user, pptr->password, 
@@ -149,14 +149,14 @@ private	int	ll_use_opennebula_configuration( char * sptr )
 /*	--------------------------------------------------------	*/
 /* 	u s e _ o p e n n e b u l a _ c o n f i g u r a t i o n 	*/
 /*	--------------------------------------------------------	*/
-private	int	use_opennebula_configuration( char * sptr )
+private	struct	on_subscription * use_opennebula_configuration( char * nptr )
 {
-	int	status;
-	if ((status = ll_use_opennebula_configuration( sptr )) != 404 )
-		return( status );
-	else if (!( sptr = get_operator_profile()))
-		return( 404 );
-	else	return( use_opennebula_configuration( sptr ) );
+	struct	on_subscription * sptr;
+	if ((sptr = ll_use_opennebula_configuration( nptr )) != (struct on_subscription *) 0)
+		return( sptr );
+	else if (!( nptr = get_operator_profile()))
+		return( sptr );
+	else	return( use_opennebula_configuration( nptr ) );
 }
 
 /*	--------------------------------------------------------	*/
@@ -182,7 +182,7 @@ private	int	reset_opennebula_server( struct opennebula * pptr )
 /*	--------------------------------------------------------	*/
 /* 	     c o n n e c t _ o p e n n e b u l a _ s e r v e r		*/
 /*	--------------------------------------------------------	*/
-private	int	connect_opennebula_server( struct on_response * rptr,struct opennebula * pptr )
+private	int	connect_opennebula_server( struct on_subscription * subptr, struct on_response * rptr,struct opennebula * pptr )
 {
 	int	pending=60*60;
 	char *	version;
@@ -253,7 +253,7 @@ private	int	connect_opennebula_server( struct on_response * rptr,struct opennebu
 				sleep(1);
 				if ( zptr )
 					zptr = liberate_on_response( zptr );
-				if (!( zptr = on_get_server( pptr->number )))
+				if (!( zptr = on_get_server( subptr, pptr->number )))
 				{
 					reset_opennebula_server( pptr );
 					return( 555 );
@@ -319,6 +319,7 @@ private	struct	rest_response * start_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	char		* idptr;
 	struct	on_response * osptr;
 	struct	on_response * metaptr;
@@ -332,15 +333,16 @@ private	struct	rest_response * start_opennebula(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else if ( pptr->state != _OCCI_IDLE )
 		return( rest_html_response( aptr, 200, "OK" ) );
-	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+	else if (!(subptr = use_opennebula_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "Configuration Not Found" ) );
 
 	sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
 
-	if (!( filename = on_create_compute_request( 
+	if (!( filename = on_create_compute_request(
+		subptr, 
 		pptr->name, pptr->flavor, pptr->image, pptr->publicnetwork, pptr->privatenetwork, pptr->architecture, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 2400, "Bad Request : Create Server Message" ) );
-	else if (!( osptr = on_create_compute( filename )))
+	else if (!( osptr = on_create_compute( subptr, filename )))
 	 	return( rest_html_response( aptr, 2401, "Bad Request : Create Server Request" ) );
 	else if (!( osptr->response ))
 	 	return( rest_html_response( aptr, 2402, "Bad Request : Create Server No Response" ) );
@@ -355,7 +357,7 @@ private	struct	rest_response * start_opennebula(
 		/* --------------------------------- */
 		/* retrieve crucial data from server */
 		/* --------------------------------- */
-		status = connect_opennebula_server( osptr, pptr );
+		status = connect_opennebula_server( subptr,osptr, pptr );
 		if (!( status ))
 		{
 			/* ----------------------- */
@@ -391,7 +393,7 @@ private	struct	rest_response * start_opennebula(
 /*	--------------------------------------------	*/
 /*	      o n _ c o n n e c t _ i m a g e		*/
 /*	--------------------------------------------	*/
-private	struct on_response * on_connect_image( struct opennebula * pptr, struct on_response * onptr )
+private	struct on_response * on_connect_image( struct on_subscription * subptr, struct opennebula * pptr, struct on_response * onptr )
 {
 	char *	vptr;
 	char * 	wptr=(char *) 0;
@@ -424,21 +426,21 @@ private	struct on_response * on_connect_image( struct opennebula * pptr, struct 
 /*	--------------------------------------------	*/
 /*	      o n _ s h u t d o w n _ i m a g e		*/
 /*	--------------------------------------------	*/
-private	int 	on_shutdown_image( struct opennebula * pptr  )
+private	int 	on_shutdown_image( struct on_subscription * subptr, struct opennebula * pptr  )
 {
 	char * filename;
 	struct	on_response * rptr;
 	char *	vptr;
-	if (!( filename = on_shutdown_compute_request( pptr->number ) ))
+	if (!( filename = on_shutdown_compute_request( subptr, pptr->number ) ))
 		return(118);
-	else if (!( rptr = on_shutdown_compute( pptr->number, filename ) ))
+	else if (!( rptr = on_shutdown_compute( subptr, pptr->number, filename ) ))
 		return(119);
 	else
 	{
 		rptr = liberate_on_response( rptr );
 		while (1)
 		{
-			if (!( rptr = on_get_server( pptr->number )))
+			if (!( rptr = on_get_server( subptr, pptr->number )))
 			{
 				return(120);
 			}
@@ -471,15 +473,15 @@ private	int 	on_shutdown_image( struct opennebula * pptr  )
 /*	-------------------------------------------	*/
 /*		o n _ i m a g e _ a c c e s s		*/
 /*	-------------------------------------------	*/
-private	int	on_image_access( char * image, int mode )
+private	int	on_image_access( struct on_subscription * subptr, char * image, int mode )
 {
 	struct on_response * onptr;
 	char *	filename;
 	if ( mode )
 	{
-		if (!( filename = on_public_image_request( image ) ))
+		if (!( filename = on_public_image_request( subptr, image ) ))
 			return(0);
-		else if (!( onptr = on_public_image( image, filename ) ))
+		else if (!( onptr = on_public_image( subptr, image, filename ) ))
 			return( 0 );
 		else	
 		{
@@ -489,9 +491,9 @@ private	int	on_image_access( char * image, int mode )
 	}
 	else
 	{
-		if (!( filename = on_private_image_request( image ) ))
+		if (!( filename = on_private_image_request( subptr, image ) ))
 			return(0);
-		else if (!( onptr = on_private_image( image, filename ) ))
+		else if (!( onptr = on_private_image( subptr, image, filename ) ))
 			return( 0 );
 		else	
 		{
@@ -511,6 +513,7 @@ private	struct	rest_response * save_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	char		reference[512];
 	struct	on_response * onptr;
 	int		status;
@@ -521,11 +524,11 @@ private	struct	rest_response * save_opennebula(
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 1402, "Contract Not Active" ) );
 
-	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+	else if (!(subptr = use_opennebula_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "configuration not found" ) );
-	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->name, pptr->driver ) ))
+	else if (!( filename = on_create_image_request( subptr,pptr->number, pptr->image, pptr->name, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 1403, "image message failure" ) );
-	else if (!( onptr = on_create_image( pptr->number, filename ) ))
+	else if (!( onptr = on_create_image( subptr, pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 1404, "create image failure" ) );
 	else if (!( onptr->response ))
 	 	return( rest_html_response( aptr, 2402, "create image no response" ) );
@@ -535,9 +538,9 @@ private	struct	rest_response * save_opennebula(
 		onptr = liberate_on_response( onptr );
 		return( aptr );
 	}
-	else if (!( onptr = on_connect_image( pptr, onptr ) ))
+	else if (!( onptr = on_connect_image( subptr, pptr, onptr ) ))
 	 	return( rest_html_response( aptr, 1405, "connect image failure" ) );
-	else if ((status = on_shutdown_image( pptr )) != 0)
+	else if ((status = on_shutdown_image( subptr, pptr )) != 0)
 	 	return( rest_html_response( aptr, 1400 + status, "save shutdown failure" ) );
 	else
 	{
@@ -555,7 +558,7 @@ private	struct	rest_response * save_opennebula(
 			/* -------------------------------------------- */
 			/* its a save operation and MUST be made public */
 			/* -------------------------------------------- */
-			on_image_access( pptr->image, 1 );
+			on_image_access( subptr, pptr->image, 1 );
 		}
 		onptr = liberate_on_response( onptr );
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
@@ -577,6 +580,7 @@ private	struct	rest_response * snapshot_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	char		reference[512];
 	struct	on_response * onptr;
 	int		status;
@@ -587,11 +591,11 @@ private	struct	rest_response * snapshot_opennebula(
 	else if ( pptr->state == _OCCI_IDLE )
 		return( rest_html_response( aptr, 1402, "Contract Not Active" ) );
 
-	else if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+	else if (( subptr = use_opennebula_configuration( pptr->profile )))
 		return( rest_html_response( aptr, status, "configuration not found" ) );
-	else if (!( filename = on_create_image_request( pptr->number, pptr->image, pptr->id, pptr->driver ) ))
+	else if (!( filename = on_create_image_request(subptr,  pptr->number, pptr->image, pptr->id, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 1403, "image request failure" ) );
-	else if (!( onptr = on_create_image( pptr->number, filename ) ))
+	else if (!( onptr = on_create_image( subptr, pptr->number, filename ) ))
 	 	return( rest_html_response( aptr, 1404, "create image failure" ) );
 	else if (!( onptr->response ))
 	 	return( rest_html_response( aptr, 2402, "create image no response" ) );
@@ -601,9 +605,9 @@ private	struct	rest_response * snapshot_opennebula(
 		onptr = liberate_on_response( onptr );
 		return( aptr );
 	}
-	else if (!( onptr = on_connect_image( pptr, onptr ) ))
+	else if (!( onptr = on_connect_image( subptr, pptr, onptr ) ))
 	 	return( rest_html_response( aptr, 1405, "connect image failure" ) );
-	else if ((status = on_shutdown_image( pptr )) != 0)
+	else if ((status = on_shutdown_image( subptr, pptr )) != 0)
 	 	return( rest_html_response( aptr, 1400+status, "snapshot shutdown failure" ) );
 	{
 		onptr = liberate_on_response( onptr );
@@ -621,10 +625,11 @@ private	struct	rest_response * snapshot_opennebula(
 /*	--------------------------------------------------------	*/
 private	struct on_response * stop_opennebula_provisioning( struct opennebula * pptr )
 {
+	struct	on_subscription * subptr;
 	int	status;
 	struct	on_response * onptr;
 	char		reference[512];
-	if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+	if (!(subptr = use_opennebula_configuration( pptr->profile )))
 		return((struct on_response *) 0);
 	else
 	{
@@ -641,7 +646,7 @@ private	struct on_response * stop_opennebula_provisioning( struct opennebula * p
 					pptr->account );
 			}
 		}
-		return( on_delete_server( pptr->number ) );
+		return( on_delete_server( subptr, pptr->number ) );
 	}
 }
 
@@ -655,6 +660,7 @@ private	struct	rest_response * stop_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	char		reference[512];
 	struct	on_response * onptr;
 	int		status;
@@ -689,6 +695,7 @@ private	struct	rest_response * softboot_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	struct	opennebula * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -705,6 +712,7 @@ private	struct	rest_response * hardboot_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	struct	opennebula * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -721,6 +729,7 @@ private	struct	rest_response * rebuild_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	struct	opennebula * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -737,6 +746,7 @@ private	struct	rest_response * resize_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	struct	opennebula * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -753,6 +763,7 @@ private	struct	rest_response * confirm_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	struct	opennebula * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
@@ -769,6 +780,7 @@ private	struct	rest_response * revert_opennebula(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	struct	on_subscription * subptr;
 	struct	opennebula * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );

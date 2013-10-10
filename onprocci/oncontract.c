@@ -448,12 +448,13 @@ public	int	create_opennebula_contract(
 		char * agent,
 		char * tls )
 {
+	struct	on_subscription * subptr;
 	struct	cords_on_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
 	int	status;
 
-	if ((status = use_opennebula_configuration( pptr->profile )) != 0)
+	if (!(subptr = use_opennebula_configuration( pptr->profile )))
 		return( status );
 	else	memset( &contract, 0, sizeof( struct cords_on_contract ));
 
@@ -502,7 +503,7 @@ public	int	create_opennebula_contract(
 	/* --------------------------------------------------------- */
 	/* recover detailled list of OS Flavors and resolve contract */
 	/* --------------------------------------------------------- */
-	else if (!( contract.flavors = on_list_flavors() ))
+	else if (!( contract.flavors = on_list_flavors(subptr) ))
 		return( terminate_opennebula_contract( 1579, &contract ) );
 	else if (!( pptr->flavor = resolve_opennebula_flavor( &contract ) ))
 		return( terminate_opennebula_contract( 1580, &contract ) );
@@ -541,7 +542,7 @@ public	int	create_opennebula_contract(
 	/* ------------------------------------------------------ */
 	/* retrieve detailled list of images and resolve contract */
 	/* ------------------------------------------------------ */
-	else if (!( contract.images = on_list_images() ))
+	else if (!( contract.images = on_list_images(subptr) ))
 		return( terminate_opennebula_contract( 1585, &contract ) );
 	else if (!( pptr->image = resolve_opennebula_image( &contract ) ))
 		return( terminate_opennebula_contract( 1586, &contract ) );
@@ -552,7 +553,7 @@ public	int	create_opennebula_contract(
 	/* --------------------------------------- */
 	/* retrieve the public network information */
 	/* --------------------------------------- */
-	else if (!( contract.networks = on_list_network_pool() ))
+	else if (!( contract.networks = on_list_network_pool(subptr) ))
 		return( terminate_opennebula_contract( 1588, &contract ) );
 	else if (!( pptr->publicnetwork = resolve_opennebula_network( &contract ) ))
 		return( terminate_opennebula_contract( 1589, &contract ) );
@@ -579,11 +580,12 @@ public	int	delete_opennebula_contract(
 		char * agent,
 		char * tls )
 {
-	struct	on_response * osptr;
+	struct	on_subscription * subptr;
+	struct	on_response * onptr;
 	if ( pptr->state != _OCCI_IDLE )
 	{
-		if ((osptr = stop_opennebula_provisioning( pptr )) != (struct on_response *) 0)
-			osptr = liberate_on_response( osptr );
+		if ((onptr = stop_opennebula_provisioning( pptr )) != (struct on_response *) 0)
+			onptr = liberate_on_response( onptr );
 	}
 	if (!( pptr->image ))
 		return( 0 );
@@ -591,9 +593,11 @@ public	int	delete_opennebula_contract(
 		return( 0 );
 	else if (!( strcmp( pptr->original, pptr->image ) ))
 		return( 0 );
+	else if (!(subptr = use_opennebula_configuration( pptr->profile )))
+		return( 0 );
 	else
 	{
-		on_delete_image( pptr->image );
+		on_delete_image( subptr,pptr->image );
 		return(0);
 	}
 	return(0);

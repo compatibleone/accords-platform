@@ -33,7 +33,7 @@ private	struct	on_config On = {
 	(char *) 0,
 	(char *) 0,
 
-	(char *) 0,
+	0,
 	(char *) 0,
 
 	(char *) 0,
@@ -43,7 +43,36 @@ private	struct	on_config On = {
 
 	};
 
-public	struct	rest_header   *	on_authenticate();
+/*	-----------------------------------------------		*/
+/*	l i b e r a t e _ o n _ s u b s c r i p t i o n 	*/
+/*	-----------------------------------------------		*/
+public	struct	on_subscription * liberate_on_subscription( struct on_subscription * sptr )
+{
+	if ( sptr )
+	{
+		if ( sptr->host ) 
+			sptr->host = liberate( sptr->host );
+		if ( sptr->base ) 
+			sptr->base = liberate( sptr->base );
+		if ( sptr->user ) 
+			sptr->user = liberate( sptr->user );
+		if ( sptr->password ) 
+			sptr->password = liberate( sptr->password );
+		if ( sptr->version ) 
+			sptr->version = liberate( sptr->version );
+		if ( sptr->namespace ) 
+			sptr->namespace = liberate( sptr->host );
+		if ( sptr->agent ) 
+			sptr->agent = liberate( sptr->agent );
+		if ( sptr->tls ) 
+			sptr->tls = liberate( sptr->tls );
+		if ( sptr->authenticate ) 
+			sptr->authenticate = liberate( sptr->authenticate );
+		liberate( sptr );
+	}
+	return((struct on_subscription *) 0);
+
+}
 
 /*	------------------------------------------------------------	*/
 /*		l i b e r a t e _ o n _ r e s p o n s e			*/
@@ -152,6 +181,7 @@ private	struct	on_response * on_check( struct rest_response * aptr )
 /*	 	o n _ c r e a t e _ n e t w o r k _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
 public	char * on_create_network_request(
+		struct on_subscription * sptr,
 		char * name,
 		char * address,
 		char * size,
@@ -161,11 +191,8 @@ public	char * on_create_network_request(
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
@@ -215,6 +242,7 @@ public	char * on_create_network_request(
 /*	 	o n _ c r e a t e _ s t o r a g e _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
 public	char * on_create_storage_request(
+		struct on_subscription * sptr,
 		char * name,
 		char * description,
 		char * type,
@@ -224,11 +252,8 @@ public	char * on_create_storage_request(
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
@@ -256,6 +281,7 @@ public	char * on_create_storage_request(
 /*	request providing the flavor, image and network description.		*/
 /*	----------------------------------------------------------------	*/
 public	char * on_create_compute_request(
+		struct on_subscription * sptr,
 		char * identity, 
 		char * flavour, 
 		char * image,
@@ -267,11 +293,8 @@ public	char * on_create_compute_request(
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"w" ) ))
 		return( liberate( filename ) );
@@ -299,7 +322,7 @@ public	char * on_create_compute_request(
 		fprintf(h,"<DISK>\n");
 		if ( rest_valid_string( image ) )
 		{
-			fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,image);
+			fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",sptr->base,image);
 		}
 		fprintf(h,"<TYPE>OS</TYPE>\n");
 		if ( rest_valid_string( driver ) )
@@ -366,16 +389,13 @@ public	char * on_create_compute_request(
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ s t o p _ c o m p u t e _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
-public	char * on_stop_compute_request( char * identity )
+public	char * on_stop_compute_request(struct on_subscription * sptr,char * identity )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"w" ) ))
 		return( liberate( filename ) );
@@ -397,16 +417,13 @@ public	char * on_stop_compute_request( char * identity )
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ s h u t d o w n _ c o m p u t e _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
-public	char * on_shutdown_compute_request( char * identity )
+public	char * on_shutdown_compute_request(struct on_subscription * sptr, char * identity )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"w" ) ))
 		return( liberate( filename ) );
@@ -428,16 +445,13 @@ public	char * on_shutdown_compute_request( char * identity )
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ s t a r t _ c o m p u t e _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	char * on_start_compute_request( char * identity )
+public	char * on_start_compute_request(struct on_subscription * sptr, char * identity )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"w" ) ))
 		return( liberate( filename ) );
@@ -460,6 +474,7 @@ public	char * on_start_compute_request( char * identity )
 /*	 	o n _ c r e a t e _ i m a g e _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
 public	char * on_create_image_request(
+		struct on_subscription * sptr,
 		char * number,
 		char * oldnumber,
 		char * newname,
@@ -469,11 +484,8 @@ public	char * on_create_image_request(
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
@@ -483,10 +495,10 @@ public	char * on_create_image_request(
 		/* ----------------------------------------- */
 		/* generate image creation request element */
 		/* ----------------------------------------- */
-		fprintf(h,"<COMPUTE href='%s/compute/%s'>\n",On.base,number);
+		fprintf(h,"<COMPUTE href='%s/compute/%s'>\n",sptr->base,number);
 		fprintf(h,"<ID>%s</ID>\n",number);
 		fprintf(h,"<DISK id='0'>");
-		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",On.base,oldnumber);
+		fprintf(h,"<STORAGE href='%s/storage/%s'/>\n",sptr->base,oldnumber);
 		fprintf(h,"<SAVE_AS name='%s'/>\n",newname);
 		if ( rest_valid_string( driver ) )
 		{
@@ -502,16 +514,13 @@ public	char * on_create_image_request(
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ p u b l i c _ i m a g e _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	char * on_public_image_request( char * image )
+public	char * on_public_image_request(struct on_subscription * sptr, char * image )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
@@ -526,16 +535,13 @@ public	char * on_public_image_request( char * image )
 /*	----------------------------------------------------------------	*/
 /*	 	o n _ p r i v a t e _ i m a g e _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	char * on_private_image_request( char * image )
+public	char * on_private_image_request(struct on_subscription * sptr, char * image )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
@@ -551,16 +557,13 @@ public	char * on_private_image_request( char * image )
 /*	----------------------------------------------------------------	*/
 /*	    	o n _ r e n a m e _ i m a g e _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	char * on_rename_image_request( char * image, char * newname )
+public	char * on_rename_image_request(struct on_subscription * sptr, char * image, char * newname )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
@@ -576,16 +579,13 @@ public	char * on_rename_image_request( char * image, char * newname )
 /*	----------------------------------------------------------------	*/
 /*	    o n _ p e r s i s t e n t _ i m a g e _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
-public	char * on_persistent_image_request( char * image )
+public	char * on_persistent_image_request(struct on_subscription * sptr, char * image )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
@@ -601,16 +601,13 @@ public	char * on_persistent_image_request( char * image )
 /*	----------------------------------------------------------------	*/
 /*	    	o n _ v o l a t i l e _ i m a g e _ r e q u e s t		*/
 /*	----------------------------------------------------------------	*/
-public	char * on_volatile_image_request( char * image )
+public	char * on_volatile_image_request(struct on_subscription * sptr, char * image )
 {
 	char *	filename;
 	FILE *	h;
 	int	bytes;
-	struct	rest_header * hptr;
 
-	if (!( hptr = on_authenticate() ))
-		return((char *) 0);
-	else if (!( filename = rest_temporary_filename("xml")))
+	if (!( filename = rest_temporary_filename("xml")))
 		return( filename );
 	else if (!( h = fopen( filename,"wa" ) ))
 		return( liberate( filename ) );
@@ -624,20 +621,9 @@ public	char * on_volatile_image_request( char * image )
 }
 
 /*	----------------------------------------------------------------	*/
-/*			o n _ c r e a t e _ i m a g e 				*/
-/*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_create_image( char * id, char * filename ) 
-{ 
-	char 	buffer[2048];
-	sprintf(buffer,"/compute/%s",id);
-	return( on_put_request( buffer, filename ) );
-}
-
-
-/*	----------------------------------------------------------------	*/
 /*	 	o n _ c r e a t e _ s e r v e r _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	char * on_create_server_request(
+public	char * on_create_server_request(struct on_subscription * sptr,
 		char * identity, 
 		char * flavour, 
 		char * image,
@@ -646,14 +632,13 @@ public	char * on_create_server_request(
 		char * personality,
 		char * filename ) 
 {
-	return( on_create_compute_request( identity, flavour, image, network,local, personality, filename ) );
+	return( on_create_compute_request( sptr,identity, flavour, image, network,local, personality, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*		o n _ c l i e n t _ g e t _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response * 
-	on_client_get_request(
+public	struct	on_response * on_client_get_request(
 		char * target, char * tls, char * agent, struct rest_header * hptr ) 
 { 
 	return( on_check( rest_client_get_request( target, tls, agent, hptr ) ) );
@@ -662,8 +647,7 @@ public	struct	on_response *
 /*	----------------------------------------------------------------	*/
 /*		o n _ c l i e n t _ d e l e t e _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response * 
-	on_client_delete_request(
+public	struct	on_response * on_client_delete_request(
 		char * target, char * tls, char * agent, struct rest_header * hptr ) 
 {
 	return( on_check( rest_client_delete_request( target, tls, agent, hptr ) ) );
@@ -672,8 +656,7 @@ public	struct	on_response *
 /*	----------------------------------------------------------------	*/
 /*		o n _ c l i e n t _ h e a d _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response * 
-	on_client_head_request(
+public	struct	on_response * on_client_head_request(
 		char * target, char * tls, char * agent, struct rest_header * hptr ) 
 {
 	return( on_check( rest_client_head_request( target, tls, agent, hptr ) ) );
@@ -682,8 +665,7 @@ public	struct	on_response *
 /*	----------------------------------------------------------------	*/
 /*		o n _ c l i e n t _ p o s t _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response * 
-	on_client_post_request(
+public	struct	on_response * on_client_post_request(
 		char * target, char * tls, char * agent, char * filename, struct rest_header * hptr ) 
 { 
 	return( on_check( rest_client_post_request( target, tls, agent, filename, hptr ) ) );
@@ -692,8 +674,7 @@ public	struct	on_response *
 /*	----------------------------------------------------------------	*/
 /*		o n _ c l i e n t _ p u t _ r e q u e s t			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response * 
-	on_client_put_request(
+public	struct	on_response * on_client_put_request(
 		char * target, char * tls, char * agent, char * filename, struct rest_header * hptr ) 
 {
 	return( on_check( rest_client_put_request( target, tls, agent, filename, hptr ) ) );
@@ -702,7 +683,7 @@ public	struct	on_response *
 /*	------------------------------------------------------------	*/
 /*			o n _ a u t h e n t i c a t e ()		*/
 /*	------------------------------------------------------------	*/
-public	struct	rest_header   *	on_authenticate	( )
+public	struct	rest_header   *	on_authenticate(struct on_subscription * sptr)
 {
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 	struct	on_response	*	rptr;
@@ -712,18 +693,18 @@ public	struct	rest_header   *	on_authenticate	( )
 	char	buffer[256];
 	char	uwork[256];
 	char	pwork[256];
-	if (!( On.user ))
+	if (!( sptr->user ))
 		return((struct rest_header *) 0);
-	else if (!( On.password ))
+	else if (!( sptr->password ))
 		return((struct rest_header *) 0);
-	else if (!( On.version ))
+	else if (!( sptr->version ))
 		return((struct rest_header *) 0);
-	else if (!( On.authenticate ))
-		if (!( On.authenticate = rest_encode_credentials( On.user, On.password ) ))
+	else if (!( sptr->authenticate ))
+		if (!( sptr->authenticate = rest_encode_credentials( sptr->user, sptr->password ) ))
 			return((struct rest_header *) 0);
-	if (!( On.authenticate ))
+	if (!( sptr->authenticate ))
 		return((struct rest_header *) 0);
-	else if (!( hptr = rest_create_header( "Authorization", On.authenticate ) ))
+	else if (!( hptr = rest_create_header( "Authorization", sptr->authenticate ) ))
 		return( hptr );
 	else if (!( hptr->next = rest_create_header( _HTTP_ACCEPT, "text/xml" ) ))
 		return( liberate_rest_header( hptr ) );
@@ -733,16 +714,16 @@ public	struct	rest_header   *	on_authenticate	( )
 /*	----------------------------------------------------------------	*/
 /*			o n _ l i s t _ r e q u e s t 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_list_request( char * buffer ) 
+public	struct	on_response *	on_list_request(struct on_subscription * sptr, char * buffer ) 
 { 
 	struct	on_response	*	rptr=(struct on_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = on_authenticate() ))
+	if (!( hptr = on_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( On.base )))
+	else if (!( uptr = analyse_url( sptr->base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -751,7 +732,7 @@ public	struct	on_response *	on_list_request( char * buffer )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = on_client_get_request( nptr, On.tls, On.agent, hptr ) ))
+	else if (!( rptr = on_client_get_request( nptr, sptr->tls, sptr->agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -764,16 +745,16 @@ public	struct	on_response *	on_list_request( char * buffer )
 /*	----------------------------------------------------------------	*/
 /*			o n _ g e t _ r e q u e s t 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_get_request( char * buffer ) 
+public	struct	on_response *	on_get_request(struct on_subscription * sptr, char * buffer ) 
 { 
 	struct	on_response	*	rptr=(struct on_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = on_authenticate() ))
+	if (!( hptr = on_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( On.base )))
+	else if (!( uptr = analyse_url( sptr->base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -782,7 +763,7 @@ public	struct	on_response *	on_get_request( char * buffer )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = on_client_get_request( nptr, On.tls, On.agent, hptr ) ))
+	else if (!( rptr = on_client_get_request( nptr, sptr->tls, sptr->agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -795,16 +776,16 @@ public	struct	on_response *	on_get_request( char * buffer )
 /*	----------------------------------------------------------------	*/
 /*			o n _ d e l e t e _ r e q u e s t 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_delete_request( char * buffer ) 
+public	struct	on_response *	on_delete_request(struct on_subscription * sptr, char * buffer ) 
 { 
 	struct	on_response	*	rptr=(struct on_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = on_authenticate() ))
+	if (!( hptr = on_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( On.base )))
+	else if (!( uptr = analyse_url( sptr->base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -813,7 +794,7 @@ public	struct	on_response *	on_delete_request( char * buffer )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = on_client_delete_request( nptr, On.tls, On.agent, hptr ) ))
+	else if (!( rptr = on_client_delete_request( nptr, sptr->tls, sptr->agent, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -826,16 +807,16 @@ public	struct	on_response *	on_delete_request( char * buffer )
 /*	----------------------------------------------------------------	*/
 /*			o n _ p u t _ r e q u e s t 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_put_request( char * buffer, char * filename ) 
+public	struct	on_response *	on_put_request(struct on_subscription * sptr, char * buffer, char * filename ) 
 { 
 	struct	on_response	*	rptr=(struct on_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = on_authenticate() ))
+	if (!( hptr = on_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( On.base )))
+	else if (!( uptr = analyse_url( sptr->base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -844,7 +825,7 @@ public	struct	on_response *	on_put_request( char * buffer, char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = on_client_put_request( nptr, On.tls, On.agent, filename, hptr ) ))
+	else if (!( rptr = on_client_put_request( nptr, sptr->tls, sptr->agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -857,16 +838,16 @@ public	struct	on_response *	on_put_request( char * buffer, char * filename )
 /*	----------------------------------------------------------------	*/
 /*			o n _ p o s t _ r e q u e s t 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_post_request( char * buffer, char * filename ) 
+public	struct	on_response *	on_post_request(struct on_subscription * sptr, char * buffer, char * filename ) 
 { 
 	struct	on_response	*	rptr=(struct on_response *) 0;
 	struct	url		*	uptr;
 	char 			*	nptr;
 	struct	rest_header 	*	hptr=(struct rest_header * ) 0;
 
-	if (!( hptr = on_authenticate() ))
+	if (!( hptr = on_authenticate(sptr) ))
 		return( rptr );
-	else if (!( uptr = analyse_url( On.base )))
+	else if (!( uptr = analyse_url( sptr->base )))
 		return( rptr );
 	else if (!( uptr = validate_url( uptr ) ))
 		return( rptr );
@@ -875,7 +856,7 @@ public	struct	on_response *	on_post_request( char * buffer, char * filename )
 		uptr = liberate_url( uptr );
 		return( rptr );
 	}
-	else if (!( rptr = on_client_post_request( nptr, On.tls, On.agent, filename, hptr ) ))
+	else if (!( rptr = on_client_post_request( nptr, sptr->tls, sptr->agent, filename, hptr ) ))
 	{
 		uptr = liberate_url( uptr );
 		liberate( nptr );
@@ -888,39 +869,39 @@ public	struct	on_response *	on_post_request( char * buffer, char * filename )
 /*	----------------------------------------------------------------	*/
 /*		   o n _ l i s t _ c o m p u t e _ p o o l			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_list_compute_pool( ) 
+public	struct	on_response *	on_list_compute_pool(struct on_subscription * sptr ) 
 { 
-	return( on_list_request( "/compute" ) );
+	return( on_list_request( sptr, "/compute" ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*		   o n _ l i s t _ n e t w o r k _ p o o l			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_list_network_pool( ) 
+public	struct	on_response *	on_list_network_pool(struct on_subscription * sptr) 
 { 
-	return( on_list_request( "/network" ) );
+	return( on_list_request( sptr, "/network" ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*		   o n _ l i s t _ s t o r a g e _ p o o l			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_list_storage_pool( ) 
+public	struct	on_response *	on_list_storage_pool(struct on_subscription * sptr ) 
 { 
-	return( on_list_request( "/storage" ) );
+	return( on_list_request( sptr, "/storage" ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ l i s t _ s e r v e r s				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_list_servers	( )
+public	struct	on_response *	on_list_servers	(struct on_subscription * sptr)
 { 
-	return( on_list_compute_pool() );
+	return( on_list_compute_pool(sptr) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ l i s t _ f l a v o r s				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_list_flavors ( )
+public	struct	on_response *	on_list_flavors (struct on_subscription * sptr)
 { 
 	return( allocate_on_response() );
 }
@@ -928,121 +909,133 @@ public	struct	on_response *	on_list_flavors ( )
 /*	----------------------------------------------------------------	*/
 /*			o n _ l i s t _ i m a g e S				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_list_images  ( ) 
+public	struct	on_response *	on_list_images  (struct on_subscription * sptr) 
 {
-	return(on_list_storage_pool()); 
+	return(on_list_storage_pool(sptr)); 
 }
+
+/*	----------------------------------------------------------------	*/
+/*			o n _ c r e a t e _ i m a g e 				*/
+/*	----------------------------------------------------------------	*/
+public	struct	on_response *	on_create_image(struct on_subscription * sptr, char * id, char * filename ) 
+{ 
+	char 	buffer[2048];
+	sprintf(buffer,"/compute/%s",id);
+	return( on_put_request( sptr, buffer, filename ) );
+}
+
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ c r e a t e _ c o m p u t e			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_create_compute( char * filename ) 
+public	struct	on_response *	on_create_compute( struct on_subscription * sptr,char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/compute");
-	return( on_post_request( buffer, filename ) );
+	return( on_post_request( sptr, buffer, filename ) );
 }
+
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ s t o p _ c o m p u t e				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_stop_compute( char * id, char * filename ) 
+public	struct	on_response *	on_stop_compute( struct on_subscription * sptr,char * id, char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/compute/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr,buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ s h u t d o w n _ c o m p u t e			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_shutdown_compute( char * id, char * filename ) 
+public	struct	on_response *	on_shutdown_compute( struct on_subscription * sptr, char * id, char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/compute/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ s t a r t _ c o m p u t e				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_start_compute( char * id, char * filename ) 
+public	struct	on_response *	on_start_compute(struct on_subscription * sptr, char * id, char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/compute/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request(sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ c r e a t e _ s t o r a g e			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_create_storage( char * filename ) 
+public	struct	on_response *	on_create_storage(struct on_subscription * sptr, char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/storage");
-	return( on_post_request( buffer, filename ) );
+	return( on_post_request(sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ c r e a t e _ n e t w o r k 			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_create_network( char * filename ) 
+public	struct	on_response *	on_create_network(struct on_subscription * sptr, char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/network");
-	return( on_post_request( buffer, filename ) );
+	return( on_post_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ c r e a t e _ s e r v e r				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_create_server( char * filename ) 
+public	struct	on_response *	on_create_server(struct on_subscription * sptr, char * filename ) 
 { 
-	return( on_create_compute( filename ) ); 
+	return( on_create_compute( sptr, filename ) ); 
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ g e t _ c o m p u t e 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_get_compute( char * id ) 
+public	struct	on_response *	on_get_compute( struct on_subscription * sptr,char * id ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/compute/%s",id);
-	return( on_get_request( buffer ) );
+	return( on_get_request( sptr, buffer ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ g e t _ s t o r a g e 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_get_storage	( char * id ) 
+public	struct	on_response *	on_get_storage	( struct on_subscription * sptr,char * id ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/storage/%s",id);
-	return( on_get_request( buffer ) );
+	return( on_get_request(sptr, buffer ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ g e t _ n e t w o r k 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_get_network	( char * id ) 
+public	struct	on_response *	on_get_network	(struct on_subscription * sptr, char * id ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/network/%s",id);
-	return( on_get_request( buffer ) );
+	return( on_get_request( sptr, buffer ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ g e t _ s e r v e r				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_get_server	( char * id ) 
+public	struct	on_response *	on_get_server	( struct on_subscription * sptr,char * id ) 
 { 
-	return( on_get_compute( id ) );
+	return( on_get_compute( sptr, id ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ g e t _ f l a v o u r				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_get_flavour  ( char * id ) 
+public	struct	on_response *	on_get_flavour  ( struct on_subscription * sptr,char * id ) 
 {
 	return( allocate_on_response() ); 
 }
@@ -1050,176 +1043,179 @@ public	struct	on_response *	on_get_flavour  ( char * id )
 /*	----------------------------------------------------------------	*/
 /*			o n _ g e t _ i m a g e 				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_get_image    ( char * id ) 
+public	struct	on_response *	on_get_image    ( struct on_subscription * sptr,char * id ) 
 {
-	return( on_get_storage( id ) );
+	return( on_get_storage( sptr, id ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ u p d a t e _ c o m p u t e			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_update_compute( char * id, char * filename ) 
+public	struct	on_response *	on_update_compute( struct on_subscription * sptr,char * id, char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/compute/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ u p d a t e _ s t o r a g e			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_update_storage( char * id, char * filename ) 
+public	struct	on_response *	on_update_storage( struct on_subscription * sptr, char * id, char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/storage/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ u p d a t e _ n e t w o r k			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_update_network( char * id, char * filename ) 
+public	struct	on_response *	on_update_network( struct on_subscription * sptr,char * id, char * filename ) 
 { 
 	char 	buffer[2048];
 	sprintf(buffer,"/network/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ u p d a t e _ s e r v e r				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_update_server( char * id, char * filename ) 
+public	struct	on_response *	on_update_server( struct on_subscription * sptr,char * id, char * filename ) 
 { 
-	return( on_update_compute( id, filename ) );
+	return( on_update_compute( sptr, id, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ d e l e t e _ c o m p u t e			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_delete_compute( char * id ) 
+public	struct	on_response *	on_delete_compute( struct on_subscription * sptr,char * id ) 
 {
 	char 	buffer[2048];
 	sprintf(buffer,"/compute/%s",id);
-	return( on_delete_request( buffer ) );
+	return( on_delete_request( sptr, buffer ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ d e l e t e _ s t o r a g e			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_delete_storage( char * id ) 
+public	struct	on_response *	on_delete_storage( struct on_subscription * sptr,char * id ) 
 {
 	char 	buffer[2048];
 	sprintf(buffer,"/storage/%s",id);
-	return( on_delete_request( buffer ) );
+	return( on_delete_request( sptr, buffer ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ d e l e t e _ n e t w o r k			*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_delete_network( char * id ) 
+public	struct	on_response *	on_delete_network( struct on_subscription * sptr,char * id ) 
 {
 	char 	buffer[2048];
 	sprintf(buffer,"/network/%s",id);
-	return( on_delete_request( buffer ) );
+	return( on_delete_request( sptr, buffer ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ d e l e t e _ s e r v e r				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_delete_server( char * id ) 
+public	struct	on_response *	on_delete_server( struct on_subscription * sptr,char * id ) 
 {
-	return( on_delete_compute( id ) );
+	return( on_delete_compute( sptr, id ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ d e l e t e _ i m a g e				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_delete_image ( char * id ) 
+public	struct	on_response *	on_delete_image ( struct on_subscription * sptr,char * id ) 
 {
-	return( on_delete_storage( id ));
+	return( on_delete_storage( sptr, id ));
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ p u b l i c _ i m a g e				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_public_image ( char * id, char * filename ) 
+public	struct	on_response *	on_public_image ( struct on_subscription * sptr,char * id, char * filename ) 
 {
 	char 	buffer[2048];
 	sprintf(buffer,"/storage/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ p r i v a t e _ i m a g e				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_private_image ( char * id, char * filename ) 
+public	struct	on_response *	on_private_image ( struct on_subscription * sptr,char * id, char * filename ) 
 {
 	char 	buffer[2048];
 	sprintf(buffer,"/storage/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*			o n _ r e n a m e _ i m a g e				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_rename_image ( char * id, char * filename ) 
+public	struct	on_response *	on_rename_image ( struct on_subscription * sptr,char * id, char * filename ) 
 {
 	char 	buffer[2048];
 	sprintf(buffer,"/storage/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*		o n _ p e r s i s t e n t _ i m a g e				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_persistent_image ( char * id, char * filename ) 
+public	struct	on_response *	on_persistent_image ( struct on_subscription * sptr,char * id, char * filename ) 
 {
 	char 	buffer[2048];
 	sprintf(buffer,"/storage/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	----------------------------------------------------------------	*/
 /*		o n _ v o l a t i l e _ i m a g e				*/
 /*	----------------------------------------------------------------	*/
-public	struct	on_response *	on_volatile_image ( char * id, char * filename ) 
+public	struct	on_response *	on_volatile_image ( struct on_subscription * sptr,char * id, char * filename ) 
 {
 	char 	buffer[2048];
 	sprintf(buffer,"/storage/%s",id);
-	return( on_put_request( buffer, filename ) );
+	return( on_put_request( sptr, buffer, filename ) );
 }
 
 /*	------------------------------------------------------------	*/
 /*		o n _ i n i t i a l i s e _ c l i e n t 		*/
 /*	------------------------------------------------------------	*/
-public	int	on_initialise_client( 
+public	struct on_subscription *	on_initialise_client( 
 		char * user, char * password, 
 		char * host, char * agent, char * version, char * tls )
 {
-	if (!( On.user = allocate_string( user )))
-		return( 27 );
-	if (!( On.password = allocate_string( password )))
-		return( 27 );
-	if (!( On.host = allocate_string( host )))
-		return( 27 );
-	if (!( On.base = allocate_string( host )))
-		return( 27 );
-	else if (!( On.agent = allocate_string( agent )))
-		return( 27 );
-	else if (!( On.version = allocate_string( version )))
-		return( 27 );
-	else if (!( On.namespace = allocate( strlen( _ON_NS_COMPUTE ) + strlen( On.version ) + 16 ) ))
-		return( 27 );
+	struct	on_subscription * sptr;
+	if (!( sptr = (struct on_subscription *) allocate( sizeof( struct on_subscription ) ) ))
+		return( sptr );
+	else if (!( sptr->user = allocate_string( user )))
+		return( liberate_on_subscription( sptr ) );
+	if (!( sptr->password = allocate_string( password )))
+		return( liberate_on_subscription( sptr ) );
+	if (!( sptr->host = allocate_string( host )))
+		return( liberate_on_subscription( sptr ) );
+	if (!( sptr->base = allocate_string( host )))
+		return( liberate_on_subscription( sptr ) );
+	else if (!( sptr->agent = allocate_string( agent )))
+		return( liberate_on_subscription( sptr ) );
+	else if (!( sptr->version = allocate_string( version )))
+		return( liberate_on_subscription( sptr ) );
+	else if (!( sptr->namespace = allocate( strlen( _ON_NS_COMPUTE ) + strlen( sptr->version ) + 16 ) ))
+		return( liberate_on_subscription( sptr ) );
 	else	
 	{
-		sprintf(On.namespace,"%s%s",_ON_NS_COMPUTE,On.version);
-		On.authenticate= (char *) 0;
-		if (!( tls ))
-			On.tls = (char *) 0;
-		else if ((On.tls = allocate_string(tls)) != (char *) 0)
-			if ( (!( strlen( On.tls ) )) || ( *(On.tls) == '0' ) )
-				On.tls = liberate( On.tls );
-		return( 0 );
+		sprintf(sptr->namespace,"%s%s",_ON_NS_COMPUTE,sptr->version);
+		sptr->authenticate= (char *) 0;
+		if (!( rest_valid_string( tls ) ))
+			sptr->tls = (char *) 0;
+		else if ((sptr->tls = allocate_string(tls)) != (char *) 0)
+			if ( (!( strlen( sptr->tls ) )) || ( *(sptr->tls) == '0' ) )
+				sptr->tls = liberate( sptr->tls );
+		return( sptr );
 	}
 }
 
