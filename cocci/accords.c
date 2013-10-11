@@ -200,6 +200,10 @@ public	int	accords_configuration_option( char * aptr, int argi, char * argv[] )
 		configuration->chathost = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "chatport" ) ))
 		configuration->chatport = atoi( argv[++argi] );
+	else if (!( strcmp( aptr, "chatuser" ) ))
+		configuration->chatuser = allocate_string( argv[++argi] );
+	else if (!( strcmp( aptr, "chatpass" ) ))
+		configuration->chatpass = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "threads" ) ))
 		configuration->threads = _REST_THREAD_WORKER;
 	else	return( 0 );
@@ -267,6 +271,8 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 
 	set_xml_echo(configuration->debug);
 
+	cptr->chatpass = cptr->chatuser = (char *) 0;
+
 	if (( document = document_parse_file( configuration->config )) != (struct xml_element *) 0)
 	{
 		if ( configuration->verbose )
@@ -297,6 +303,15 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 					configuration->resthost = document_atribut_string( aptr );
 				if ((aptr = document_atribut( vptr, "port" )) != (struct xml_atribut *) 0)
 					configuration->restport = document_atribut_value( aptr );
+
+				if ((aptr = document_atribut( vptr, "chathost" )) != (struct xml_atribut *) 0)
+					configuration->chathost = document_atribut_string( aptr );
+				if ((aptr = document_atribut( vptr, "chatport" )) != (struct xml_atribut *) 0)
+					configuration->chatport = document_atribut_value( aptr );
+				if ((aptr = document_atribut( vptr, "chatuser" )) != (struct xml_atribut *) 0)
+					configuration->chatuser = document_atribut_string( aptr );
+				if ((aptr = document_atribut( vptr, "chatpass" )) != (struct xml_atribut *) 0)
+					configuration->chatpass = document_atribut_string( aptr );
 
 				if ((aptr = document_atribut( vptr, "alert" )) != (struct xml_atribut *) 0)
 					if (!( alert_status = document_atribut_value( aptr ) ))
@@ -401,8 +416,8 @@ public	int	save_accords_configuration( struct accords_configuration * cptr, char
 			fprintf(h,"\tipv6=\"%u\"\n",cptr->ipv6);
 			fprintf(h,"\tdebug=\"%u\"\n",cptr->debug);
 			fprintf(h,"\tthreads=\"%u\">\n",cptr->threads);
-			fprintf(h,"<rest host=\"%s\" port=\"%u\" storage=\"%s\"/>\n",
-				cptr->resthost,cptr->restport,cptr->storage);
+			fprintf(h,"<rest host=\"%s\" port=\"%u\" chathost=\"%s\" chatport=\"%u\" storage=\"%s\"/>\n",
+				cptr->resthost,cptr->restport,cptr->chathost,cptr->chatport,cptr->storage);
 			fprintf(h,"<security user=\"%s\" password=\"%s\" tls=\"%s\" monitor=\"%u\"/>\n",
 				cptr->user,cptr->password,cptr->tls,cptr->monitor);
 			fprintf(h,"<domain name=\"%s\" zone=\"%s\"/>\n",
@@ -476,6 +491,10 @@ public	char *	serialise_component_configuration(struct accords_configuration * c
 		return( result );
 	else if (!( result = serialise_integer_value( result, "port", cptr->restport )))
 		return( result );
+	else if (!( result = serialise_string_value( result, "chathost", cptr->chathost )))
+		return( result );
+	else if (!( result = serialise_integer_value( result, "chatport", cptr->chatport )))
+		return( result );
 	else if (!( result = serialise_integer_value( result, "verbose", cptr->verbose )))
 		return( result );
 	else if (!( result = serialise_integer_value( result, "debug", cptr->debug )))
@@ -518,6 +537,12 @@ public	void	deserialise_component_configuration(
 		configuration->resthost = document_atribut_string( aptr );
 	if ((aptr = document_atribut( eptr, "port" )) != (struct xml_atribut *) 0)
 		configuration->restport = document_atribut_value( aptr );
+
+	if ((aptr = document_atribut( eptr, "chathost" )) != (struct xml_atribut *) 0)
+		configuration->chathost = document_atribut_string( aptr );
+	if ((aptr = document_atribut( eptr, "chatport" )) != (struct xml_atribut *) 0)
+		configuration->chatport = document_atribut_value( aptr );
+
 	if ((aptr = document_atribut( eptr, "storage" )) != (struct xml_atribut *) 0)
 		configuration->storage = document_atribut_string( aptr );
 

@@ -27,6 +27,7 @@ private	struct ldap_controller * ldap_failure(struct ldap_controller * h, int ec
 		if (!( ecode ))
 			liberate( h );
 	}
+	close_socket_catcher(0,"ldap failure",ecode);
 	return((struct ldap_controller * ) 0);
 }
 
@@ -127,7 +128,7 @@ private	void	DropUpdate( 	LDAPMod	* mptr		)
 /*	---------------------------------------		*/
 /*		O p e n L d a p 			*/
 /*	---------------------------------------		*/
-public	struct ldap_controller * OpenLdap( char * host, char * credentials, char * password )
+public	struct ldap_controller * OpenLdap( char * host, int port, char * credentials, char * password )
 {
 	struct ldap_controller * lptr;
 	LDAP	*	handle=(LDAP *) 0;
@@ -153,6 +154,7 @@ public	struct ldap_controller * OpenLdap( char * host, char * credentials, char 
 		lptr->modifications = (LDAPMod**) 0;
 	}
 
+	start_socket_catcher(0,"ldap open");
 	if (!( host )) 
 		return( ldap_failure( lptr, 0  ) );
 
@@ -162,12 +164,18 @@ public	struct ldap_controller * OpenLdap( char * host, char * credentials, char 
 	else if (!( password )) 
 		return( ldap_failure( lptr, 0  ) );
 
-	else if (!( lptr->handle = ldap_init( host, LDAP_PORT ) ))
+	else if (!( lptr->handle = ldap_init( host, port ) ))
 		return( ldap_failure(lptr,0) );
 
 	else if ((lptr->error = ldap_simple_bind_s( lptr->handle, credentials, password )) != LDAP_SUCCESS )
 		return( ldap_failure(lptr,lptr->error) );
-	else	return( lptr );
+	else if ( is_socket_hit() )
+		return( ldap_failure(lptr,lptr->error) );
+	else
+	{
+		close_socket_catcher(0,"socket open",0);
+		return( lptr );
+	}
 }
 
 /*	-------------------------------		*/
@@ -179,6 +187,7 @@ public	void	CloseLdap( struct ldap_controller * lptr )
 		return;
 	else	
 	{
+		start_socket_catcher(0,"ldap close");
 		DropLdapUpdate( lptr );	
 		ldap_failure( lptr, 0 );
 	}

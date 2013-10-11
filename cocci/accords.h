@@ -44,7 +44,8 @@ struct	accords_configuration
 	char *	component;		/* the component name			*/
 	struct	occi_category *	firstcat;
 	struct	occi_category *	lastcat;
-
+	char *	chatuser;
+	char *	chatpass;
 };
 
 public	void	load_accords_configuration( struct accords_configuration * configuration, char * section );

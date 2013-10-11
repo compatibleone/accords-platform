@@ -33,7 +33,7 @@ struct	ldap_controller
 	LDAPMod		**	modifications;
 };
 
-public	struct 	ldap_controller * 	OpenLdap( char * host, char * credentials, char * password );
+public	struct 	ldap_controller * 	OpenLdap( char * host, int port, char * credentials, char * password );
 public	void				CloseLdap( struct ldap_controller * lptr );
 public	struct 	ldap_controller * 	LdapAtbValue(struct ldap_controller * lptr );
 public	struct 	ldap_controller * 	FirstLdapAtb(struct ldap_controller * lptr, char * criteria );

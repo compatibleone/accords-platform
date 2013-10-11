@@ -105,6 +105,11 @@ private	int	sockethit=0;
 
 #ifdef UNIX
 
+public	int	is_socket_hit()
+{
+	return( sockethit );
+}
+
 public	void	socketcatcher( int signal )
 {
 	sockethit++;
@@ -132,6 +137,7 @@ public	void	close_socket_catcher(int socket, char * message, int ecode )
 
 #else
 
+#define	is_socket_hit() 0
 #define start_socket_catcher(a,b)
 #define close_socket_catcher(a,b,c)
 
