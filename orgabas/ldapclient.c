@@ -27,6 +27,9 @@ private	struct ldap_controller * ldap_failure(struct ldap_controller * h, int ec
 		if (!( ecode ))
 			liberate( h );
 	}
+	if ( ecode )
+		if ( check_verbose() )
+			printf("   LDAP FAIL %u \n",ecode );
 	close_socket_catcher(0,"ldap failure",ecode);
 	return((struct ldap_controller * ) 0);
 }
@@ -164,11 +167,18 @@ public	struct ldap_controller * OpenLdap( char * host, int port, char * credenti
 	else if (!( password )) 
 		return( ldap_failure( lptr, 0  ) );
 
-	else if (!( lptr->handle = ldap_init( host, port ) ))
+	if ( check_verbose() )
+		printf("   LDAP INIT %s : %u \n",host,port);
+
+	if (!( lptr->handle = ldap_init( host, port ) ))
 		return( ldap_failure(lptr,0) );
 
-	else if ((lptr->error = ldap_simple_bind_s( lptr->handle, credentials, password )) != LDAP_SUCCESS )
+	if ( check_verbose() )
+		printf("   LDAP BIND '%s' : '%s' \n",credentials, password);
+
+	if ((lptr->error = ldap_simple_bind_s( lptr->handle, credentials, password )) != LDAP_SUCCESS )
 		return( ldap_failure(lptr,lptr->error) );
+
 	else if ( is_socket_hit() )
 		return( ldap_failure(lptr,lptr->error) );
 	else
