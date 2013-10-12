@@ -11,10 +11,14 @@ private	struct ldap_controller * ldap_failure(struct ldap_controller * h, int ec
 	char *	sptr;
 	int	whoops;
 	char *	mptr="default message";
+#ifdef	LDAP_OPT_RESULT_CODE
 	if ( ecode == -1 )
 		if ( h )
 			whoops = ldap_get_option( h->handle,LDAP_OPT_RESULT_CODE , &ecode);
+#endif
+#ifdef	LDAP_OPT_DIAGNOSTIC_MESSAGE
 	whoops = ldap_get_option( h->handle,LDAP_OPT_DIAGNOSTIC_MESSAGE , &mptr);
+#endif
 	if ( h ) 
 	{
 		if ( h->handle ) 
@@ -158,7 +162,11 @@ public	struct ldap_controller * OpenLdap( char * host, int port, char * credenti
 		lptr->pending	= 
 		lptr->error	=
 		lptr->messages  = 0;
+#ifdef	LDAP_OPT_RESULT_CODE
 		lptr->version   = LDAP_VERSION3;
+#else
+		lptr->version   = LDAP_VERSION2;
+#endif
 		lptr->itember	=(BerElement *) 0;
 		lptr->server    =	
 		lptr->client    = (LDAPControl *) 0;

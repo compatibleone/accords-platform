@@ -4,20 +4,7 @@
 #include "ldapclient.h"
 #include "ldapclient.c"
 
-struct	ldap_configuration
-{
-	char *	host;
-	int	port;
-	char *	base;
-	char *	user;
-	char *	pass;
-} LdapConfig = 	{
-	(char *) 0,
-	0,
-	(char *) 0,
-	(char *) 0,
-	(char *) 0
-	};
+private	struct	accords_configuration LdapConfig;
 
 struct	ldap_user
 {
@@ -28,84 +15,39 @@ struct	ldap_user
 	char *	role;
 	char *	account;
 	char *	authorization;
-	int		when;
-	int		state;
+	int	when;
+	int	state;
 };
+
+/*	---------------------------------------------	*/
+/*	l o a d _ l d a p _ c o n f i g u r a t i o n	*/
+/*	---------------------------------------------	*/
+public	void	load_ldap_configuration( char * filename, char * section ) 
+{	
+	memset( &LdapConfig, 0, sizeof( struct accords_configuration ) );
+	LdapConfig.config = allocate_string( filename );
+	LdapConfig.verbose = 1;
+	load_accords_configuration( &LdapConfig, section);
+}
 
 /*	------------------------------	*/
 /* "ou=users,dc=easi-clouds,dc=eu"	*/
 /*	------------------------------	*/
 
 /*	-------------------------	*/
-/*	s e t _ l d a p _ h o s t 	*/
+/*	g e t _ l d a p _ b a s e  	*/
 /*	-------------------------	*/
-public	char *	set_ldap_host(char * v)	
-{
-	if ( LdapConfig.host )
-		LdapConfig.host = liberate( LdapConfig.host );
-	if (!( v ))
-		return( v );
-	else	return((LdapConfig.host=allocate_string(v)));
-} 
-
-/*	-------------------------	*/
-/*	s e t _ l d a p _ p o r t 	*/
-/*	-------------------------	*/
-public	int set_ldap_port(int v)	
-{
-	return((LdapConfig.port=v));
-} 
-
-/*	-------------------------	*/
-/*	s e t _ l d a p _ b a s e  	*/
-/*	-------------------------	*/
-public	char *	set_ldap_base(char * v)	
-{
-	if ( LdapConfig.base )
-		LdapConfig.base = liberate( LdapConfig.base );
-	if (!( v ))
-		return( v );
-	else	return((LdapConfig.base=allocate_string(v)));
-} 
-
-/*	-------------------------	*/
-/*	s e t _ l d a p _ u s e r 	*/
-/*	-------------------------	*/
-public	char *	set_ldap_user(char * v)	
-{
-	if ( LdapConfig.user )
-		LdapConfig.user = liberate( LdapConfig.user );
-	if (!( v ))
-		return( v );
-	else	return((LdapConfig.user=allocate_string(v)));
-} 
-
-/*	-------------------------	*/
-/*	s e t _ l d a p _ p a s s	*/
-/*	-------------------------	*/
-public	char *	set_ldap_pass(char * v)	
-{
-	if ( LdapConfig.pass )
-		LdapConfig.pass = liberate( LdapConfig.pass );
-	if (!( v ))
-		return( v );
-	else	return((LdapConfig.pass=allocate_string(v)));
-} 
-
-/*	-------------------------	*/
-/*	g e t _ l d a p _ b a s e 	*/
-/*	-------------------------	*/
-private	char * get_ldap_base()	{	return( LdapConfig.base );	}
+private	char * get_ldap_base()	{	return( LdapConfig.storage );	}
 
 /*	-------------------------	*/
 /*	g e t _ l d a p _ h o s t 	*/
 /*	-------------------------	*/
-private	char * get_ldap_host()	{	return( LdapConfig.host );	}
+private	char * get_ldap_host()	{	return( LdapConfig.resthost );	}
 
 /*	-------------------------	*/
 /*	g e t _ l d a p _ p o r t 	*/
 /*	-------------------------	*/
-private	int	get_ldap_port()	{	return( LdapConfig.port );	}
+private	int	get_ldap_port()	{	return( LdapConfig.restport );	}
 
 /*	-------------------------	*/
 /*	g e t _ l d a p _ u s e r 	*/
@@ -115,7 +57,7 @@ private	char * get_ldap_user()	{	return( LdapConfig.user );	}
 /*	-------------------------	*/
 /*	g e t _ l d a p _ p a s s 	*/
 /*	-------------------------	*/
-private	char * get_ldap_pass()	{	return( LdapConfig.pass );	}
+private	char * get_ldap_pass()	{	return( LdapConfig.password );	}
 	
 /*	-----------------------------------	*/
 /*	l i b e r a t e _ l d a p _ u s e r	*/

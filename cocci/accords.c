@@ -196,14 +196,6 @@ public	int	accords_configuration_option( char * aptr, int argi, char * argv[] )
 		configuration->resthost = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "restport" ) ))
 		configuration->restport = atoi( argv[++argi] );
-	else if (!( strcmp( aptr, "chathost" ) ))
-		configuration->chathost = allocate_string( argv[++argi] );
-	else if (!( strcmp( aptr, "chatport" ) ))
-		configuration->chatport = atoi( argv[++argi] );
-	else if (!( strcmp( aptr, "chatuser" ) ))
-		configuration->chatuser = allocate_string( argv[++argi] );
-	else if (!( strcmp( aptr, "chatpass" ) ))
-		configuration->chatpass = allocate_string( argv[++argi] );
 	else if (!( strcmp( aptr, "threads" ) ))
 		configuration->threads = _REST_THREAD_WORKER;
 	else	return( 0 );
@@ -266,81 +258,72 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 	struct	xml_element * vptr;
 	struct	xml_atribut * aptr;
 
-	configuration = cptr;
-	section	      = sptr;
+	if (!( configuration ))
+		configuration = cptr;
+	if (!( section ))
+		section	      = sptr;
 
-	set_xml_echo(configuration->debug);
+	set_xml_echo(cptr->debug);
 
-	cptr->chatpass = cptr->chatuser = (char *) 0;
-
-	if (( document = document_parse_file( configuration->config )) != (struct xml_element *) 0)
+	if (( document = document_parse_file( cptr->config )) != (struct xml_element *) 0)
 	{
-		if ( configuration->verbose )
-			printf("   Loading configuration section : %s, from : %s \n",section,configuration->config);
+		if ( check_verbose() )
+			printf("   Loading configuration section : %s, from : %s \n",sptr,cptr->config);
 
-		if (( eptr = document_element( document, section )) != (struct xml_element *) 0)
+		if (( eptr = document_element( document, sptr )) != (struct xml_element *) 0)
 		{
 			if ((aptr = document_atribut( eptr, "identity" )) != (struct xml_atribut *) 0)
-				configuration->identity = document_atribut_string( aptr );
+				cptr->identity = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "component" )) != (struct xml_atribut *) 0)
-				configuration->component = document_atribut_string( aptr );
+				cptr->component = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "publisher")) != (struct xml_atribut *) 0)
-				configuration->publisher = document_atribut_string( aptr );
+				cptr->publisher = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "operator")) != (struct xml_atribut *) 0)
-				configuration->operator = document_atribut_string( aptr );
+				cptr->operator = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "verbose")) != (struct xml_atribut *) 0)
-				configuration->verbose = document_atribut_value( aptr );
+				cptr->verbose = document_atribut_value( aptr );
 			if ((aptr = document_atribut( eptr, "ipv6")) != (struct xml_atribut *) 0)
-				configuration->ipv6 = document_atribut_value( aptr );
+				cptr->ipv6 = document_atribut_value( aptr );
 			if ((aptr = document_atribut( eptr, "debug")) != (struct xml_atribut *) 0)
-				configuration->debug = document_atribut_value( aptr );
+				cptr->debug = document_atribut_value( aptr );
 			if ((aptr = document_atribut( eptr, "threads")) != (struct xml_atribut *) 0)
-				configuration->threads = document_atribut_value( aptr );
+				cptr->threads = document_atribut_value( aptr );
 
 			if (( vptr = document_element( eptr, "rest" )) != (struct xml_element *) 0)
 			{
 				if ((aptr = document_atribut( vptr, "host" )) != (struct xml_atribut *) 0)
-					configuration->resthost = document_atribut_string( aptr );
+					cptr->resthost = document_atribut_string( aptr );
 				if ((aptr = document_atribut( vptr, "port" )) != (struct xml_atribut *) 0)
-					configuration->restport = document_atribut_value( aptr );
-
-				if ((aptr = document_atribut( vptr, "chathost" )) != (struct xml_atribut *) 0)
-					configuration->chathost = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "chatport" )) != (struct xml_atribut *) 0)
-					configuration->chatport = document_atribut_value( aptr );
-				if ((aptr = document_atribut( vptr, "chatuser" )) != (struct xml_atribut *) 0)
-					configuration->chatuser = document_atribut_string( aptr );
-				if ((aptr = document_atribut( vptr, "chatpass" )) != (struct xml_atribut *) 0)
-					configuration->chatpass = document_atribut_string( aptr );
+					cptr->restport = document_atribut_value( aptr );
 
 				if ((aptr = document_atribut( vptr, "alert" )) != (struct xml_atribut *) 0)
 					if (!( alert_status = document_atribut_value( aptr ) ))
 						alert_status = 600;
 
 				if ((aptr = document_atribut( vptr, "storage" )) != (struct xml_atribut *) 0)
-					configuration->storage = document_atribut_string( aptr );
+					cptr->storage = document_atribut_string( aptr );
 			}
 
 			if (( vptr = document_element( eptr, "security" )) != (struct xml_element *) 0)
 			{
 				if ((aptr = document_atribut( vptr, "user" )) != (struct xml_atribut *) 0)
-					configuration->user = document_atribut_string( aptr );
+					cptr->user = document_atribut_string( aptr );
 				if ((aptr = document_atribut( vptr, "password"))  != (struct xml_atribut *) 0)
-					configuration->password = document_atribut_string( aptr );
+					cptr->password = document_atribut_string( aptr );
 				if ((aptr = document_atribut( vptr, "tls" )) != (struct xml_atribut *) 0)
-					if ((configuration->tls = document_atribut_string( aptr )) != 0)
-						if (!( strlen(configuration->tls) ))
-							configuration->tls = (char *) 0;
+					if ((cptr->tls = document_atribut_string( aptr )) != 0)
+						if (!( strlen(cptr->tls) ))
+							cptr->tls = (char *) 0;
 				if ((aptr = document_atribut( vptr, "monitor")) != (struct xml_atribut *) 0)
-					configuration->monitor = document_atribut_value( aptr );
+					cptr->monitor = document_atribut_value( aptr );
 			}
 
 			if (( vptr = document_element( eptr, "domain" )) != (struct xml_element *) 0)
 			{
 				if ((aptr = document_atribut( vptr, "name" )) != (struct xml_atribut *) 0)
-					configuration->domain = document_atribut_string( aptr );
+					cptr->domain = document_atribut_string( aptr );
 				if ((aptr = document_atribut( vptr, "zone" )) != (struct xml_atribut *) 0)
-					configuration->zone = document_atribut_string( aptr );
+					cptr->zone = document_atribut_string( aptr );
 			}
 		}
 		document = document_drop( document );
@@ -357,10 +340,10 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 		/* --------------------------------------- */
 		/* ensure service prefixed identity string */
 		/* --------------------------------------- */
-		if ( is_valid_value( configuration->identity ) )
+		if ( is_valid_value( cptr->identity ) )
 		{
-			configuration->identity = service_prefix_url( 
-				configuration->identity,
+			cptr->identity = service_prefix_url( 
+				cptr->identity,
 				( security ? "https" : "http" )
 				);
 		}
@@ -368,10 +351,10 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 		/* ---------------------------------------- */
 		/* ensure service prefixed publisher string */
 		/* ---------------------------------------- */
-		if ( is_valid_value( configuration->publisher ) )
+		if ( is_valid_value( cptr->publisher ) )
 		{
-			configuration->publisher = service_prefix_url( 
-				configuration->publisher,
+			cptr->publisher = service_prefix_url( 
+				cptr->publisher,
 				( security ? "https" : "http" )
 				);
 		}
@@ -380,8 +363,8 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 		else	set_socket_ipv4();
 
 	}
-	else if ( configuration->verbose )
-		printf("   Failed to load configuration section : %s, from : %s \n",section,configuration->config);
+	else if ( check_verbose() )
+		printf("   Failed to load configuration section : %s, from : %s \n",sptr,cptr->config);
 	set_xml_echo(0);
 	return;
 }
@@ -416,8 +399,8 @@ public	int	save_accords_configuration( struct accords_configuration * cptr, char
 			fprintf(h,"\tipv6=\"%u\"\n",cptr->ipv6);
 			fprintf(h,"\tdebug=\"%u\"\n",cptr->debug);
 			fprintf(h,"\tthreads=\"%u\">\n",cptr->threads);
-			fprintf(h,"<rest host=\"%s\" port=\"%u\" chathost=\"%s\" chatport=\"%u\" storage=\"%s\"/>\n",
-				cptr->resthost,cptr->restport,cptr->chathost,cptr->chatport,cptr->storage);
+			fprintf(h,"<rest host=\"%s\" port=\"%u\" storage=\"%s\"/>\n",
+				cptr->resthost,cptr->restport,cptr->storage);
 			fprintf(h,"<security user=\"%s\" password=\"%s\" tls=\"%s\" monitor=\"%u\"/>\n",
 				cptr->user,cptr->password,cptr->tls,cptr->monitor);
 			fprintf(h,"<domain name=\"%s\" zone=\"%s\"/>\n",
@@ -491,10 +474,6 @@ public	char *	serialise_component_configuration(struct accords_configuration * c
 		return( result );
 	else if (!( result = serialise_integer_value( result, "port", cptr->restport )))
 		return( result );
-	else if (!( result = serialise_string_value( result, "chathost", cptr->chathost )))
-		return( result );
-	else if (!( result = serialise_integer_value( result, "chatport", cptr->chatport )))
-		return( result );
 	else if (!( result = serialise_integer_value( result, "verbose", cptr->verbose )))
 		return( result );
 	else if (!( result = serialise_integer_value( result, "debug", cptr->debug )))
@@ -537,11 +516,6 @@ public	void	deserialise_component_configuration(
 		configuration->resthost = document_atribut_string( aptr );
 	if ((aptr = document_atribut( eptr, "port" )) != (struct xml_atribut *) 0)
 		configuration->restport = document_atribut_value( aptr );
-
-	if ((aptr = document_atribut( eptr, "chathost" )) != (struct xml_atribut *) 0)
-		configuration->chathost = document_atribut_string( aptr );
-	if ((aptr = document_atribut( eptr, "chatport" )) != (struct xml_atribut *) 0)
-		configuration->chatport = document_atribut_value( aptr );
 
 	if ((aptr = document_atribut( eptr, "storage" )) != (struct xml_atribut *) 0)
 		configuration->storage = document_atribut_string( aptr );

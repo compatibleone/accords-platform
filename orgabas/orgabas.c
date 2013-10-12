@@ -53,12 +53,6 @@ struct	accords_configuration OrgaBas = {
 	(struct occi_category *) 0
 	};
 
-public	char *	set_ldap_host(char * v);
-public	int	set_ldap_port(int port);
-public	char *	set_ldap_base(char * v);
-public	char *	set_ldap_user(char * v);
-public	char *	set_ldap_pass(char * v);
-
 public	int	check_debug()		{	return(OrgaBas.debug);		}
 public	int	check_verbose()		{	return(OrgaBas.verbose);	}
 public	char *	default_publisher()	{	return(OrgaBas.publisher);	}
@@ -89,19 +83,6 @@ public	int	failure( int e, char * m1, char * m2 )
 private	void	orgabas_load()
 {
 	load_accords_configuration( &OrgaBas, "orgabas" );
-	return;
-}
-
-/*	---------------------------------------------	*/  
-/*	 s e t _ l d a p _ c o n f i g u r a t i o n	*/
-/*	---------------------------------------------	*/  
-private	void	set_ldap_configuration()
-{
-	set_ldap_host(OrgaBas.chathost);
-	set_ldap_port(OrgaBas.chatport);
-	set_ldap_user(OrgaBas.chatuser);
-	set_ldap_pass(OrgaBas.chatpass);
-	set_ldap_base("ou=users,dc=easi-clouds,dc=eu");
 	return;
 }
 
@@ -351,7 +332,7 @@ private	int	orgabas_operation( char * nptr )
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
 
-	set_ldap_configuration();
+	load_ldap_configuration("ldapuser.xml", "ldapuser" );
 
 	set_autosave_cords_xlink_name("links_orgabas.xml");
 
