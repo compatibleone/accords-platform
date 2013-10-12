@@ -9,7 +9,12 @@
 private	struct ldap_controller * ldap_failure(struct ldap_controller * h, int ecode)
 {
 	char *	sptr;
-
+	int	whoops;
+	char *	mptr="default message";
+	if ( ecode == -1 )
+		if ( h )
+			whoops = ldap_get_option( h->handle,LDAP_OPT_RESULT_CODE , &ecode);
+	whoops = ldap_get_option( h->handle,LDAP_OPT_DIAGNOSTIC_MESSAGE , &mptr);
 	if ( h ) 
 	{
 		if ( h->handle ) 
@@ -29,7 +34,7 @@ private	struct ldap_controller * ldap_failure(struct ldap_controller * h, int ec
 	}
 	if ( ecode )
 		if ( check_verbose() )
-			printf("   LDAP FAIL %u \n",ecode );
+			printf("   LDAP FAIL %s %u \n",mptr,ecode );
 	close_socket_catcher(0,"ldap failure",ecode);
 	return((struct ldap_controller * ) 0);
 }
@@ -153,8 +158,15 @@ public	struct ldap_controller * OpenLdap( char * host, int port, char * credenti
 		lptr->pending	= 
 		lptr->error	=
 		lptr->messages  = 0;
+		lptr->version   = LDAP_VERSION3;
 		lptr->itember	=(BerElement *) 0;
+		lptr->server    =	
+		lptr->client    = (LDAPControl *) 0;
+		lptr->tlsmode   = LDAP_OPT_X_TLS_NEVER;
+		lptr->keyfile  = "security/commandPrivateKey.pem";
+		lptr->certfile  = "security/commandCertificate.pem";
 		lptr->modifications = (LDAPMod**) 0;
+		sprintf(lptr->url,"%s:%u",host,port);
 	}
 
 	start_socket_catcher(0,"ldap open");
@@ -168,10 +180,43 @@ public	struct ldap_controller * OpenLdap( char * host, int port, char * credenti
 		return( ldap_failure( lptr, 0  ) );
 
 	if ( check_verbose() )
-		printf("   LDAP INIT %s : %u \n",host,port);
+		printf("   LDAP OPEN %s : %u \n",host,port);
 
-	if (!( lptr->handle = ldap_init( host, port ) ))
+	if (!( lptr->handle = ldap_open( host, port )))
 		return( ldap_failure(lptr,0) );
+
+	if ( check_verbose() )
+		printf("   LDAP SET OPTION: PROTOCOL VERSION %u\n",lptr->version);
+
+	if ((lptr->error = ldap_set_option( lptr->handle, LDAP_OPT_PROTOCOL_VERSION, &lptr->version)) != LDAP_SUCCESS)
+		return( ldap_failure(lptr,lptr->error) );
+
+	if ( check_verbose() )
+		printf("   LDAP SET OPTION: REQUIRE CERTIFICATE NEVER \n");
+
+	if ((lptr->error = ldap_set_option( lptr->handle, LDAP_OPT_X_TLS_REQUIRE_CERT, &lptr->tlsmode)) != LDAP_SUCCESS)
+		return( ldap_failure(lptr,lptr->error) );
+
+	if ( check_verbose() )
+		printf("   LDAP SET OPTION: TLS KEYFILE %s \n",lptr->keyfile);
+
+	if ((lptr->error = ldap_set_option( lptr->handle, LDAP_OPT_X_TLS_KEYFILE, lptr->keyfile)) != LDAP_SUCCESS)
+		return( ldap_failure(lptr,lptr->error) );
+
+	if ( check_verbose() )
+		printf("   LDAP SET OPTION: TLS CERTFILE %s \n",lptr->certfile);
+
+	if ((lptr->error = ldap_set_option( lptr->handle, LDAP_OPT_X_TLS_CERTFILE, lptr->certfile)) != LDAP_SUCCESS)
+		return( ldap_failure(lptr,lptr->error) );
+
+	if ( check_verbose() )
+		printf("   LDAP START TLS \n");
+
+	if ((lptr->error = ldap_start_tls_s( lptr->handle, NULL, NULL )))
+	{
+		printf("ldap start tls -> %d:%u \n" ,lptr->error,errno);
+		return( ldap_failure(lptr,lptr->error) );
+	}
 
 	if ( check_verbose() )
 		printf("   LDAP BIND '%s' : '%s' \n",credentials, password);

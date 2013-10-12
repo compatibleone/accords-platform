@@ -21,6 +21,7 @@ struct	ldap_controller
 	LDAPMessage	*	result;
 	LDAPMessage	*	message;
 	BerElement 	* 	itember;
+	char			url[2048];
 	int			error;
 	int			messages;
 	char		*	dn;
@@ -29,7 +30,13 @@ struct	ldap_controller
 	int			synchronise;
 	int			operation;
 	int			pending;
+	int			version;
 	char 		*	domain;
+	LDAPControl	*	server;
+	LDAPControl	*	client;
+	char *			keyfile;
+	char *			certfile;
+	int			tlsmode;
 	LDAPMod		**	modifications;
 };
 
