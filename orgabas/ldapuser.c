@@ -38,6 +38,7 @@ public	void	load_ldap_configuration( char * filename, char * section )
 /*	g e t _ l d a p _ b a s e  	*/
 /*	-------------------------	*/
 private	char * get_ldap_base()	{	return( LdapConfig.storage );	}
+private	char * get_ldap_tls()	{	return( LdapConfig.tls );	}
 
 /*	-------------------------	*/
 /*	g e t _ l d a p _ h o s t 	*/
@@ -489,7 +490,9 @@ private struct rest_response * occi_ldap_user_item(
 	struct	ldap_user * uptr = (struct ldap_user *) 0;
 	struct	ldap_controller * lptr=(struct ldap_controller *) 0;
 
-	if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), get_ldap_user(), get_ldap_pass() ) ))
+	if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), 
+				get_ldap_user(), get_ldap_pass(), 
+				get_ldap_tls() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
 	else if (!( uptr = RetrieveLdapUser( lptr, id ) ))
 	{
@@ -517,7 +520,9 @@ private struct rest_response * occi_ldap_user_list(
 	struct	rest_header * hptr=(struct rest_header *) 0;
 	struct	ldap_controller * lptr=(struct ldap_controller *) 0;
 
-	if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), get_ldap_user(), get_ldap_pass() ) ))
+	if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), 
+				get_ldap_user(), get_ldap_pass(), 
+				get_ldap_tls() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
 	else if (!( hptr = RetrieveLdapUsers( lptr ) ))
 	{
@@ -567,7 +572,9 @@ private struct rest_response * occi_ldap_user_post(void * vptr, struct rest_clie
 		return( aptr );
 	else if (!( optr = vptr ))
 		return( rest_html_response( aptr, 400, "Bad Request") );
-	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), get_ldap_user(), get_ldap_pass() ) ))
+	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), 
+				get_ldap_user(), get_ldap_pass(), 
+				get_ldap_tls() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
 	else if (!( uptr = BuildLdapUser( rptr->first, uptr ) ))
 	{
@@ -604,7 +611,9 @@ private struct rest_response * occi_ldap_user_put(void * vptr, struct rest_clien
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( id = (rptr->object+strlen(optr->location) )))
 		return( rest_html_response( aptr, 400, "Bad Request") );
-	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), get_ldap_user(), get_ldap_pass() ) ))
+	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), 
+				get_ldap_user(), get_ldap_pass(), 
+				get_ldap_tls() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
 	else if (!( uptr = RetrieveLdapUser( lptr, id ) ))
 	{
@@ -648,7 +657,9 @@ private struct rest_response * occi_ldap_user_delete(void * vptr, struct rest_cl
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( id = (rptr->object+strlen(optr->location) )))
 		return( rest_html_response( aptr, 400, "Bad Request") );
-	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), get_ldap_user(), get_ldap_pass() ) ))
+	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), 
+				get_ldap_user(), get_ldap_pass(), 
+				get_ldap_tls() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
 	else if (( status = DeleteLdapUser( lptr, id )) != 0)
 	{
@@ -679,7 +690,9 @@ private struct rest_response * occi_ldap_user_head(void * vptr, struct rest_clie
 		return( rest_html_response( aptr, 400, "Bad Request") );
 	else if (!( id = (rptr->object+strlen(optr->location) )))
 		return( rest_html_response( aptr, 400, "Bad Request") );
-	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), get_ldap_user(), get_ldap_pass() ) ))
+	else if (!( lptr = OpenLdap( get_ldap_host(), get_ldap_port(), 
+				get_ldap_user(), get_ldap_pass(), 
+				get_ldap_tls() ) ))
 		return( rest_html_response( aptr, 401, "Not Authorised") );
 	else if (!( uptr = RetrieveLdapUser( lptr, id ) ))
 	{

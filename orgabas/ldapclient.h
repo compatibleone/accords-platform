@@ -5,7 +5,14 @@
 #include <ldap.h>
 
 #define	_DEFAULT_LDAP_HOST 		"localhost"
-#define	_DEFAULT_LDAP_DOMAIN 		"ou=confAdmin"
+
+#ifndef	LDAPS_PORT
+#define	LDAPS_PORT	636
+#endif
+
+#ifndef	LDAP_PORT
+#define	LDAP_PORT	389
+#endif
 
 #ifndef	private
 #define	private static
@@ -17,6 +24,10 @@
 
 struct	ldap_controller	
 {
+	char 		*	host;
+	char 		*	credentials;
+	char 		*	password;
+	int			port;
 	LDAP		*	handle;
 	LDAPMessage	*	result;
 	LDAPMessage	*	message;
@@ -34,13 +45,15 @@ struct	ldap_controller
 	char 		*	domain;
 	LDAPControl	*	server;
 	LDAPControl	*	client;
+	char *			tls;
+	struct	tls_configuration * tlsconf;
 	char *			keyfile;
 	char *			certfile;
 	int			tlsmode;
 	LDAPMod		**	modifications;
 };
 
-public	struct 	ldap_controller * 	OpenLdap( char * host, int port, char * credentials, char * password );
+public	struct 	ldap_controller * 	OpenLdap( char * host, int port, char * credentials, char * password , char * tls);
 public	void				CloseLdap( struct ldap_controller * lptr );
 public	struct 	ldap_controller * 	LdapAtbValue(struct ldap_controller * lptr );
 public	struct 	ldap_controller * 	FirstLdapAtb(struct ldap_controller * lptr, char * criteria );
