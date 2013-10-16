@@ -131,6 +131,8 @@ public	char *	rest_decode_html( char * sptr );
 public	int	rest_server_signal();
 public	int	rest_normalise_value( char * sptr, int factor );
 
+public void     rest_set_cors( struct rest_response* aptr, struct rest_request* rptr );
+
 #endif	/* _restpublic_h */
 	/* ------------- */
 
