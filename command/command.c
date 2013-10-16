@@ -2479,8 +2479,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.05");
-	printf("\n   Beta Version : 29/09/2013 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.06");
+	printf("\n   Beta Version : 16/10/2013 ");
 	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
