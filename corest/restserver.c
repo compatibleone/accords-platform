@@ -579,10 +579,8 @@ public	void rest_set_cors(
 {  
   struct rest_header * hptr;
 
-  printf("Check Origin header\n");
   if ( hptr = rest_resolve_header( rptr->first, _HTTP_ORIGIN ) )
     {
-      printf("Found  Origin header: %s\n", hptr->value);
       rest_response_header( aptr, _HTTP_CORS_ORIGIN, hptr->value );
     }
 }
