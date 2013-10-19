@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema version='0.1.0'>
-<model name='opennebula' description='' version='0.1.0'> 
+<model name='opennebula' description='opennebula provisioning contract' version='0.1.0'> 
 	<!-- categories from service at port 8098 -->
 	<!--  Open Nebula -->
 	<category term='opennebula' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/opennebula/' rel='http://schemas.ogf.org/occi/core#resource' structname='opennebula'>
@@ -16,6 +16,8 @@
 	        <attribute name='node' type='string' required='false' immutable='false'/>
 	        <attribute name='price' type='string' required='false' immutable='false'/>
 	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='accountname' type='string' required='false' immutable='false'/>
+	        <attribute name='networkname' type='string' required='false' immutable='false'/>
 	        <attribute name='access' type='string' required='false' immutable='false'/>
 	        <attribute name='workload' type='string' required='false' immutable='false'/>
 	        <attribute name='blob' type='string' required='false' immutable='false'/>
@@ -69,3 +71,4 @@
 	</category>
 </model>
 </schema>
+

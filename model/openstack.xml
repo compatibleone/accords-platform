@@ -18,6 +18,7 @@
 	        <attribute name='rootpass' type='string' required='false' immutable='false'/>
 	        <attribute name='reference' type='string' required='false' immutable='false'/>
 	        <attribute name='network' type='string' required='false' immutable='false'/>
+	        <attribute name='networkname' type='string' required='false' immutable='false'/>
 	        <attribute name='access' type='string' required='false' immutable='false'/>
 	        <attribute name='accessip' type='string' required='false' immutable='false'/>
 	        <attribute name='floating' type='string' required='false' immutable='false'/>

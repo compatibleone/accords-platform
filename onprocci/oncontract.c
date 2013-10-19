@@ -259,10 +259,83 @@ private	char *	opennebula_network_id( char * href )
 	}
 }
 
+/*	-----------------------------------------------		*/
+/*	r e s o l v e _ c o n t r a c t _ n e t w o r k		*/
+/*	-----------------------------------------------		*/
+private	char *	resolve_contract_network( 
+			struct cords_on_contract * contract, 
+			char * servicename, 
+			char * accountname, 
+			char * contractname )
+{
+	char	*	nptr;
+	char 	*	vptr;
+	/* ---------------------------------------------------------- */
+	/* retrieve appropriate parameters from node image components */
+	/* ---------------------------------------------------------- */
+	nptr = occi_extract_atribut( contract->network.message, "occi", _CORDS_NETWORK, _CORDS_NAME );
+	vptr = occi_extract_atribut( contract->network.message, "occi", _CORDS_NETWORK, _CORDS_LABEL);
+
+	/* ----------------------------------------------- */
+	/* the network.name value will be used as the name */
+	/* ----------------------------------------------- */
+	if (!( rest_valid_string( vptr ) ))
+	{
+		if (!( rest_valid_string( nptr ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( nptr ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the network.name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "ethernet" ) ))
+	{
+		if (!( rest_valid_string( nptr ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( nptr ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the account name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "account" ) ))
+	{
+		if (!( rest_valid_string( accountname ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( accountname ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the service name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "service" ) ))
+	{
+		if (!( rest_valid_string( servicename ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( servicename ) );
+	}
+
+	/* ------------------------------------------------ */
+	/* the contract name value will be used as the name */
+	/* ------------------------------------------------ */
+	else if (!( strcmp( vptr, "contract" ) ))
+	{
+		if (!( rest_valid_string( contractname ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( contractname ) );
+	}
+	/* ------------------------------------------------ */
+	/* the network.label value will be used as the name */
+	/* ------------------------------------------------ */
+	else	return( allocate_string( vptr ) );
+}	
+
+
 /*	-----------------------------------------------------------------	*/
 /*		r e s o l v e _ o p e n n e b u l a _ n e t w o r k 		*/
 /*	-----------------------------------------------------------------	*/
-private	char *	resolve_opennebula_network( struct cords_on_contract * cptr )
+private	char *	resolve_opennebula_network( struct cords_on_contract * cptr, struct opennebula * pptr )
 {
 	struct	on_network_infos	request;
 	struct	on_network_infos	infos;
@@ -274,17 +347,13 @@ private	char *	resolve_opennebula_network( struct cords_on_contract * cptr )
 	char 		    * vptr;
 	char	* seekname;
 
-	if (!( eptr = document_element( cptr->networks->xmlroot, "NETWORK_COLLECTION" )))
+	if (!( pptr->networkname = resolve_contract_network( cptr, pptr->name, pptr->name, pptr->accountname ) ))
 		return((char *) 0);
 
-	/* ------------------------------------------------------------ */
-	/* retrieve appropriate parameters from node network components */
-	/* ------------------------------------------------------------ */
-
-	else if (!( vptr = occi_extract_atribut( cptr->network.message, "occi", 
-		_CORDS_NETWORK, _CORDS_NAME ) ))
+	else if (!( eptr = document_element( cptr->networks->xmlroot, "NETWORK_COLLECTION" )))
 		return((char *) 0);
-	else if (!( request.name = occi_unquoted_value( vptr ) ))
+
+	else if (!( request.name = pptr->networkname ))
 		return((char *) 0);
 
 	memset( &best, 0, sizeof( struct on_network_infos ));
@@ -314,7 +383,7 @@ private	char *	resolve_opennebula_network( struct cords_on_contract * cptr )
 			liberate( infos.name );
 		}
 	}
-	liberate( request.name );
+
 	if ( best.name )
 		best.name = liberate( best.name );
 	if (!( best.href ))
@@ -452,11 +521,21 @@ public	int	create_opennebula_contract(
 	struct	cords_on_contract contract;
 	struct	os_response * flavors=(struct os_response *) 0;
 	struct	os_response * images =(struct os_response *) 0;
+	struct	occi_response * zptr;
 	int	status;
 
 	if (!(subptr = use_opennebula_configuration( pptr->profile )))
 		return( status );
 	else	memset( &contract, 0, sizeof( struct cords_on_contract ));
+
+	/* ------------------------------- */
+	/* recover the account description */
+	/* ------------------------------- */
+	if (!( zptr = occi_simple_get( pptr->account, agent, tls ) ))
+		return( terminate_opennebula_contract( 1169, &contract ) );
+	else if (!( pptr->accountname = occi_extract_atribut( zptr, "occi", _CORDS_ACCOUNT, _CORDS_NAME ) ))
+		return( terminate_opennebula_contract( 1169, &contract ) );
+	else	zptr = occi_remove_response( zptr );
 
 	/* ---------------------------- */
 	/* recover the node description */
@@ -555,7 +634,7 @@ public	int	create_opennebula_contract(
 	/* --------------------------------------- */
 	else if (!( contract.networks = on_list_network_pool(subptr) ))
 		return( terminate_opennebula_contract( 1588, &contract ) );
-	else if (!( pptr->publicnetwork = resolve_opennebula_network( &contract ) ))
+	else if (!( pptr->publicnetwork = resolve_opennebula_network( &contract, pptr ) ))
 		return( terminate_opennebula_contract( 1589, &contract ) );
 
 

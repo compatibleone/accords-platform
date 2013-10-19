@@ -168,7 +168,7 @@ public	int create_quantum_network( struct os_subscription * sptr, struct opensta
 	/* -------------------------- */
 	/* create the account network */
 	/* -------------------------- */
-	if (!( zptr = os_create_network( sptr, pptr->accountname, 1, 0 ) ))
+	if (!( zptr = os_create_network( sptr, pptr->networkname, 1, 0 ) ))
 		return(0);
 
 	else if (!( pptr->privatenet = resolve_json_id( zptr ) ))
@@ -181,7 +181,7 @@ public	int create_quantum_network( struct os_subscription * sptr, struct opensta
 	/* --------------------- */
 	/* create account subnet */
 	/* --------------------- */
-	if (!( zptr = os_create_subnet( sptr, pptr->accountname, pptr->privatenet, 4, "192.168.0.0/24" )))
+	if (!( zptr = os_create_subnet( sptr, pptr->networkname, pptr->privatenet, 4, "192.168.0.0/24" )))
 		return(0);
 
 	else if (!( sid = resolve_json_id( zptr )))
@@ -194,7 +194,7 @@ public	int create_quantum_network( struct os_subscription * sptr, struct opensta
 	/* --------------------- */
 	/* create account router */
 	/* --------------------- */
-	if (!( zptr = os_create_router( sptr, pptr->accountname, pptr->publicnet, 1 ) ))
+	if (!( zptr = os_create_router( sptr, pptr->networkname, pptr->publicnet, 1 ) ))
 	{
 		sid = liberate( sid );
 		return(0);
@@ -263,7 +263,7 @@ public	int resolve_quantum_network( struct os_subscription * sptr, struct openst
 			/* ------------------------------------------ */
 			/* then resolve or create the private network */
 			/* ------------------------------------------ */
-			if (!( pptr->privatenet = resolve_named_network( zptr, pptr->accountname ) ))
+			if (!( pptr->privatenet = resolve_named_network( zptr, pptr->networkname ) ))
 			{
 				if (!( create_quantum_network( sptr, pptr ) ))
 				{

@@ -61,6 +61,7 @@
 /*	-------------------------	*/
 #define	_CORDS_ID		"id"
 #define	_CORDS_NAME		"name"
+#define	_CORDS_LABEL		"label"
 #define	_CORDS_MEMORY		"memory"
 #define	_CORDS_ARCHITECTURE	"architecture"
 #define	_CORDS_SPEED		"speed"

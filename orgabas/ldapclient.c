@@ -157,7 +157,7 @@ public	struct ldap_controller * OpenLdap( char * host, int port, char * credenti
 	struct ldap_controller * lptr;
 	LDAP	*	handle=(LDAP *) 0;
 	int		mid=0;
-	LDAP	*	ldap_open( char *, int );
+	LDAP	*	ldap_open( const char *, int );
 
 	if (!( lptr = allocate( sizeof( struct ldap_controller ) ) ))
 		return( lptr );

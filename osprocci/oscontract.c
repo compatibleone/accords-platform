@@ -448,6 +448,78 @@ private	char *	resolve_contract_image( struct	os_subscription * subptr, struct c
 	}
 }
 
+/*	-----------------------------------------------		*/
+/*	r e s o l v e _ c o n t r a c t _ n e t w o r k		*/
+/*	-----------------------------------------------		*/
+private	char *	resolve_contract_network( 
+			struct cords_os_contract * contract, 
+			char * servicename, 
+			char * accountname, 
+			char * contractname )
+{
+	char	*	nptr;
+	char 	*	vptr;
+	/* ---------------------------------------------------------- */
+	/* retrieve appropriate parameters from node image components */
+	/* ---------------------------------------------------------- */
+	nptr = occi_extract_atribut( contract->network.message, "occi", _CORDS_NETWORK, _CORDS_NAME );
+	vptr = occi_extract_atribut( contract->network.message, "occi", _CORDS_NETWORK, _CORDS_LABEL);
+
+	/* ----------------------------------------------- */
+	/* the network.name value will be used as the name */
+	/* ----------------------------------------------- */
+	if (!( rest_valid_string( vptr ) ))
+	{
+		if (!( rest_valid_string( nptr ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( nptr ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the network.name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "ethernet" ) ))
+	{
+		if (!( rest_valid_string( nptr ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( nptr ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the account name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "account" ) ))
+	{
+		if (!( rest_valid_string( accountname ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( accountname ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the service name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "service" ) ))
+	{
+		if (!( rest_valid_string( servicename ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( servicename ) );
+	}
+
+	/* ------------------------------------------------ */
+	/* the contract name value will be used as the name */
+	/* ------------------------------------------------ */
+	else if (!( strcmp( vptr, "contract" ) ))
+	{
+		if (!( rest_valid_string( contractname ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( contractname ) );
+	}
+	/* ------------------------------------------------ */
+	/* the network.label value will be used as the name */
+	/* ------------------------------------------------ */
+	else	return( allocate_string( vptr ) );
+}	
+
 /*	-----------------------------------------------------------------	*/
 /*		c r e a t e _ o p e n s t a c k _ c o n t r a c t		*/
 /*	-----------------------------------------------------------------	*/
@@ -597,6 +669,8 @@ public	int	create_openstack_contract(
 	/* --------------------------------------- */
 	if (!( pptr->original = allocate_string( pptr->image ) ))
 		return( terminate_openstack_contract( 1190, &contract ) );
+	else if (!( pptr->networkname = resolve_contract_network( &contract, pptr->name, pptr->name, pptr->accountname ) ))
+		return( terminate_openstack_contract( 1192, &contract ) );
 	else
 	{
 		/* -------------------------------------------- */
