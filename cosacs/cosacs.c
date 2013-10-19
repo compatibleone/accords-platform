@@ -105,9 +105,9 @@ private	void	cosacs_load()
 /*	---------------------------------------------	*/  
 private	int	cosacs_banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.08");
-	printf("\n   Beta Version : 01/08/2012");
-	printf("\n   Copyright (c) 2012 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.09");
+	printf("\n   Beta Version : 19/10/2013");
+	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -319,6 +319,7 @@ private	int	cosacs_probe_worker( struct cords_probe * pptr )
 	int	sample=0;
 	char 	filename[1024];
 	char 	buffer[2048];
+	occi_child_authentication();
 	sprintf(filename,"rest/%s.probe",pptr->id);
 	unlink( filename );
 	while (!( rest_server_signal()))

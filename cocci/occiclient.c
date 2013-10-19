@@ -77,9 +77,18 @@ private	struct rest_header * get_thread_occi_headers()
 
 	struct	rest_header * hptr=(struct rest_header *) 0;
 	struct	occi_header_manager * mptr=(struct occi_header_manager *) 0;
-	if ( OcciManager.mode )
+	switch ( OcciManager.mode )
+	{
+	case	1	:
 		pid = getpid();
-	else	tid = pthread_self();
+		break;
+	case	2	:
+		pid = getppid();
+		break;
+	case	0	:
+		tid = pthread_self();
+		break;
+	}
 	pthread_mutex_lock( &ThreadLock );
 	for (	mptr = OcciManager.headers;
 		mptr != (struct occi_header_manager *) 0;
@@ -116,9 +125,18 @@ private	struct rest_header * set_thread_occi_headers( struct rest_header * hptr)
 			return( hptr );
 		else
 		{
-			if ( OcciManager.mode )
+			switch ( OcciManager.mode )
+			{
+			case	1	:
 				mptr->pid = getpid();
-			else	mptr->tid = pthread_self();
+				break;
+			case	2	:
+				mptr->pid = getppid();
+				break;
+			case	0	:
+				mptr->tid = pthread_self();
+				break;
+			}
 			mptr->headers = hptr;
 			pthread_mutex_lock( &ThreadLock );
 			if ((mptr->next = OcciManager.headers) != (struct occi_header_manager *) 0)
@@ -408,7 +426,16 @@ public	struct	rest_header * occi_client_authentication( char * aptr )
 }
 
 /*	------------------------------------------------------------	*/
-/*	    o c c i _ c l i e n t _ a u t h e n t i c a t i o n		*/
+/*	    o c c i _ c h i l d _ a u t h e n t i c a t i o n		*/
+/*	------------------------------------------------------------	*/
+public	void	occi_child_authentication()
+{
+	OcciManager.mode = 2;
+	return;
+}
+	
+/*	------------------------------------------------------------	*/
+/*	    o c c i _ s e r v e r _ a u t h e n t i c a t i o n		*/
 /*	------------------------------------------------------------	*/
 public	struct	rest_header * occi_server_authentication( char * aptr )
 {
