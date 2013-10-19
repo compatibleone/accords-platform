@@ -38,6 +38,8 @@
 	        <attribute name='access' type='string' required='false' immutable='false'/>
 	        <attribute name='agent' type='string' required='false' immutable='false'/>
 	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='accountname' type='string' required='false' immutable='false'/>
+	        <attribute name='networkname' type='string' required='false' immutable='false'/>
 	        <attribute name='firewall' type='string' required='false' immutable='false'/>
 	        <attribute name='image' type='string' required='false' immutable='false'/>
 	        <attribute name='original' type='string' required='false' immutable='false'/>
@@ -175,3 +177,4 @@
 	</category>
 </model>
 </schema>
+

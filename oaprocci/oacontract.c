@@ -66,7 +66,7 @@ private	struct oa_response * destroy_onapp_provisioning( struct onapp * pptr );
 /*  --------------------------------------------------- */
 /*  OCCI attribute handling                             */
 /*  --------------------------------------------------- */
-int set_string_from_occi_response_attribute_default(char * * const target, struct occi_response * const pocci_response
+private	int set_string_from_occi_response_attribute_default(char * * const target, struct occi_response * const pocci_response
     , char * const domain, char * const category, char * const name
     , char * const default_value)
 {
@@ -86,13 +86,13 @@ int set_string_from_occi_response_attribute_default(char * * const target, struc
   return found_string;
 }
 
-int set_string_from_occi_response_attribute(char * * const target, struct occi_response * const pocci_response
+private	int set_string_from_occi_response_attribute(char * * const target, struct occi_response * const pocci_response
     , char * const domain, char * const category, char * const name)
 {
   return set_string_from_occi_response_attribute_default(target, pocci_response, domain, category, name, NULL);
 }
 
-int set_int_from_occi_response_attribute_default(int * const target, struct occi_response * const pocci_response
+private	int set_int_from_occi_response_attribute_default(int * const target, struct occi_response * const pocci_response
     , char * const domain, char * const category, char * const name
     , int default_value)
 {
@@ -112,7 +112,7 @@ int set_int_from_occi_response_attribute_default(int * const target, struct occi
   return found_int;
 }
 
-int set_int_from_occi_response_attribute(int * const target, struct occi_response * const pocci_response
+private	int set_int_from_occi_response_attribute(int * const target, struct occi_response * const pocci_response
     , char * const domain, char * const category, char * const name)
 {
   return set_int_from_occi_response_attribute_default(target, pocci_response, domain, category, name, 0);
@@ -122,8 +122,7 @@ int set_int_from_occi_response_attribute(int * const target, struct occi_respons
 /*  --------------------------------------------------- */
 /*  Alert handling                                      */
 /*  --------------------------------------------------- */
-
-struct rest_response *  oaprocci_alert_relay_name(
+private	struct rest_response *  oaprocci_alert_relay_name(
 		void * i,
 		struct rest_client * prest_client,
 		struct rest_response * prest_response,
@@ -160,7 +159,7 @@ struct rest_response *  oaprocci_alert_relay_name(
 /*	------------------------------------------------------------------	*/
 /*	    o a p r o c c i _ a l e r t _ r e l a y                         */
 /*	------------------------------------------------------------------	*/
-struct rest_response *  oaprocci_alert_relay(
+public	struct rest_response *  oaprocci_alert_relay(
 		void * i,
 		struct rest_client * prest_client,
 		struct rest_response * prest_response,
@@ -185,23 +184,19 @@ struct rest_response *  oaprocci_alert_relay(
 }
 
 /*	--------------------------------------------------------	*/
-/*	     o n a p p _ b u i l d _ f a i l u r e		*/
+/*	     o n a p p _ b u i l d _ f a i l u r e			*/
 /*	--------------------------------------------------------	*/
 private	int	onapp_build_failure( struct onapp * pptr, int status, char * message )
 {
 	// TODO: Clear up ongoing OnApp activity.
-//	struct	os_response * zptr;
 	rest_log_message( message );
-//	if ((zptr = stop_openstack_provisioning( pptr )) != (struct os_response *) 0)
-//		zptr = liberate_os_response( zptr );
-//	reset_openstack_server( pptr );
 	pptr->build_state = allocate_string("failed");
 	return( status );
 }
 
 
 /*	--------------------------------------------------------	*/
-/*   OnApp action boilerplate handling                          */
+/*   	     OnApp action boilerplate handling                          */
 /*	--------------------------------------------------------	*/
 
 struct error_data
@@ -242,7 +237,10 @@ struct onapp_action_data
 	struct action_errors_data action_errors;
 };
 
-void allocate_action_error_data_message(struct error_data *perror_data, char const action[], char const *format)
+/*	-------------------------------------------------------------------	*/
+/*	a l l o c a t e _ a c t i o n _ e r r o r _ d a t a _ m e s s a g e	*/
+/*	-------------------------------------------------------------------	*/
+private	void allocate_action_error_data_message(struct error_data *perror_data, char const action[], char const *format)
 {
 	char buffer[512];
 	buffer[0] = '\0';
@@ -252,7 +250,10 @@ void allocate_action_error_data_message(struct error_data *perror_data, char con
 	perror_data->do_liberate = 1;
 }
 
-struct action_errors_data create_action_errors_data_default(char const action[])
+/*	-------------------------------------------------------------------	*/
+/*	c r e a t e _ a c t i o n _ e r r o r s _ d a t a _ d e f a u l t 	*/
+/*	-------------------------------------------------------------------	*/
+private	struct action_errors_data create_action_errors_data_default(char const action[])
 {
 	struct action_errors_data result = { 0 };
 	result.invalid_action.status = 500;
@@ -274,7 +275,11 @@ struct action_errors_data create_action_errors_data_default(char const action[])
 
 	return result;
 }
-void liberate_error_data_message(struct error_data *perror_data)
+
+/*	-----------------------------------------------------		*/
+/*	l i b e r a t e _ e r r o r _ d a t a _ m e s s a g e		*/
+/*	-----------------------------------------------------		*/
+private	void liberate_error_data_message(struct error_data *perror_data)
 {
 	if (perror_data != NULL)
 	{
@@ -286,7 +291,10 @@ void liberate_error_data_message(struct error_data *perror_data)
 	}
 }
 
-void liberate_onapp_action_error_data(struct action_errors_data *paction_errors)
+/*	---------------------------------------------------------------		*/
+/*	l i b e r a t e _ o n a p p _ a c t i o n _ e r r o r _ d a t a		*/
+/*	---------------------------------------------------------------		*/
+private	void liberate_onapp_action_error_data(struct action_errors_data *paction_errors)
 {
 	liberate_error_data_message(&paction_errors->invalid_action);
 	liberate_error_data_message(&paction_errors->null_response);
@@ -296,7 +304,10 @@ void liberate_onapp_action_error_data(struct action_errors_data *paction_errors)
 	liberate_error_data_message(&paction_errors->happy_response);
 }
 
-struct onapp_action_input_data const initialise_onapp_action_input_data (
+/*	-------------------------------------------------------------------		*/
+/*	i n i t i a l i s e _ o n a p p _ a c t i o n _ i n p u t _ d a t a		*/
+/*	-------------------------------------------------------------------		*/
+private	struct onapp_action_input_data const initialise_onapp_action_input_data (
 		struct occi_category * pocci_category,
 		struct rest_client * prest_client,
 		struct rest_request * prest_request,
@@ -308,7 +319,10 @@ struct onapp_action_input_data const initialise_onapp_action_input_data (
 	return input;
 }
 
-struct onapp_action_data create_onapp_action_data(char const action[], struct onapp_action_input_data onapp_action_input
+/*	----------------------------------------------		*/
+/*	c r e a t e _ o n a p p _ a c t i o n _d a t a		*/
+/*	----------------------------------------------		*/
+private	struct onapp_action_data create_onapp_action_data(char const action[], struct onapp_action_input_data onapp_action_input
 		, action_fn paction
 		, struct action_errors_data * paction_errors)
 {
@@ -324,7 +338,10 @@ struct onapp_action_data create_onapp_action_data(char const action[], struct on
 	return onapp_action;
 }
 
-struct onapp_action_data create_onapp_action_data_default_errors(char const action[], struct onapp_action_input_data onapp_action_input
+/*	-----------------------------------------------------------------------------		*/
+/*	c r e a t e _ o n a p p _ a c t i o n _ d a t a _ d e f a u l t _ e r r o r s 		*/
+/*	-----------------------------------------------------------------------------		*/
+private	struct onapp_action_data create_onapp_action_data_default_errors(char const action[], struct onapp_action_input_data onapp_action_input
 		, action_fn paction)
 {
 	return create_onapp_action_data(action, onapp_action_input, paction, NULL);
@@ -337,7 +354,10 @@ typedef enum GenerateAlert_
 	, GA_RELAY = 2
 } GenerateAlert;
 
-struct rest_response * handle_alert(int generate_alert,
+/*	------------------------------------------	*/
+/*		h a n d l e _ a l e r t			*/
+/*	------------------------------------------	*/
+private	struct rest_response * handle_alert(int generate_alert,
 	struct occi_category *pocci_category,
 	struct rest_client * prest_client,
 	struct oa_response * poa_response,
@@ -386,6 +406,9 @@ struct rest_response * handle_alert(int generate_alert,
 	return prest_response_result;
 }
 
+/*	------------------------------------------	*/
+/*	d o _ o n a p p _ a c t i o n _ a l e r t	*/
+/*	------------------------------------------	*/
 public struct rest_response * do_onapp_action_alert(
 	struct onapp_action_data * const ponapp_action,
 	int forbidden_occi_state,
@@ -444,9 +467,7 @@ public struct rest_response * do_onapp_action_alert(
 						}
 					}
 				}
-
 				poa_response = liberate_oa_response( poa_response );
-
 			}
 		}
 	}
@@ -474,11 +495,9 @@ public	struct	rest_response * do_onapp_action(
 }
 
 /*	--------------------------------------------------------	*/
-
-/*	--------------------------------------------------------	*/
 /*	     r e t r i e v e _ o n a p p _ d a t a                  */
 /*	--------------------------------------------------------	*/
-int	retrieve_onapp_data( struct	oa_config * pptr, struct cords_oa_contract * cptr
+private	int	retrieve_onapp_data( struct	oa_config * pptr, struct cords_oa_contract * cptr
 		, struct onapp *ponapp)
 {
 	char *			vptr;
@@ -578,7 +597,10 @@ int	retrieve_onapp_data( struct	oa_config * pptr, struct cords_oa_contract * cpt
 	return 0;
 }
 
-int retrieve_onapp_extras_data(struct cords_onapp_extras const * const onapp_extras,
+/*	--------------------------------------------------------	*/
+/*	  r e t r i e v e _ o n a p p _ e x t r a s _ d a t a		*/
+/*	--------------------------------------------------------	*/
+private	int retrieve_onapp_extras_data(struct cords_onapp_extras const * const onapp_extras,
 		struct onapp* ponapp)
 {
 	ponapp->initial_root_password = 0; // OnApp specific
@@ -613,7 +635,6 @@ int retrieve_onapp_extras_data(struct cords_onapp_extras const * const onapp_ext
 
 	return 0;
 }
-
 
 /*	-------------------------------------------	*/
 /*	    c r e a t e _ o n a p p _ v m          	*/
@@ -715,7 +736,7 @@ public	struct	rest_response * create_onapp_vm(
 }
 
 /*	-------------------------------------------	*/
-/* 	   	s a v e _ o n a p p         */
+/* 	   		s a v e _ o n a p p         	*/
 /*	-------------------------------------------	*/
 public	struct	rest_response * save_onapp(
 		struct occi_category * optr, 
@@ -737,7 +758,7 @@ public	struct	rest_response * save_onapp(
 }
 
 /*	-------------------------------------------	*/
-/* 	   	s t o p _ o n a p p         */
+/* 	 	  	s t o p _ o n a p p    	     	*/
 /*	-------------------------------------------	*/
 public	struct	rest_response * stop_onapp(
 		struct occi_category * pocci_category,
@@ -800,6 +821,9 @@ public	struct	rest_response * stop_onapp(
 	return prest_response_result;
 }
 
+/*	-------------------------------------------	*/
+/* 	 	  s t a r t _ o n a p p    	     	*/
+/*	-------------------------------------------	*/
 public struct rest_response * start_onapp(struct occi_category * pocci_category,
 		struct rest_client * prest_client,
 		struct rest_request * prest_request,
@@ -814,6 +838,9 @@ public struct rest_response * start_onapp(struct occi_category * pocci_category,
 	return onapp_action.prest_response_result;
 }
 
+/*	-------------------------------------------	*/
+/* 	 	  s h u t d o w n _ o n a p p         	*/
+/*	-------------------------------------------	*/
 public struct rest_response * shutdown_onapp(struct occi_category * pocci_category,
 		struct rest_client * prest_client,
 		struct rest_request * prest_request,
@@ -828,6 +855,9 @@ public struct rest_response * shutdown_onapp(struct occi_category * pocci_catego
 	return onapp_action.prest_response_result;
 }
 
+/*	-------------------------------------------	*/
+/* 	 	  r e s t a r t _ o n a p p         	*/
+/*	-------------------------------------------	*/
 public struct rest_response * restart_onapp(struct occi_category * pocci_category,
 		struct rest_client * prest_client,
 		struct rest_request * prest_request,
@@ -842,6 +872,9 @@ public struct rest_response * restart_onapp(struct occi_category * pocci_categor
 	return onapp_action.prest_response_result;
 }
 
+/*	-------------------------------------------	*/
+/* 	 	  d e s t r a y _ o n a p p         	*/
+/*	-------------------------------------------	*/
 public struct rest_response * destroy_onapp(struct occi_category * pocci_category,
 		struct rest_client * prest_client,
 		struct rest_request * prest_request,
@@ -856,9 +889,82 @@ public struct rest_response * destroy_onapp(struct occi_category * pocci_categor
 	return onapp_action.prest_response_result;
 }
 
-/*  -----------------------------------------------------------------  */
-/*      c r e a t e _ o n a p p _ c o n t r a c t          */
-/*  -----------------------------------------------------------------  */
+/*	-----------------------------------------------		*/
+/*	r e s o l v e _ c o n t r a c t _ n e t w o r k		*/
+/*	-----------------------------------------------		*/
+private	char *	resolve_contract_network( 
+			struct cords_oa_contract * contract, 
+			char * servicename, 
+			char * accountname, 
+			char * contractname )
+{
+	char	*	nptr;
+	char 	*	vptr;
+	/* ---------------------------------------------------------- */
+	/* retrieve appropriate parameters from node image components */
+	/* ---------------------------------------------------------- */
+	nptr = occi_extract_atribut( contract->network.message, "occi", _CORDS_NETWORK, _CORDS_NAME );
+	vptr = occi_extract_atribut( contract->network.message, "occi", _CORDS_NETWORK, _CORDS_LABEL);
+
+	/* ----------------------------------------------- */
+	/* the network.name value will be used as the name */
+	/* ----------------------------------------------- */
+	if (!( rest_valid_string( vptr ) ))
+	{
+		if (!( rest_valid_string( nptr ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( nptr ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the network.name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "ethernet" ) ))
+	{
+		if (!( rest_valid_string( nptr ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( nptr ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the account name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "account" ) ))
+	{
+		if (!( rest_valid_string( accountname ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( accountname ) );
+	}
+
+	/* ----------------------------------------------- */
+	/* the service name value will be used as the name */
+	/* ----------------------------------------------- */
+	else if (!( strcmp( vptr, "service" ) ))
+	{
+		if (!( rest_valid_string( servicename ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( servicename ) );
+	}
+
+	/* ------------------------------------------------ */
+	/* the contract name value will be used as the name */
+	/* ------------------------------------------------ */
+	else if (!( strcmp( vptr, "contract" ) ))
+	{
+		if (!( rest_valid_string( contractname ) ))
+			return( (char *) 0 );
+		else	return( allocate_string( contractname ) );
+	}
+	/* ------------------------------------------------ */
+	/* the network.label value will be used as the name */
+	/* ------------------------------------------------ */
+	else	return( allocate_string( vptr ) );
+}	
+
+
+/*  -----------------------------------------------------------------  	*/
+/*    	 	 c r e a t e _ o n a p p _ c o n t r a c t          	*/
+/*  -----------------------------------------------------------------  	*/
 public	int	create_onapp_contract(
 		struct occi_category * optr,
 		struct onapp * pptr,
@@ -866,13 +972,13 @@ public	int	create_onapp_contract(
 		char * agent,
 		char * tls )
 {
-	
-	struct	oa_config *                config = (struct oa_config *) 0;
+	struct	occi_response * 		zptr;	
+	struct	oa_config *			config = (struct oa_config *) 0;
 	//struct	cords_onapp_extras const * onapp_extras = (struct cords_onapp_extras const *)0;
-	struct cords_onapp_extras_handle   onapp_extras_handle = { 0 };
-	struct	cords_oa_contract          contract;
-	struct	oa_response *              instancetypes = (struct oa_response *) 0;
-	struct	oa_response *              images = (struct oa_response *) 0;
+	struct cords_onapp_extras_handle   	onapp_extras_handle = { 0 };
+	struct	cords_oa_contract          	contract;
+	struct	oa_response *              	instancetypes = (struct oa_response *) 0;
+	struct	oa_response *              	images = (struct oa_response *) 0;
 	int	status;
 	int result = 0; // Stores result for a function call.
 	char * vptr;
@@ -890,6 +996,16 @@ public	int	create_onapp_contract(
 		memset( &contract, 0, sizeof( struct cords_oa_contract ));
 		contract.config = config;
 	}
+
+	/* ------------------------------- */
+	/* recover the account description */
+	/* ------------------------------- */
+	if (!( zptr = occi_simple_get( pptr->account, agent, tls ) ))
+		return( terminate_onapp_contract( 1169, &contract ) );
+	else if (!( pptr->accountname = occi_extract_atribut( zptr, "occi", _CORDS_ACCOUNT, _CORDS_NAME ) ))
+		return( terminate_onapp_contract( 1169, &contract ) );
+	else	zptr = occi_remove_response( zptr );
+
 
 	// Find the onapp extras for this nodes.
 	if (pptr->node != NULL) // If got a node
@@ -975,8 +1091,8 @@ public	int	create_onapp_contract(
 		return( terminate_onapp_contract( 1175, &contract ) );
 	else if (!( contract.network.message = occi_simple_get( contract.network.id, agent, tls ) ))
 		return( terminate_onapp_contract( 1177, &contract ) );
-//	else if (!( pptr->network = allocate_string( contract.network.id ) ))
-//		return( terminate_onapp_contract( 1176, &contract ) );
+	else if (!( pptr->networkname = resolve_contract_network( &contract, pptr->name, pptr->accountname, pptr->name ) ))
+		return( terminate_onapp_contract( 1176, &contract ) );
 
 	else if (!( contract.storage.id = occi_extract_atribut( contract.infrastructure.message, "occi",
 		_CORDS_INFRASTRUCTURE, _CORDS_STORAGE ) ))
@@ -1041,9 +1157,9 @@ public	int	create_onapp_contract(
 	return( terminate_onapp_contract( 0, &contract ) );
 }
 
-/*  -----------------------------------------------------------------  */
-/*      d e l e t e _ o n a p p _ c o n t r a c t          */
-/*  -----------------------------------------------------------------  */
+/*  -----------------------------------------------------------------  	*/
+/*      	d e l e t e _ o n a p p _ c o n t r a c t          	*/
+/*  -----------------------------------------------------------------  	*/
 public	int	delete_onapp_contract(
 		struct occi_category * optr,
 		struct onapp * pptr,
@@ -1073,10 +1189,9 @@ public	int	delete_onapp_contract(
 	return result;
 }
 
-
-/*	-----------------------------------------------------------------  */
-/* 	    u s e _ o n a p p _ c o n f i g u r a t i o n      */
-/*	-----------------------------------------------------------------  */
+/*	-----------------------------------------------------------------  	*/
+/* 	    u s e _ o n a p p _ c o n f i g u r a t i o n      			*/
+/*	-----------------------------------------------------------------  	*/
 //private	struct oa_config * use_onapp_configuration( char * nptr )
 //{
 //	struct	oa_config * sptr;
@@ -1104,9 +1219,9 @@ private	struct oa_config * use_onapp_configuration( char * nptr )
 	else 	return( resolve_oa_configuration( operatorProfileName ) );
 }
 
-/*  -----------------------------------------------------------------  */
-/* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n               */
-/*  -----------------------------------------------------------------  */
+/*  -----------------------------------------------------------------  	*/
+/* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n             */
+/*  -----------------------------------------------------------------  	*/
 struct oa_config * resolve_oa_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
@@ -1147,9 +1262,9 @@ struct oa_config * resolve_oa_configuration( char * sptr )
 				// so rather than creating a new instance of some config containing struct,
 				// we'll just return the config directly.
 				return pptr;
-	//			return( oa_initialise_client(
-	//				pptr->user, pptr->password, pptr->host,
-	//				_CORDS_OA_AGENT, pptr->version, pptr->tls ));
+				// return( oa_initialise_client(
+				//	pptr->user, pptr->password, pptr->host,
+				//	_CORDS_OA_AGENT, pptr->version, pptr->tls ));
 			}
 		}
 	}
@@ -1158,7 +1273,7 @@ struct oa_config * resolve_oa_configuration( char * sptr )
 
 
 /*	-----------------------------------------------------------------  */
-/* 	    u s e _ o n a p p _ e x t r a s                               */
+/* 	    u s e _ o n a p p _ e x t r a s                                */
 /*	-----------------------------------------------------------------  */
 struct cords_onapp_extras_handle use_cords_onapp_extras_handle( char * sptr, char *agent, char *tls )
 {
@@ -1197,7 +1312,7 @@ void extract_onapp_extras_from_occi_response(struct cords_onapp_extras *ponapp_e
 }
 
 /*  -----------------------------------------------------------------  */
-/* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n               */
+/* 	    r e s o l v e _ o a _ c o n f i g u r a t i o n            */
 /*  -----------------------------------------------------------------  */
 struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr, char *agent, char *tls )
 {

@@ -347,7 +347,7 @@ private	char *	resolve_opennebula_network( struct cords_on_contract * cptr, stru
 	char 		    * vptr;
 	char	* seekname;
 
-	if (!( pptr->networkname = resolve_contract_network( cptr, pptr->name, pptr->name, pptr->accountname ) ))
+	if (!( pptr->networkname = resolve_contract_network( cptr, pptr->name, pptr->accountname, pptr->name ) ))
 		return((char *) 0);
 
 	else if (!( eptr = document_element( cptr->networks->xmlroot, "NETWORK_COLLECTION" )))

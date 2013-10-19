@@ -23,6 +23,8 @@
 	        <attribute name='price' type='string' required='false' immutable='false'/>
 	        <attribute name='original' type='string' required='false' immutable='false'/>
 	        <attribute name='account' type='string' required='false' immutable='false'/>
+	        <attribute name='accountname' type='string' required='false' immutable='false'/>
+	        <attribute name='networkname' type='string' required='false' immutable='false'/>
 	        <attribute name='location' type='string' required='false' immutable='false'/>
 	        <attribute name='group' type='string' required='false' immutable='false'/>
 	        <attribute name='hostedservice' type='string' required='false' immutable='false'/>
@@ -80,3 +82,4 @@
 	</category>
 </model>
 </schema>
+

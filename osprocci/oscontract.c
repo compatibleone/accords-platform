@@ -669,7 +669,7 @@ public	int	create_openstack_contract(
 	/* --------------------------------------- */
 	if (!( pptr->original = allocate_string( pptr->image ) ))
 		return( terminate_openstack_contract( 1190, &contract ) );
-	else if (!( pptr->networkname = resolve_contract_network( &contract, pptr->name, pptr->name, pptr->accountname ) ))
+	else if (!( pptr->networkname = resolve_contract_network( &contract, pptr->name, pptr->accountname, pptr->name ) ))
 		return( terminate_openstack_contract( 1192, &contract ) );
 	else
 	{
