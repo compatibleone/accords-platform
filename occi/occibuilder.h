@@ -59,6 +59,7 @@ public struct occi_category * occi_cords_service_builder(char *a,char * b);
 public struct occi_category * occi_cords_invoice_builder(char *a,char * b);
 public struct occi_category * occi_cords_contract_builder(char *a,char * b);
 public struct occi_category * occi_cords_network_builder(char *a,char * b);
+public struct occi_category * occi_cords_endpoint_builder(char *a,char * b);
 public struct occi_category * occi_cords_package_builder(char *a,char * b);
 public struct occi_category * occi_cords_profile_builder(char *a,char * b);
 public struct occi_category * occi_cords_plan_builder(char *a,char * b);

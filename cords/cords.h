@@ -20,6 +20,7 @@
 
 #include "compute.h"
 #include "network.h"
+#include "endpoint.h"
 #include "port.h"
 #include "firewall.h"
 #include "import.h"

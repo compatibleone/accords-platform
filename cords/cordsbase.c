@@ -23,6 +23,7 @@
 #include "import.c"
 #include "compute.c"
 #include "network.c"
+#include "endpoint.c"
 #include "port.c"
 #include "firewall.c"
 #include "storage.c"
