@@ -73,6 +73,7 @@ private	struct rest_response * cords_service_response( struct rest_response * ap
 private	struct rest_response * cords_script_response( struct rest_response * aptr, char * filename );
 private	char *	corcs_soap_service_response( char * action, char * service, char * message );
 public	char *	corcs_soap_get_wsdl();
+public	char *	corcs_soap_get_wsrpc();
 private char * 	corcs_resolver_soap_response( char * category, struct occi_response * rptr );
 
 /*	-----------------------------------	*/
@@ -1676,6 +1677,7 @@ private	char *	default_get_filename( char * command )
 				fprintf(h,"<tr><th colspan=2><a href=\"/service\">Command Service</a></th></tr>\n");
 				fprintf(h,"<tr><th colspan=2><a href=\"/script\">Command Script</a></th></tr>\n");
 				fprintf(h,"<tr><th colspan=2><a href=\"/wsdl\">WSDL Document</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/wsrpc\">WSDL RPC</a></th></tr>\n");
 			}		
 			fprintf(h,"</table>\n");
 			if ( strcasecmp( command, "" ) )
@@ -1708,6 +1710,8 @@ private	char *	command_get_filename( char * command )
 	}
 	else if (!( strcasecmp( command, "wsdl" ) ))
 		return( corcs_soap_get_wsdl() );
+	else if (!( strcasecmp( command, "wsrpc" ) ))
+		return( corcs_soap_get_wsrpc() );
 	else	return((char *) 0);
 }
 
