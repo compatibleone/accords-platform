@@ -32,7 +32,7 @@ private	char *	corcs_soap_wsdl(char * host)
 		fprintf(h,"xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\"\n");
 		fprintf(h,"xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">\n");
 
-		fprintf(h,"<xsd:import xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"namespace=\"%s/manifest/\"\n",host);
+		fprintf(h,"<xsd:import xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" namespace=\"%s/manifest/\"\n",host);
 		fprintf(h,"location=\"http://www.compatibleone.fr/schemes/manifest.xsd\"/>\n");
 		fprintf(h,"<xsd:import xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" namespace=\"%s/agreement/\"\n",host);
 		fprintf(h,"location=\"http://www.compatibleone.fr/schemes/slam.xsd\"/>\n");
