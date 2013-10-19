@@ -186,13 +186,27 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="cordsNetwork">
+		<xsd:choice>
+			<xsd:element name="port" type="cordsPort" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="endpoint" type="cordsEndpoint" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="label" type="xsd:string"/>
+		<xsd:attribute name="vlan" type="xsd:string"/>
+		<xsd:attribute name="state" type="xsd:integer"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="cordsEndpoint">
 		<xsd:sequence>
 			<xsd:element name="port" type="cordsPort" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="label" type="xsd:string"/>
-		<xsd:attribute name="vlan" type="xsd:string"/>
+		<xsd:attribute name="dns" type="xsd:string"/>
+		<xsd:attribute name="subnet" type="xsd:string"/>
+		<xsd:attribute name="range" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 

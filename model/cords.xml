@@ -398,6 +398,17 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
 	    </actions>
 	</category>
+	<category term='endpoint' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/endpoint/' rel='http://schemas.ogf.org/occi/core#resource'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='description' type='string' required='false' immutable='false'/>
+	        <attribute name='dns' type='string' required='false' immutable='false'/>
+	        <attribute name='subnet' type='string' required='false' immutable='false'/>
+	        <attribute name='range' type='string' required='false' immutable='false'/>
+	        <attribute name='label' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	</category>
 	<category term='network' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/network/' rel='http://schemas.ogf.org/occi/core#resource'>
 	    <attributes>
 	        <attribute name='name' type='string' required='false' immutable='false'/>
@@ -431,6 +442,7 @@
 	        <attribute name='description' type='string' required='false' immutable='false'/>
 	        <instance name='provider' category='http://scheme.compatibleone.fr/scheme/compatible#provider' multiplicity='[0..1]'/>
 	        <instance name='node' category='http://scheme.compatibleone.fr/scheme/compatible#node' multiplicity='[0..1]'/>
+	        <instance name='endpoint' category='http://scheme.compatibleone.fr/scheme/compatible#endpoint' multiplicity='[0..1]'/>
 	        <instance name='network' category='http://scheme.compatibleone.fr/scheme/compatible#network' multiplicity='[0..1]'/>
 	        <instance name='image' category='http://scheme.compatibleone.fr/scheme/compatible#image' multiplicity='[0..1]'/>
 	        <collection name='ports' category='http://scheme.compatibleone.fr/scheme/compatible#port' multiplicity='[0..*]'/>

@@ -20,7 +20,7 @@ model_h_files = azconfig.h paconfig.h publication.h placement.h account.h instru
 		opennebula.h plan.h user.h configuration.h enquiry.h security.h algorithm.h			\
 		openstack.h price.h value.h constraint.h event.h manifest.h service.h appliance.h	\
 		profile.h windowsazure.h contract.h image.h monitor.h optimise.h storage.h			\
-		authorise.h provider.h infrastructure.h network.h osconfig.h system.h	\
+		authorise.h provider.h infrastructure.h network.h endpoint.h osconfig.h system.h	\
 		iprange.h instance.h operator.h vm.h port.h firewall.h import.h agreement.h			\
 		metadata.h file.h script.h interface.h session.h consumer.h connection.h stream.h	\
 		probe.h metric.h alert.h quota.h application.h variable.h business.h zone.h			\

@@ -288,6 +288,13 @@ private	int	conets_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
+	if (!( optr = occi_cords_endpoint_builder( Conets.domain,"endpoint" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_cords_port_builder( Conets.domain, "port" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
