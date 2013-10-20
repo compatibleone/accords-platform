@@ -2109,11 +2109,13 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 	struct 	rest_request * rptr=(struct rest_request *) 0;
 	struct	rest_response * aptr=(struct rest_response *) 0;
 	struct	url *	uptr;
+	char 	buffer[2048];
+
 	/* --------------------------- */
 	/* build a pseudo rest request */
 	/* --------------------------- */
-	rest_log_message("occi_local_server");
-	rest_log_message( target );
+	sprintf(buffer,"LOCAL %s %s",method,target);
+	rest_log_message( buffer );
 
 	if (!( uptr = analyse_url( target ) ))
 		return(occi_failure(cptr,930,"incorrect url"));

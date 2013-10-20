@@ -227,7 +227,6 @@ private	int	occi_detect_local_server( char * target )
 	{
 		remote = liberate_url( remote );
 		local = liberate_url( local );
-		rest_log_message( "occi:local:optimisation" );
 		return( 1 );
 	}
 	else
