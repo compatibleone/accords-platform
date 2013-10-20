@@ -91,15 +91,36 @@ private	int	stop_monitor_controls( struct cords_monitor * pptr )
 		}
 		else
 		{	
+			/* ------------------------------------------ */
+			/* keep a copy of the source id : the monitor */
+			/* ------------------------------------------ */
 			strcpy(buffer,lptr->source);
 			liberate( wptr );
+
+			/* ------------------------------------------ */
+			/* stop the probe packet control activity now */ 
+			/* ------------------------------------------ */
 			if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
 				break;
 			else	zptr = occi_remove_response( zptr );
+
+			/* ------------------------------------------ */
+			/* delete the probe packet data control agent */
+			/* ------------------------------------------ */
+			if (!( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )))
+				continue;
+			else	zptr = occi_remove_response( zptr );
 		}
 	}
+	/* -------------------- */
+	/* perform book keeping */
+	/* -------------------- */
 	pptr->state = 0;
 	autosave_cords_monitor_nodes();
+
+	/* --------------------------------------- */
+	/* delete any residual control agent links */
+	/* --------------------------------------- */
 	if ( strlen(buffer) )
 		if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
