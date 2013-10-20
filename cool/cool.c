@@ -124,8 +124,8 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.1a.0.01");
-	printf("\n   Beta Version : 10/03/2013 ");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.1a.0.02");
+	printf("\n   Beta Version : 20/10/2013 ");
 	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -810,6 +810,7 @@ private	char *	cool_transform_control( char * control, char * source, char * tar
 			continue;
 		else if ((!( strcmp( dptr->name, "occi.control.agreement" 	) ))
 		     ||  (!( strcmp( dptr->name, "occi.control.property" 	) ))
+		     ||  (!( strcmp( dptr->name, "occi.control.mode" 		) ))
 		     ||  (!( strcmp( dptr->name, "occi.control.condition" 	) ))
 		     ||  (!( strcmp( dptr->name, "occi.control.objective" 	) ))
 		     ||  (!( strcmp( dptr->name, "occi.control.reference" 	) ))
