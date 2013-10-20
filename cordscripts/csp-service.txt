@@ -5,6 +5,9 @@
 	{
 		$m = "<tr>";
 		$n = $contract["occi.contract.name"];
+		$na = $n / "-";
+		$nn = $na[0];
+		if ( $nn == "cool" ) { $cool = 1; } else { $cool = 0; }
 		$m = $m#"<td>"#$n;
 		$pn = $contract["occi.contract.profile"];
 		$m = $m#"<td>"#$pn;
@@ -15,6 +18,21 @@
 		{ 	$m = $m#"<td><a href='"#$hostname#"'>"#$hostname#"</a>";	}
 		else
 		{	$m = $m#"<td>"#$hostname;					}
+		if ( $cool != 0 )
+		{
+			$k = $hostname / ":";
+			$kn= $k[1];
+			$kh= "https:"#$kn#":8386/job/";
+			$kwhat = $kh.list();
+			$kh = $kwhat[0];
+			$kup = '<form enctype="application/x-www-form-urlencoded" action="'#$kh#'?action=scaleup" method=POST><input type=submit name=action value=scaleup class=action></form>';
+			$kdn = '<form enctype="application/x-www-form-urlencoded" action="'#$kh#'?action=scaledown" method=POST><input type=submit name=action value=scaledown class=action></form>';
+			$kool = $kup#"&nbsp"#$kdn;
+		}
+		else
+		{
+			$kool="&nbsp;";
+		}
 		$n = $contract["occi.contract.state"];
 		if ( $n > 0 )
 		{	$m = $m#"<td>Deployed since";		}
@@ -22,7 +40,7 @@
 		{	$m = $m#"<td>&nbsp;";		}
 		$n = $contract["occi.contract.when"];
 		$n = $n.date();
-		$m = $m#"<td colspan=2>"#$n;
+		$m = $m#"<td>"#$kool#"<td>"#$n;
 		$m.display();
 		$pr = $provider.get();
 		$pp = "occi."#$pn#".price";
@@ -141,7 +159,7 @@
 		}
 		$m.display();
 
-		$m = "<tr><td class=title>Contract<td class=title>Provider<td class=title>Host<td class=title>State<td colspan=2 class=title>Date<td class=title>Price</tr>";
+		$m = "<tr><td class=title>Contract<td class=title>Provider<td class=title>Host<td colspan=2 class=title>State<td class=title>Date<td class=title>Price</tr>";
 		$m.display();
 
 		foreach ( $record as $tuple )
