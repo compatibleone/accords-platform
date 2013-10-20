@@ -74,7 +74,6 @@ private	void	purge_control_packets(struct cords_control * pptr, char * packets, 
 	}
 }
 
-
 /*	------------------------------------------------------------------	*/
 /*	      s c r i p t e d _ b u s i n e s s _ p r o c e s s i n g		*/
 /*	------------------------------------------------------------------	*/
@@ -110,7 +109,6 @@ private	int	scripted_business_processing(
 		else	return( atoi( result ) );
 	}
 }
-
 
 /*	--------------------------------------------------------	*/
 /*	      e x e c u t e _ b u s i n e s s _ v a l u e  		*/
@@ -704,8 +702,6 @@ private	struct rest_response * consume_control( struct cords_control * pptr, str
 	}
 }
 
-
-
 /*	-------------------------------------------	*/
 /* 		s t a r t _ c o n t r o l		*/
 /*	-------------------------------------------	*/
@@ -734,6 +730,32 @@ private	struct rest_response * start_control(
 }
 
 /*	-------------------------------------------	*/
+/* 	 s t o p _ c o n t r o l _ a c t i v i t y		*/
+/*	-------------------------------------------	*/
+private	int	stop_control_activity( struct cords_control * pptr )
+{
+	int	status=0;
+	struct	occi_response * zptr=(struct occi_response *) 0;
+
+	if ( pptr->probe )
+		pptr->probe = liberate( pptr->probe );
+
+	if ( pptr->process > 0 )
+	{
+		kill( pptr->process, _CONTROL_SIGNAL );
+		waitpid(pptr->process,&status,0);
+		pptr->process = 0;
+	}
+	else if ( rest_valid_string( pptr->timer ) )
+	{
+		if (( zptr = cords_invoke_action( pptr->timer, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+	}
+	pptr->state = 0;
+	return(0);
+}
+
+/*	-------------------------------------------	*/
 /* 		s t o p _ c o n t r o l			*/
 /*	-------------------------------------------	*/
 private	struct rest_response * stop_control(
@@ -757,27 +779,7 @@ private	struct rest_response * stop_control(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
-		if ( pptr->probe )
-			pptr->probe = liberate( pptr->probe );
-		if ( pptr->session )
-			pptr->session = liberate( pptr->session );
-		if ( pptr->monitor )
-			pptr->monitor = liberate( pptr->monitor );
-		if ( pptr->connection )
-			pptr->connection = liberate( pptr->connection );
-
-		if ( pptr->process > 0 )
-		{
-			kill( pptr->process, _CONTROL_SIGNAL );
-			waitpid(pptr->process,&status,0);
-			pptr->process = 0;
-		}
-		else if ( rest_valid_string( pptr->timer ) )
-		{
-			if (( zptr = cords_invoke_action( pptr->timer, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
-				zptr = occi_remove_response( zptr );
-		}
-		pptr->state = 0;
+		stop_control_activity(pptr);
 		autosave_cords_control_nodes();
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
@@ -811,6 +813,85 @@ private	struct rest_response * verify_control(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }
+
+/*	-------------------------------------------	*/
+/* 	      c r e a t e _ c o n t r o l  		*/
+/*	-------------------------------------------	*/
+private	int	create_control(struct occi_category * optr, void * vptr,struct rest_request * rptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_control * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	    r e t r i e v e _ c o n t r o l  		*/
+/*	-------------------------------------------	*/
+private	int	retrieve_control(struct occi_category * optr, void * vptr,struct rest_request * rptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_control * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      u p d a t e _ c o n t r o l  		*/
+/*	-------------------------------------------	*/
+private	int	update_control(struct occi_category * optr, void * vptr,struct rest_request * rptr)
+{
+	struct	occi_kind_node * nptr;
+	struct	cords_control * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else	return(0);
+}
+
+/*	-------------------------------------------	*/
+/* 	      d e l e t e _ c o n t r o l	  	*/
+/*	-------------------------------------------	*/
+private	int	delete_control(struct occi_category * optr, void * vptr,struct rest_request * rptr)
+{
+	struct	occi_response * zptr=(struct occi_response *) 0;
+	struct	occi_kind_node * nptr;
+	struct	cords_control * pptr;
+	if (!( nptr = vptr ))
+		return(0);
+	else if (!( pptr = nptr->contents ))
+		return(0);
+	else
+	{
+		if ( pptr->state )
+			stop_control_activity( pptr );
+		if (!( rest_valid_string( pptr->timer ) ))
+			return( 0 );
+		else
+		{
+			if ((zptr = occi_simple_delete( pptr->timer, _CORDS_CONTRACT_AGENT, default_tls())) != (struct occi_response *) 0)
+				zptr = occi_remove_response( zptr );
+	
+			pptr->timer = liberate( pptr->timer );
+			return( 0 );
+		}
+	}
+}
+
+private	struct	occi_interface	control_interface = {
+	create_control,
+	retrieve_control,
+	update_control,
+	delete_control
+	};
+
 
 	/* -------------- */
 #endif	/* _slamcontrol_c */

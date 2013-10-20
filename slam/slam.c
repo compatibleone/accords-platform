@@ -87,8 +87,8 @@ private	void	slam_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.04");
-	printf("\n   Beta Version : 04/02/2013");
+	printf("\n   CompatibleOne SLAM Services : Version 1.0a.0.05");
+	printf("\n   Beta Version : 20/10/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -344,7 +344,7 @@ private	int	slam_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback  = &control_interface;
 
 	if (!( optr = occi_add_action( optr,_CORDS_START,"",start_control)))
 		return( 27 );

@@ -242,7 +242,7 @@ private	int	delete_monitor(struct occi_category * optr, void * vptr,struct rest_
 		return(0);
 	else if (!( pptr->state ))
 		return( 0 );
-	else	return( stop_monitor_controls( pptr ) );
+	else	return( delete_monitor_controls( pptr ) );
 }
 
 private	struct	occi_interface	monitor_interface = {
