@@ -903,10 +903,7 @@ private	struct	occi_element * cool_transform_instruction(
 		if ((!( strcmp( eptr->name, "occi.instruction.method" ) )) && (!( strcmp( eptr->value , _CORDS_MONITOR ) )))
 			ismonitor=1;
 
-		else if ((!( strcmp( eptr->name, "occi.instruction.type" ) )) && (!( strcmp( eptr->value , _CORDS_MONITOR ) )))
-			ismonitor=1;
-
-		if (!( strcmp( eptr->name, "occi.instruction.provision" ) ))
+		else if (!( strcmp( eptr->name, "occi.instruction.provision" ) ))
 		{
 			/* ---------------------------------------------------------------- */
 			/* create a new element and replace the reference to the provision  */
