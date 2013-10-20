@@ -879,8 +879,26 @@ private	struct	occi_element * cool_transform_instruction(
 	struct	occi_element * root=(struct occi_element *) 0;
 	struct	occi_element * foot=(struct occi_element *) 0;
 	struct	occi_element * work=(struct occi_element *) 0;
+	struct	occi_element * fptr=(struct occi_element *) 0;
 
 	cool_log_message("transform instruction",0);
+
+	/* ------------------------------- */
+	/* detect a monitoring instruction */
+	/* ------------------------------- */
+
+	if ((( fptr = occi_locate_element( eptr, "occi.instruction.type" )) != (struct occi_element *) 0)
+	&&  ( fptr->value )
+	&&  (!( strcmp( fptr->value, "method") )))
+		ismethod = 1;
+	else	ismethod = 0;
+
+	if ((( fptr = occi_locate_element( eptr, "occi.instruction.method" )) != (struct occi_element *) 0)
+	&&  ( fptr->value )
+	&&  (!( strcmp( fptr->value, _CORDS_MONITOR ) )))
+		ismonitor = 1;
+	else	ismonitor = 0;
+
 
 	for (	;
 		eptr != (struct occi_element *) 0;
@@ -897,14 +915,6 @@ private	struct	occi_element * cool_transform_instruction(
 			continue;
 		else if (!( strcmp( eptr->name, "occi.core.status" ) ))
 			continue;
-
-		/* ------------------------------- */
-		/* detect a monitoring instruction */
-		/* ------------------------------- */
-		if ((!( strcmp( eptr->name, "occi.instruction.type" ) )) && (!( strcmp( eptr->value , "method" ) )))
-			ismethod=1;
-		else if ((!( strcmp( eptr->name, "occi.instruction.method" ) )) && (!( strcmp( eptr->value , _CORDS_MONITOR ) )))
-			ismonitor=1;
 
 		if (!( strcmp( eptr->name, "occi.instruction.provision" ) ))
 		{
