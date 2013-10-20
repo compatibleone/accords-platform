@@ -345,15 +345,15 @@ private	int	cosched_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
+	if (!( optr = occi_add_action( optr,"hit","",hit_counter)))
+		return(27);
+
 	if (!( optr = occi_cords_result_builder( Cosched.domain, "result" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-
-	if (!( optr = occi_add_action( optr,"hit","",hit_counter)))
-		return(27);
 
 	if (!( optr = occi_cords_timer_builder( Cosched.domain, "timer" ) ))
 		return( 27 );

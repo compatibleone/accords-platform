@@ -2131,11 +2131,6 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 		rptr = liberate_rest_request( rptr );
 		return(occi_failure(cptr,927,"allocation failure"));
 	}
-	else if (!( rptr->host = allocate_string( uptr->host ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return(occi_failure(cptr,927,"allocation failure"));
-	}
 	else
 	{
 		rptr->port = uptr->port;
@@ -2172,6 +2167,18 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 				hptr = hptr->next;
 			rptr->last = hptr;
 		}
+
+		/* --------------------------------------------- */
+		/* add HOST header for correct Location handling */
+		/* --------------------------------------------- */
+		if (!(hptr = add_rest_header( rptr )))
+			return(occi_failure(cptr,944,"HOST Header failure"));
+		else if (!( hptr->name = allocate_string( _HTTP_HOST ) ))
+			return(occi_failure(cptr,944,"HOST Header failure"));
+		else if (!( hptr->value = allocate_string( uptr->host ) ))
+			return(occi_failure(cptr,944,"HOST Header failure"));
+		else if (!( rest_request_host( rptr ) ))
+			return(occi_failure(cptr,944,"HOST Header failure"));
 
 		/* ---------------- */
 		/* process the body */
