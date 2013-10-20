@@ -82,9 +82,9 @@ private	void	procci_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Request Procci : Version 1.0a.0.04");
-	printf("\n   Beta Version : 25/05/2012");
-	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Request Procci : Version 1.0a.0.05");
+	printf("\n   Beta Version : 20/10/2013");
+	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -135,6 +135,7 @@ private	struct rest_extension * procci_extension( void * v,struct rest_server * 
 /*	inclusion of the actions and methods required for contract handling	*/
 /*	------------------------------------------------------------------	*/
 #include "proccicontract.c"
+#include "procciinstruction.c"
 
 /*	------------------------------------------------------------------	*/
 /*			p r o c c i _ o p e r a t i o n				*/
@@ -161,6 +162,14 @@ private	int	procci_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+
+	if (!( optr = occi_cords_instruction_builder( Procci.domain, _CORDS_INSTRUCTION ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = &instruction_interface;
 
 	if (!( optr = occi_cords_parameter_builder( Procci.domain,"parameter" ) ))
 		return( 27 );
