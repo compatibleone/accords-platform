@@ -873,6 +873,7 @@ private	struct	occi_element * cool_transform_instruction(
 		char * source, char * result, char * provision )
 {
 	int	ismonitor=0;
+	int	ismethod=0;
 	char *	control=(char *) 0;
 	char *	newcontrol=(char *) 0;
 	struct	occi_element * root=(struct occi_element *) 0;
@@ -900,10 +901,12 @@ private	struct	occi_element * cool_transform_instruction(
 		/* ------------------------------- */
 		/* detect a monitoring instruction */
 		/* ------------------------------- */
-		if ((!( strcmp( eptr->name, "occi.instruction.method" ) )) && (!( strcmp( eptr->value , _CORDS_MONITOR ) )))
+		if ((!( strcmp( eptr->name, "occi.instruction.type" ) )) && (!( strcmp( eptr->value , "method" ) )))
+			ismethod=1;
+		else if ((!( strcmp( eptr->name, "occi.instruction.method" ) )) && (!( strcmp( eptr->value , _CORDS_MONITOR ) )))
 			ismonitor=1;
 
-		else if (!( strcmp( eptr->name, "occi.instruction.provision" ) ))
+		if (!( strcmp( eptr->name, "occi.instruction.provision" ) ))
 		{
 			/* ---------------------------------------------------------------- */
 			/* create a new element and replace the reference to the provision  */
@@ -917,7 +920,7 @@ private	struct	occi_element * cool_transform_instruction(
 		/* --------------------------------------------------------------- */
 		else if (!( strcmp( eptr->name, "occi.instruction.value" ) ))
 		{
-			if ( ismonitor )
+			if (( ismethod ) && ( ismonitor ))
 			{
 				/* ------------------------------------------ */
 				/* duplicate the control with new contract ID */
