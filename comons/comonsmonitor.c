@@ -92,22 +92,10 @@ private	int	stop_monitor_controls( struct cords_monitor * pptr )
 		else
 		{	
 			/* ------------------------------------------ */
-			/* keep a copy of the source id : the monitor */
-			/* ------------------------------------------ */
-			strcpy(buffer,lptr->source);
-			liberate( wptr );
-
-			/* ------------------------------------------ */
 			/* stop the probe packet control activity now */ 
 			/* ------------------------------------------ */
+			liberate( wptr );
 			if (!(zptr = cords_invoke_action( lptr->target, _CORDS_STOP, _CORDS_SERVICE_AGENT, default_tls() )))
-				break;
-			else	zptr = occi_remove_response( zptr );
-
-			/* ------------------------------------------ */
-			/* delete the probe packet data control agent */
-			/* ------------------------------------------ */
-			if (!( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )))
 				continue;
 			else	zptr = occi_remove_response( zptr );
 		}
@@ -118,12 +106,6 @@ private	int	stop_monitor_controls( struct cords_monitor * pptr )
 	pptr->state = 0;
 	autosave_cords_monitor_nodes();
 
-	/* --------------------------------------- */
-	/* delete any residual control agent links */
-	/* --------------------------------------- */
-	if ( strlen(buffer) )
-		if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
-			zptr = occi_remove_response( zptr );
 	return(0);
 }
 
@@ -189,6 +171,62 @@ private	int	update_monitor(struct occi_category * optr, void * vptr,struct rest_
 	else if (!( pptr = nptr->contents ))
 		return(0);
 	else	return(0);
+}
+
+/*	---------------------------------------------	*/
+/* 	d e l e t e _ m o n i t o r _ c o n t r o l s 	*/
+/*	---------------------------------------------	*/
+private	int	delete_monitor_controls( struct cords_monitor * pptr )
+{
+	int	status=0;
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	struct	occi_response 	* zptr;
+	struct	occi_element  	* eptr;
+	char *	wptr;
+	char	buffer[2048];
+	buffer[0] = 0;
+	for (	nptr=occi_last_link_node();
+		nptr != (struct occi_link_node *) 0;
+		nptr = nptr->previous )
+	{
+		if (!( lptr = nptr->contents ))
+			continue;
+		else if (!( lptr->source ))
+			continue;
+		else if (!( lptr->target ))
+			continue;
+		else if (!( wptr = occi_category_id( lptr->source ) ))
+			continue;
+		else if ( strcmp( wptr, pptr->id ) != 0)
+		{
+			liberate( wptr );
+			continue;
+		}
+		else
+		{	
+			/* ------------------------------------------ */
+			/* keep a copy of the source id : the monitor */
+			/* ------------------------------------------ */
+			strcpy(buffer,lptr->source);
+			liberate( wptr );
+
+			/* ------------------------------------------ */
+			/* delete the probe packet data control agent */
+			/* ------------------------------------------ */
+			if (!( zptr = occi_simple_delete( lptr->target, _CORDS_SERVICE_AGENT, default_tls() )))
+				continue;
+			else	zptr = occi_remove_response( zptr );
+		}
+	}
+
+	/* --------------------------------------- */
+	/* delete any residual control agent links */
+	/* --------------------------------------- */
+	if ( strlen(buffer) )
+		if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
+			zptr = occi_remove_response( zptr );
+	return(0);
 }
 
 /*	-------------------------------------------	*/
