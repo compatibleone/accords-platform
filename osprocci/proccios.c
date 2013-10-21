@@ -1219,12 +1219,9 @@ private	int	os_install_cosacs( struct os_subscription * subptr, struct openstack
 		liberate( buffer ) ;
 		return( _NO_COSACS );
 	}
-	sprintf(syntax,"wget %s/%s/%s; bash ./%s", 
-		hostdepot,
-		version,
-		package,
-		package);
-	
+	sprintf(syntax,"wget %s/%s/%s",hostdepot,version,package);
+	status = os_launch_using_keypair( pptr, username, syntax );
+	sprintf(syntax,"bash ./%s",package);
 	status = os_launch_using_keypair( pptr, username, syntax );
 
 	buffer = liberate( buffer );
