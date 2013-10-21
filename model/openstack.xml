@@ -16,6 +16,8 @@
 	        <attribute name='accountname' type='string' required='false' immutable='false'/>
 	        <attribute name='number' type='string' required='false' immutable='false'/>
 	        <attribute name='rootpass' type='string' required='false' immutable='false'/>
+	        <attribute name='keyname' type='string' required='false' immutable='false'/>
+	        <attribute name='keyfile' type='string' required='false' immutable='false'/>
 	        <attribute name='reference' type='string' required='false' immutable='false'/>
 	        <attribute name='network' type='string' required='false' immutable='false'/>
 	        <attribute name='networkname' type='string' required='false' immutable='false'/>

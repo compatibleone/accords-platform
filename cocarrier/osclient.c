@@ -1773,12 +1773,11 @@ private	char * os_create_server_xml_request(
 			}
 		}
 		fprintf(h,"\t</metadata>\n");
-		if ( generate_personality )
-		{
+
 		/* ---------------------------- */
 		/* generate personality section */
 		/* ---------------------------- */
-		if (( personality ) && ( resource ) && ( use_personality_file ))
+		if (( generate_personality ) && ( personality ) && ( resource ) && ( use_personality_file ))
 		{
 			if (( strlen( personality ) )
 			&&  ( EncodeBase64( eptr, personality, strlen(personality) ) > 0 ))
@@ -1801,7 +1800,7 @@ private	char * os_create_server_xml_request(
 				fprintf(h,"</personality>\n");
 			}
 		}
-		}
+
 		if ( subptr->KeyStone.quantum )
 		{
 			if ( rest_valid_string( network ) )
@@ -1917,11 +1916,10 @@ private	char * os_create_server_json_request(
 			}
 		}
 		fprintf(h,"}\n");
-
 		/* ---------------------------- */
 		/* generate personality section */
 		/* ---------------------------- */
-		if (( personality ) && ( resource ) && ( use_personality_file ))
+		if (( generate_personality ) && ( personality ) && ( resource ) && ( use_personality_file ))
 		{
 			if (( strlen( personality ) )
 			&&  ( EncodeBase64( eptr, personality, strlen(personality) ) > 0 ))

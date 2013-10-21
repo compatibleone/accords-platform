@@ -63,6 +63,7 @@ struct	os_image_infos
 };
 
 #include "quantum.c"
+#include "oskeypair.c"
 
 /*	-----------------------------------------------------------------	*/
 /*	     t e r m i n a t e _ o p e n s t a c k _ c o n t r a c t		*/
@@ -671,7 +672,8 @@ public	int	create_openstack_contract(
 		return( terminate_openstack_contract( 1190, &contract ) );
 	else if (!( pptr->networkname = resolve_contract_network( &contract, pptr->name, pptr->accountname, pptr->name ) ))
 		return( terminate_openstack_contract( 1192, &contract ) );
-	else
+	else if ((status = resolve_contract_keypair( subptr, pptr )) != 0 )
+		return( terminate_openstack_contract( status, &contract ) );
 	{
 		/* -------------------------------------------- */
 		/* detect presence of quantum network interface */
