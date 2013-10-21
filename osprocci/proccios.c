@@ -1214,7 +1214,7 @@ private	int	os_install_cosacs( struct os_subscription * subptr, struct openstack
 	/* ---------------------------------------- */
 	/* build installation command syntax string */
 	/* ---------------------------------------- */
-	else if (!( syntax = allocate( strlen( hostdepot ) + strlen( version ) + strlen( package ) + 64 ) ))
+	else if (!( syntax = allocate( strlen( hostdepot ) + strlen( version ) + ( strlen( package ) * 2) + 64 ) ))
 	{
 		liberate( buffer ) ;
 		return( _NO_COSACS );
@@ -1222,6 +1222,7 @@ private	int	os_install_cosacs( struct os_subscription * subptr, struct openstack
 	sprintf(syntax,"wget %s/%s/%s; bash ./%s", 
 		hostdepot,
 		version,
+		package,
 		package);
 	
 	status = os_launch_using_keypair( pptr, username, syntax );
