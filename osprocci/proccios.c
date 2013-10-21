@@ -1129,6 +1129,32 @@ public 	int	build_openstack_firewall(struct os_subscription * subptr, struct ope
 	}
 }
 
+/*	-----------------------------------------	*/
+/*	c r e a t e _ s e r v e r _ r e q u e s t	*/
+/*	-----------------------------------------	*/
+/*	when a keypair is specified then JSON is	*/
+/*	to be used to prepare the request message	*/
+/*	-----------------------------------------	*/
+private	char * create_server_request(
+	struct os_subscription *  sptr, 
+	char * identity, char * flavor, char * image, char * address, char * personality, 
+	char * resource, char * group, char * zone, char * keyname, char * network )
+{
+	if (!( rest_valid_string( keyname ) ))
+
+		return( os_create_server_request( 
+				sptr, identity, flavor, image, 
+				address, personality,
+				resource, group, zone,
+				keyname, network ) );
+
+	else 	
+		return( os_create_server_json_request( 
+				sptr, identity, flavor, image, 
+				address, personality,
+				resource, group, zone,
+				keyname, network ) );
+}
 
 /*	-------------------------------------------	*/
 /* 	      s t a r t  _ o p e n s t a c k	  	*/
@@ -1215,7 +1241,7 @@ private	struct	rest_response * start_openstack(
 		openstack_build_failure( pptr, 911, "Failure Building Image Reference" );
 		return( rest_html_response( aptr, 4003, "Server Failure : Workload preparation" ) );
 	}
-	if (!( filename = os_create_server_request( 
+	if (!( filename = create_server_request( 
 		subptr, pptr->name, pptr->image, pptr->flavor, 
 		pptr->accessip, personality, resource, 
 		pptr->firewall, pptr->zone, 

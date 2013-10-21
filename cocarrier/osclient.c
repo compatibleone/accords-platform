@@ -1660,7 +1660,7 @@ public	char *	os_build_flavor_reference(struct os_subscription * sptr, char * np
 /*		o s _ c r e a te _  s e r v e r _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
 
-private	char * os_create_server_xml_request(
+public	char * os_create_server_xml_request(
 		struct os_subscription * subptr,
 		char * identity,	/* the identity of the server 	*/
 		char * image,		/* the server image identifier  */
@@ -1820,7 +1820,7 @@ private	char * os_create_server_xml_request(
 /*		o s _ c r e a te _  s e r v e r _ r e q u e s t		*/
 /*	------------------------------------------------------------	*/
 
-private	char * os_create_server_json_request(
+public	char * os_create_server_json_request(
 		struct os_subscription * subptr,
 		char * identity,	/* the identity of the server 	*/
 		char * image,		/* the server image identifier  */

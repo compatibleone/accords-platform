@@ -4,10 +4,127 @@
 private	int	use_keypairs=1;
 
 /*	-----------------------------------------------		*/
+/*	g e n e r a t e _ p r i v a t e _ k e y f i l e		*/
+/*	-----------------------------------------------		*/
+private	int	generate_private_keyfile( char * pathname, char * kptr )
+{
+	FILE *	h;
+	int	status=1;
+	int	mode = 0;
+	int	bytes=64;
+	if (!( rest_valid_string( kptr ) ))
+		return( 0 );
+	else if (!( rest_valid_string( pathname ) ))
+		return( 0 );
+	else if (!( h = fopen( pathname, "w" ) ))
+		return( 0 );
+	else
+	{
+		while ( *kptr != 0 )
+		{
+			switch ( mode )
+			{
+			case	0	:
+				if ( *kptr != '-' )
+					mode++;
+				else	fprintf(h,"%c",*(kptr++));
+				continue;
+			case	1	:
+				if ( *kptr == '-' )
+					mode++;
+				else	fprintf(h,"%c",*(kptr++));
+				continue;
+			case	2	:
+				if ( *kptr != '-' )
+					mode++;
+				else	fprintf(h,"%c",*(kptr++));
+				continue;
+			case	3	:
+				if ( *kptr != 'n' )
+				{
+					status = 0;
+					break;
+				}
+				else
+				{
+					fprintf(h,"\n");
+					mode++;
+					bytes=64;
+				}
+				continue;
+			case	4	:
+				if (!( bytes ))
+				{
+					if ( *kptr != 'n' )
+					{
+						status = 0;
+						break;
+					}
+					else
+					{
+						fprintf(h,"\n");
+						bytes = 64;
+					}
+				}
+				else if ( *kptr == '=' )
+					mode++;
+				else
+				{
+					fprintf(h,"%c",*(kptr++));
+					bytes--;
+				}
+				continue;
+			case	5	:
+				if ( *kptr != '=' )
+					mode++;
+				else	fprintf(h,"%c",*(kptr++));
+				continue;
+			case	6	:
+				if ( *kptr != 'n' )
+				{
+					status = 0;
+					break;
+				}
+				else
+				{
+					fprintf(h,"\n");
+					mode++;
+				}
+				continue;
+			case	7	:
+				if ( *kptr != '-' )
+					mode++;
+				else	fprintf(h,"%c",*(kptr++));
+				continue;
+			case	8	:
+				if ( *kptr == '-' )
+					mode++;
+				else	fprintf(h,"%c",*(kptr++));
+				continue;
+			case	9	:
+				if ( *kptr != '-' )
+					mode++;
+				else	fprintf(h,"%c",*(kptr++));
+				continue;
+			case	10	:
+				if ( *kptr != 'n' )
+					status = 0;
+				else	fprintf(h,"\n");
+				break;
+			}
+		}
+		fclose(h);
+		if (!( status )) unlink( pathname );
+		return(status);
+	}
+}
+
+/*	-----------------------------------------------		*/
 /*	r e s o l v e _ c o n t r a c t _ k e y p a i r		*/
 /*	-----------------------------------------------		*/
 public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openstack * pptr)
 {
+	char *	kptr=(char *) 0;
 	char *	filename=(char *) 0;
 	char	pathname[1024];
 	char 	buffer[1024];
@@ -16,6 +133,7 @@ public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openst
 	struct	os_response * rptr=(struct os_response *) 0;
 	struct	data_element * eptr=(struct data_element *) 0;
 	int	iteration=0;
+	int	mode=0;
 	FILE *	h=(FILE *) 0;
 
 	/* ---------------------------- */
@@ -96,7 +214,8 @@ public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openst
 	/* retrieve the private key data from the response */
 	/* ----------------------------------------------- */
 	if ((!( rptr->jsonroot ))
-	||  (!( eptr = json_element( rptr->jsonroot, "private_key" ) )))
+	||  (!( eptr = json_element( rptr->jsonroot, "private_key" ) ))
+	||  (!( kptr = eptr->value )))
 	{
 		rptr = liberate_os_response( rptr );
 		return( 1178 );
@@ -106,18 +225,13 @@ public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openst
 	/* the keypair has been created and must be saved to file */
 	/* ------------------------------------------------------ */
 	sprintf(pathname,"security/%s.key",pptr->keyname);
-	if (!( h = fopen( pathname, "w" ) ))
+	if (!( generate_private_keyfile( pathname, kptr ) ))
 	{
 		rptr = liberate_os_response( rptr );
 		return( 1148 );
 	}
 	else
 	{
-		/* ------------------------------ */
-		/* write private key data to file */
-		/* ------------------------------ */
-		fprintf(h,"%s\n",eptr->value);
-		fclose(h);
 		if (!( pptr->keyfile = allocate_string( pathname ) ))
 		{
 			unlink( buffer );
