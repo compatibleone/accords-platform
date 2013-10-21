@@ -44,7 +44,7 @@ public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openst
 
 		sprintf(buffer,"%s-%s-%u",operator,pptr->accountname,++iteration);
 
-		if (!( rptr = os_get_keypair( sptr, pptr->keyname ) ))
+		if (!( rptr = os_get_keypair( sptr, buffer ) ))
 			return( 1156 );
 		else if ( rptr->response->status == 200 )
 		{
@@ -73,7 +73,7 @@ public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openst
 			rptr = liberate_os_response( rptr );
 			if (!( pptr->keyname = allocate_string( buffer ) ))
 				return( 1127 );
-			else	continue;
+			else	break;
 		}
 	}
 
@@ -86,7 +86,7 @@ public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openst
 		return( 1147 );
 	else if (!( rptr->response ))
 		return( 1147 );
-	else if (!( rptr->response->status > 299 ))
+	else if (( rptr->response->status > 299 ))
 	{
 		rptr = liberate_os_response( rptr );
 		return( 1147 );
