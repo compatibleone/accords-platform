@@ -746,6 +746,7 @@
 	        <attribute name='profile' type='string' required='false' immutable='false'/>
 	        <attribute name='reference' type='string' required='false' immutable='false'/>
 	        <attribute name='hostname' type='string' required='false' immutable='false'/>
+	        <attribute name='scaling' type='string' required='false' immutable='false'/>
 	        <attribute name='rootpass' type='string' required='false' immutable='false'/>
 	        <attribute name='workload' type='string' required='false' immutable='false'/>
 	        <attribute name='blob' type='string' required='false' immutable='false'/>

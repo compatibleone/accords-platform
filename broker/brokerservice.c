@@ -611,6 +611,7 @@ private	struct	rest_response * save_service(
 	struct	cords_service * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
@@ -643,6 +644,7 @@ private	struct	rest_response * snapshot_service(
 	struct	cords_service * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
@@ -675,6 +677,7 @@ private	struct	rest_response * stop_service(
 	struct	cords_service * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
@@ -682,6 +685,72 @@ private	struct	rest_response * stop_service(
 			pptr->when  = time((long*) 0);
 			autosave_cords_service_nodes();
 			reverse_service_action( pptr, pptr->id, _CORDS_STOP );
+			pptr->when  = time((long*) 0);
+			pptr->state = _OCCI_IDLE;
+			autosave_cords_service_nodes();
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	   	s c a l e u p _ s e r v i c e		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * scaleup_service(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	char			* mptr;
+	char 			* wptr;
+	struct	cords_service * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
+	{
+		if ( pptr->state == _OCCI_RUNNING )
+		{
+			pptr->state = _OCCI_WORKING;
+			pptr->when  = time((long*) 0);
+			autosave_cords_service_nodes();
+			service_action( pptr, pptr->id, "scaleup" );
+			pptr->when  = time((long*) 0);
+			pptr->state = _OCCI_IDLE;
+			autosave_cords_service_nodes();
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	     s c a l e d o w n _ s e r v i c e		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * scaledown_service(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	char			* mptr;
+	char 			* wptr;
+	struct	cords_service * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
+	{
+		if ( pptr->state == _OCCI_RUNNING )
+		{
+			pptr->state = _OCCI_WORKING;
+			pptr->when  = time((long*) 0);
+			autosave_cords_service_nodes();
+			reverse_service_action( pptr, pptr->id, "scaledown" );
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_IDLE;
 			autosave_cords_service_nodes();
@@ -1039,6 +1108,10 @@ private	struct	occi_category *	broker_service_builder( char * domain, char * cat
 		else if (!( optr = occi_add_action( optr,_CORDS_SNAPSHOT,"",snapshot_service)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_service)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"scaleup","",scaleup_service)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"scaledown","",scaledown_service)))
 			return( optr );
 		else	return( optr );
 	}

@@ -578,11 +578,13 @@ private	void	reset_contract( struct cords_contract * pptr )
 	if (pptr->reference) pptr->reference = liberate( pptr->reference );
 	if (pptr->rootpass ) pptr->rootpass  = liberate( pptr->rootpass  );
 	if (pptr->hostname ) pptr->hostname  = liberate( pptr->hostname  );
+	if (pptr->scaling  ) pptr->scaling   = liberate( pptr->scaling   );
 	if (pptr->workload ) pptr->workload  = liberate( pptr->workload  );
 	if (pptr->blob ) pptr->blob  = liberate( pptr->blob  );
 	pptr->reference = allocate_string("");
 	pptr->rootpass  = allocate_string("");
 	pptr->hostname  = allocate_string("");
+	pptr->scaling   = allocate_string("");
 	pptr->workload  = allocate_string("");
 	pptr->blob  = allocate_string("");
 	pptr->when  = time((long*) 0);
@@ -605,6 +607,7 @@ private	struct	rest_response * stop_contract(
 	struct	cords_contract * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
 	{
 		if ( pptr->state != _OCCI_IDLE )
 		{
@@ -702,6 +705,189 @@ private	struct	rest_response * stop_contract(
 			pptr->stopduration = (time((long*)0) - pptr->when);
 			reset_contract( pptr );
 			autosave_cords_contract_nodes();
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+
+/*	-------------------------------------------	*/
+/*	    c o n t r a c t _ c a n _ s c a l e		*/
+/*	-------------------------------------------	*/
+private	char *	contract_can_scale( struct cords_contract * pptr )
+{
+	struct	occi_response * zptr;
+	char	buffer[2048];
+	char *	prefix;
+	char *	vptr;
+	struct	occi_element * eptr;
+	if ( rest_valid_string( pptr->scaling ) != 0 )
+		return( pptr->scaling );
+	else if (!( rest_valid_string( pptr->hostname ) ))
+		return( (char *) 0 );
+	else if (!( prefix = rest_http_prefix() ))
+		return( (char *) 0 );
+	else
+	{
+		sprintf(buffer,"%s://%s:8386/job/",prefix,pptr->hostname);
+		if (!( zptr = occi_simple_get( buffer,_CORDS_CONTRACT_AGENT, default_tls() )))
+			return( (char *) 0 );
+		else if (!( zptr->response ))
+			return( (char *) 0 );
+		else if (!( zptr->response->status != 200 ))
+			return( (char *) 0 );
+		else if (!( eptr = zptr->first ))
+			return((char *) 0);
+		else if (!( eptr->value ))
+			return((char *) 0);
+		else if (!( vptr = allocate_string( eptr->value ) ))
+			return((char *) 0);
+		else if (!( vptr = occi_unquoted_value( vptr ) ))
+			return((char *) 0);
+		else 	return( (pptr->scaling = vptr ) );
+	}
+}
+
+
+/*	-------------------------------------------	*/
+/* 	   	s c a l e u p _ c o n t r a c t		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * scaleup_contract(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	int	status;
+	struct	occi_response * zptr;
+	struct	cords_contract * pptr;
+	char *	target=(char *) 0;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
+	{
+		if ( pptr->state != _OCCI_IDLE )
+		{
+			/* ------------------ */
+			/* dont scale commons */
+			/* ------------------ */
+			if ( pptr->commons )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( is_common_contract( pptr ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ((!( rest_valid_string( pptr->type ) ))
+			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			{
+				/* ------------------------------ */
+				/* detect scale up interface here */
+				/* ------------------------------ */
+				if (!( target = contract_can_scale( pptr ) ))
+					return( rest_html_response( aptr, 200, "OK" ) );
+				else
+				{
+					if (!(zptr = cords_invoke_action( target, "scaleup", 
+						_CORDS_CONTRACT_AGENT, default_tls() )))
+							return( rest_html_response( aptr, 900, "ScaleUp Invocation Failure" ) );
+					else if ((status = zptr->response->status) > 299 )
+					{
+						zptr = occi_remove_response ( zptr );
+						return( rest_html_response( aptr, status, "Scaleup Invocation Error" ) );
+					}
+					else	zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, 200, "OK" ) );
+				}
+			}
+			else if (( rest_valid_string( pptr->category ) != 0)
+			     && ( strcmp( pptr->category, _CORDS_MANIFEST ) != 0 ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( rest_valid_string( pptr->service ) != 0 )
+			{
+				/* ---------------------------------- */
+				/* propogate scale up to service here */
+				/* ---------------------------------- */
+				if (!(zptr = cords_invoke_action( pptr->service, "scaleup", 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
+			}
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	    s c a l e d o w n_ c o n t r a c t		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * scaledown_contract(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	int	status;
+	struct	occi_response * zptr;
+	struct	cords_contract * pptr;
+	char *	target;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
+	{
+		if ( pptr->state != _OCCI_IDLE )
+		{
+			/* ------------------ */
+			/* dont scale commons */
+			/* ------------------ */
+			if ( pptr->commons )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( is_common_contract( pptr ) )
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ((!( rest_valid_string( pptr->type ) ))
+			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
+			{
+				/* -------------------------------- */
+				/* detect scale down interface here */
+				/* -------------------------------- */
+				if (!( target = contract_can_scale( pptr ) ))
+					return( rest_html_response( aptr, 200, "OK" ) );
+				else
+				{
+					if (!(zptr = cords_invoke_action( target, "scaledown", 
+						_CORDS_CONTRACT_AGENT, default_tls() )))
+						return( rest_html_response( aptr, 900, "ScaleDown Invocation Failure" ) );
+					else if ((status = zptr->response->status) > 299 )
+					{
+						zptr = occi_remove_response ( zptr );
+						return( rest_html_response( aptr, status, "ScaleDown Invocation Error" ) );
+					}
+					else	zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, 200, "OK" ) );
+				}
+			}
+			else if (( rest_valid_string( pptr->category ) != 0)
+			     && ( strcmp( pptr->category, _CORDS_MANIFEST ) != 0 ))
+				return( rest_html_response( aptr, 200, "OK" ) );
+			else if ( rest_valid_string( pptr->service ) != 0 )
+			{
+				/* ----------------------------------- */
+				/* propogate scaledown to service here */
+				/* ----------------------------------- */
+				if (!(zptr = cords_invoke_action( pptr->service, "scaledown", 
+					_CORDS_CONTRACT_AGENT, default_tls() )))
+					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
+				else if ((status = zptr->response->status) > 299 )
+				{
+					zptr = occi_remove_response ( zptr );
+					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
+				}
+				else	zptr = occi_remove_response ( zptr );
+			}
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -1050,6 +1236,10 @@ private	struct	occi_category *	procci_contract_builder( char * domain, char * ca
 		else if (!( optr = occi_add_action( optr,_CORDS_STOP,"",stop_contract)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,_CORDS_RESOLVE,"",resolve_contract)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"scaleup","",scaleup_contract)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"scaledown","",scaledown_contract)))
 			return( optr );
 		else	return( optr );
 	}
