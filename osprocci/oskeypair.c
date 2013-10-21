@@ -9,7 +9,7 @@ private	int	use_keypairs=1;
 private	int	generate_private_keyfile( char * pathname, char * kptr )
 {
 	FILE *	h;
-	int	status=1;
+	int	status=0;
 	int	mode = 0;
 	int	bytes=64;
 	if (!( rest_valid_string( kptr ) ))
@@ -47,6 +47,7 @@ private	int	generate_private_keyfile( char * pathname, char * kptr )
 				}
 				else
 				{
+					kptr++;
 					fprintf(h,"\n");
 					mode++;
 					bytes=64;
@@ -62,6 +63,7 @@ private	int	generate_private_keyfile( char * pathname, char * kptr )
 					}
 					else
 					{
+						kptr++;
 						fprintf(h,"\n");
 						bytes = 64;
 					}
@@ -87,6 +89,7 @@ private	int	generate_private_keyfile( char * pathname, char * kptr )
 				}
 				else
 				{
+					kptr++;
 					fprintf(h,"\n");
 					mode++;
 				}
@@ -109,7 +112,12 @@ private	int	generate_private_keyfile( char * pathname, char * kptr )
 			case	10	:
 				if ( *kptr != 'n' )
 					status = 0;
-				else	fprintf(h,"\n");
+				else
+				{
+					kptr++;
+					status = 1;
+					fprintf(h,"\n");
+				}
 				break;
 			}
 		}
