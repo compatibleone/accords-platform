@@ -3,6 +3,57 @@
 
 private	int	use_keypairs=1;
 
+#define	_REMOTE_SSH_EXEC "ssh -o StrictHostKeyChecking=no -q"
+
+/*	-------------------------------------------------	*/
+/*	 s s h _ l a u n c h _ u s i n g _ k e y p a i r	*/
+/*	-------------------------------------------------	*/
+public	int	ssh_launch_using_keypair( char * username, char * keyfile, char * hostname, char * command )
+{
+	int	status=0;
+	char *	syntax=(char *) 0;
+	if ((!( username))
+	||  (!( keyfile ))
+	||  (!( hostname))
+	||  (!( command )))
+		return( 118 );
+	if (!( syntax = allocate( 
+			strlen( _REMOTE_SSH_EXEC) + 
+			strlen( keyfile 	) + 
+			strlen( username	) +
+			strlen( hostname	) +
+			strlen( command 	) + 64 ) ))
+		return( 27 );
+	else
+	{
+		sprintf(syntax,"%s -i %s %s@%s %c%s%c",
+			_REMOTE_SSH_EXEC,
+			keyfile,username,hostname,
+			0x0022, command, 0x0022 );
+		status = system( syntax );
+		syntax = liberate( syntax );
+		if ( status != -1 )
+			return( 0 );
+		else	return( errno );
+	}
+} 
+
+/*	-------------------------------------------------	*/
+/*	  o s _ l a u n c h _ u s i n g _ k e y p a i r		*/
+/*	-------------------------------------------------	*/
+public	int	os_launch_using_keypair( struct openstack * pptr, char * username, char * command )
+{
+	if (!( pptr ))
+		return( 118 );
+	else if (!( command ))
+		return( 118 );
+	else if (!( pptr->hostname ))
+		return( 118 );
+	else if (!( pptr->keyfile ))
+		return( 118 );
+	else	return( ssh_launch_using_keypair( username, pptr->keyfile, pptr->hostname, command ) );
+}
+
 /*	-----------------------------------------------		*/
 /*	g e n e r a t e _ p r i v a t e _ k e y f i l e		*/
 /*	-----------------------------------------------		*/

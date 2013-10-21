@@ -79,18 +79,25 @@ public	int	use_cosacs_agent( char * sptr )
 	if ( rest_valid_string_value( sptr, "cosacs" ) )
 	{
 		_is_secure_cosacs=_secure_cosacs;
-		return(1);
+		return(_USE_COSACS);
 	}
-	else if ( rest_valid_string_value( sptr, "http:cosacs" ) )
+	else if (( rest_valid_string_value( sptr, "http:cosacs" ) )
+	     ||  ( rest_valid_string_value( sptr, "cosacs:http" ) ))
 	{
 		_is_secure_cosacs=0;
-		return( 1 );
+		return(_USE_COSACS);
 	}
-	else if ( rest_valid_string_value( sptr, "https:cosacs" ) )
+	else if (( rest_valid_string_value( sptr, "https:cosacs" ) )
+	     ||  ( rest_valid_string_value( sptr, "cosacs:https" ) ))
 	{
 		_is_secure_cosacs=1;
-		return( 1 );
+		return(_USE_COSACS);
 	}
+	else if (!( rest_valid_string( sptr ) ))
+		return( 0 );
+	else if ((!( strncasecmp( sptr, "install:cosacs", strlen( "install:cosacs" ) )))
+	     ||  (!( strncasecmp( sptr, "cosacs:install", strlen( "cosacs:install" ) ))))
+		return( _INSTALL_COSACS );
 	else	return( 0 );
 }
 

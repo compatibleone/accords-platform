@@ -24,6 +24,10 @@
 #define	_COSACS_STOP_TIMEOUT	10
 #define	_COSACS_STOP_RETRY   2
 
+#define	_NO_COSACS	0
+#define	_USE_COSACS	1
+#define	_INSTALL_COSACS	2
+
 public	void	cosacs_release_interface( char * host );
 public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, char * value );
 public	int	cosacs_create_script( char * cosacs, char * action, char * parameters, char * type );

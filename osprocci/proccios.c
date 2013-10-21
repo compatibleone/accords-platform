@@ -1156,6 +1156,84 @@ private	char * create_server_request(
 				keyname, network ) );
 }
 
+/*	-----------------------------------	*/
+/*	 o s _ i n s t a l l _ c o s a c s	*/
+/*	-----------------------------------	*/
+private	int	os_install_cosacs( struct os_subscription * subptr, struct openstack * pptr )
+{
+	int	status;
+	char *	hostdepot="http://www.compatibleone.fr/accords-platform";
+	char *	buffer=(char *) 0;
+	char *	syntax=(char *) 0;
+	char *	username=(char *) 0;
+	char *	version=(char *) 0;
+	char *	package=(char *) 0;
+	char *	sptr;
+
+	/* ---------------------------------- */
+	/* detect cosacs installation request */
+	/* ---------------------------------- */
+	if (!( sptr = pptr->agent ))
+		return( _NO_COSACS );
+	else if (( strncasecmp( sptr, "cosacs:install", strlen("cosacs:install") ) != 0 )
+	     &&  ( strncasecmp( sptr, "install:cosacs", strlen("install:cosacs") ) != 0 ))
+		return( _NO_COSACS );
+	else	sptr += strlen( "cosacs:install" );
+
+	if ( *sptr != ':' )
+		return( _NO_COSACS );
+	else	sptr++;
+
+	/* -------------------------------------- */
+	/* extract user, version and package info */
+	/* -------------------------------------- */
+	if (!( buffer = allocate_string( sptr ) ))
+		return( _NO_COSACS );
+
+	username = sptr = strcpy( buffer, sptr );
+
+	while ( *sptr )
+	{
+		if ( *sptr == ':' )
+		{
+			*(sptr++) = 0;
+			if (!( version ))
+				version = sptr;
+			else if (!( package ))
+				package = sptr;
+			else	break;
+		}
+		else	sptr++;
+	}
+	if ((!( package)) || (!( version )) || (!( username )))
+	{
+		liberate( buffer ) ;
+		return( _NO_COSACS );
+	}
+
+	/* ---------------------------------------- */
+	/* build installation command syntax string */
+	/* ---------------------------------------- */
+	else if (!( syntax = allocate( strlen( hostdepot ) + strlen( version ) + strlen( package ) + 64 ) ))
+	{
+		liberate( buffer ) ;
+		return( _NO_COSACS );
+	}
+	sprintf(syntax,"wget %s/%s/%s; bash ./%s", 
+		hostdepot,
+		version,
+		package);
+	
+	status = os_launch_using_keypair( pptr, username, syntax );
+
+	buffer = liberate( buffer );
+	syntax = liberate( syntax );
+
+	if (!( status ))
+		return( _NO_COSACS  );
+	else	return( _USE_COSACS );
+}
+
 /*	-------------------------------------------	*/
 /* 	      s t a r t  _ o p e n s t a c k	  	*/
 /*	-------------------------------------------	*/
@@ -1315,8 +1393,12 @@ private	struct	rest_response * start_openstack(
 		/* ---------------------------- */
 		/* launch the COSACS operations */
 		/* ---------------------------- */
-		if ( use_cosacs_agent( pptr->agent ) )
+		switch ( use_cosacs_agent( pptr->agent ) )
 		{
+		case	_INSTALL_COSACS	:
+			if (!( os_install_cosacs( subptr, pptr ) ))
+				break;
+		case	_USE_COSACS	:
 			if ( cosacs_test_interface( pptr->hostname, _COSACS_START_TIMEOUT, _COSACS_START_RETRY ) )
 			{
 				cosacs_metadata_instructions( 
