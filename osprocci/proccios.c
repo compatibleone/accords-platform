@@ -1227,7 +1227,7 @@ private	int	os_install_cosacs( struct os_subscription * subptr, struct openstack
 	buffer = liberate( buffer );
 	syntax = liberate( syntax );
 
-	if (!( status ))
+	if ( status )
 		return( _NO_COSACS  );
 	else	return( _USE_COSACS );
 }
@@ -1391,10 +1391,10 @@ private	struct	rest_response * start_openstack(
 		/* ---------------------------- */
 		/* launch the COSACS operations */
 		/* ---------------------------- */
-		switch ( use_cosacs_agent( pptr->agent ) )
+		switch ((pptr->agentstatus = use_cosacs_agent( pptr->agent )))
 		{
 		case	_INSTALL_COSACS	:
-			if (!( os_install_cosacs( subptr, pptr ) ))
+			if (!( pptr->agentstatus = os_install_cosacs( subptr, pptr ) ))
 				break;
 		case	_USE_COSACS	:
 			if ( cosacs_test_interface( pptr->hostname, _COSACS_START_TIMEOUT, _COSACS_START_RETRY ) )
@@ -1413,7 +1413,7 @@ private	struct	rest_response * start_openstack(
 			/* ------------------------------------- */
 			/* release the COSACS client information */
 			/* ------------------------------------- */
-			if ( use_cosacs_agent( pptr->agent ) )
+			if ( pptr->agentstatus )
 			{
 				cosacs_release_interface( pptr->hostname );
 			}
@@ -1695,7 +1695,7 @@ private	struct os_response *	stop_openstack_provisioning( struct openstack * ppt
 		/* ------------------------------------------- */
 		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
-		if ( use_cosacs_agent( pptr->agent ) )
+		if ( pptr->agentstatus )
 		{
 			if ( cosacs_test_interface( pptr->hostname, _COSACS_STOP_TIMEOUT, _COSACS_STOP_RETRY ) )
 			{
