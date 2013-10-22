@@ -756,44 +756,44 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 		return(rest_html_response(aptr, 400, "missing request body"));
 	else if (!( sptr = corcs_xml_element( rptr->body ) ))
 		return(rest_html_response(aptr, 400, "incorrect request body"));
-	else if (!( strcmp(  command, "/Resolver" ) ))
+	else if (!( strcmp(  command, "Resolver" ) ))
 		return( corcs_soap_resolver( aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/ParseManifest" ) ))
+	else if (!( strcmp(  command, "ParseManifest" ) ))
 		return( corcs_soap_manifest_parser( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
-	else if (!( strcmp(  command, "/ParseSLA" ) ))
+	else if (!( strcmp(  command, "ParseSLA" ) ))
 		return( corcs_soap_sla_parser( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
-	else if (!( strcmp(  command, "/BrokerSLA" ) ))
+	else if (!( strcmp(  command, "BrokerSLA" ) ))
 		return( corcs_soap_sla_broker( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
-	else if (!( strcmp(  command, "/ServiceAction" ) ))
+	else if (!( strcmp(  command, "ServiceAction" ) ))
 		return( corcs_soap_service( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
-	else if (!( strcmp(  command, "/RunScript" ) ))
+	else if (!( strcmp(  command, "RunScript" ) ))
 		return( corcs_soap_script( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 
-	else if (!( strcmp(  command, "/occi" ) ))
+	else if (!( strcmp(  command, "occi" ) ))
 		return( corcs_soap_occi( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 
-	else if (!( strcmp(  command, "/AsynchParseManifest" ) ))
+	else if (!( strcmp(  command, "AsynchParseManifest" ) ))
 		return( corcs_asynchronous_request( corcs_soap_manifest_parser, command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchParseSLA" ) ))
+	else if (!( strcmp(  command, "AsynchParseSLA" ) ))
 		return( corcs_asynchronous_request( corcs_soap_sla_parser, command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchBrokerSLA" ) ))
+	else if (!( strcmp(  command, "AsynchBrokerSLA" ) ))
 		return( corcs_asynchronous_request( corcs_soap_sla_broker, command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchServiceAction" ) ))
+	else if (!( strcmp(  command, "AsynchServiceAction" ) ))
 		return( corcs_asynchronous_request( corcs_soap_service, command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchRunScript" ) ))
+	else if (!( strcmp(  command, "AsynchRunScript" ) ))
 		return( corcs_asynchronous_request( corcs_soap_script, command, aptr, sptr, rptr ) );
 
-	else if (!( strcmp(  command, "/AsynchResult" ) ))
+	else if (!( strcmp(  command, "AsynchResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchParseManifestResult" ) ))
+	else if (!( strcmp(  command, "AsynchParseManifestResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchParseSLAResult" ) ))
+	else if (!( strcmp(  command, "AsynchParseSLAResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchBrokerSLAResult" ) ))
+	else if (!( strcmp(  command, "AsynchBrokerSLAResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchServiceActionResult" ) ))
+	else if (!( strcmp(  command, "AsynchServiceActionResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
-	else if (!( strcmp(  command, "/AsynchRunScriptResult" ) ))
+	else if (!( strcmp(  command, "AsynchRunScriptResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 
 	else
