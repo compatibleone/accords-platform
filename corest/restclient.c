@@ -524,6 +524,21 @@ private	struct	rest_response *	rest_client_response( int status, char * message,
 	else	return( rest_html_response( aptr, status, message ) );
 }
 
+/*	-------------------------------		*/
+/*	r e s t _ t e s t _ c l i e n t 	*/
+/*	-------------------------------		*/
+public	int rest_test_client( char * host, int port, char * tls, int timeout, int retry )
+{
+	struct	rest_client * cptr;
+	if (!( cptr = rest_try_open_client( host, port, tls, timeout, retry ) ))
+		return(0);
+	else
+	{
+		cptr = rest_liberate_client( cptr );
+		return( 1 );
+	}
+}
+
 /*	------------------------------------------------	*/
 /*	   r e s t _ c l i e n t _ r e q u e s t 		*/
 /*	------------------------------------------------	*/

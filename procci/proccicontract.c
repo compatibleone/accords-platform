@@ -716,6 +716,7 @@ private	struct	rest_response * stop_contract(
 /*	-------------------------------------------	*/
 private	char *	contract_can_scale( struct cords_contract * pptr )
 {
+	struct	rest_client * cptr;
 	struct	occi_response * zptr;
 	char	buffer[2048];
 	char *	prefix;
@@ -726,6 +727,8 @@ private	char *	contract_can_scale( struct cords_contract * pptr )
 	else if (!( rest_valid_string( pptr->hostname ) ))
 		return( (char *) 0 );
 	else if (!( prefix = rest_http_prefix() ))
+		return( (char *) 0 );
+	else if (!( rest_test_client( pptr->hostname, 8386, default_tls(), 2, 2 ) ))
 		return( (char *) 0 );
 	else
 	{

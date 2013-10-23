@@ -18,5 +18,5 @@ cp ../accords-platform/*.css .
 cp ../accords-platform/*.crt .
 ./accords-config
 co-start
-bash dahsboard-init.sh
+bash dashboard-init.sh
 

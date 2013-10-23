@@ -85,6 +85,8 @@ public	struct	rest_response *
 	rest_client_put_request(
 		char * target, char * tls, char * nptr, char * filename, struct rest_header * hptr );
 
+public	int rest_test_client( char * host, int port, char * tls, int timeout, int retries );
+
 #endif	/* _restclient_h */
 	/* ------------- */
 
