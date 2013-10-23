@@ -9,12 +9,12 @@ private void	wsdl_soap_encoding( FILE * h, char * sbs )
 	fprintf(h,"<soap:body encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"\n");
 	if (!( strcmp( sbs, "rpc" ) ))
 	{
-		fprintf(h,"namespace=\"urn:compatibleone:resolverservice\"\n");
+		fprintf(h,"namespace=\"urn:compatibleone:corcsservice\"\n");
 		fprintf(h,"use=\"encoded\"/>\n");
 	}
 	else
 	{
-		fprintf(h,"namespace=\"urn:compatibleone:resolverservice\"\n");
+		fprintf(h,"namespace=\"urn:compatibleone:corcsservice\"\n");
 		fprintf(h,"use=\"literal\"/>\n");
 	}
 	return;
@@ -31,7 +31,7 @@ private void	wsdl_input_output_fault(FILE * h, char * sbs )
 	fprintf(h,"<output>\n");
 	wsdl_soap_encoding(h,sbs);
 	fprintf(h,"</output>\n");
-/*	fprintf(h,"<fault><soap:fault name=\"fault\"/></fault>\n"); */
+	fprintf(h,"<fault><soap:fault name=\"fault\"/></fault>\n"); 
 	return;
 }
 
@@ -51,7 +51,7 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 		else	sbb = "wsdl";
 
 		fprintf(h,"<?xml version=\"1.0\"?>\n");
-		fprintf(h,"<definitions name=\"ResolverService\"\n");
+		fprintf(h,"<definitions name=\"CorcsService\"\n");
 		fprintf(h,"targetNamespace=\"%s/resolver.wsdl\"\n",host);
 		fprintf(h,"xmlns=\"http://schemas.xmlsoap.org/wsdl/\"\n");
 		fprintf(h,"xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\"\n");
@@ -87,11 +87,11 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 		fprintf(h,"</types>\n");
 
 		fprintf(h,"<message name=\"AsynchMessageRequest\">\n");
-		fprintf(h,"<part name=\"identifier\" type=\"xsd:string\"/>\n");
+		fprintf(h,"<part name=\"identity\" type=\"xsd:string\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"AsynchMessageResponse\">\n");
-		fprintf(h,"<part name=\"identifier\" type=\"xsd:string\"/>\n");
+		fprintf(h,"<part name=\"identity\" type=\"xsd:string\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"ResolverRequest\">\n");
@@ -106,42 +106,42 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 
 		fprintf(h,"<message name=\"ParseManifestRequest\">\n");
 		fprintf(h,"<part name=\"command\" type=\"xsd:string\"/>\n");
-		fprintf(h,"<part name=\"document\" type=\"tns:manifest\"/>\n");
+		fprintf(h,"<part name=\"manifest\" type=\"tns:manifest\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"AsynchParseManifestRequest\">\n");
 		fprintf(h,"<part name=\"command\" type=\"xsd:string\"/>\n");
-		fprintf(h,"<part name=\"document\" type=\"tns:manifest\"/>\n");
+		fprintf(h,"<part name=\"manifest\" type=\"tns:manifest\"/>\n");
 		fprintf(h,"<part name=\"callback\" type=\"xsd:string\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"ParseManifestResponse\">\n");
-		fprintf(h,"<part name=\"document\" type=\"xsd:string\"/>\n");
+		fprintf(h,"<part name=\"manifest\" type=\"xsd:string\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"ParseSLARequest\">\n");
 		fprintf(h,"<part name=\"command\" type=\"xsd:string\"/>\n");
-		fprintf(h,"<part name=\"document\" type=\"tns:agreement\"/>\n");
+		fprintf(h,"<part name=\"agreement\" type=\"tns:agreement\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"AsynchParseSLARequest\">\n");
 		fprintf(h,"<part name=\"command\" type=\"xsd:string\"/>\n");
-		fprintf(h,"<part name=\"document\" type=\"tns:agreement\"/>\n");
+		fprintf(h,"<part name=\"agreement\" type=\"tns:agreement\"/>\n");
 		fprintf(h,"<part name=\"callback\" type=\"xsd:string\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"ParseSLAResponse\">\n");
-		fprintf(h,"<part name=\"document\" type=\"xsd:string\"/>\n");
+		fprintf(h,"<part name=\"agreement\" type=\"xsd:string\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"BrokerSLARequest\">\n");
 		fprintf(h,"<part name=\"command\" type=\"xsd:string\"/>\n");
-		fprintf(h,"<part name=\"document\" type=\"tns:agreement\"/>\n");
+		fprintf(h,"<part name=\"agreement\" type=\"tns:agreement\"/>\n");
 		fprintf(h,"</message>\n");
 
 		fprintf(h,"<message name=\"AsynchBrokerSLARequest\">\n");
 		fprintf(h,"<part name=\"command\" type=\"xsd:string\"/>\n");
-		fprintf(h,"<part name=\"document\" type=\"tns:agreement\"/>\n");
+		fprintf(h,"<part name=\"agreement\" type=\"tns:agreement\"/>\n");
 		fprintf(h,"<part name=\"callback\" type=\"xsd:string\"/>\n");
 		fprintf(h,"</message>\n");
 
@@ -199,8 +199,18 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 			fprintf(h,"<output message=\"tns:ParseManifestResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			fprintf(h,"<operation name=\"AsynchParseManifestResult\">\n");
+			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
+			fprintf(h,"<output message=\"tns:ParseManifestResponse\"/>\n");
+			fprintf(h,"</operation>\n");
+
 			fprintf(h,"<operation name=\"ParseSLA\">\n");
 			fprintf(h,"<input message=\"tns:ParseSLARequest\"/>\n");
+			fprintf(h,"<output message=\"tns:ParseSLAResponse\"/>\n");
+			fprintf(h,"</operation>\n");
+
+			fprintf(h,"<operation name=\"AsynchParseSLAResult\">\n");
+			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ParseSLAResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
@@ -209,13 +219,28 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 			fprintf(h,"<output message=\"tns:BrokerSLAResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			fprintf(h,"<operation name=\"AsynchBrokerSLAResult\">\n");
+			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
+			fprintf(h,"<output message=\"tns:BrokerSLAResponse\"/>\n");
+			fprintf(h,"</operation>\n");
+
 			fprintf(h,"<operation name=\"ServiceAction\">\n");
 			fprintf(h,"<input message=\"tns:ServiceActionRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ServiceActionResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			fprintf(h,"<operation name=\"AsynchServiceActionResult\">\n");
+			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
+			fprintf(h,"<output message=\"tns:ServiceActionResponse\"/>\n");
+			fprintf(h,"</operation>\n");
+
 			fprintf(h,"<operation name=\"RunScript\">\n");
 			fprintf(h,"<input message=\"tns:RunScriptRequest\"/>\n");
+			fprintf(h,"<output message=\"tns:RunScriptResponse\"/>\n");
+			fprintf(h,"</operation>\n");
+
+			fprintf(h,"<operation name=\"AsynchRunScriptResult\">\n");
+			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:RunScriptResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
@@ -309,12 +334,37 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
 
+			fprintf(h,"<operation name=\"AsynchParseManifestResult\">\n");
+			fprintf(h,"<soap:operation soapAction=\"AsynchParseManifestResult\"/>\n");
+			wsdl_input_output_fault(h,sbs);
+			fprintf(h,"</operation>\n");
+
+			fprintf(h,"<operation name=\"AsynchParseSLAResult\">\n");
+			fprintf(h,"<soap:operation soapAction=\"AsynchParseSLAResult\"/>\n");
+			wsdl_input_output_fault(h,sbs);
+			fprintf(h,"</operation>\n");
+
+			fprintf(h,"<operation name=\"AsynchBrokerSLAResult\">\n");
+			fprintf(h,"<soap:operation soapAction=\"AsynchBrokerSLAResult\"/>\n");
+			wsdl_input_output_fault(h,sbs);
+			fprintf(h,"</operation>\n");
+
+			fprintf(h,"<operation name=\"AsynchServiceActionResult\">\n");
+			fprintf(h,"<soap:operation soapAction=\"AsynchServiceActionResult\"/>\n");
+			wsdl_input_output_fault(h,sbs);
+			fprintf(h,"</operation>\n");
+
+			fprintf(h,"<operation name=\"AsynchRunScriptResult\">\n");
+			fprintf(h,"<soap:operation soapAction=\"AsynchRunScriptResult\"/>\n");
+			wsdl_input_output_fault(h,sbs);
+			fprintf(h,"</operation>\n");
+
 		fprintf(h,"</binding>\n");
 
-		fprintf(h,"<service name=\"ResolverService\">\n");
-		fprintf(h,"<documentation>WSDL File for ResolverService</documentation>\n"); 
+		fprintf(h,"<service name=\"CorcsService\">\n");
+		fprintf(h,"<documentation>WSDL File for CorcsService</documentation>\n"); 
 		fprintf(h,"<port binding=\"tns:CorcsBinding\" name=\"CorcsPort\">\n");
-		fprintf(h,"<soap:address location=\"%s/Resolver/\"/>\n",host);
+		fprintf(h,"<soap:address location=\"%s/Corcs/\"/>\n",host);
 		fprintf(h,"</port>\n");
 		fprintf(h,"</service>\n");
 

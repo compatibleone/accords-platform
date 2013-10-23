@@ -9,17 +9,14 @@ private	int	invoke_soap_request( char * action, char * host, char * wsdl, char *
 	struct	rest_header * hptr;
 	struct	rest_response * rptr;
 	struct	xml_element * eptr;
-	char 	buffer[1024];
 
 	if ( check_verbose() )
 		printf("SOAP API REQUEST POST %s %s \n",host, filename);
 
-	sprintf(buffer,"%s%s",host,action);
-
 	if ( check_verbose() )
-		printf("SOAP ACTION %s \n",buffer);
+		printf("SOAP ACTION %s \n",action);
 
-	if (!( hptr = rest_create_header( "soapAction", buffer )))
+	if (!( hptr = rest_create_header( "soapAction", action )))
 		return( 0 );
 	else if (!( rptr = rest_client_post_request( host, default_tls(), get_default_agent(), filename, hptr ) ))
 		return( 0 );
