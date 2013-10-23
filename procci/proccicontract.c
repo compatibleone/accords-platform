@@ -854,9 +854,9 @@ private	struct	rest_response * scaledown_contract(
 			/* dont scale commons */
 			/* ------------------ */
 			if ( pptr->commons > 1 )
-				return( rest_html_response( aptr, 200, "OK" ) );
+				return( rest_html_response( aptr, 202, "Accepted" ) );
 			else if ( is_common_contract( pptr ) )
-				return( rest_html_response( aptr, 200, "OK" ) );
+				return( rest_html_response( aptr, 202, "Accepted" ) );
 			else if ((!( rest_valid_string( pptr->type ) ))
 			||  (!( strcmp( pptr->type, _CORDS_SIMPLE ) )))
 			{
@@ -864,7 +864,7 @@ private	struct	rest_response * scaledown_contract(
 				/* detect scale down interface here */
 				/* -------------------------------- */
 				if (!( target = contract_can_scale( pptr ) ))
-					return( rest_html_response( aptr, 200, "OK" ) );
+					return( rest_html_response( aptr, 202, "Accepted" ) );
 				else
 				{
 					if (!(zptr = cords_invoke_action( target, "scaledown", 
@@ -881,7 +881,7 @@ private	struct	rest_response * scaledown_contract(
 			}
 			else if (( rest_valid_string( pptr->category ) != 0)
 			     && ( strcmp( pptr->category, _CORDS_MANIFEST ) != 0 ))
-				return( rest_html_response( aptr, 200, "OK" ) );
+				return( rest_html_response( aptr, 202, "Accepted" ) );
 			else if ( rest_valid_string( pptr->service ) != 0 )
 			{
 				/* ----------------------------------- */
