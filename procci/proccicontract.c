@@ -744,7 +744,13 @@ private	char *	contract_can_scale( struct cords_contract * pptr )
 			return((char *) 0);
 		else if (!( vptr = occi_unquoted_value( vptr ) ))
 			return((char *) 0);
-		else 	return( (pptr->scaling = vptr ) );
+		else if (!( pptr->scaling = vptr ))
+			return((char *) 0);
+		else
+		{
+			autosave_cords_contract_nodes();
+			return( pptr->scaling );
+		}
 	}
 }
 
