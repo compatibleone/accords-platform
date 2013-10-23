@@ -461,8 +461,9 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 			failure(errno,"socket_create","errno");
 		return( rest_liberate_client( cptr ) );
 	}
-	while ( retry-- )
+	while ( retry )
 	{
+		retry--;
 		if (( status = socket_try_connect( cptr->net.socket, host, port, ( timeout > 1 ? timeout / 2 : 1 ) )) == 1)
 		{
 			/* ------- */
