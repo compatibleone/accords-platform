@@ -476,7 +476,8 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 			/* ------- */
 			/* failure */
 			/* ------- */
-			sleep(( timeout > 1 ? timeout / 2 : 1 ));
+			if ( retry )
+				sleep(( timeout > 1 ? timeout / 2 : 1 ));
 			continue;
 		}
 		else
