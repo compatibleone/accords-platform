@@ -699,6 +699,8 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#save'/>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#snapshot'/>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#scaleup'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#scaledown'/>
 	    </actions>
 	</category>
 	<!--  no doc or live instances -->
@@ -780,6 +782,8 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#snapshot'/>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#resolve'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#scaleup'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#scaledown'/>
 	    </actions>
 	</category>
 	<!-- no docs or live instances -->
