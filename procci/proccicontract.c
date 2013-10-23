@@ -737,7 +737,7 @@ private	char *	contract_can_scale( struct cords_contract * pptr )
 			return( (char *) 0 );
 		else if (!( zptr->response ))
 			return( (char *) 0 );
-		else if (!( zptr->response->status != 200 ))
+		else if ( zptr->response->status != 200 )
 			return( (char *) 0 );
 		else if (!( eptr = zptr->first ))
 			return((char *) 0);
