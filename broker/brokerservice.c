@@ -719,7 +719,7 @@ private	struct	rest_response * scaleup_service(
 			autosave_cords_service_nodes();
 			service_action( pptr, pptr->id, "scaleup" );
 			pptr->when  = time((long*) 0);
-			pptr->state = _OCCI_IDLE;
+			pptr->state = _OCCI_RUNNING;
 			autosave_cords_service_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
@@ -752,7 +752,7 @@ private	struct	rest_response * scaledown_service(
 			autosave_cords_service_nodes();
 			reverse_service_action( pptr, pptr->id, "scaledown" );
 			pptr->when  = time((long*) 0);
-			pptr->state = _OCCI_IDLE;
+			pptr->state = _OCCI_RUNNING;
 			autosave_cords_service_nodes();
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );

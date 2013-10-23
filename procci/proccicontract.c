@@ -778,7 +778,7 @@ private	struct	rest_response * scaleup_contract(
 			/* ------------------ */
 			/* dont scale commons */
 			/* ------------------ */
-			if ( pptr->commons )
+			if ( pptr->commons > 1 )
 				return( rest_html_response( aptr, 202, "Accepted" ) );
 			else if ( is_common_contract( pptr ) )
 				return( rest_html_response( aptr, 202, "Accepted" ) );
@@ -850,7 +850,7 @@ private	struct	rest_response * scaledown_contract(
 			/* ------------------ */
 			/* dont scale commons */
 			/* ------------------ */
-			if ( pptr->commons )
+			if ( pptr->commons > 1 )
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( is_common_contract( pptr ) )
 				return( rest_html_response( aptr, 200, "OK" ) );
