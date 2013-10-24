@@ -28,17 +28,17 @@ export PYTHON_ACCORDS_PATH=/usr/local/bin/ec2procci/
 # then specify the security directory,
 # and the nagios configuration file
 # -------------------------------------
-# nethsm=1
-# nagios=/usr/local/etc/accords/accords-nagios.cfg
-# tls=security
+tls=security
+nagios=/usr/local/etc/accords/accords-nagios.cfg
 runcops=1
+# nethsm=1
 # -------------------------------------
 # with neither security nor monitoring 
 # -------------------------------------
-tls=
-nethsm=
-nagios=
+# tls=
+# nagios=
 # runcops=
+nethsm=
 # -------------------------------------
 resthost=127.0.0.1
 zone="europe"
@@ -175,7 +175,7 @@ _co_platform() {
 #       The provisioning services agreements 
 # ---------------------------------------------------
     secs=20
-    echo "Please wait $secs seconds while starting the provisioning services agreements"
+    echo "Waiting $secs seconds before launching provisioning interfaces"
     for i in $(seq 1 $secs)
     do 
        sleep 1
@@ -224,7 +224,7 @@ _co_provision()
     _co_run_prov cnprocci accords "accords compute next services" 10 10 1000 10 10
     _co_run_prov eziprocci accords "accords easiclouds services" 10 10 1000 10 10
     _co_run_prov oaprocci accords "accords on app services" 10 10 1000 10 10
-    _co_run_prov dummyprocci accords "accords dummy services" 10 10 1000 10 10
+#   _co_run_prov dummyprocci accords "accords dummy services" 10 10 1000 10 10
     _co_run_prov paasprocci accords "accords paas procci services" 10 10 1000 10 10
     _co_run_prov osocciprocci accords "accords os occi procci services" 10 10 1000 10 10
 
@@ -632,7 +632,7 @@ _accords_config() {
 	export pass=Accords
 
 	if [ -z "$nethsm" ]; then 
-		export options=13
+		export options=141
 
 	else
 		export options=525

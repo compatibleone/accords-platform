@@ -118,7 +118,7 @@ private	void	soap_message_footer( FILE * h, char * nptr )
 private	void	soap_message_header( FILE * h, char * nptr )
 {
 	fprintf(h,"<?xml version=\"1.0\"?>\n");
-	fprintf(h,"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope\">\n");
+	fprintf(h,"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n");
 
 	fprintf(h,"<soapenv:Body>\n");
 	fprintf(h,"<m:%s xmlns:m=\"%s/wsdl\">\n",nptr,get_identity());
@@ -131,7 +131,7 @@ private	void	soap_message_header( FILE * h, char * nptr )
 private	void	soap_fault_message( FILE * h, int status, char * reason, char * detail )
 {
 	fprintf(h,"<?xml version=\"1.0\"?>\n");
-	fprintf(h,"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope\">\n");
+	fprintf(h,"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n");
 	fprintf(h,"<soapenv:Body>\n");
 	fprintf(h,"<soapenv:Fault>\n");
 	fprintf(h,"<soapenv:Code>\n");
