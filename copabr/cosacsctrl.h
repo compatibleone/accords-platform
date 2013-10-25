@@ -28,6 +28,7 @@
 #define	_USE_COSACS	1
 #define	_INSTALL_COSACS	2
 
+public	int	ssh_launch_using_keypair( char * username, char * keyfile, char * hostname, char * command );
 public	void	cosacs_release_interface( char * host );
 public	int	cosacs_create_metadata( char * cosacs, char * prefix, char * symbol, char * value );
 public	int	cosacs_create_script( char * cosacs, char * action, char * parameters, char * type );

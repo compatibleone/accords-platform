@@ -25,6 +25,7 @@
 #include "cp.h"
 #include "cb.h"
 #include "stdnode.h"
+#include "accords.h"
 
 public	char *	occi_extract_atribut( 
 	struct occi_response * zptr, char * domain,
@@ -1162,13 +1163,16 @@ private	char * create_server_request(
 private	int	os_install_cosacs( struct os_subscription * subptr, struct openstack * pptr )
 {
 	int	status;
-	char *	hostdepot="http://www.compatibleone.fr/accords-platform";
+	char *	hostdepot=(char *) 0;
 	char *	buffer=(char *) 0;
 	char *	syntax=(char *) 0;
 	char *	username=(char *) 0;
 	char *	version=(char *) 0;
 	char *	package=(char *) 0;
 	char *	sptr;
+
+	if (!( hostdepot = get_default_depot()))
+		return( _NO_COSACS );
 
 	/* ---------------------------------- */
 	/* detect cosacs installation request */

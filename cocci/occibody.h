@@ -25,6 +25,7 @@
 #include "restclient.h"
 #include "url.h"
 #include "urlpublic.h"
+#include "accords.h"
 
 public	char *	occi_content_length( struct rest_header * hptr, char * filename );
 public	struct rest_header * occi_accept_header( struct rest_response * response );

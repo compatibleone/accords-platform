@@ -29,19 +29,13 @@
 #include "occimixin.h"
 #include "linknode.h"
 #include "kindnode.h"
+#include "accords.h"
 
 public	struct	occi_kind_node * allocate_occi_kind_node();
 public	struct	occi_kind_node * liberate_occi_kind_node(struct	occi_kind_node * n);
 public	struct	occi_link_node * allocate_occi_link_node();
 public	struct	occi_link_node * liberate_occi_link_node(struct	occi_link_node * n);
 public	char *	occi_http_link( struct occi_category * optr, char * target, char * id );
-
-public	char *	get_identity();
-public	char *	get_component();
-public	char * 	get_default_agent();
-public	int	set_default_agent( char * nptr);
-public	char *	get_operator_profile();
-public	char *	serialise_component_configuration();
 
 #define	_CORDS_SERVICE_AGENT 	get_default_agent()
 #define	_CORDS_CONTRACT_AGENT 	get_default_agent()
@@ -53,13 +47,6 @@ public	char *	serialise_component_configuration();
 #define	_CORDS_AZ_AGENT 	"CO-RDS-AZ/1.0"
 #define	_CORDS_PA_AGENT 	"CO-RDS-PA/1.0"
 #define	_CORDS_SG_AGENT 	"CO-RDS-SG/1.0"
-
-public	char *	default_publisher();
-public	char *	default_tls();
-public	char *	default_zone();
-public	char *	default_operator();
-public	char *	get_default_account();
-public	char *	get_default_account_id();
 
 #define	_CORDS_DEFAULT_PUBLISHER "http://publisher.compatibleone.fr:28001"
 #define	_DEFAULT_PUBLISHER default_publisher()
