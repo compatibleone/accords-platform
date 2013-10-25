@@ -630,6 +630,10 @@ private	int	service_operation( char * command, char * service, char * syntax )
 			return( cords_service_action( id, "restart" ) );
 		else if (!( strcasecmp( command, "STOP" ) ))
 			return( cords_service_action( id, "stop" ) );
+		else if (!( strcasecmp( command, "SCALEUP" ) ))
+			return( cords_service_action( id, "scaleup" ) );
+		else if (!( strcasecmp( command, "SCALEDOWN" ) ))
+			return( cords_service_action( id, "scaledown" ) );
 		else if (!( strcasecmp( command, "SAVE" ) ))
 			return( cords_service_action( id, "save" ) );
 		else if (!( strcasecmp( command, "SNAPSHOT" ) ))
@@ -2483,8 +2487,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.07");
-	printf("\n   Beta Version : 23/10/2013 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.08");
+	printf("\n   Beta Version : 25/10/2013 ");
 	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
@@ -2493,6 +2497,8 @@ private	int	banner()
 	printf("\n         command <options> START       <service_file> ");
 	printf("\n         command <options> RESTART     <service_file> ");
 	printf("\n         command <options> STOP        <service_file> ");
+	printf("\n         command <options> SCALEUP     <service_file> ");
+	printf("\n         command <options> SCALEDOWN   <service_file> ");
 	printf("\n         command <options> SAVE        <service_file> ");
 	printf("\n         command <options> SNAPSHOT    <service_file> ");
 	printf("\n         command <options> DELETE      <service_file> ");

@@ -7,7 +7,6 @@
 		$n = $contract["occi.contract.name"];
 		$na = $n / "-";
 		$nn = $na[0];
-		if ( $nn == "cool" ) { $cool = 1; } else { $cool = 0; }
 		$m = $m#"<td>"#$n;
 		$pn = $contract["occi.contract.profile"];
 		$m = $m#"<td>"#$pn;
@@ -18,21 +17,7 @@
 		{ 	$m = $m#"<td><a href='"#$hostname#"'>"#$hostname#"</a>";	}
 		else
 		{	$m = $m#"<td>"#$hostname;					}
-		if ( $cool != 0 )
-		{
-			$k = $hostname / ":";
-			$kn= $k[1];
-			$kh= "https:"#$kn#":8386/job/";
-			$kwhat = $kh.list();
-			$kh = $kwhat[0];
-			$kup = '<form enctype="application/x-www-form-urlencoded" action="'#$kh#'?action=scaleup" method=POST><input type=submit name=action value=scaleup class=action></form>';
-			$kdn = '<form enctype="application/x-www-form-urlencoded" action="'#$kh#'?action=scaledown" method=POST><input type=submit name=action value=scaledown class=action></form>';
-			$kool = $kup#"&nbsp"#$kdn;
-		}
-		else
-		{
-			$kool="&nbsp;";
-		}
+		$kool="&nbsp;";
 		$n = $contract["occi.contract.state"];
 		if ( $n > 0 )
 		{	$m = $m#"<td>Deployed since";		}
@@ -81,7 +66,7 @@
 
 		$m = "<tr><td class=title colspan=7>Service</td></tr>";
 		$m.display();
-		$m = "<tr><td><b>Reference</b><td colspan=4>"#$service#"</td>";
+		$m = "<tr><td><b>Service Reference</b><td colspan=4>"#$service#"</td>";
 		$m.display();
 		$state = $record["occi.service.state"];
 		$m = "<td>&nbsp;<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
@@ -91,7 +76,9 @@
 		switch ( $state )
 		{
 		case	1	:
-			"<input type=submit class=redaction name=action value='stop service'></form></tr>".display();
+			"<input type=submit class=redaction name=action value='stop service'>".display();
+			"<br><input type=submit class=greenaction name=action value='scaleup service'>".display();
+			"<br><input type=submit class=action name=action value='scaledown service'></form></tr>".display();
 			break;
 		case	0	:
 			"<input type=submit class=greenaction name=action value='start service'></form></tr>".display();

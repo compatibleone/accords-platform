@@ -36,6 +36,8 @@ class admin_role extends role
 	print "</select>\n";
 	print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='inspect service'></div></tr>\n";
 	print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='stop service'></div></tr>\n";
+	print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='scaleup service'></div></tr>\n";
+	print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='scaledown service'></div></tr>\n";
 	print "<tr><td>Action<td><div align=center><input class='action' type='submit' name='action' value='delete service'></div></tr>\n";
 	print "</table></div>\n";
 	print "</form></tr>";
@@ -170,6 +172,14 @@ class admin_role extends role
 			case	"stop service" :
 				$this->display_tabs("0");
 				$result = $this->service->stop($this->page);
+				break;
+			case	"scaleup service" :
+				$this->display_tabs("0");
+				$result = $this->service->scaleup($this->page);
+				break;
+			case	"scaleup service" :
+				$this->display_tabs("0");
+				$result = $this->service->scaleup($this->page);
 				break;
 			case	"delete service" :
 				$this->display_tabs("0");

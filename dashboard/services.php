@@ -30,6 +30,28 @@ public function stop($p)
 }
 
 /*	---------------------------------	*/
+/*	 s c a l e u p _ s e r v i c e 		*/
+/*	---------------------------------	*/
+public function scaleup($p)
+{
+	$a = array();
+	exec("bash ./dashboard-command --verbose scaleup ".$_REQUEST['service'],$a);
+	$p->command_output( "Stop Service", $a );
+	return( "stop" );
+}
+
+/*	---------------------------------	*/
+/*	s c a l e d o w n _ s e r v i c e 	*/
+/*	---------------------------------	*/
+public function scaledown($p)
+{
+	$a = array();
+	exec("bash ./dashboard-command --verbose scaledown ".$_REQUEST['service'],$a);
+	$p->command_output( "Stop Service", $a );
+	return( "stop" );
+}
+
+/*	---------------------------------	*/
 /*	   s a v e _ s e r v i c e 		*/
 /*	---------------------------------	*/
 public function save($p)

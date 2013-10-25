@@ -366,6 +366,16 @@ class user_role extends role
 				$result = $this->service->stop($this->page);
 				$this->service_menu();
 				break;
+			case	"scaleup service" :
+				$this->display_tabs("0");
+				$result = $this->service->scaleup($this->page);
+				$this->service_menu();
+				break;
+			case	"scaledown service" :
+				$this->display_tabs("0");
+				$result = $this->service->scaledown($this->page);
+				$this->service_menu();
+				break;
 			case	"delete service" :
 				$this->display_tabs("0");
 				$result = $this->service->delete($this->page);
