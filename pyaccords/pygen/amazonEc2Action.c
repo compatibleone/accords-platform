@@ -110,7 +110,7 @@ private	int	ec2_install_cosacs( struct ec2_subscription * subptr, struct amazonE
 	sprintf(syntax,"wget %s/%s/%s",hostdepot,version,package);
 	status = ec2_launch_using_keypair( pptr, username, syntax );
 	sprintf(syntax,"bash ./%s",package);
-	status = os_launch_using_keypair( pptr, username, syntax );
+	status = ec2_launch_using_keypair( pptr, username, syntax );
 
 	buffer = liberate( buffer );
 	syntax = liberate( syntax );
