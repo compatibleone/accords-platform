@@ -28,7 +28,7 @@
 /*	-------------------------------------------------	*/
 /*	  e c 2 _ l a u n c h _ u s i n g _ k e y p a i r		*/
 /*	-------------------------------------------------	*/
-public	int	ec2_launch_using_keypair( struct openstack * pptr, char * username, char * command )
+public	int	ec2_launch_using_keypair( struct amazonEc2 * pptr, char * username, char * command )
 {
 	if (!( pptr ))
 		return( 118 );
@@ -44,7 +44,7 @@ public	int	ec2_launch_using_keypair( struct openstack * pptr, char * username, c
 /*	-----------------------------------	*/
 /*	e c 2 _ i n s t a l l _ c o s a c s	*/
 /*	-----------------------------------	*/
-private	int	ec2_install_cosacs( struct ec2_subscription * subptr, struct openstack * pptr )
+private	int	ec2_install_cosacs( struct ec2_subscription * subptr, struct amazonEc2 * pptr )
 {
 	int	status;
 	char *	hostdepot=(char *) 0;
@@ -131,10 +131,10 @@ public	struct rest_response * start_amazonEc2(
 	void * vptr )
 {
 	struct amazonEc2 * pptr;
-	int status = 0;
-	char * secgroup;
-	struct ec2_subscription * subptr = (struct ec2_subscription*) 0;
-	char		reference[512];	
+	int 	status = 0;
+	char * 	secgroup;
+	struct 	ec2_subscription * subptr = (struct ec2_subscription*) 0;
+	char	reference[512];	
 	
 	/* --------------------------------- */
 	/* retrieve the instance information */
@@ -143,7 +143,9 @@ public	struct rest_response * start_amazonEc2(
 		return( rest_html_response( aptr, 404, "ec2 Invalid Action" ) );
 	else if(pptr->state == _OCCI_SUSPENDED)
 	{
-		if((status = start_ec2_instance(subptr,pptr)!=0))
+		if (!(subptr = use_ec2_configuration(pptr->profile)))
+			return( rest_html_response (aptr, 404, "ac2 configuration not found"));
+		else if((status = start_ec2_instance(subptr,pptr)!=0))
 			return ( rest_html_response( aptr, status, "start ec2 vm failure"));
 	}
 	else if (pptr->state != _OCCI_IDLE )
@@ -163,8 +165,19 @@ public	struct rest_response * start_amazonEc2(
 	switch ((pptr->agentstatus = use_cosacs_agent( pptr->agent )))
 	{
 	case	_INSTALL_COSACS	:
-		if (!( pptr->agentstatus = ec2_install_cosacs( subptr, pptr ) ))
+		if (!( subptr->keypair ))
+		{
+			pptr->agentstatus = _NO_COSACS;
 			break;
+		}
+		else if (!( pptr->keyfile = allocate_string( subptr->keypair ) ))
+		{
+			pptr->agentstatus = _NO_COSACS;
+			break;
+		}
+		else if (!( pptr->agentstatus = ec2_install_cosacs( subptr, pptr ) ))
+			break;
+
 	case	_USE_COSACS	:
 		if ( cosacs_test_interface( pptr->hostname, _COSACS_START_TIMEOUT, _COSACS_START_RETRY ) )
 		{
