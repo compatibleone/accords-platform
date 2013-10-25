@@ -77,6 +77,7 @@ int deleteCategory(char categoryName[], int indice)
  	char occicordsname[DIM];
  	char pathfc[DIM];
  	char pathfh[DIM];
+	char pathfilter[DIM];
  	char occipath[DIM];
  	char pyinc[DIM];
  	char pyincname[DIM];
@@ -140,6 +141,7 @@ int deleteCategory(char categoryName[], int indice)
 
  
  	sprintf(pathfh,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
+	sprintf(pathfilter,"%s/%s/%s_occi_filter.h",pathf,CORDS_SRC,categoryName);
  	sprintf(pathfc,"%s/%s/%s.c",pathf,CORDS_SRC,categoryName);
  	sprintf(occipath,"%s/%s/occi%s.c",pathf,CORDS_SRC,categoryName);
  
@@ -159,6 +161,11 @@ int deleteCategory(char categoryName[], int indice)
  	if( remove( pathfh) != 0 )
  	{
    		printf( "Error in delete category (CORDS_SRC H):No such category name\n" );
+   		return 0;
+ 	}
+	if( remove( pathfilter) != 0 )
+ 	{
+   		printf( "Error in delete category filter (CORDS_SRC H):No such category name\n" );
    		return 0;
  	}
  	else if( remove( pathfc) != 0 )
