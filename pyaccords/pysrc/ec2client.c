@@ -700,7 +700,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	/* ------------------------------------------- */
 	/* perform pre-release actions for destruction */
 	/* ------------------------------------------- */
-	if ( use_cosacs_agent( pptr->agent ) )
+	if ( pptr->agentstatus == _USE_COSACS )
 	{
 		if ( cosacs_test_interface( pptr->hostname, _COSACS_STOP_TIMEOUT, _COSACS_STOP_RETRY ) )
 		{

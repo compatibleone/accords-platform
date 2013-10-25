@@ -24,6 +24,7 @@
 #include "rest.h"
 
 private	struct	accords_configuration 	* configuration 		= (struct accords_configuration *) 0;
+private	char				* depot				= (char *) 0;
 private	char				* section 			= (char *) 0;
 private	char				* identity			= (char *) 0;
 private	char				* component			= (char *) 0;
@@ -33,6 +34,25 @@ private	char				* default_agent			= (char *) 0;
 private	char				* default_operator_profile	= (char *) 0;
 private	int				  alert_status=600;
 
+/*	---------------------------------------------------------	*/
+/*	  	    g e t _ d e f a u l t _ d e p o t			*/
+/*	---------------------------------------------------------	*/
+public	char *	get_default_depot()
+{
+	if ( depot )
+		return( depot );
+	else	return((depot = allocate_string( "http://www.compatibleone.fr/accords-platform" ) ));
+}
+
+/*	---------------------------------------------------------	*/
+/*	  	    s e t _ d e f a u l t _ d e p o t			*/
+/*	---------------------------------------------------------	*/
+public	char *	set_default_depot( char * vptr )
+{
+	if ( depot )
+		depot = liberate( depot );
+	else	return((depot = allocate_string( vptr )));
+}
 
 /*	---------------------------------------------------------	*/
 /*	  	    i s _ a l e r t _ s t a t u s 			*/
@@ -534,6 +554,7 @@ public	void	deserialise_component_configuration(
 		configuration->zone = document_atribut_string( aptr );
 	return;
 }
+
 
 #endif	/* _accords_c */
 	/* ---------- */

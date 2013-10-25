@@ -18,6 +18,8 @@
 #ifndef	_accords_h
 #define	_accords_h
 
+#define	_REMOTE_SSH_EXEC "ssh -o StrictHostKeyChecking=no -q"
+
 struct	accords_configuration
 {
 	int	monitor;		/* monitoring information options	*/
@@ -49,6 +51,19 @@ struct	accords_configuration
 public	void	load_accords_configuration( struct accords_configuration * configuration, char * section );
 public	void	accords_configuration_options();
 public	int	accords_configuration_option( char * aptr, int argi, char * argv[] );
+public	char *	get_identity();
+public	char *	get_component();
+public	char * 	get_default_agent();
+public	char * 	get_default_depot();
+public	int	set_default_agent( char * nptr);
+public	char *	get_operator_profile();
+public	char *	serialise_component_configuration();
+public	char *	default_publisher();
+public	char *	default_tls();
+public	char *	default_zone();
+public	char *	default_operator();
+public	char *	get_default_account();
+public	char *	get_default_account_id();
 
 #endif	/* _accords_h */
 	/* ---------- */
