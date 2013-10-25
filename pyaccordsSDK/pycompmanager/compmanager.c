@@ -1702,6 +1702,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
 		if(!flag){
 			fprintf(f,"\tset_cords_%s_field(category, filter->attributes, field_name, value);\n",categoryName);
 			fprintf(f,"\tactivate_cords_%s_filter_on_field(category, filter, field_name);\n",categoryName);
+		}
 		else
 		{
 			fprintf(f,"\tset_%s_field(category, filter->attributes, field_name, value);\n",categoryName);
