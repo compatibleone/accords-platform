@@ -309,6 +309,101 @@ private	int	connect_opennebula_server( struct on_subscription * subptr, struct o
 	}
 }
 
+/*	-------------------------------------------------	*/
+/*	  o n _ l a u n c h _ u s i n g _ k e y p a i r		*/
+/*	-------------------------------------------------	*/
+public	int	on_launch_using_keypair( struct opennebula * pptr, char * username, char * command )
+{
+	if (!( pptr ))
+		return( 118 );
+	else if (!( command ))
+		return( 118 );
+	else if (!( pptr->hostname ))
+		return( 118 );
+	else if (!( pptr->keyfile ))
+		return( 118 );
+	else	return( ssh_launch_using_keypair( username, pptr->keyfile, pptr->hostname, command ) );
+}
+
+/*	-----------------------------------	*/
+/*	 o n _ i n s t a l l _ c o s a c s	*/
+/*	-----------------------------------	*/
+private	int	on_install_cosacs( struct on_subscription * subptr, struct opennebula * pptr )
+{
+	int	status;
+	char *	hostdepot=(char *) 0;
+	char *	buffer=(char *) 0;
+	char *	syntax=(char *) 0;
+	char *	username=(char *) 0;
+	char *	version=(char *) 0;
+	char *	package=(char *) 0;
+	char *	sptr;
+
+	if (!( hostdepot = get_default_depot()))
+		return( _NO_COSACS );
+
+	/* ---------------------------------- */
+	/* detect cosacs installation request */
+	/* ---------------------------------- */
+	if (!( sptr = pptr->agent ))
+		return( _NO_COSACS );
+	else if (( strncasecmp( sptr, "cosacs:install", strlen("cosacs:install") ) != 0 )
+	     &&  ( strncasecmp( sptr, "install:cosacs", strlen("install:cosacs") ) != 0 ))
+		return( _NO_COSACS );
+	else	sptr += strlen( "cosacs:install" );
+
+	if ( *sptr != ':' )
+		return( _NO_COSACS );
+	else	sptr++;
+
+	/* -------------------------------------- */
+	/* extract user, version and package info */
+	/* -------------------------------------- */
+	if (!( buffer = allocate_string( sptr ) ))
+		return( _NO_COSACS );
+
+	username = sptr = strcpy( buffer, sptr );
+
+	while ( *sptr )
+	{
+		if ( *sptr == ':' )
+		{
+			*(sptr++) = 0;
+			if (!( version ))
+				version = sptr;
+			else if (!( package ))
+				package = sptr;
+			else	break;
+		}
+		else	sptr++;
+	}
+	if ((!( package)) || (!( version )) || (!( username )))
+	{
+		liberate( buffer ) ;
+		return( _NO_COSACS );
+	}
+
+	/* ---------------------------------------- */
+	/* build installation command syntax string */
+	/* ---------------------------------------- */
+	else if (!( syntax = allocate( strlen( hostdepot ) + strlen( version ) + ( strlen( package ) * 2) + 64 ) ))
+	{
+		liberate( buffer ) ;
+		return( _NO_COSACS );
+	}
+	sprintf(syntax,"wget %s/%s/%s",hostdepot,version,package);
+	status = on_launch_using_keypair( pptr, username, syntax );
+	sprintf(syntax,"bash ./%s",package);
+	status = on_launch_using_keypair( pptr, username, syntax );
+
+	buffer = liberate( buffer );
+	syntax = liberate( syntax );
+
+	if ( status )
+		return( _NO_COSACS  );
+	else	return( _USE_COSACS );
+}
+
 /*	-------------------------------------------	*/
 /* 	      s t a r t  _ o p e n n e b u l a	  	*/
 /*	-------------------------------------------	*/
@@ -321,7 +416,7 @@ private	struct	rest_response * start_opennebula(
 {
 	struct	on_subscription * subptr;
 	char		* idptr;
-	struct	on_response * osptr;
+	struct	on_response * onptr;
 	struct	on_response * metaptr;
 	struct	opennebula * pptr;
 	int		status;
@@ -342,41 +437,38 @@ private	struct	rest_response * start_opennebula(
 		subptr, 
 		pptr->name, pptr->flavor, pptr->image, pptr->publicnetwork, pptr->privatenetwork, pptr->architecture, pptr->driver ) ))
 	 	return( rest_html_response( aptr, 2400, "Bad Request : Create Server Message" ) );
-	else if (!( osptr = on_create_compute( subptr, filename )))
+	else if (!( onptr = on_create_compute( subptr, filename )))
 	 	return( rest_html_response( aptr, 2401, "Bad Request : Create Server Request" ) );
-	else if (!( osptr->response ))
+	else if (!( onptr->response ))
 	 	return( rest_html_response( aptr, 2402, "Bad Request : Create Server No Response" ) );
-	else if ( osptr->response->status >= 400 )
+	else if ( onptr->response->status >= 400 )
 	{
-		aptr = rest_html_response( aptr, osptr->response->status + 2000, "Bad Request : Create Server No Response" );
-		osptr = liberate_on_response( osptr );
+		aptr = rest_html_response( aptr, onptr->response->status + 2000, "Bad Request : Create Server No Response" );
+		onptr = liberate_on_response( onptr );
 		return( aptr );
 	}
 	else
 	{
-		/* --------------------------------- */
-		/* retrieve crucial data from server */
-		/* --------------------------------- */
-		status = connect_opennebula_server( subptr,osptr, pptr );
-		if (!( status ))
+		if (!(status = connect_opennebula_server( subptr,onptr, pptr ) ))
 		{
-			/* ----------------------- */
-			/* create server meta data */
-			/* ----------------------- */
-			if ( use_cosacs_agent( pptr->agent ) )
+			/* ---------------------------- */
+			/* launch the COSACS operations */
+			/* ---------------------------- */
+			switch ((pptr->agentstatus = use_cosacs_agent( pptr->agent )))
 			{
+			case	_INSTALL_COSACS	:
+				if (!( pptr->agentstatus = on_install_cosacs( subptr, pptr ) ))
+					break;
+			case	_USE_COSACS	:
 				if ( cosacs_test_interface( pptr->hostname, _COSACS_START_TIMEOUT, _COSACS_START_RETRY ) )
 				{
 					cosacs_metadata_instructions( 
-						pptr->hostname, 
-						_CORDS_CONFIGURATION,
-						reference, 
-						OnProcci.publisher,
-						pptr->account );
+						pptr->hostname, _CORDS_CONFIGURATION,
+						reference, default_publisher(), pptr->account );
 				}
 			}
 		}
-		osptr = liberate_on_response( osptr );
+		onptr = liberate_on_response( onptr );
 		if (!( status ))
 		{
 			if (!( rest_valid_string( pptr->price ) ))
@@ -634,7 +726,7 @@ private	struct on_response * stop_opennebula_provisioning( struct opennebula * p
 	else
 	{
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
-		if ( use_cosacs_agent( pptr->agent ) )
+		if ( pptr->agentstatus == _USE_COSACS )
 		{
 			if ( cosacs_test_interface( pptr->hostname, _COSACS_STOP_TIMEOUT, _COSACS_STOP_RETRY ) )
 			{
@@ -642,7 +734,7 @@ private	struct on_response * stop_opennebula_provisioning( struct opennebula * p
 					pptr->hostname, 
 					_CORDS_RELEASE,
 					reference, 
-					OnProcci.publisher,
+					default_publisher(),
 					pptr->account );
 			}
 		}

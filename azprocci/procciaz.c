@@ -482,6 +482,101 @@ private	char *	build_windowsazure_firewall(struct az_subscription * subscription
 
 }
 
+/*	-------------------------------------------------	*/
+/*	  a z _ l a u n c h _ u s i n g _ k e y p a i r		*/
+/*	-------------------------------------------------	*/
+public	int	az_launch_using_keypair( struct windowsazure * pptr, char * username, char * command )
+{
+	if (!( pptr ))
+		return( 118 );
+	else if (!( command ))
+		return( 118 );
+	else if (!( pptr->hostname ))
+		return( 118 );
+	else if (!( pptr->keyfile ))
+		return( 118 );
+	else	return( ssh_launch_using_keypair( username, pptr->keyfile, pptr->hostname, command ) );
+}
+
+/*	-----------------------------------	*/
+/*	 a z _ i n s t a l l _ c o s a c s	*/
+/*	-----------------------------------	*/
+private	int	az_install_cosacs( struct az_subscription * subptr, struct windowsazure * pptr )
+{
+	int	status;
+	char *	hostdepot=(char *) 0;
+	char *	buffer=(char *) 0;
+	char *	syntax=(char *) 0;
+	char *	username=(char *) 0;
+	char *	version=(char *) 0;
+	char *	package=(char *) 0;
+	char *	sptr;
+
+	if (!( hostdepot = get_default_depot()))
+		return( _NO_COSACS );
+
+	/* ---------------------------------- */
+	/* detect cosacs installation request */
+	/* ---------------------------------- */
+	if (!( sptr = pptr->agent ))
+		return( _NO_COSACS );
+	else if (( strncasecmp( sptr, "cosacs:install", strlen("cosacs:install") ) != 0 )
+	     &&  ( strncasecmp( sptr, "install:cosacs", strlen("install:cosacs") ) != 0 ))
+		return( _NO_COSACS );
+	else	sptr += strlen( "cosacs:install" );
+
+	if ( *sptr != ':' )
+		return( _NO_COSACS );
+	else	sptr++;
+
+	/* -------------------------------------- */
+	/* extract user, version and package info */
+	/* -------------------------------------- */
+	if (!( buffer = allocate_string( sptr ) ))
+		return( _NO_COSACS );
+
+	username = sptr = strcpy( buffer, sptr );
+
+	while ( *sptr )
+	{
+		if ( *sptr == ':' )
+		{
+			*(sptr++) = 0;
+			if (!( version ))
+				version = sptr;
+			else if (!( package ))
+				package = sptr;
+			else	break;
+		}
+		else	sptr++;
+	}
+	if ((!( package)) || (!( version )) || (!( username )))
+	{
+		liberate( buffer ) ;
+		return( _NO_COSACS );
+	}
+
+	/* ---------------------------------------- */
+	/* build installation command syntax string */
+	/* ---------------------------------------- */
+	else if (!( syntax = allocate( strlen( hostdepot ) + strlen( version ) + ( strlen( package ) * 2) + 64 ) ))
+	{
+		liberate( buffer ) ;
+		return( _NO_COSACS );
+	}
+	sprintf(syntax,"wget %s/%s/%s",hostdepot,version,package);
+	status = az_launch_using_keypair( pptr, username, syntax );
+	sprintf(syntax,"bash ./%s",package);
+	status = az_launch_using_keypair( pptr, username, syntax );
+
+	buffer = liberate( buffer );
+	syntax = liberate( syntax );
+
+	if ( status )
+		return( _NO_COSACS  );
+	else	return( _USE_COSACS );
+}
+
 /*	-------------------------------------------	*/
 /* 	   s t a r t  _ w i n d o w s a z u r e	  	*/
 /*	-------------------------------------------	*/
@@ -624,13 +719,17 @@ private	struct	rest_response * start_windowsazure(
 	/* ---------------------------- */
 	/* launch the COSACS operations */
 	/* ---------------------------- */
-	if ( use_cosacs_agent( pptr->agent ) )
+	switch ((pptr->agentstatus = use_cosacs_agent( pptr->agent )))
 	{
+	case	_INSTALL_COSACS	:
+		if (!( pptr->agentstatus = az_install_cosacs( subscription, pptr ) ))
+			break;
+	case	_USE_COSACS	:
 		if ( cosacs_test_interface( pptr->hostname, _COSACS_START_TIMEOUT, _COSACS_START_RETRY ) )
 		{
 			cosacs_metadata_instructions( 
 				pptr->hostname, _CORDS_CONFIGURATION,
-				reference, WazProcci.publisher, pptr->account );
+				reference, default_publisher(), pptr->account );
 		}
 	}
 
@@ -857,7 +956,7 @@ private	int	stop_windowsazure_provisioning( struct windowsazure * pptr )
 	/* ------------------------------------------- */
 	/* perform pre-release actions for destruction */
 	/* ------------------------------------------- */
-	if ( use_cosacs_agent( pptr->agent ) )
+	if ( pptr->agentstatus == _USE_COSACS )
 	{
 		if ( cosacs_test_interface( pptr->hostname, _COSACS_STOP_TIMEOUT, _COSACS_STOP_RETRY ) )
 		{

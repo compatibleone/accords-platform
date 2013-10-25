@@ -31,7 +31,9 @@
 	        <attribute name='firewall' type='string' required='false' immutable='false'/>
 	        <attribute name='group' type='string' required='false' immutable='false'/>
 	        <attribute name='configuration' type='string' required='false' immutable='false'/>
+	        <attribute name='keyfile' type='string' required='false' immutable='false'/>
 	        <attribute name='agent' type='string' required='false' immutable='false'/>
+	        <attribute name='agentstatus' type='int' required='false' immutable='false'/>
 	        <attribute name='when' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
