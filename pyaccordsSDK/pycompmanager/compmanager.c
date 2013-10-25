@@ -24,21 +24,21 @@
 int commitPlatform()
 {
 
- int a,b;
- char makeCommand[1024];
- char pysetupCommand[1024];
- char pathf[1024];
+ 	int a,b;
+ 	char makeCommand[1024];
+ 	char pysetupCommand[1024];
+ 	char pathf[1024];
  
- strcpy(pathf,PYPATH);
- sprintf(makeCommand,"cd %s && su -c  \"make clean && make && make install\" root",pathf);
- sprintf(pysetupCommand,"cd %s/%s && su -c \"python setup.py install\" root",pathf,PYCODEV_DIR);
+ 	strcpy(pathf,PYPATH);
+ 	sprintf(makeCommand,"cd %s && su -c  \"make clean && make && make install\" root",pathf);
+ 	sprintf(pysetupCommand,"cd %s/%s && su -c \"python setup.py install\" root",pathf,PYCODEV_DIR);
  
- a= system(makeCommand);
- if(a!=0) return 0;
- b= system(pysetupCommand);
- if(b!=0) return 0;
+ 	a= system(makeCommand);
+ 	if(a!=0) return 0;
+ 	b= system(pysetupCommand);
+ 	if(b!=0) return 0;
  
- return 1;
+ 	return 1;
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -46,16 +46,16 @@ int commitPlatform()
 /*----------------------------------------------------------------------------------*/
 int deleteModule(char moduleName[])
 {
- char pathff[DIM];
- char pathf[1024];
- strcpy(pathf,PYPATH);
- sprintf(pathff,"rm -r %s/%s",pathf,moduleName);
- if (system(pathff)!= 0 )
- {
-   printf( "Error in delete module:No such component name\n" );
-   return 0;
- }
- return 1;
+ 	char pathff[DIM];
+ 	char pathf[1024];
+ 	strcpy(pathf,PYPATH);
+ 	sprintf(pathff,"rm -r %s/%s",pathf,moduleName);
+ 	if (system(pathff)!= 0 )
+ 	{
+   		printf( "Error in delete module:No such component name\n" );
+   		return 0;
+ 	}
+ 	return 1;
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -348,7 +348,7 @@ int generateAccordsCategory(
     		for(; token != NULL ;)
     		{
       			fprintf(f,"\tchar * %s;\n",token);
-			fprintf(h,"\tchar * %s;\n",token);
+			fprintf(h,"\tint %s;\n",token);
       			dim++;
       			addBack(&categoryAtr,token);
       			token=strtok(NULL, " ");
@@ -1352,1034 +1352,1122 @@ int generateCategoryPySourcefile(char *categoryName,listc categoryAtr,char pathf
 /*-----------------------------------------------------------------------------------------------------------------*/
 int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim,int flag, char pathf[])
 {
- char pathfc[1024];
- char pathfcc[1024];
- char **nameAtr; 
- FILE *f;
- int i;
+ 	char pathfc[1024];
+ 	char pathfcc[1024];
+ 	char **nameAtr; 
+ 	FILE *f;
+ 	int i;
  
- str_sub(pathf,0,strlen(pathf)-3,pathfc);
- sprintf(pathfcc,"%s.c",pathfc);
+ 	str_sub(pathf,0,strlen(pathf)-3,pathfc);
+ 	sprintf(pathfcc,"%s.c",pathfc);
  
- nameAtr = (char**) malloc(sizeof (char*) * dim);
-  for(i = 0; i < dim; i++)
-      nameAtr[i] = (char*) malloc(sizeof (char) * DIM);
+ 	nameAtr = (char**) malloc(sizeof (char*) * dim);
+  	for(i = 0; i < dim; i++)
+      		nameAtr[i] = (char*) malloc(sizeof (char) * DIM);
 
- enTete(pathfcc);
+ 	enTete(pathfcc);
 
- if((f=fopen(pathfcc,"a"))==NULL)
- {
-  printf("Error create category occi file C: No such file or directory\n");
-  return 0;
- }
- else
- {
-    i=0;
-    elem *pelem = categoryAttributes.first;    
-    while(pelem)
-    {       
-     strcpy(nameAtr[i],pelem->value);     
-     pelem = pelem->next; 
-     i++;   
-    }
-    free(pelem);
-    fprintf(f,"#ifndef _occi%s_c_\n",categoryName);
-    fprintf(f,"#define _occi%s_c_\n\n",categoryName);
-    fprintf(f,"#include \"%s.h\"\n\n",categoryName);
-    fprintf(f,"/*	--------------------------------	*/\n");
-    if(!flag) fprintf(f,"/*	o c c i _ c o r d s _ %s 	        */\n",categoryName);
-    else  if(!flag) fprintf(f,"/*	o c c i _ %s 	        */\n",categoryName);
-    fprintf(f,"/*	--------------------------------	*/\n");
+ 	if((f=fopen(pathfcc,"a"))==NULL)
+ 	{
+  		printf("Error create category occi file C: No such file or directory\n");
+  		return 0;
+ 	}
+ 	else
+ 	{
+    		i=0;
+    		elem *pelem = categoryAttributes.first;    
+    		while(pelem)
+    		{       
+     			strcpy(nameAtr[i],pelem->value);     
+     			pelem = pelem->next; 
+     			i++;   
+    		}
+    		free(pelem);
+    		fprintf(f,"#ifndef _occi%s_c_\n",categoryName);
+    		fprintf(f,"#define _occi%s_c_\n\n",categoryName);
+    		fprintf(f,"#include \"%s.h\"\n",categoryName);
+		fprintf(f,"#include \"%s_occi_filter.h\"\n\n",categoryName);
+    		fprintf(f,"/*	--------------------------------	*/\n");
+    		if(!flag) fprintf(f,"/*	o c c i _ c o r d s _ %s 	        */\n",categoryName);
+    		else  if(!flag) fprintf(f,"/*	o c c i _ %s 	        */\n",categoryName);
+    		fprintf(f,"/*	--------------------------------	*/\n");
 
-    fprintf(f,"/*	--------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/\n");
-    fprintf(f,"/*	--------------------------------------------------------------------	*/\n");
-    if(!flag)
-    {
-       fprintf(f,"struct cords_%s * allocate_cords_%s();\n",categoryName,categoryName);
-       fprintf(f,"struct cords_%s * liberate_cords_%s(struct cords_%s * optr);\n",categoryName,categoryName,categoryName);
-       fprintf(f,"private pthread_mutex_t list_cords_%s_control=PTHREAD_MUTEX_INITIALIZER;\n",categoryName);
-       fprintf(f,"private struct occi_kind_node * cords_%s_first = (struct occi_kind_node *) 0;\n",categoryName);
-       fprintf(f,"private struct occi_kind_node * cords_%s_last  = (struct occi_kind_node *) 0;\n",categoryName);
-       fprintf(f,"public struct  occi_kind_node * occi_first_cords_%s_node() { return( cords_%s_first ); }\n\n",categoryName,categoryName);
-    }
-    else
-    {
-       fprintf(f,"struct %s * allocate_%s();\n",categoryName,categoryName);
-       fprintf(f,"struct %s * liberate_%s(struct %s * optr);\n",categoryName,categoryName,categoryName);
-       fprintf(f,"private pthread_mutex_t list_%s_control=PTHREAD_MUTEX_INITIALIZER;\n",categoryName);
-       fprintf(f,"private struct occi_kind_node * %s_first = (struct occi_kind_node *) 0;\n",categoryName);
-       fprintf(f,"private struct occi_kind_node * %s_last  = (struct occi_kind_node *) 0;\n",categoryName);
-       fprintf(f,"public struct  occi_kind_node * occi_first_%s_node() { return( %s_first ); }\n\n",categoryName,categoryName);
-    }
-    fprintf(f,"/*	----------------------------------------------	*/\n");
-    fprintf(f,"//	o c c i   c a t e g o r y   d r o p   n o d e 	\n");
-    fprintf(f,"/*	----------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct occi_kind_node * ll_drop_cords_%s_node(struct occi_kind_node * nptr) {\n",categoryName);
-    else fprintf(f,"private struct occi_kind_node * ll_drop_%s_node(struct occi_kind_node * nptr) {\n",categoryName);
-    fprintf(f,"\tif ( nptr ) {\n");
-    fprintf(f,"\t\tif (!( nptr->previous ))\n");
-    if(!flag) fprintf(f,"\t\t\tcords_%s_first = nptr->next;\n",categoryName);
-    else fprintf(f,"\t\t\t%s_first = nptr->next;\n",categoryName);
-    fprintf(f,"\t\telse	nptr->previous->next = nptr->next;\n");
-    fprintf(f,"\t\tif (!( nptr->next ))\n");
-    if(!flag) fprintf(f,"\t\t\tcords_%s_last = nptr->previous;\n",categoryName);
-    else fprintf(f,"\t\t\t%s_last = nptr->previous;\n",categoryName);
-    fprintf(f,"\t\telse	nptr->next->previous = nptr->previous;\n");
-    fprintf(f,"\t\t\tliberate_occi_kind_node( nptr );\n");
-    fprintf(f,"\t}\n");
-    fprintf(f,"\treturn((struct occi_kind_node *)0);\n");
-    fprintf(f,"}\n");
-    if(!flag) 
-    {
-       fprintf(f,"private struct occi_kind_node * drop_cords_%s_node(struct occi_kind_node * nptr) {\n",categoryName);
-       fprintf(f,"\tpthread_mutex_lock( &list_cords_%s_control );\n",categoryName);
-       fprintf(f,"\tnptr = ll_drop_cords_%s_node( nptr );\n",categoryName);
-       fprintf(f,"\tpthread_mutex_unlock( &list_cords_%s_control );\n",categoryName);
-    }
-    else 
-    {
-      fprintf(f,"private struct occi_kind_node * drop_%s_node(struct occi_kind_node * nptr) {\n",categoryName);
-      fprintf(f,"\tpthread_mutex_lock( &list_%s_control );\n",categoryName);
-      fprintf(f,"\tnptr = ll_drop_%s_node( nptr );\n",categoryName);
-      fprintf(f,"\tpthread_mutex_unlock( &list_%s_control );\n",categoryName);
-    }  
-    fprintf(f,"\treturn(nptr);\n");
-    fprintf(f,"}\n\n");
+    		fprintf(f,"/*	--------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   m a n a g e m e n t   s t r u c t u r e 	*/\n");
+    		fprintf(f,"/*	--------------------------------------------------------------------	*/\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"struct cords_%s * allocate_cords_%s();\n",categoryName,categoryName);
+       			fprintf(f,"struct cords_%s * liberate_cords_%s(struct cords_%s * optr);\n",categoryName,categoryName,categoryName);
+       			fprintf(f,"private pthread_mutex_t list_cords_%s_control=PTHREAD_MUTEX_INITIALIZER;\n",categoryName);
+       			fprintf(f,"private struct occi_kind_node * cords_%s_first = (struct occi_kind_node *) 0;\n",categoryName);
+       			fprintf(f,"private struct occi_kind_node * cords_%s_last  = (struct occi_kind_node *) 0;\n",categoryName);
+       			fprintf(f,"public struct  occi_kind_node * occi_first_cords_%s_node() { return( cords_%s_first ); }\n\n",categoryName,categoryName);
+    		}	
+    		else
+    		{
+       			fprintf(f,"struct %s * allocate_%s();\n",categoryName,categoryName);
+       			fprintf(f,"struct %s * liberate_%s(struct %s * optr);\n",categoryName,categoryName,categoryName);
+       			fprintf(f,"private pthread_mutex_t list_%s_control=PTHREAD_MUTEX_INITIALIZER;\n",categoryName);
+       			fprintf(f,"private struct occi_kind_node * %s_first = (struct occi_kind_node *) 0;\n",categoryName);
+       			fprintf(f,"private struct occi_kind_node * %s_last  = (struct occi_kind_node *) 0;\n",categoryName);
+       			fprintf(f,"public struct  occi_kind_node * occi_first_%s_node() { return( %s_first ); }\n\n",categoryName,categoryName);
+    		}
+    		fprintf(f,"/*	----------------------------------------------	*/\n");
+    		fprintf(f,"//	o c c i   c a t e g o r y   d r o p   n o d e 	\n");
+    		fprintf(f,"/*	----------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct occi_kind_node * ll_drop_cords_%s_node(struct occi_kind_node * nptr) {\n",categoryName);
+    		else fprintf(f,"private struct occi_kind_node * ll_drop_%s_node(struct occi_kind_node * nptr) {\n",categoryName);
+    		fprintf(f,"\tif ( nptr ) {\n");
+    		fprintf(f,"\t\tif (!( nptr->previous ))\n");
+    		if(!flag) fprintf(f,"\t\t\tcords_%s_first = nptr->next;\n",categoryName);
+    		else fprintf(f,"\t\t\t%s_first = nptr->next;\n",categoryName);
+    		fprintf(f,"\t\telse	nptr->previous->next = nptr->next;\n");
+    		fprintf(f,"\t\tif (!( nptr->next ))\n");
+    		if(!flag) fprintf(f,"\t\t\tcords_%s_last = nptr->previous;\n",categoryName);
+    		else fprintf(f,"\t\t\t%s_last = nptr->previous;\n",categoryName);
+    		fprintf(f,"\t\telse	nptr->next->previous = nptr->previous;\n");
+    		fprintf(f,"\t\t\tliberate_occi_kind_node( nptr );\n");
+    		fprintf(f,"\t}\n");
+    		fprintf(f,"\treturn((struct occi_kind_node *)0);\n");
+    		fprintf(f,"}\n");
+    		if(!flag) 
+    		{
+       			fprintf(f,"private struct occi_kind_node * drop_cords_%s_node(struct occi_kind_node * nptr) {\n",categoryName);
+       			fprintf(f,"\tpthread_mutex_lock( &list_cords_%s_control );\n",categoryName);
+       			fprintf(f,"\tnptr = ll_drop_cords_%s_node( nptr );\n",categoryName);
+       			fprintf(f,"\tpthread_mutex_unlock( &list_cords_%s_control );\n",categoryName);
+    		}
+    		else 
+    		{
+      			fprintf(f,"private struct occi_kind_node * drop_%s_node(struct occi_kind_node * nptr) {\n",categoryName);
+      			fprintf(f,"\tpthread_mutex_lock( &list_%s_control );\n",categoryName);
+      			fprintf(f,"\tnptr = ll_drop_%s_node( nptr );\n",categoryName);
+      			fprintf(f,"\tpthread_mutex_unlock( &list_%s_control );\n",categoryName);
+    		}  
+    		fprintf(f,"\treturn(nptr);\n");
+    		fprintf(f,"}\n\n");
 
-    fprintf(f,"/*	--------------------------------------------------	*/\n");
-    fprintf(f,"//	o c c i   c a t e g o r y   l o c a t e   n o d e 	\n");
-    fprintf(f,"/*	--------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct occi_kind_node * ll_locate_cords_%s_node(char * id) {\n",categoryName);
-    else  fprintf(f,"private struct occi_kind_node * ll_locate_%s_node(char * id) {\n",categoryName);
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag)
-    {
-       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-       fprintf(f,"\tfor ( nptr = cords_%s_first;\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-       fprintf(f,"\tfor ( nptr = %s_first;\n",categoryName);
-    }
-    fprintf(f,"\t\tnptr != (struct occi_kind_node *) 0;\n");
-    fprintf(f,"\t\tnptr = nptr->next ) {\n");
-    fprintf(f,"\t\tif (!( pptr = nptr->contents )) continue;\n");
-    fprintf(f,"\t\telse if (!( pptr->id )) continue;\n");
-    fprintf(f,"\t\telse if (!( strcmp(pptr->id,id) )) break;\n");
-    fprintf(f,"\t}\n");
-    fprintf(f,"\treturn( nptr );\n");
-    fprintf(f,"}\n\n");
-    if(!flag) fprintf(f,"private struct occi_kind_node * locate_cords_%s_node(char * id) {\n",categoryName);
-    else fprintf(f,"private struct occi_kind_node * locate_%s_node(char * id) {\n",categoryName);
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag)
-    {
-       fprintf(f,"\tpthread_mutex_lock( &list_cords_%s_control );\n",categoryName);
-       fprintf(f,"\tnptr = ll_locate_cords_%s_node(id);\n",categoryName);
-       fprintf(f,"\tpthread_mutex_unlock( &list_cords_%s_control );\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\tpthread_mutex_lock( &list_%s_control );\n",categoryName);
-       fprintf(f,"\tnptr = ll_locate_%s_node(id);\n",categoryName);
-       fprintf(f,"\tpthread_mutex_unlock( &list_%s_control );\n",categoryName);
-    }
-    fprintf(f,"\treturn( nptr );\n");
-    fprintf(f,"}\n\n");
+    		fprintf(f,"/*	--------------------------------------------------	*/\n");
+    		fprintf(f,"//	o c c i   c a t e g o r y   l o c a t e   n o d e 	\n");
+    		fprintf(f,"/*	--------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct occi_kind_node * ll_locate_cords_%s_node(char * id) {\n",categoryName);
+    		else  fprintf(f,"private struct occi_kind_node * ll_locate_%s_node(char * id) {\n",categoryName);
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+       			fprintf(f,"\tfor ( nptr = cords_%s_first;\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+       			fprintf(f,"\tfor ( nptr = %s_first;\n",categoryName);
+    		}
+    		fprintf(f,"\t\tnptr != (struct occi_kind_node *) 0;\n");
+    		fprintf(f,"\t\tnptr = nptr->next ) {\n");
+    		fprintf(f,"\t\tif (!( pptr = nptr->contents )) continue;\n");
+    		fprintf(f,"\t\telse if (!( pptr->id )) continue;\n");
+    		fprintf(f,"\t\telse if (!( strcmp(pptr->id,id) )) break;\n");
+    		fprintf(f,"\t}\n");
+    		fprintf(f,"\treturn( nptr );\n");
+    		fprintf(f,"}\n\n");
+    		if(!flag) fprintf(f,"private struct occi_kind_node * locate_cords_%s_node(char * id) {\n",categoryName);
+    		else fprintf(f,"private struct occi_kind_node * locate_%s_node(char * id) {\n",categoryName);
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"\tpthread_mutex_lock( &list_cords_%s_control );\n",categoryName);
+       			fprintf(f,"\tnptr = ll_locate_cords_%s_node(id);\n",categoryName);
+       			fprintf(f,"\tpthread_mutex_unlock( &list_cords_%s_control );\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"\tpthread_mutex_lock( &list_%s_control );\n",categoryName);
+       			fprintf(f,"\tnptr = ll_locate_%s_node(id);\n",categoryName);
+       			fprintf(f,"\tpthread_mutex_unlock( &list_%s_control );\n",categoryName);
+    		}
+    		fprintf(f,"\treturn( nptr );\n");
+    		fprintf(f,"}\n\n");
 
-    fprintf(f,"/*	--------------------------------------------	*/\n");
-    fprintf(f,"//	o c c i   c a t e g o r y   a d d   n o d e 	\n");
-    fprintf(f,"/*	--------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct occi_kind_node * ll_add_cords_%s_node(int mode) {\n",categoryName);
-    else fprintf(f,"private struct occi_kind_node * ll_add_%s_node(int mode) {\n",categoryName);
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    fprintf(f,"\tif (!( nptr = allocate_occi_kind_node() ))\n");
-    fprintf(f,"\t\treturn( nptr );\n");
-    fprintf(f,"\telse	{\n");
-    if(!flag) fprintf(f,"\t\tif (!( nptr->contents = allocate_cords_%s()))\n",categoryName);
-    else fprintf(f,"\t\tif (!( nptr->contents = allocate_%s()))\n",categoryName);
-    fprintf(f,"\t\t\treturn( liberate_occi_kind_node(nptr) );\n");
-    fprintf(f,"\t\tif (!( pptr = nptr->contents ))\n");
-    fprintf(f,"\t\t\treturn( liberate_occi_kind_node(nptr) );\n");
-    fprintf(f,"\t\telse if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))\n");
-    fprintf(f,"\t\t\treturn( liberate_occi_kind_node(nptr) );\n");
-    fprintf(f,"\t\telse{\n");
-    if(!flag) fprintf(f,"\t\t\tif (!( nptr->previous = cords_%s_last ))\n",categoryName);
-    else fprintf(f,"\t\t\tif (!( nptr->previous = %s_last ))\n",categoryName);
-    if(!flag) fprintf(f,"\t\t\t\tcords_%s_first = nptr;\n",categoryName);
-    else fprintf(f,"\t\t\t\t%s_first = nptr;\n",categoryName);
-    fprintf(f,"\t\t\telse	nptr->previous->next = nptr;\n");
-    if(!flag) fprintf(f,"\t\t\tcords_%s_last = nptr;\n",categoryName);
-    else fprintf(f,"\t\t\t%s_last = nptr;\n",categoryName);
-    fprintf(f,"\t\t\treturn( nptr );\n");
-    fprintf(f,"\t\t}\n");
-    fprintf(f,"\t}\n");
-    fprintf(f,"}\n\n");
-    if(!flag) fprintf(f,"private struct occi_kind_node * add_cords_%s_node(int mode) {\n",categoryName);
-    else fprintf(f,"private struct occi_kind_node * add_%s_node(int mode) {\n",categoryName);
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag)
-    {
-       fprintf(f,"\tpthread_mutex_lock( &list_cords_%s_control );\n",categoryName);
-       fprintf(f,"\tnptr = ll_add_cords_%s_node( mode );\n",categoryName);
-       fprintf(f,"\tpthread_mutex_unlock( &list_cords_%s_control );\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\tpthread_mutex_lock( &list_%s_control );\n",categoryName);
-       fprintf(f,"\tnptr = ll_add_%s_node( mode );\n",categoryName);
-       fprintf(f,"\tpthread_mutex_unlock( &list_%s_control );\n",categoryName);
-    }
-    fprintf(f,"\treturn(nptr);\n");
-    fprintf(f,"}\n\n");
+    		fprintf(f,"/*	--------------------------------------------	*/\n");
+    		fprintf(f,"//	o c c i   c a t e g o r y   a d d   n o d e 	\n");
+    		fprintf(f,"/*	--------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct occi_kind_node * ll_add_cords_%s_node(int mode) {\n",categoryName);
+    		else fprintf(f,"private struct occi_kind_node * ll_add_%s_node(int mode) {\n",categoryName);
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		fprintf(f,"\tif (!( nptr = allocate_occi_kind_node() ))\n");
+    		fprintf(f,"\t\treturn( nptr );\n");
+    		fprintf(f,"\telse	{\n");
+    		if(!flag) fprintf(f,"\t\tif (!( nptr->contents = allocate_cords_%s()))\n",categoryName);
+    		else fprintf(f,"\t\tif (!( nptr->contents = allocate_%s()))\n",categoryName);
+    		fprintf(f,"\t\t\treturn( liberate_occi_kind_node(nptr) );\n");
+    		fprintf(f,"\t\tif (!( pptr = nptr->contents ))\n");
+    		fprintf(f,"\t\t\treturn( liberate_occi_kind_node(nptr) );\n");
+    		fprintf(f,"\t\telse if (( mode != 0 ) && (!( pptr->id = occi_allocate_uuid())))\n");
+    		fprintf(f,"\t\t\treturn( liberate_occi_kind_node(nptr) );\n");
+    		fprintf(f,"\t\telse{\n");
+    		if(!flag) fprintf(f,"\t\t\tif (!( nptr->previous = cords_%s_last ))\n",categoryName);
+    		else fprintf(f,"\t\t\tif (!( nptr->previous = %s_last ))\n",categoryName);
+    		if(!flag) fprintf(f,"\t\t\t\tcords_%s_first = nptr;\n",categoryName);
+    		else fprintf(f,"\t\t\t\t%s_first = nptr;\n",categoryName);
+    		fprintf(f,"\t\t\telse	nptr->previous->next = nptr;\n");
+    		if(!flag) fprintf(f,"\t\t\tcords_%s_last = nptr;\n",categoryName);
+    		else fprintf(f,"\t\t\t%s_last = nptr;\n",categoryName);
+    		fprintf(f,"\t\t\treturn( nptr );\n");
+    		fprintf(f,"\t\t}\n");
+    		fprintf(f,"\t}\n");
+    		fprintf(f,"}\n\n");
+    		if(!flag) fprintf(f,"private struct occi_kind_node * add_cords_%s_node(int mode) {\n",categoryName);
+    		else fprintf(f,"private struct occi_kind_node * add_%s_node(int mode) {\n",categoryName);
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"\tpthread_mutex_lock( &list_cords_%s_control );\n",categoryName);
+       			fprintf(f,"\tnptr = ll_add_cords_%s_node( mode );\n",categoryName);
+       			fprintf(f,"\tpthread_mutex_unlock( &list_cords_%s_control );\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"\tpthread_mutex_lock( &list_%s_control );\n",categoryName);
+       			fprintf(f,"\tnptr = ll_add_%s_node( mode );\n",categoryName);
+       			fprintf(f,"\tpthread_mutex_unlock( &list_%s_control );\n",categoryName);
+    		}
+    		fprintf(f,"\treturn(nptr);\n");
+    		fprintf(f,"}\n\n");
 
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    if(!flag)
-    {
-       fprintf(f,"private char*autosave_cords_%s_name=\"cords_%s.xml\";\n",categoryName,categoryName);
-       fprintf(f,"private void autoload_cords_%s_nodes() {\n",categoryName);
-       fprintf(f,"\tchar * fn=autosave_cords_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
-       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"private char*autosave_%s_name=\"%s.xml\";\n",categoryName,categoryName);
-       fprintf(f,"private void autoload_%s_nodes() {\n",categoryName);
-       fprintf(f,"\tchar * fn=autosave_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
-       fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    }
-    fprintf(f,"\tstruct xml_element * document;\n");
-    fprintf(f,"\tstruct xml_element * eptr;\n");
-    fprintf(f,"\tstruct xml_element * vptr;\n");
-    fprintf(f,"\tstruct xml_atribut  * aptr;\n");
-    fprintf(f,"\tif (!( document = document_parse_file(fn)))\n");
-    fprintf(f,"\t\treturn;\n");
-    if(!flag) fprintf(f,"\tif ((eptr = document_element(document,\"cords_%ss\")) != (struct xml_element *) 0) {\n",categoryName);
-    else fprintf(f,"\tif ((eptr = document_element(document,\"%ss\")) != (struct xml_element *) 0) {\n",categoryName);
-    fprintf(f,"\t\tfor (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {\n");
-    fprintf(f,"\t\t\tif (!( vptr->name )) continue;\n");
-    if(!flag)
-    {
-       fprintf(f,"\t\t\telse if ( strcmp( vptr->name, \"cords_%s\" ) ) continue;\n",categoryName);
-       fprintf(f,"\t\t\telse if (!( nptr = add_cords_%s_node(0))) break;\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\t\t\telse if ( strcmp( vptr->name, \"%s\" ) ) continue;\n",categoryName);
-       fprintf(f,"\t\t\telse if (!( nptr = add_%s_node(0))) break;\n",categoryName);
-    }
-    fprintf(f,"\t\t\telse if (!( pptr = nptr->contents )) break;\n");
-    for(i=0;i<dim;i++)
-    {
-     fprintf(f,"\t\t\tif ((aptr = document_atribut( vptr, \"%s\" )) != (struct xml_atribut *) 0)\n",nameAtr[i]);
-     fprintf(f,"\t\t\t\tpptr->%s = document_atribut_string(aptr);\n",nameAtr[i]);
-    }
-    fprintf(f,"\t\t}\n");
-    fprintf(f,"\t}\n");
-    fprintf(f,"\tdocument = document_drop( document );\n");
-    fprintf(f,"\treturn;\n");
-    fprintf(f,"}\n\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    if(!flag)
-    {
-       fprintf(f,"public  void set_autosave_cords_%s_name(char * fn) {\n",categoryName);
-       fprintf(f,"\tautosave_cords_%s_name = fn;	return;\n",categoryName);
-       fprintf(f,"}\n");
-       fprintf(f,"public  void autosave_cords_%s_nodes() {\n",categoryName);
-       fprintf(f,"\tchar * fn=autosave_cords_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
-       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"public  void set_autosave_%s_name(char * fn) {\n",categoryName);
-       fprintf(f,"\tautosave_%s_name = fn;	return;\n",categoryName);
-       fprintf(f,"}\n");
-       fprintf(f,"public  void autosave_%s_nodes() {\n",categoryName);
-       fprintf(f,"\tchar * fn=autosave_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
-       fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    }
-    fprintf(f,"\tFILE * h;\n");
-    if(!flag) fprintf(f,"\tpthread_mutex_lock( &list_cords_%s_control );\n",categoryName);
-    else fprintf(f,"\tpthread_mutex_lock( &list_%s_control );\n",categoryName);
-    fprintf(f,"\tif (( h = fopen(fn,\"w\")) != (FILE *) 0) {\n");
-    if(!flag) 
-    {
-       fprintf(f,"\tfprintf(h,\"<cords_%ss>\\n\");\n",categoryName);
-       fprintf(f,"\tfor ( nptr = cords_%s_first;\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\tfprintf(h,\"<%ss>\\n\");\n",categoryName);
-       fprintf(f,"\tfor ( nptr = %s_first;\n",categoryName);
-    }
-    fprintf(f,"\t\tnptr != (struct occi_kind_node *) 0;\n");
-    fprintf(f,"\t\tnptr = nptr->next ) {\n");
-    fprintf(f,"\t\tif (!( pptr = nptr->contents )) continue;\n");
-    if(!flag) fprintf(f,"\t\tfprintf(h,\"<cords_%s\\n\");\n",categoryName);
-    else fprintf(f,"\t\tfprintf(h,\"<%s\\n\");\n",categoryName);
-    for(i=0;i<dim;i++)
-    {
-      fprintf(f,"\t\tfprintf(h,\" %s=%%c\",0x0022);\n",nameAtr[i]);
-      fprintf(f,"\t\tfprintf(h,\"%%s\",(pptr->%s?pptr->%s:\"\"));\n",nameAtr[i],nameAtr[i]);
-      fprintf(f,"\t\tfprintf(h,\"%%c\",0x0022);\n"); 
-    }
-    fprintf(f,"\t\tfprintf(h,\" />\\n\");\n");
-    fprintf(f,"\t\t}\n");
-    if(!flag) fprintf(f,"\tfprintf(h,\"</cords_%ss>\\n\");\n",categoryName);
-    else fprintf(f,"\tfprintf(h,\"</%ss>\\n\");\n",categoryName);
-    fprintf(f,"\tfclose(h);\n");
-    fprintf(f,"\t}\n");
-    if(!flag) fprintf(f,"\tpthread_mutex_unlock( &list_cords_%s_control );\n",categoryName);
-    else fprintf(f,"\tpthread_mutex_unlock( &list_%s_control );\n",categoryName);
-    fprintf(f,"\treturn;\n");
-    fprintf(f,"}\n\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   l o a d 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"private char*autosave_cords_%s_name=\"cords_%s.xml\";\n",categoryName,categoryName);
+       			fprintf(f,"private void autoload_cords_%s_nodes() {\n",categoryName);
+       			fprintf(f,"\tchar * fn=autosave_cords_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
+       			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"private char*autosave_%s_name=\"%s.xml\";\n",categoryName,categoryName);
+      			fprintf(f,"private void autoload_%s_nodes() {\n",categoryName);
+       			fprintf(f,"\tchar * fn=autosave_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
+       			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		}
+    		fprintf(f,"\tstruct xml_element * document;\n");
+    		fprintf(f,"\tstruct xml_element * eptr;\n");
+    		fprintf(f,"\tstruct xml_element * vptr;\n");
+    		fprintf(f,"\tstruct xml_atribut  * aptr;\n");
+    		fprintf(f,"\tif (!( document = document_parse_file(fn)))\n");
+    		fprintf(f,"\t\treturn;\n");
+    		if(!flag) fprintf(f,"\tif ((eptr = document_element(document,\"cords_%ss\")) != (struct xml_element *) 0) {\n",categoryName);
+    		else fprintf(f,"\tif ((eptr = document_element(document,\"%ss\")) != (struct xml_element *) 0) {\n",categoryName);
+    		fprintf(f,"\t\tfor (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {\n");
+    		fprintf(f,"\t\t\tif (!( vptr->name )) continue;\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"\t\t\telse if ( strcmp( vptr->name, \"cords_%s\" ) ) continue;\n",categoryName);
+       			fprintf(f,"\t\t\telse if (!( nptr = add_cords_%s_node(0))) break;\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"\t\t\telse if ( strcmp( vptr->name, \"%s\" ) ) continue;\n",categoryName);
+       			fprintf(f,"\t\t\telse if (!( nptr = add_%s_node(0))) break;\n",categoryName);
+    		}
+    		fprintf(f,"\t\t\telse if (!( pptr = nptr->contents )) break;\n");
+    		for(i=0;i<dim;i++)
+    		{
+     			fprintf(f,"\t\t\tif ((aptr = document_atribut( vptr, \"%s\" )) != (struct xml_atribut *) 0)\n",nameAtr[i]);
+     			fprintf(f,"\t\t\t\tpptr->%s = document_atribut_string(aptr);\n",nameAtr[i]);
+    		}		
+    		fprintf(f,"\t\t}\n");
+    		fprintf(f,"\t}\n");
+    		fprintf(f,"\tdocument = document_drop( document );\n");
+    		fprintf(f,"\treturn;\n");
+    		fprintf(f,"}\n\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a u t o   s a v e 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"public  void set_autosave_cords_%s_name(char * fn) {\n",categoryName);
+       			fprintf(f,"\tautosave_cords_%s_name = fn;	return;\n",categoryName);
+       			fprintf(f,"}\n");
+       			fprintf(f,"public  void autosave_cords_%s_nodes() {\n",categoryName);
+       			fprintf(f,"\tchar * fn=autosave_cords_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
+       			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"public  void set_autosave_%s_name(char * fn) {\n",categoryName);
+       			fprintf(f,"\tautosave_%s_name = fn;	return;\n",categoryName);
+       			fprintf(f,"}\n");
+       			fprintf(f,"public  void autosave_%s_nodes() {\n",categoryName);
+       			fprintf(f,"\tchar * fn=autosave_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
+       			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		}
+    		fprintf(f,"\tFILE * h;\n");
+    		if(!flag) fprintf(f,"\tpthread_mutex_lock( &list_cords_%s_control );\n",categoryName);
+    		else fprintf(f,"\tpthread_mutex_lock( &list_%s_control );\n",categoryName);
+    		fprintf(f,"\tif (( h = fopen(fn,\"w\")) != (FILE *) 0) {\n");
+    		if(!flag) 
+    		{
+       			fprintf(f,"\tfprintf(h,\"<cords_%ss>\\n\");\n",categoryName);
+       			fprintf(f,"\tfor ( nptr = cords_%s_first;\n",categoryName);
+    		}
+    		else
+    		{		
+       			fprintf(f,"\tfprintf(h,\"<%ss>\\n\");\n",categoryName);
+       			fprintf(f,"\tfor ( nptr = %s_first;\n",categoryName);
+    		}
+    		fprintf(f,"\t\tnptr != (struct occi_kind_node *) 0;\n");
+    		fprintf(f,"\t\tnptr = nptr->next ) {\n");
+    		fprintf(f,"\t\tif (!( pptr = nptr->contents )) continue;\n");
+    		if(!flag) fprintf(f,"\t\tfprintf(h,\"<cords_%s\\n\");\n",categoryName);
+    		else fprintf(f,"\t\tfprintf(h,\"<%s\\n\");\n",categoryName);
+    		for(i=0;i<dim;i++)
+    		{
+      			fprintf(f,"\t\tfprintf(h,\" %s=%%c\",0x0022);\n",nameAtr[i]);
+      			fprintf(f,"\t\tfprintf(h,\"%%s\",(pptr->%s?pptr->%s:\"\"));\n",nameAtr[i],nameAtr[i]);
+      			fprintf(f,"\t\tfprintf(h,\"%%c\",0x0022);\n"); 
+    		}
+    		fprintf(f,"\t\tfprintf(h,\" />\\n\");\n");
+    		fprintf(f,"\t\t}\n");
+    		if(!flag) fprintf(f,"\tfprintf(h,\"</cords_%ss>\\n\");\n",categoryName);
+    		else fprintf(f,"\tfprintf(h,\"</%ss>\\n\");\n",categoryName);
+    		fprintf(f,"\tfclose(h);\n");
+    		fprintf(f,"\t}\n");
+    		if(!flag) fprintf(f,"\tpthread_mutex_unlock( &list_cords_%s_control );\n",categoryName);
+    		else fprintf(f,"\tpthread_mutex_unlock( &list_%s_control );\n",categoryName);
+    		fprintf(f,"\treturn;\n");
+    		fprintf(f,"}\n\n");
 
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private void set_cords_%s_field(\n",categoryName);
-    else fprintf(f,"private void set_%s_field(\n",categoryName);
-    fprintf(f,"struct occi_category * cptr,void * optr, char * nptr, char * vptr)\n");
-    fprintf(f,"{\n");
-    if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    fprintf(f,"\tchar prefix[1024];\n");
-    fprintf(f,"\tif (!( pptr = optr )) return;\n");
-    fprintf(f,"\tsprintf(prefix,\"%%s.%%s.\",cptr->domain,cptr->id);\n");
-    fprintf(f,"\tif (!( strncmp( nptr, prefix, strlen(prefix) ) )) {\n");
-    fprintf(f,"\t\tnptr += strlen(prefix);\n");
-    for(i=1;i<dim;i++)
-    {
-      fprintf(f,"\t\tif (!( strcmp( nptr, \"%s\" ) ))\n",nameAtr[i]);
-      fprintf(f,"\t\t\tpptr->%s = allocate_string(vptr);\n",nameAtr[i]);
-    }
-    fprintf(f,"\t}\n"); 
-    fprintf(f,"\treturn;\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	--------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/\n");
-    fprintf(f,"/*	--------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct %s * filter_cords_%s_info(\n",categoryName,categoryName);
-    else fprintf(f,"private struct %s * filter_%s_info(\n",categoryName,categoryName);
-    fprintf(f,"\tstruct occi_category * optr,\n");
-    fprintf(f,"\tstruct rest_request  * rptr,\n");
-    fprintf(f,"\tstruct rest_response * aptr) {\n");
-    if(!flag)
-    {
-       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-       fprintf(f,"\tif (!( pptr = allocate_cords_%s()))\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-       fprintf(f,"\tif (!( pptr = allocate_%s()))\n",categoryName);
-
-    }
-    fprintf(f,"\treturn( pptr );\n");
-    if(!flag) fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_cords_%s_field) ))\n",categoryName);
-    else fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, pptr, set_%s_field) ))\n",categoryName);
-    if(!flag) fprintf(f,"\treturn( liberate_cords_%s(pptr));\n",categoryName);
-    else fprintf(f,"\treturn( liberate_%s(pptr));\n",categoryName);
-    fprintf(f,"\telse	return( pptr );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	--------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/\n");
-    fprintf(f,"/*	--------------------------------------------------	*/\n");
-    if(!flag)
-    {
-       fprintf(f,"private int pass_cords_%s_filter(\n",categoryName);
-       fprintf(f,"\tstruct cords_%s * pptr,struct cords_%s * fptr) {\n",categoryName,categoryName);
-    }
-    else
-    {
-       fprintf(f,"private int pass_%s_filter(\n",categoryName);
-       fprintf(f,"\tstruct %s * pptr,struct %s * fptr) {\n",categoryName,categoryName);
-    }
-    for(i=0;i<dim;i++)
-    {
-     fprintf(f,"\tif (( fptr->%s )\n",nameAtr[i]);
-     fprintf(f,"\t&&  (strlen( fptr->%s ) != 0)) {\n",nameAtr[i]);
-     fprintf(f,"\t\tif (!( pptr->%s ))\n",nameAtr[i]);
-     fprintf(f,"\t\t\treturn(0);\n");
-     fprintf(f,"\t\telse if ( strcmp(pptr->%s,fptr->%s) != 0)\n",nameAtr[i],nameAtr[i]);
-     fprintf(f,"\t\treturn(0);\n");
-     fprintf(f,"\t}\n");
-    }
-    fprintf(f,"\treturn(1);\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/\n");
-    fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_occi_response(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_occi_response(\n",categoryName);
-    fprintf(f,"struct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"struct rest_request * rptr, struct rest_response * aptr,\n");
-    if(!flag) fprintf(f,"struct cords_%s * pptr)\n",categoryName);
-    else fprintf(f,"struct %s * pptr)\n",categoryName);
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tsprintf(cptr->buffer,\"occi.core.id=%%s\",pptr->id);\n");
-    fprintf(f,"\tif (!( hptr = rest_response_header( aptr, \"X-OCCI-Attribute\",cptr->buffer) ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\" ) );\n");
-    for(i=1;i<dim;i++)
-    {
-       fprintf(f,"\tsprintf(cptr->buffer,\"%%s.%%s.%s=%%s\",optr->domain,optr->id,pptr->%s);\n",nameAtr[i],nameAtr[i]);
-       fprintf(f,"\tif (!( hptr = rest_response_header( aptr, \"X-OCCI-Attribute\",cptr->buffer) ))\n");
-       fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\" ) );\n");
-    }
-    fprintf(f,"\tif ( occi_render_links( aptr, pptr->id ) != 0)\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Link Failure\" ) );\n");
-    fprintf(f,"\telse	if (!( occi_success( aptr ) ))\n");
-    fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
-    fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/\n");
-    fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_get_item(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_get_item(\n",categoryName);
-    fprintf(f,"struct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"struct rest_request * rptr, struct rest_response * aptr, char * id)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_interface * iptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    fprintf(f,"\tiptr = optr->callback;\n");
-    if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
-    else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\tif (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);\n");
-    if(!flag)
-    {
-      fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
-      fprintf(f,"\treturn( cords_%s_occi_response(optr,cptr,rptr,aptr,pptr));\n",categoryName);
-    }
-    else
-    {
-      fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
-      fprintf(f,"\treturn( %s_occi_response(optr,cptr,rptr,aptr,pptr));\n",categoryName);
-    }
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_post_link(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_post_link(\n",categoryName);
-    fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr,char * id)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_interface * iptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    fprintf(f,"\tchar * reqhost;\n");
-    if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
-    else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	--------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/\n");
-    fprintf(f,"/*	--------------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_post_mixin(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_post_mixin(\n",categoryName);
-    fprintf(f,"struct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"struct rest_request * rptr, struct rest_response * aptr,char * id)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_interface * iptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    fprintf(f,"\tchar * reqhost;\n");
-    if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
-    else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\"));\n");
-    fprintf(f,"}\n\n");
-
-
-    fprintf(f,"/*	----------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/\n");
-    fprintf(f,"/*	----------------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_post_action(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_post_action(\n",categoryName);
-    fprintf(f,"struct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"struct rest_request * rptr, struct rest_response * aptr,char * id)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_interface * iptr;\n");
-    fprintf(f,"\tstruct occi_action * fptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    fprintf(f,"\tchar * reqhost;\n");
-    fprintf(f,"\tchar * mptr;\n");
-    if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
-    else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\tmptr = (rptr->parameters+strlen(\"action=\"));\n");
-    fprintf(f,"\tfor ( fptr=optr->firstact;\n");
-    fprintf(f,"\t\tfptr != (struct occi_action *) 0;\n");
-    fprintf(f,"\t\tfptr = fptr->next )\n");
-    fprintf(f,"\t\tif (!( strncmp( mptr, fptr->name, strlen( fptr->name )) ))\n");
-    fprintf(f,"\t\t\treturn( occi_invoke_action(fptr,optr,cptr,rptr,aptr,pptr) );\n");
-    fprintf(f,"\treturn( rest_html_response( aptr, 400, \"Incorrect Action Request\"));\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_post_item(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_post_item(\n",categoryName);
-    fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_interface * iptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    fprintf(f,"\tchar * reqhost;\n");
-    fprintf(f,"\tiptr = optr->callback;\n");
-    fprintf(f,"\tif (!( reqhost = rest_request_host( rptr ) ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
-    if(!flag) fprintf(f,"\tif (!( nptr = add_cords_%s_node(1)))\n",categoryName);
-    else fprintf(f,"\tif (!( nptr = add_%s_node(1)))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
-    fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
-    if(!flag) fprintf(f,"\tif (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_%s_field ) ))\n",categoryName);
-    else fprintf(f,"\tif (!( occi_process_atributs( optr, rptr,aptr, pptr, set_%s_field ) ))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
-    fprintf(f,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);\n");
-    if(!flag) fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
-    else fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
-    fprintf(f,"\tsprintf(cptr->buffer,\"%%s%%s%%s\",reqhost,optr->location,pptr->id);\n");
-    fprintf(f,"\tif (!( hptr = rest_response_header( aptr, \"X-OCCI-Location\",cptr->buffer) ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\" ) );\n");
-    fprintf(f,"\telse if (!( occi_success( aptr ) ))\n");
-    fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
-    fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/\n");
-    fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_put_item(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_put_item(\n",categoryName);
-    fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr,char * id)\n");
-    fprintf(f,"{\n");  
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_interface * iptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-    else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-    fprintf(f,"\tiptr = optr->callback;\n");
-    if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
-    else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    if(!flag) fprintf(f,"\tif (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_%s_field ) ))\n",categoryName);
-    else fprintf(f,"\tif (!( occi_process_atributs(optr,rptr,aptr, pptr, set_%s_field ) ))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
-    fprintf(f,"\tif (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);\n");
-    if(!flag) 
-    {
-       fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
-       fprintf(f,"\treturn( cords_%s_occi_response(optr,cptr,rptr,aptr,pptr));\n",categoryName);
-    }
-    else
-    {
-      fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
-      fprintf(f,"\treturn( %s_occi_response(optr,cptr,rptr,aptr,pptr));\n",categoryName);
-    }
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_head_item(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_head_item(\n",categoryName);
-    fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr,char * id)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag)
-    {
-       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-       fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-       fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
-    }
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");;
-    fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	----------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/\n");
-    fprintf(f,"/*	----------------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_delete_item(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_delete_item(\n",categoryName);
-    fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr, char * id)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_interface * iptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    if(!flag)
-    {
-      fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-      fprintf(f,"\tiptr = optr->callback;\n");
-      fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
-    }
-    else
-    {
-      fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-      fprintf(f,"\tiptr = optr->callback;\n");
-      fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
-    }
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
-    fprintf(f,"\tif (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);\n");
-    if(!flag)
-    {
-       fprintf(f,"\tdrop_cords_%s_node( nptr );\n",categoryName);
-       fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
-    }
-    else
-    {
-     fprintf(f,"\tdrop_%s_node( nptr );\n",categoryName);
-     fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
-    }
-
-    fprintf(f,"\tif (!( occi_success( aptr ) ))\n");
-    fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
-    fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/\n");
-    fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_get_list(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_get_list(\n",categoryName);
-    fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * sptr;\n");
-    if(!flag)
-    {
-       fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-       fprintf(f,"\tstruct cords_%s * fptr;\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-       fprintf(f,"\tstruct %s * fptr;\n",categoryName);
-    }
-    fprintf(f,"\tchar * reqhost;\n");
-    fprintf(f,"\tif (!( reqhost = rest_request_host( rptr ) ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
-    if(!flag) fprintf(f,"\telse if (!( fptr = filter_cords_%s_info( optr, rptr, aptr ) ))\n",categoryName);
-    else  fprintf(f,"\telse if (!( fptr = filter_%s_info( optr, rptr, aptr ) ))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
-    if(!flag) fprintf(f,"\tfor ( sptr = cords_%s_first;\n",categoryName);
-    else fprintf(f,"\tfor ( sptr = %s_first;\n",categoryName);
-    fprintf(f,"\t\tsptr != (struct occi_kind_node *) 0;\n");
-    fprintf(f,"\t\tsptr = sptr->next ) {\n");
-    fprintf(f,"\t\tif (!( pptr = sptr->contents ))\n");
-    fprintf(f,"\t\t\tcontinue;\n");
-    if(!flag) fprintf(f,"\t\tif (!( pass_cords_%s_filter( pptr, fptr ) ))\n",categoryName);
-    else fprintf(f,"\t\tif (!( pass_%s_filter( pptr, fptr ) ))\n",categoryName);
-    fprintf(f,"\t\t\tcontinue;\n");
-    fprintf(f,"\t\tsprintf(cptr->buffer,\"%%s%%s%%s\",reqhost,optr->location,pptr->id);\n");
-    fprintf(f,"\t\tif (!( hptr = rest_response_header( aptr, \"X-OCCI-Location\",cptr->buffer) ))\n");
-    fprintf(f,"\t\t\treturn( rest_html_response( aptr, 500, \"Server Failure\" ) );\n");
-    fprintf(f,"\t\t}\n");
-    fprintf(f,"\tif (!( occi_success( aptr ) ))\n");
-    fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
-    fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	--------------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/\n");
-    fprintf(f,"/*	--------------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * cords_%s_delete_all(\n",categoryName);
-    else fprintf(f,"private struct rest_response * %s_delete_all(\n",categoryName);
-    fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
-    fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr)\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * hptr;\n");
-    fprintf(f,"\tstruct occi_interface * iptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * nptr;\n");
-    fprintf(f,"\tstruct occi_kind_node * sptr;\n");
-    if(!flag)
-    {
-      fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-      fprintf(f,"\tstruct cords_%s * fptr;\n",categoryName);
-    }
-    else
-    {
-      fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-      fprintf(f,"\tstruct %s * fptr;\n",categoryName);
-    }
-    fprintf(f,"\tiptr = optr->callback;\n");
-    if(!flag) fprintf(f,"\tif (!( fptr = filter_cords_%s_info( optr, rptr, aptr ) ))\n",categoryName);
-    else  fprintf(f,"\tif (!( fptr = filter_%s_info( optr, rptr, aptr ) ))\n",categoryName);
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
-    if(!flag) fprintf(f,"\tnptr=cords_%s_first;\n",categoryName);
-    else fprintf(f,"\tnptr=%s_first;\n",categoryName);
-    fprintf(f,"\twhile (nptr != (struct occi_kind_node *) 0) {\n");
-    fprintf(f,"\t\tif ((!( pptr = nptr->contents ))\n");
-    if(!flag) fprintf(f,"\t\t||  (!( pass_cords_%s_filter( pptr, fptr ) ))) {\n",categoryName);
-    else fprintf(f,"\t\t||  (!( pass_%s_filter( pptr, fptr ) ))) {\n",categoryName);
-    fprintf(f,"\t\t\tnptr = nptr->next;\n");
-    fprintf(f,"\t\t\tcontinue;\n");
-    fprintf(f,"\t\t\t}\n");
-    fprintf(f,"\t\telse	{\n");
-    fprintf(f,"\t\t\tif (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }\n");
-    fprintf(f,"\t\t\tsptr = nptr->next;\n");
-    if(!flag) fprintf(f,"\t\t\tdrop_cords_%s_node( nptr );\n",categoryName);
-    else fprintf(f,"\t\t\tdrop_%s_node( nptr );\n",categoryName);
-    fprintf(f,"\t\t\tnptr = sptr;\n");
-    fprintf(f,"\t\t\t}\n");
-    fprintf(f,"\t\t}\n");
-    if(!flag) fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
-    else fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
-    fprintf(f,"\tif (!( occi_success( aptr ) ))\n");
-    fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
-    fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    else fprintf(f,"private struct rest_response * occi_%s_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_response * aptr;\n");
-    fprintf(f,"\tstruct rest_header   * hptr;\n");
-    fprintf(f,"\tstruct occi_category * optr;\n");
-    fprintf(f,"\tchar * ctptr;\n");
-    fprintf(f,"\tchar * mptr;\n");
-    fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
-    fprintf(f,"\t\tctptr = \"text/occi\";\n");
-    fprintf(f,"\telse	ctptr = hptr->value;\n");
-    fprintf(f,"\tif (!( optr = vptr ))\n"); 
-    fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
-    fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
-    fprintf(f,"\t\treturn( aptr );\n");
-    fprintf(f,"\telse if (!(strcmp( rptr->object, optr->location ) ))\n");
-    if(!flag) fprintf(f,"\t\treturn( cords_%s_get_list( optr, cptr, rptr, aptr ) );\n",categoryName);
-    else fprintf(f,"\t\treturn( %s_get_list( optr, cptr, rptr, aptr ) );\n",categoryName);
-    fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
-    if(!flag) fprintf(f,"\t\treturn( cords_%s_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    else fprintf(f,"\t\treturn( %s_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	--------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/\n");
-    fprintf(f,"/*	--------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    else fprintf(f,"private struct rest_response * occi_%s_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_response * aptr;\n");
-    fprintf(f,"\tstruct rest_header   * hptr;\n");
-    fprintf(f,"\tstruct occi_category * optr;\n");
-    fprintf(f,"\tchar * ctptr;\n");
-    fprintf(f,"\tchar * mptr;\n");
-    fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
-    fprintf(f,"\t\tctptr = \"text/occi\";\n");
-    fprintf(f,"\telse	ctptr = hptr->value;\n");
-    fprintf(f,"\tif (!( optr = vptr )) \n");
-    fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
-    fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
-    fprintf(f,"\t\treturn( aptr );\n");
-    fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
-    if(!flag) fprintf(f,"\t\treturn( cords_%s_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    else fprintf(f,"\t\treturn( %s_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	--------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/\n");
-    fprintf(f,"/*	--------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    else fprintf(f,"private struct rest_response * occi_%s_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_response * aptr;\n");
-    fprintf(f,"\tstruct rest_header   * hptr;\n");
-    fprintf(f,"\tstruct occi_category * optr;\n");
-    fprintf(f,"\tchar * ctptr;\n");
-    fprintf(f,"\tchar * mptr;\n");
-    fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
-    fprintf(f,"\t\tctptr = \"text/occi\";\n");
-    fprintf(f,"\telse	ctptr = hptr->value;\n");
-    fprintf(f,"\tif (!( optr = vptr )) \n");
-    fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
-    fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
-    fprintf(f,"\t\treturn( aptr );\n");
-    fprintf(f,"\telse if (!( strcmp( rptr->object, optr->location ) ))\n");
-    if(!flag) fprintf(f,"\t\treturn( cords_%s_post_item( optr, cptr, rptr, aptr ) );\n",categoryName);
-    else fprintf(f,"\t\treturn( %s_post_item( optr, cptr, rptr, aptr ) );\n",categoryName);
-    fprintf(f,"\telse if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"\telse if (!( rptr->parameters ))\n");
-    fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"action=\", strlen(\"action=\")) ))\n");
-    if(!flag)
-    {
-       fprintf(f,"\t\treturn( cords_%s_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-       fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"mixin=\", strlen(\"mixin=\")) ))\n");
-       fprintf(f,"\t\treturn( cords_%s_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-       fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"link=\", strlen(\"link=\")) ))\n");
-       fprintf(f,"\t\treturn( cords_%s_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"\t\treturn( %s_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-       fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"mixin=\", strlen(\"mixin=\")) ))\n");
-       fprintf(f,"\t\treturn( %s_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-       fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"link=\", strlen(\"link=\")) ))\n");
-       fprintf(f,"\t\treturn( %s_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-
-    }
-    fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    else fprintf(f,"private struct rest_response * occi_%s_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_response * aptr;\n");
-    fprintf(f,"\tstruct rest_header   * hptr;\n");
-    fprintf(f,"\tstruct occi_category * optr;\n");
-    fprintf(f,"\tchar * ctptr;\n");
-    fprintf(f,"\tchar * mptr;\n");
-    fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
-    fprintf(f,"\t\tctptr = \"text/occi\";\n");
-    fprintf(f,"\telse	ctptr = hptr->value;\n");
-    fprintf(f,"\tif (!( optr = vptr )) \n");
-    fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
-    fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
-    fprintf(f,"\t\treturn( aptr );\n");
-    fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
-    if(!flag) fprintf(f,"\t\treturn( cords_%s_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    else fprintf(f,"\t\treturn( %s_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	------------------------------------------------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/\n");
-    fprintf(f,"/*	------------------------------------------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    else fprintf(f,"private struct rest_response * occi_%s_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_response * aptr;\n");
-    fprintf(f,"\tstruct rest_header   * hptr;\n");
-    fprintf(f,"\tstruct occi_category * optr;\n");
-    fprintf(f,"\tchar * ctptr;\n");
-    fprintf(f,"\tchar * mptr;\n");
-    fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
-    fprintf(f,"\t\tctptr = \"text/occi\";\n");
-    fprintf(f,"\telse	ctptr = hptr->value;\n");
-    fprintf(f,"\tif (!( optr = vptr )) \n");
-    fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
-    fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
-    fprintf(f,"\t\treturn( aptr );\n");
-    fprintf(f,"\telse if (!(strcmp( rptr->object, optr->location ) ))\n");
-    if(!flag)
-    {
-       fprintf(f,"\t\treturn( cords_%s_delete_all( optr, cptr, rptr, aptr ) );\n",categoryName);
-       fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
-       fprintf(f,"\t\treturn( cords_%s_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    }
-    else
-    {
-      fprintf(f,"\t\treturn( %s_delete_all( optr, cptr, rptr, aptr ) );\n",categoryName);
-      fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
-      fprintf(f,"\t\treturn( %s_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
-    }
-    fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
-    fprintf(f,"}\n\n");
-
-    fprintf(f,"/*	--------------------------------------------------------------------------------------*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n       */\n");
-    fprintf(f,"/*	--------------------------------------------------------------------------------------*/\n");
-   
-    if(!flag)
-    {
-      fprintf(f,"private void	redirect_occi_cords_%s_mt( struct rest_interface * iptr )\n",categoryName);
-      fprintf(f,"{\n");
-      fprintf(f,"\tiptr->get = occi_cords_%s_get;\n",categoryName);
-      fprintf(f,"\tiptr->post = occi_cords_%s_post;\n",categoryName);
-      fprintf(f,"\tiptr->put = occi_cords_%s_put;\n",categoryName);
-      fprintf(f,"\tiptr->delete = occi_cords_%s_delete;\n",categoryName);
-      fprintf(f,"\tiptr->head = occi_cords_%s_head;\n",categoryName);
-    }
-    else
-    {
-      fprintf(f,"private void	redirect_occi_%s_mt( struct rest_interface * iptr )\n",categoryName);
-      fprintf(f,"{\n");
-      fprintf(f,"\tiptr->get = occi_%s_get;\n",categoryName);
-      fprintf(f,"\tiptr->post = occi_%s_post;\n",categoryName);
-      fprintf(f,"\tiptr->put = occi_%s_put;\n",categoryName);
-      fprintf(f,"\tiptr->delete = occi_%s_delete;\n",categoryName);
-      fprintf(f,"\tiptr->head = occi_%s_head;\n",categoryName);
-    }
-    fprintf(f,"\treturn;\n");
-    fprintf(f,"}\n\n");
     
-    fprintf(f,"/*	------------------------------------	*/\n");
-    fprintf(f,"/*	c r u d   d e l e t e   a c t i o n 	*/\n");
-    fprintf(f,"/*	------------------------------------	*/\n");
-    if(!flag) fprintf(f,"private struct rest_response * delete_action_cords_%s(struct occi_category * optr,\n",categoryName); 
-    else fprintf(f,"private struct rest_response * delete_action_%s(struct occi_category * optr,\n",categoryName); 
-    fprintf(f,"struct rest_client * cptr,\n");  
-    fprintf(f,"struct rest_request * rptr,\n");  
-    fprintf(f,"struct rest_response * aptr,\n");  
-    fprintf(f,"void * vptr )\n");
-    fprintf(f,"{\n");
-    fprintf(f,"\taptr = liberate_rest_response( aptr );\n");
-    if(!flag) fprintf(f,"\treturn( occi_cords_%s_delete(optr,cptr,rptr));\n",categoryName);
-    else fprintf(f,"\treturn( occi_%s_delete(optr,cptr,rptr));\n",categoryName);
-    fprintf(f,"}\n");
+		fprintf(f,"/*	-------------------------------------------------------------------------------------------------	*/\n");
+		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   a c t i v a t e   f i l t e r 	*/\n");
+		fprintf(f,"/*	------------------------------------------------------------------------------------------------------	*/\n");
+		if(!flag) fprintf(f,"private void activate_cords_%s_filter_on_field(\n",categoryName);
+		else fprintf(f,"private void activate_%s_filter_on_field(\n",categoryName);
+		fprintf(f,"\tstruct occi_category * cptr,void * target_void, char * field_name)\n");
+		fprintf(f,"{\n");
+		if(!flag) fprintf(f,"\tstruct cords_%s_occi_filter * target;\n",categoryName);
+		else fprintf(f,"\tstruct %s_occi_filter * target;\n",categoryName);
+		fprintf(f,"\tchar prefix[1024];\n");
+		fprintf(f,"\tif (!( target = target_void )) return;\n");
+		fprintf(f,"\tsprintf(prefix,\"%%s.%%s.\",cptr->domain,cptr->id);\n");
+		fprintf(f,"\tif (!( strncmp( field_name, prefix, strlen(prefix) ) )) {\n");
+		fprintf(f,"\t\tfield_name += strlen(prefix);\n");
+		for(i=1;i<dim;i++)
+    		{
+      			fprintf(f,"\t\tif (!( strcmp( field_name, \"%s\" ) ))\n",nameAtr[i]);
+      			fprintf(f,"\t\t\ttarget->%s = 1;\n",nameAtr[i]);
+    		}	
+		fprintf(f,"\t}\n");
+		fprintf(f,"\treturn;\n");
+		fprintf(f,"}\n");
 
-    fprintf(f,"/*	------------------------------------------	*/\n");
-    fprintf(f,"/*	o c c i   c a t e g o r y   b u i l d e r 	*/\n");
-    fprintf(f,"/*	------------------------------------------	*/\n");
-    if(!flag) 
-    {
-	fprintf(f,"/* occi category rest instance builder for : occi_cords_%s */\n",categoryName);
-	fprintf(f,"public struct occi_category * occi_cords_%s_builder(char * a,char * b) {\n",categoryName);
-    }	
-    else 
-    {
-	fprintf(f,"/* occi category rest instance builder for : occi_%s */\n",categoryName);
-    	fprintf(f,"public struct occi_category * occi_%s_builder(char * a,char * b) {\n",categoryName);
-    }
-    fprintf(f,"\tchar * c=\"http://scheme.compatibleone.fr/scheme/compatible#\";\n");
-    fprintf(f,"\tchar * d=\"kind\";\n");
-    fprintf(f,"\tchar * e=\"http://scheme.ogf.org/occi/resource#\";\n");
-    if(!flag) fprintf(f,"\tchar * f=\"CompatibleOne OCCI resource cords_%s\";\n",categoryName);
-    else fprintf(f,"\tchar * f=\"CompatibleOne OCCI resource %s\";\n",categoryName);
-    fprintf(f,"\tstruct occi_category * optr;\n");
-    fprintf(f,"\tif (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }\n");
-    fprintf(f,"\telse {\n");
-    if(!flag) fprintf(f,"\t\tredirect_occi_cords_%s_mt(optr->interface);\n",categoryName);
-    else fprintf(f,"\t\tredirect_occi_%s_mt(optr->interface);\n",categoryName);
-    for(i=1;i<dim;i++)
-    {
-      fprintf(f,"\t\tif (!( optr = occi_add_attribute(optr, \"%s\",0,0) ))\n",nameAtr[i]);
-      fprintf(f,"\t\t\treturn(optr);\n");
-    }
-    if(!flag)fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\",\"\",delete_action_cords_%s)))\n",categoryName);
-    else fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\",\"\",delete_action_%s)))\n",categoryName);
-    fprintf(f,"\t\t\treturn (optr);\n");
-    if(!flag) fprintf(f,"\t\tautoload_cords_%s_nodes();\n",categoryName);
-    else fprintf(f,"\t\tautoload_%s_nodes();\n",categoryName);
-    fprintf(f,"\t\t\treturn(optr);\n");
-    fprintf(f,"\t}\n");
-    fprintf(f,"}\n\n");
+		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i e l d 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private void set_cords_%s_field(\n",categoryName);
+    		else fprintf(f,"private void set_%s_field(\n",categoryName);
+    		fprintf(f,"struct occi_category * cptr,void * target_void, char * field_name, char * value)\n");
+    		fprintf(f,"{\n");
+    		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		fprintf(f,"\tchar prefix[1024];\n");
+    		fprintf(f,"\tif (!( pptr = target_void )) return;\n");
+    		fprintf(f,"\tsprintf(prefix,\"%%s.%%s.\",cptr->domain,cptr->id);\n");
+    		fprintf(f,"\tif (!( strncmp( field_name, prefix, strlen(prefix) ) )) {\n");
+    		fprintf(f,"\t\tnptr += strlen(prefix);\n");
+    		for(i=1;i<dim;i++)
+    		{
+      			fprintf(f,"\t\tif (!( strcmp( field_name, \"%s\" ) ))\n",nameAtr[i]);
+      			fprintf(f,"\t\t\tpptr->%s = allocate_string(vptr);\n",nameAtr[i]);
+    		}
+    		fprintf(f,"\t}\n"); 
+    		fprintf(f,"\treturn;\n");
+    		fprintf(f,"}\n\n");
 
-    fprintf(f,"/*	------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"/*	c o r d s _ %s _ o c c i _ h e a d e r s 	*/\n",categoryName);
-    else fprintf(f,"/*	%s _ o c c i _ h e a d e r s 	*/\n",categoryName);
-    fprintf(f,"/*	------------------------------------------------	*/\n");
-    if(!flag) fprintf(f,"public struct rest_header *  cords_%s_occi_headers(struct cords_%s * sptr)\n",categoryName,categoryName);
-    else fprintf(f,"public struct rest_header *  %s_occi_headers(struct %s * sptr)\n",categoryName,categoryName);
-    fprintf(f,"{\n");
-    fprintf(f,"\tstruct rest_header * first=(struct rest_header *) 0;\n");
-    fprintf(f,"\tstruct rest_header * last=(struct rest_header *) 0;\n");
-    fprintf(f,"\tstruct rest_header * hptr=(struct rest_header *) 0;\n");
-    fprintf(f,"\tchar buffer[8192];\n");
-    fprintf(f,"\tif (!( sptr )) return(0);\n");
-    fprintf(f,"\tif (!( hptr = allocate_rest_header()))\n");
-    fprintf(f,"\t\treturn(hptr);\n");
-    fprintf(f,"\t\telse	if (!( hptr->previous = last))\n");
-    fprintf(f,"\t\t\tfirst = hptr;\n");
-    fprintf(f,"\t\telse	hptr->previous->next = hptr;\n");
-    fprintf(f,"\t\tlast = hptr;\n");
-    fprintf(f,"\tif (!( hptr->name = allocate_string(\"Category\")))\n");
-    fprintf(f,"\t\treturn(first);\n");
-    if(!flag) fprintf(f,"\tsprintf(buffer,\"cords_%s; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\\r\\n\");\n",categoryName);
-    else fprintf(f,"\tsprintf(buffer,\"%s; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\\r\\n\");\n",categoryName);
-    fprintf(f,"\tif (!( hptr->value = allocate_string(buffer)))\n");
-    fprintf(f,"\t\treturn(first);\n");
-    fprintf(f,"\tif (!( hptr = allocate_rest_header()))\n");
-    fprintf(f,"\t\treturn(first);\n");
-    fprintf(f,"\t\telse	if (!( hptr->previous = last))\n");
-    fprintf(f,"\t\t\tfirst = hptr;\n");
-    fprintf(f,"\t\telse	hptr->previous->next = hptr;\n");
-    fprintf(f,"\t\tlast = hptr;\n");
-    fprintf(f,"\tif (!( hptr->name = allocate_string(\"X-OCCI-Attribute\")))\n");
-    fprintf(f,"\t\treturn(first);\n");
-    for(i=1;i<dim-1;i++)
-    {
-	if(!flag) fprintf(f,"\tsprintf(buffer,\"occi.cords_%s.%s='%%s'\\r\\n\",(sptr->%s?sptr->%s:\"\"));\n",categoryName,nameAtr[i],nameAtr[i],nameAtr[i]);
-        else fprintf(f,"\tsprintf(buffer,\"occi.%s.%s='%%s'\\r\\n\",(sptr->%s?sptr->%s:\"\"));\n",categoryName,nameAtr[i],nameAtr[i],nameAtr[i]);
-	fprintf(f,"\tif (!( hptr->value = allocate_string(buffer)))\n");
-	fprintf(f,"\t\treturn(first);\n");
-	fprintf(f,"\tif (!( hptr = allocate_rest_header()))\n");
-	fprintf(f,"\t\treturn(first);\n");
-	fprintf(f,"\t\telse	if (!( hptr->previous = last))\n");
-	fprintf(f,"\t\tfirst = hptr;\n");
-	fprintf(f,"\t\telse	hptr->previous->next = hptr;\n");
-	fprintf(f,"\t\tlast = hptr;\n");
-	fprintf(f,"\tif (!( hptr->name = allocate_string(\"X-OCCI-Attribute\")))\n");
-	fprintf(f,"\t\treturn(first);\n");
-     }
-     if(dim>0)
-     {
-     if(!flag) fprintf(f,"\tsprintf(buffer,\"occi.cords_%s.%s='%%s'\\r\\n\",(sptr->%s?sptr->%s:\"\"));\n",categoryName,nameAtr[dim-1],nameAtr[dim-1],nameAtr[i]);
-     else fprintf(f,"\tsprintf(buffer,\"occi.%s.%s='%%s'\\r\\n\",(sptr->%s?sptr->%s:\"\"));\n",categoryName,nameAtr[dim-1],nameAtr[dim-1],nameAtr[i]);
-     fprintf(f,"\tif (!( hptr->value = allocate_string(buffer)))\n");
-     fprintf(f,"\t\treturn(first);\n");
-     fprintf(f,"\treturn(first);\n");
-     }
-     fprintf(f,"}\n\n");
-     fprintf(f,"#endif	/* _%s_c_ */\n",categoryName);
-     fclose(f);
-     free(nameAtr);
+		fprintf(f,"/*	--------------------------------------------------------------------------------------------------------------	*/\n");
+		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   s e t   f i l t e r   o n   f i e l d 	*/\n");
+		fprintf(f,"/*	--------------------------------------------------------------------------------------------------------------	*/\n");
+		if(!flag) fprintf(f,"private void set_cords_%s_filter_on_field(\n",categoryName);
+		else fprintf(f,"private void set_%s_filter_on_field(\n",categoryName);
+		fprintf(f,"\tstruct occi_category * category, void * target_void, char * field_name, char * value)\n");
+		fprintf(f,"{\n");
+		if(!flag) fprintf(f,"\tstruct cords_%s_occi_filter *filter = target_void;\n",categoryName);
+		else fprintf(f,"\tstruct %s_occi_filter *filter = target_void;\n",categoryName);
+		if(!flag){
+			fprintf(f,"\tset_cords_%s_field(category, filter->attributes, field_name, value);\n",categoryName);
+			fprintf(f,"\tactivate_cords_%s_filter_on_field(category, filter, field_name);\n",categoryName);
+		else
+		{
+			fprintf(f,"\tset_%s_field(category, filter->attributes, field_name, value);\n",categoryName);
+			fprintf(f,"\tactivate_%s_filter_on_field(category, filter, field_name);\n",categoryName);
+
+		}
+		fprintf(f,"}\n\n");		
+
+    		fprintf(f,"/*	--------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   f i l t e r   i n f o 	*/\n");
+    		fprintf(f,"/*	--------------------------------------------------	*/\n");
+    		if(!flag) 
+		{
+			fprintf(f,"private int filter_cords_%s_info(\n",categoryName);
+			fprintf(f,"\tstruct cords_%s_occi_filter *filter,\n",categoryName);
+		}
+    		else 
+		{
+			fprintf(f,"private int filter_%s_info(\n",categoryName);
+			fprintf(f,"\tstruct %s_occi_filter *filter,\n",categoryName);
+		}
+    		fprintf(f,"\tstruct occi_category * optr,\n");
+    		fprintf(f,"\tstruct rest_request  * rptr,\n");
+    		fprintf(f,"\tstruct rest_response * aptr) {\n");
+    		if(!flag)
+    		{
+			fprintf(f,"\t*filter = (const struct cords_%s_occi_filter) {0};\n",categoryName);
+			fprintf(f,"\tif (!( filter->attributes = allocate_cords_%s()))\n",categoryName);	
+    		}
+    		else
+    		{
+       			fprintf(f,"\t*filter = (const struct %s_occi_filter) {0};\n",categoryName);
+			fprintf(f,"\tif (!( filter->attributes = allocate_%s()))\n",categoryName);	
+
+    		}
+    		fprintf(f,"\t\treturn(0);\n");
+    		if(!flag) fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_cords_%s_on_field) ))\n",categoryName);
+    		else fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_%s_on_field) ))\n",categoryName);
+    		if(!flag) fprintf(f,"\t\tliberate_cords_%s(filter->attributtes);\n",categoryName);
+    		else fprintf(f,"\t\tliberate_%s(filter->attributes));\n",categoryName);
+    		fprintf(f,"\t\treturn (0);\n");
+    		fprintf(f,"\t}\n");
+		fprintf(f,"\telse return (1);\n");
+		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	--------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   f i l t e r   p a s s 	*/\n");
+    		fprintf(f,"/*	--------------------------------------------------	*/\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"private int pass_cords_%s_filter(\n",categoryName);
+       			fprintf(f,"\tstruct cords_%s * pptr,struct cords_%s_occi_filter * filter) {\n",categoryName,categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"private int pass_%s_filter(\n",categoryName);
+       			fprintf(f,"\tstruct %s * pptr,struct %s_occi_filter * filter) {\n",categoryName,categoryName);
+    		}
+    		for(i=0;i<dim;i++)
+    		{
+     			fprintf(f,"\tif (( filter->%s ){\n",nameAtr[i]);
+     			fprintf(f,"\t\tif (!( pptr->%s ))\n",nameAtr[i]);
+     			fprintf(f,"\t\t\treturn(0);\n");
+     			fprintf(f,"\t\telse if ( strcmp(pptr->%s,filter->attributes->%s) != 0)\n",nameAtr[i],nameAtr[i]);
+     			fprintf(f,"\t\t\treturn(0);\n");
+     			fprintf(f,"\t}\n");
+    		}
+    		fprintf(f,"\treturn(1);\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   r e s p o n s e 	*/\n");
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_occi_response(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_occi_response(\n",categoryName);
+    		fprintf(f,"struct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"struct rest_request * rptr, struct rest_response * aptr,\n");
+    		if(!flag) fprintf(f,"struct cords_%s * pptr)\n",categoryName);
+    		else fprintf(f,"struct %s * pptr)\n",categoryName);
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tsprintf(cptr->buffer,\"occi.core.id=%%s\",pptr->id);\n");
+    		fprintf(f,"\tif (!( hptr = rest_response_header( aptr, \"X-OCCI-Attribute\",cptr->buffer) ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\" ) );\n");
+    		for(i=1;i<dim;i++)
+    		{
+       			fprintf(f,"\tsprintf(cptr->buffer,\"%%s.%%s.%s=%%s\",optr->domain,optr->id,pptr->%s);\n",nameAtr[i],nameAtr[i]);
+       			fprintf(f,"\tif (!( hptr = rest_response_header( aptr, \"X-OCCI-Attribute\",cptr->buffer) ))\n");
+       			fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\" ) );\n");
+    		}
+    		fprintf(f,"\tif ( occi_render_links( aptr, pptr->id ) != 0)\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Link Failure\" ) );\n");
+    		fprintf(f,"\telse	if (!( occi_success( aptr ) ))\n");
+    		fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
+    		fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   i t e m 	*/\n");
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_get_item(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_get_item(\n",categoryName);
+    		fprintf(f,"struct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"struct rest_request * rptr, struct rest_response * aptr, char * id)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_interface * iptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		fprintf(f,"\tiptr = optr->callback;\n");
+    		if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
+    		else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\tif (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);\n");
+    		if(!flag)
+    		{
+      			fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
+      			fprintf(f,"\treturn( cords_%s_occi_response(optr,cptr,rptr,aptr,pptr));\n",categoryName);
+    		}
+    		else
+    		{
+      			fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
+      			fprintf(f,"\treturn( %s_occi_response(optr,cptr,rptr,aptr,pptr));\n",categoryName);
+    		}
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   l i n k 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_post_link(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_post_link(\n",categoryName);
+    		fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr,char * id)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_interface * iptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		fprintf(f,"\tchar * reqhost;\n");
+    		if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
+    		else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	--------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   m i x i n 	*/\n");
+    		fprintf(f,"/*	--------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_post_mixin(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_post_mixin(\n",categoryName);
+    		fprintf(f,"struct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"struct rest_request * rptr, struct rest_response * aptr,char * id)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_interface * iptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		fprintf(f,"\tchar * reqhost;\n");
+    		if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
+    		else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\"));\n");
+    		fprintf(f,"}\n\n");
+
+
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   a c t i o n 	*/\n");
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_post_action(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_post_action(\n",categoryName);
+    		fprintf(f,"struct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"struct rest_request * rptr, struct rest_response * aptr,char * id)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_interface * iptr;\n");
+    		fprintf(f,"\tstruct occi_action * fptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		fprintf(f,"\tchar * reqhost;\n");
+    		fprintf(f,"\tchar * mptr;\n");
+    		if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
+    		else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\tmptr = (rptr->parameters+strlen(\"action=\"));\n");
+    		fprintf(f,"\tfor ( fptr=optr->firstact;\n");
+    		fprintf(f,"\t\tfptr != (struct occi_action *) 0;\n");
+    		fprintf(f,"\t\tfptr = fptr->next )\n");
+    		fprintf(f,"\t\tif (!( strncmp( mptr, fptr->name, strlen( fptr->name )) ))\n");
+    		fprintf(f,"\t\t\treturn( occi_invoke_action(fptr,optr,cptr,rptr,aptr,pptr) );\n");
+    		fprintf(f,"\treturn( rest_html_response( aptr, 400, \"Incorrect Action Request\"));\n");
+    		fprintf(f,"}\n\n");
+
+		if(!flag) fprintf(f,"private void prepare_cords_%s_location(char *r,char *h,int port,char *l,char *i)\n",categoryName);
+		else fprintf(f,"private void prepare_%s_location(char *r,char *h,int port,char *l,char *i)\n",categoryName);
+		fprintf(f,"{\n");
+		fprintf(f,"\tchar * sptr=h;\n");
+		fprintf(f,"\twhile ( *sptr ) { if (( *sptr == ':' ) && ( *(sptr+1) != '/' ))  break; else sptr++; }\n");
+		fprintf(f,"\tif ( *sptr != ':' )\n");
+		fprintf(f,"\t\tsprintf(r,\"%%s:%%u%%s%%s\",h,port,l,i);\n");
+		fprintf(f,"\telse\n");
+		fprintf(f,"\t\tsprintf(r,\"%%s%%s%%s\",h,l,i);\n");
+		fprintf(f,"}\n\n");
+
+
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t   i t e m 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_post_item(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_post_item(\n",categoryName);
+    		fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_interface * iptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		fprintf(f,"\tchar * reqhost;\n");
+    		fprintf(f,"\tiptr = optr->callback;\n");
+    		fprintf(f,"\tif (!( reqhost = rest_request_host( rptr ) ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
+    		if(!flag) fprintf(f,"\tif (!( nptr = add_cords_%s_node(1)))\n",categoryName);
+    		else fprintf(f,"\tif (!( nptr = add_%s_node(1)))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
+    		fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
+    		if(!flag) fprintf(f,"\tif (!( occi_process_atributs( optr, rptr,aptr, pptr, set_cords_%s_field ) ))\n",categoryName);
+    		else fprintf(f,"\tif (!( occi_process_atributs( optr, rptr,aptr, pptr, set_%s_field ) ))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
+    		fprintf(f,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);\n");
+    		if(!flag) 
+		{
+			fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
+			fprintf(f,"\tprepare_cords_%s_location(cptr->buffer,reqhost,reqport,optr->location, pptr->id);\n",categoryName);
+		}
+    		else 
+		{
+			fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
+			fprintf(f,"\tprepare_%s_location(cptr->buffer,reqhost,reqport,optr->location, pptr->id);\n",categoryName);
+		}
+    		fprintf(f,"\tif (!( hptr = rest_response_header( aptr, \"X-OCCI-Location\",cptr->buffer) ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\" ) );\n");
+    		fprintf(f,"\telse if (!( occi_success( aptr ) ))\n");
+    		fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
+    		fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t   i t e m 	*/\n");
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_put_item(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_put_item(\n",categoryName);
+    		fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr,char * id)\n");
+    		fprintf(f,"{\n");  
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_interface * iptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+    		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+    		fprintf(f,"\tiptr = optr->callback;\n");
+    		if(!flag) fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
+    		else fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		if(!flag) fprintf(f,"\tif (!( occi_process_atributs(optr,rptr,aptr, pptr, set_cords_%s_field ) ))\n",categoryName);
+    		else fprintf(f,"\tif (!( occi_process_atributs(optr,rptr,aptr, pptr, set_%s_field ) ))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 500, \"Server Failure\") );\n");
+    		fprintf(f,"\tif (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);\n");
+    		if(!flag) 
+    		{
+       			fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
+       			fprintf(f,"\treturn( cords_%s_occi_response(optr,cptr,rptr,aptr,pptr));\n",categoryName);
+    		}
+    		else
+    		{
+      			fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
+      			fprintf(f,"\treturn( %s_occi_response(optr,cptr,rptr,aptr,pptr));\n",categoryName);
+    		}
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d   i t e m 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_head_item(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_head_item(\n",categoryName);
+    		fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr,char * id)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+       			fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+       			fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
+    		}
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");;
+    		fprintf(f,"\telse if (!( pptr = nptr->contents ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   i t e m 	*/\n");
+   		fprintf(f,"/*	----------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_delete_item(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_delete_item(\n",categoryName);
+    		fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr, char * id)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_interface * iptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		if(!flag)
+    		{
+      			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+      			fprintf(f,"\tiptr = optr->callback;\n");
+      			fprintf(f,"\tif (!( nptr = locate_cords_%s_node(id)))\n",categoryName);
+    		}
+    		else
+    		{		
+      			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+      			fprintf(f,"\tiptr = optr->callback;\n");
+      			fprintf(f,"\tif (!( nptr = locate_%s_node(id)))\n",categoryName);
+    		}
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 404, \"Not Found\") );\n");
+    		fprintf(f,"\tif (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,nptr,rptr);\n");
+   	 	if(!flag)
+    		{
+       			fprintf(f,"\tdrop_cords_%s_node( nptr );\n",categoryName);
+       			fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);
+    		}
+    		else
+    		{
+     			fprintf(f,"\tdrop_%s_node( nptr );\n",categoryName);
+     			fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
+    		}		
+
+    		fprintf(f,"\tif (!( occi_success( aptr ) ))\n");
+    		fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
+    		fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t   l i s t 	*/\n");
+    		fprintf(f,"/*	----------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_get_list(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_get_list(\n",categoryName);
+    		fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * sptr;\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+       			fprintf(f,"\tstruct cords_%s_occi_filter * filter;\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+       			fprintf(f,"\tstruct %s_occi_filter * filter;\n",categoryName);
+    		}
+    		fprintf(f,"\tchar * reqhost;\n");
+    		fprintf(f,"\tif (!( reqhost = rest_request_host( rptr ) ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
+    		if(!flag) fprintf(f,"\telse if (!(filter_cords_%s_info(&filter, optr, rptr, aptr ) ))\n",categoryName);
+    		else  fprintf(f,"\telse if (!(filter_%s_info(&filter, optr, rptr, aptr ) ))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
+    		if(!flag) fprintf(f,"\tfor ( sptr = cords_%s_first;\n",categoryName);
+    		else fprintf(f,"\tfor ( sptr = %s_first;\n",categoryName);
+    		fprintf(f,"\t\tsptr != (struct occi_kind_node *) 0;\n");
+    		fprintf(f,"\t\tsptr = sptr->next ) {\n");
+    		fprintf(f,"\t\tif (!( pptr = sptr->contents ))\n");
+    		fprintf(f,"\t\t\tcontinue;\n");
+    		if(!flag) fprintf(f,"\t\tif (!( pass_cords_%s_filter( pptr, &filter ) ))\n",categoryName);
+    		else fprintf(f,"\t\tif (!( pass_%s_filter( pptr, &filter ) ))\n",categoryName);
+    		fprintf(f,"\t\t\tcontinue;\n");
+		if(!flag) fprintf(f,"\t\tprepare_cords_%s_location(cptr->buffer,reqhost,reqport,optr->location, pptr->id);\n",categoryName);
+		else fprintf(f,"\t\tprepare_%s_location(cptr->buffer,reqhost,reqport,optr->location, pptr->id);\n",categoryName);
+    		fprintf(f,"\t\tif (!( hptr = rest_response_header( aptr, \"X-OCCI-Location\",cptr->buffer) )){\n");
+		if(!flag)fprintf(f,"\t\t\tliberate_cords_%s(filter.attributes);\n",categoryName);
+		else fprintf(f,"\t\t\tliberate_%s(filter.attributes);\n",categoryName);
+    		fprintf(f,"\t\t\treturn( rest_html_response( aptr, 500, \"Server Failure\" ) );\n");
+    		fprintf(f,"\t\t}\n");
+		fprintf(f,"\t}\n");
+		if(!flag)fprintf(f,"\tliberate_cords_%s(filter.attributes);\n",categoryName);
+		else fprintf(f,"\tliberate_%s(filter.attributes);\n",categoryName);
+    		fprintf(f,"\tif (!( occi_success( aptr ) ))\n");
+    		fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
+    		fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	--------------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e   a l l 	*/\n");
+    		fprintf(f,"/*	--------------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * cords_%s_delete_all(\n",categoryName);
+    		else fprintf(f,"private struct rest_response * %s_delete_all(\n",categoryName);
+    		fprintf(f,"\tstruct occi_category * optr, struct rest_client * cptr,\n");
+    		fprintf(f,"\tstruct rest_request * rptr, struct rest_response * aptr)\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * hptr;\n");
+    		fprintf(f,"\tstruct occi_interface * iptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * nptr;\n");
+    		fprintf(f,"\tstruct occi_kind_node * sptr;\n");
+    		if(!flag)
+    		{
+      			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
+      			fprintf(f,"\tstruct cords_%s_occi_filter * filter;\n",categoryName);
+    		}
+    		else
+    		{
+      			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
+      			fprintf(f,"\tstruct %s * fptr;\n",categoryName);
+    		}
+    		fprintf(f,"\tiptr = optr->callback;\n");
+    		if(!flag) fprintf(f,"\tif (!(filter_cords_%s_info( &filter, optr, rptr, aptr ) ))\n",categoryName);
+    		else  fprintf(f,"\tif (!(filter_%s_info( &filter, optr, rptr, aptr ) ))\n",categoryName);
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
+    		if(!flag) fprintf(f,"\tnptr=cords_%s_first;\n",categoryName);
+    		else fprintf(f,"\tnptr=%s_first;\n",categoryName);
+    		fprintf(f,"\twhile (nptr != (struct occi_kind_node *) 0) {\n");
+    		fprintf(f,"\t\tif ((!( pptr = nptr->contents ))\n");
+    		if(!flag) fprintf(f,"\t\t||  (!( pass_cords_%s_filter( pptr, filter ) ))) {\n",categoryName);
+    		else fprintf(f,"\t\t||  (!( pass_%s_filter( pptr, filter ) ))) {\n",categoryName);
+    		fprintf(f,"\t\t\tnptr = nptr->next;\n");
+    		fprintf(f,"\t\t\tcontinue;\n");
+    		fprintf(f,"\t\t\t}\n");
+    		fprintf(f,"\t\telse	{\n");
+    		fprintf(f,"\t\t\tif (( iptr ) && (iptr->delete)) { (*iptr->delete)(optr,nptr,rptr); }\n");
+    		fprintf(f,"\t\t\tsptr = nptr->next;\n");
+    		if(!flag) fprintf(f,"\t\t\tdrop_cords_%s_node( nptr );\n",categoryName);
+    		else fprintf(f,"\t\t\tdrop_%s_node( nptr );\n",categoryName);
+    		fprintf(f,"\t\t\tnptr = sptr;\n");
+    		fprintf(f,"\t\t\t}\n");
+    		fprintf(f,"\t\t}\n");
+    		if(!flag) 
+		{
+			fprintf(f,"\tliberate_cords_%s(filter.attributes);\n",categoryName);
+			fprintf(f,"\tautosave_cords_%s_nodes();\n",categoryName);	
+		}
+    		else 
+		{
+			fprintf(f,"\tliberate_%s(filter.attributes);\n",categoryName);
+			fprintf(f,"\tautosave_%s_nodes();\n",categoryName);
+		}
+    		
+		fprintf(f,"\tif (!( occi_success( aptr ) ))\n");
+    		fprintf(f,"\t\treturn( rest_response_status( aptr, 500, \"Server Failure\" ) );\n");
+    		fprintf(f,"\telse	return( rest_response_status( aptr, 200, \"OK\" ) );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   g e t 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		else fprintf(f,"private struct rest_response * occi_%s_get(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_response * aptr;\n");
+    		fprintf(f,"\tstruct rest_header   * hptr;\n");
+    		fprintf(f,"\tstruct occi_category * optr;\n");
+    		fprintf(f,"\tchar * ctptr;\n");
+    		fprintf(f,"\tchar * mptr;\n");
+    		fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
+    		fprintf(f,"\t\tctptr = \"text/occi\";\n");
+		fprintf(f,"\telse	ctptr = hptr->value;\n");
+		fprintf(f,"\tif (!( optr = vptr ))\n"); 
+		fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
+		fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
+		fprintf(f,"\t\treturn( aptr );\n");
+		fprintf(f,"\telse if (!(strcmp( rptr->object, optr->location ) ))\n");
+		if(!flag) fprintf(f,"\t\treturn( cords_%s_get_list( optr, cptr, rptr, aptr ) );\n",categoryName);
+		else fprintf(f,"\t\treturn( %s_get_list( optr, cptr, rptr, aptr ) );\n",categoryName);
+		fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
+		if(!flag) fprintf(f,"\t\treturn( cords_%s_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		else fprintf(f,"\t\treturn( %s_get_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	--------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   h e a d 	*/\n");
+    		fprintf(f,"/*	--------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		else fprintf(f,"private struct rest_response * occi_%s_head(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_response * aptr;\n");
+    		fprintf(f,"\tstruct rest_header   * hptr;\n");
+    		fprintf(f,"\tstruct occi_category * optr;\n");
+    		fprintf(f,"\tchar * ctptr;\n");
+    		fprintf(f,"\tchar * mptr;\n");
+    		fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
+    		fprintf(f,"\t\tctptr = \"text/occi\";\n");
+    		fprintf(f,"\telse	ctptr = hptr->value;\n");
+    		fprintf(f,"\tif (!( optr = vptr )) \n");
+    		fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
+    		fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
+    		fprintf(f,"\t\treturn( aptr );\n");
+    		fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
+    		if(!flag) fprintf(f,"\t\treturn( cords_%s_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		else fprintf(f,"\t\treturn( %s_head_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	--------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p o s t 	*/\n");
+    		fprintf(f,"/*	--------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		else fprintf(f,"private struct rest_response * occi_%s_post(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_response * aptr;\n");
+    		fprintf(f,"\tstruct rest_header   * hptr;\n");
+    		fprintf(f,"\tstruct occi_category * optr;\n");
+    		fprintf(f,"\tchar * ctptr;\n");
+    		fprintf(f,"\tchar * mptr;\n");
+    		fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
+    		fprintf(f,"\t\tctptr = \"text/occi\";\n");
+    		fprintf(f,"\telse	ctptr = hptr->value;\n");
+    		fprintf(f,"\tif (!( optr = vptr )) \n");
+    		fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
+    		fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
+    		fprintf(f,"\t\treturn( aptr );\n");
+    		fprintf(f,"\telse if (!( strcmp( rptr->object, optr->location ) ))\n");
+    		if(!flag) fprintf(f,"\t\treturn( cords_%s_post_item( optr, cptr, rptr, aptr ) );\n",categoryName);
+    		else fprintf(f,"\t\treturn( %s_post_item( optr, cptr, rptr, aptr ) );\n",categoryName);
+    		fprintf(f,"\telse if ( strncmp( rptr->object, optr->location,strlen(optr->location)) != 0)\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"\telse if (!( rptr->parameters ))\n");
+    		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"action=\", strlen(\"action=\")) ))\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"\t\treturn( cords_%s_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+       			fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"mixin=\", strlen(\"mixin=\")) ))\n");
+       			fprintf(f,"\t\treturn( cords_%s_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+       			fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"link=\", strlen(\"link=\")) ))\n");
+       			fprintf(f,"\t\treturn( cords_%s_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		}
+    		else
+    		{
+       			fprintf(f,"\t\treturn( %s_post_action( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+       			fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"mixin=\", strlen(\"mixin=\")) ))\n");
+       			fprintf(f,"\t\treturn( %s_post_mixin( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+       			fprintf(f,"\telse if (!( strncmp( rptr->parameters, \"link=\", strlen(\"link=\")) ))\n");
+       			fprintf(f,"\t\treturn( %s_post_link( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+
+    		}	
+    		fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   p u t 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		else fprintf(f,"private struct rest_response * occi_%s_put(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_response * aptr;\n");
+    		fprintf(f,"\tstruct rest_header   * hptr;\n");
+    		fprintf(f,"\tstruct occi_category * optr;\n");
+    		fprintf(f,"\tchar * ctptr;\n");
+    		fprintf(f,"\tchar * mptr;\n");
+    		fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
+    		fprintf(f,"\t\tctptr = \"text/occi\";\n");
+    		fprintf(f,"\telse	ctptr = hptr->value;\n");
+    		fprintf(f,"\tif (!( optr = vptr )) \n");
+    		fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
+    		fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
+    		fprintf(f,"\t\treturn( aptr );\n");
+    		fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
+    		if(!flag) fprintf(f,"\t\treturn( cords_%s_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		else fprintf(f,"\t\treturn( %s_put_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	------------------------------------------------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   m e t h o d   d e l e t e 	*/\n");
+    		fprintf(f,"/*	------------------------------------------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * occi_cords_%s_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		else fprintf(f,"private struct rest_response * occi_%s_delete(void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n",categoryName);
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_response * aptr;\n");
+    		fprintf(f,"\tstruct rest_header   * hptr;\n");
+    		fprintf(f,"\tstruct occi_category * optr;\n");
+    		fprintf(f,"\tchar * ctptr;\n");
+    		fprintf(f,"\tchar * mptr;\n");
+    		fprintf(f,"\tif (!( hptr = rest_resolve_header( rptr->first, \"Content-Type\" ) ))\n");
+    		fprintf(f,"\t\tctptr = \"text/occi\";\n");
+    		fprintf(f,"\telse	ctptr = hptr->value;\n");
+    		fprintf(f,"\tif (!( optr = vptr )) \n");
+    		fprintf(f,"\t\treturn( rest_bad_request(vptr,cptr,rptr) );\n");
+    		fprintf(f,"\tif(!(aptr = rest_allocate_response( cptr )))\n");
+    		fprintf(f,"\t\treturn( aptr );\n");
+    		fprintf(f,"\telse if (!(strcmp( rptr->object, optr->location ) ))\n");
+    		if(!flag)
+    		{
+       			fprintf(f,"\t\treturn( cords_%s_delete_all( optr, cptr, rptr, aptr ) );\n",categoryName);
+       			fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
+       			fprintf(f,"\t\treturn( cords_%s_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		}
+    		else
+    		{
+      			fprintf(f,"\t\treturn( %s_delete_all( optr, cptr, rptr, aptr ) );\n",categoryName);
+      			fprintf(f,"\telse if (!(strncmp( rptr->object, optr->location, strlen(optr->location) ) ))\n");
+      			fprintf(f,"\t\treturn( %s_delete_item( optr, cptr, rptr, aptr,rptr->object+strlen(optr->location) ) );\n",categoryName);
+    		}
+    		fprintf(f,"\telse	return( rest_html_response( aptr, 400, \"Bad Request\") );\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	--------------------------------------------------------------------------------------*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   r e s t   i n t e r f a c e   r e d i r e c t i o n       */\n");
+    		fprintf(f,"/*	--------------------------------------------------------------------------------------*/\n");
    
-     return 1;
- }
+    		if(!flag)
+    		{
+      			fprintf(f,"private void	redirect_occi_cords_%s_mt( struct rest_interface * iptr )\n",categoryName);
+      			fprintf(f,"{\n");
+      			fprintf(f,"\tiptr->get = occi_cords_%s_get;\n",categoryName);
+      			fprintf(f,"\tiptr->post = occi_cords_%s_post;\n",categoryName);
+      			fprintf(f,"\tiptr->put = occi_cords_%s_put;\n",categoryName);
+      			fprintf(f,"\tiptr->delete = occi_cords_%s_delete;\n",categoryName);
+      			fprintf(f,"\tiptr->head = occi_cords_%s_head;\n",categoryName);
+    		}
+    		else
+    		{
+      			fprintf(f,"private void	redirect_occi_%s_mt( struct rest_interface * iptr )\n",categoryName);
+      			fprintf(f,"{\n");
+      			fprintf(f,"\tiptr->get = occi_%s_get;\n",categoryName);
+      			fprintf(f,"\tiptr->post = occi_%s_post;\n",categoryName);
+      			fprintf(f,"\tiptr->put = occi_%s_put;\n",categoryName);
+      			fprintf(f,"\tiptr->delete = occi_%s_delete;\n",categoryName);
+      			fprintf(f,"\tiptr->head = occi_%s_head;\n",categoryName);
+    		}
+    		fprintf(f,"\treturn;\n");
+    		fprintf(f,"}\n\n");
+    
+    		fprintf(f,"/*	------------------------------------	*/\n");
+    		fprintf(f,"/*	c r u d   d e l e t e   a c t i o n 	*/\n");
+    		fprintf(f,"/*	------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"private struct rest_response * delete_action_cords_%s(struct occi_category * optr,\n",categoryName); 
+    		else fprintf(f,"private struct rest_response * delete_action_%s(struct occi_category * optr,\n",categoryName); 
+    		fprintf(f,"struct rest_client * cptr,\n");  
+    		fprintf(f,"struct rest_request * rptr,\n");  
+    		fprintf(f,"struct rest_response * aptr,\n");  
+    		fprintf(f,"void * vptr )\n");
+    		fprintf(f,"{\n");
+    		fprintf(f,"\taptr = liberate_rest_response( aptr );\n");
+    		if(!flag) fprintf(f,"\treturn( occi_cords_%s_delete(optr,cptr,rptr));\n",categoryName);
+    		else fprintf(f,"\treturn( occi_%s_delete(optr,cptr,rptr));\n",categoryName);
+    		fprintf(f,"}\n");
+
+    		fprintf(f,"/*	------------------------------------------	*/\n");
+    		fprintf(f,"/*	o c c i   c a t e g o r y   b u i l d e r 	*/\n");
+    		fprintf(f,"/*	------------------------------------------	*/\n");
+    		if(!flag) 
+    		{
+			fprintf(f,"/* occi category rest instance builder for : occi_cords_%s */\n",categoryName);
+			fprintf(f,"public struct occi_category * occi_cords_%s_builder(char * a,char * b) {\n",categoryName);
+    		}	
+    		else 
+    		{		
+			fprintf(f,"/* occi category rest instance builder for : occi_%s */\n",categoryName);
+    			fprintf(f,"public struct occi_category * occi_%s_builder(char * a,char * b) {\n",categoryName);
+    		}
+    		fprintf(f,"\tchar * c=\"http://scheme.compatibleone.fr/scheme/compatible#\";\n");
+    		fprintf(f,"\tchar * d=\"kind\";\n");
+    		fprintf(f,"\tchar * e=\"http://scheme.ogf.org/occi/resource#\";\n");
+    		if(!flag) fprintf(f,"\tchar * f=\"CompatibleOne OCCI resource cords_%s\";\n",categoryName);
+    		else fprintf(f,"\tchar * f=\"CompatibleOne OCCI resource %s\";\n",categoryName);
+    		fprintf(f,"\tstruct occi_category * optr;\n");
+    		fprintf(f,"\tif (!( optr = occi_create_category(a,b,c,d,e,f) )) { return(optr); }\n");
+    		fprintf(f,"\telse {\n");
+    		if(!flag) fprintf(f,"\t\tredirect_occi_cords_%s_mt(optr->interface);\n",categoryName);
+    		else fprintf(f,"\t\tredirect_occi_%s_mt(optr->interface);\n",categoryName);
+    		for(i=1;i<dim;i++)
+    		{
+      			fprintf(f,"\t\tif (!( optr = occi_add_attribute(optr, \"%s\",0,0) ))\n",nameAtr[i]);
+      			fprintf(f,"\t\t\treturn(optr);\n");
+    		}
+    		if(!flag)fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\",\"\",delete_action_cords_%s)))\n",categoryName);
+    		else fprintf(f,"\t\tif(!( optr = occi_add_action( optr, \"DELETE\",\"\",delete_action_%s)))\n",categoryName);
+    		fprintf(f,"\t\t\treturn (optr);\n");
+    		if(!flag) fprintf(f,"\t\tautoload_cords_%s_nodes();\n",categoryName);
+    		else fprintf(f,"\t\tautoload_%s_nodes();\n",categoryName);
+    		fprintf(f,"\t\t\treturn(optr);\n");
+    		fprintf(f,"\t}\n");
+    		fprintf(f,"}\n\n");
+
+    		fprintf(f,"/*	------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"/*	c o r d s _ %s _ o c c i _ h e a d e r s 	*/\n",categoryName);
+    		else fprintf(f,"/*	%s _ o c c i _ h e a d e r s 	*/\n",categoryName);
+    		fprintf(f,"/*	------------------------------------------------	*/\n");
+    		if(!flag) fprintf(f,"public struct rest_header *  cords_%s_occi_headers(struct cords_%s * sptr)\n",categoryName,categoryName);
+    		else fprintf(f,"public struct rest_header *  %s_occi_headers(struct %s * sptr)\n",categoryName,categoryName);
+    		fprintf(f,"{\n");
+    		fprintf(f,"\tstruct rest_header * first=(struct rest_header *) 0;\n");
+    		fprintf(f,"\tstruct rest_header * last=(struct rest_header *) 0;\n");
+    		fprintf(f,"\tstruct rest_header * hptr=(struct rest_header *) 0;\n");
+    		fprintf(f,"\tchar buffer[8192];\n");
+    		fprintf(f,"\tif (!( sptr )) return(0);\n");
+		fprintf(f,"\tif (!( hptr = allocate_rest_header()))\n");
+		fprintf(f,"\t\treturn(hptr);\n");
+		fprintf(f,"\t\telse	if (!( hptr->previous = last))\n");
+		fprintf(f,"\t\t\tfirst = hptr;\n");
+		fprintf(f,"\t\telse	hptr->previous->next = hptr;\n");
+		fprintf(f,"\t\tlast = hptr;\n");
+		fprintf(f,"\tif (!( hptr->name = allocate_string(\"Category\")))\n");
+		fprintf(f,"\t\treturn(first);\n");
+		if(!flag) fprintf(f,"\tsprintf(buffer,\"cords_%s; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\\r\\n\");\n",categoryName);
+		else fprintf(f,"\tsprintf(buffer,\"%s; scheme='http://scheme.compatibleone.fr/scheme/compatible#'; class='kind';\\r\\n\");\n",categoryName);
+		fprintf(f,"\tif (!( hptr->value = allocate_string(buffer)))\n");
+		fprintf(f,"\t\treturn(first);\n");
+		fprintf(f,"\tif (!( hptr = allocate_rest_header()))\n");
+		fprintf(f,"\t\treturn(first);\n");
+		fprintf(f,"\t\telse	if (!( hptr->previous = last))\n");
+		fprintf(f,"\t\t\tfirst = hptr;\n");
+		fprintf(f,"\t\telse	hptr->previous->next = hptr;\n");
+		fprintf(f,"\t\tlast = hptr;\n");
+		fprintf(f,"\tif (!( hptr->name = allocate_string(\"X-OCCI-Attribute\")))\n");
+		fprintf(f,"\t\treturn(first);\n");
+		for(i=1;i<dim-1;i++)
+		{
+			if(!flag) fprintf(f,"\tsprintf(buffer,\"occi.cords_%s.%s='%%s'\\r\\n\",(sptr->%s?sptr->%s:\"\"));\n",categoryName,nameAtr[i],nameAtr[i],nameAtr[i]);
+			else fprintf(f,"\tsprintf(buffer,\"occi.%s.%s='%%s'\\r\\n\",(sptr->%s?sptr->%s:\"\"));\n",categoryName,nameAtr[i],nameAtr[i],nameAtr[i]);
+			fprintf(f,"\tif (!( hptr->value = allocate_string(buffer)))\n");
+			fprintf(f,"\t\treturn(first);\n");
+			fprintf(f,"\tif (!( hptr = allocate_rest_header()))\n");
+			fprintf(f,"\t\treturn(first);\n");
+			fprintf(f,"\t\telse	if (!( hptr->previous = last))\n");
+			fprintf(f,"\t\tfirst = hptr;\n");
+			fprintf(f,"\t\telse	hptr->previous->next = hptr;\n");
+			fprintf(f,"\t\tlast = hptr;\n");
+			fprintf(f,"\tif (!( hptr->name = allocate_string(\"X-OCCI-Attribute\")))\n");
+			fprintf(f,"\t\treturn(first);\n");
+		}
+		if(dim>0)
+		{
+			if(!flag) fprintf(f,"\tsprintf(buffer,\"occi.cords_%s.%s='%%s'\\r\\n\",(sptr->%s?sptr->%s:\"\"));\n",categoryName,nameAtr[dim-1],nameAtr[dim-1],nameAtr[i]);
+			else fprintf(f,"\tsprintf(buffer,\"occi.%s.%s='%%s'\\r\\n\",(sptr->%s?sptr->%s:\"\"));\n",categoryName,nameAtr[dim-1],nameAtr[dim-1],nameAtr[i]);
+			fprintf(f,"\tif (!( hptr->value = allocate_string(buffer)))\n");
+			fprintf(f,"\t\treturn(first);\n");
+			fprintf(f,"\treturn(first);\n");
+		}
+		fprintf(f,"}\n\n");
+		fprintf(f,"#endif	/* _%s_c_ */\n",categoryName);
+		fclose(f);
+		free(nameAtr);
+
+		return 1;
+ 	}
  
 }
 
@@ -2392,11 +2480,11 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
 /*-------------------------------------------------------------------------------------------------------------------------*/
 int createCategoryCordsCfile(char *categoryName, listc categoryAttributes, int dim, int flag, char pathf[])
 {
- char pathfc[1024];
- char pathfcc[1024];
- char **nameAtr; 
- FILE *f;
- int i;
+ 	char pathfc[1024];
+ 	char pathfcc[1024];
+ 	char **nameAtr; 
+ 	FILE *f;
+ 	int i;
  
  str_sub(pathf,0,strlen(pathf)-3,pathfc);
  sprintf(pathfcc,"%s.c",pathfc);
@@ -2597,10 +2685,10 @@ int  enTete(char pathf[])
 /*---------------------------------------------------------------------------------------------------------------*/
 int generateModuleFile(char * moduleName, char * categoryNameList)
 {
-   char pathfd[DIM];
-   char pathff[DIM];
-   char pathf[1024];
-   FILE *f;
+   	char pathfd[DIM];
+   	char pathff[DIM];
+   	char pathf[1024];
+   	FILE *f;
    
    strcpy(pathf,PYPATH);
    sprintf(pathfd,"%s/%s",pathf,moduleName);
