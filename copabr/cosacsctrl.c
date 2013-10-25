@@ -372,13 +372,19 @@ public	int	cosacs_test_interface( char * cosacs, int timeout, int retry )
 	char *	agent=_CORDS_CONTRACT_AGENT;
 	struct	rest_header * hptr=(struct rest_header *) 0;
 	struct	rest_response * rptr;
-	if (!( host = getenv( "COSACS" ) ))
+
+	/* --------------------------------- */
+	/* test for local overload of COSACS */
+	/* --------------------------------- */
+	if (!( rest_valid_string( (host = getenv( "COSACS" )) ) ))
 		host = cosacs;
 
 	/* -------------------------------- */
 	/* time out quick if incorrect host */
 	/* -------------------------------- */
 	if (!( rest_valid_string( host ) ))
+		return(0);
+	else if (!( check_hostname( host ) ))
 		return(0);
 	else	sprintf(buffer,"%s://%s:%u/-/",cosacs_http_prefix(),host,_COSACS_PORT);
 
@@ -1178,7 +1184,9 @@ public	int	ssh_launch_using_keypair( char * username, char * keyfile, char * hos
 	||  (!( hostname))
 	||  (!( command )))
 		return( 118 );
-	if (!( syntax = allocate( 
+	else if (!( check_hostname( hostname ) ))
+		return( 118 );
+	else if (!( syntax = allocate( 
 			strlen( _REMOTE_SSH_EXEC) + 
 			strlen( keyfile 	) + 
 			strlen( username	) +

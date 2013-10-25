@@ -175,6 +175,18 @@ public	int	socket_create( int a, int b, int c )
 	return(h);
 }
 
+/*	---------------------------------	*/
+/*	   c h e c k _ h o s t n a m e 		*/
+/*	---------------------------------	*/
+public	int	check_hostname( char * u )
+{
+	struct  hostent *hp=(struct hostent *) 0;
+     	if (!(hp = gethostbyname(u)))
+		return(0);
+	else 	return(1);
+}
+
+
 /*	------------------------------------------	*/
 /*		s o c k e t _ c o n n e c t		*/
 /*	------------------------------------------	*/
