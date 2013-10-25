@@ -66,184 +66,184 @@ int deleteModule(char moduleName[])
 /*-----------------------------------------------------------------------------------*/
 int deleteCategory(char categoryName[], int indice)
 {
- char cordsh[DIM];
- char cordshname[DIM];
- char occibuilder[DIM];
- char occibuilderb[DIM];
- char occibuildername[DIM];
- char cordsbase[DIM];
- char cordsbasename[DIM];
- char occicords[DIM];
- char occicordsname[DIM];
- char pathfc[DIM];
- char pathfh[DIM];
- char occipath[DIM];
- char pyinc[DIM];
- char pyincname[DIM];
- char pathpyc[DIM];
- char pathpyp[DIM];
- char pathpycl[DIM];
- char pathpyi[DIM];
- char pathpystruct[DIM];
- char pathpystructname[DIM];
- char pathactc[DIM];
- char pathactpy[DIM];
- char pathactpyi[DIM];
- char pyListcateg[DIM];
- char pyListcategname[DIM];
- char pathactcname[DIM];
- char pathactclist[DIM];
- char pathactstructname[DIM];
- char pathactstruct[DIM];
- char pathactnstructname[DIM];
- char pathactnstruct[DIM];
- char pathactbstructname[DIM];
- char pathactbstruct[DIM];
- char pathf[DIM];
- char pathaccess[DIM];
- int flag = 1;
+ 	char cordsh[DIM];
+ 	char cordshname[DIM];
+ 	char occibuilder[DIM];
+ 	char occibuilderb[DIM];
+ 	char occibuildername[DIM];
+ 	char cordsbase[DIM];
+ 	char cordsbasename[DIM];
+ 	char occicords[DIM];
+ 	char occicordsname[DIM];
+ 	char pathfc[DIM];
+ 	char pathfh[DIM];
+ 	char occipath[DIM];
+ 	char pyinc[DIM];
+ 	char pyincname[DIM];
+ 	char pathpyc[DIM];
+ 	char pathpyp[DIM];
+ 	char pathpycl[DIM];
+ 	char pathpyi[DIM];
+ 	char pathpystruct[DIM];
+ 	char pathpystructname[DIM];
+ 	char pathactc[DIM];
+ 	char pathactpy[DIM];
+ 	char pathactpyi[DIM];
+ 	char pyListcateg[DIM];
+ 	char pyListcategname[DIM];
+ 	char pathactcname[DIM];
+ 	char pathactclist[DIM];
+ 	char pathactstructname[DIM];
+ 	char pathactstruct[DIM];
+ 	char pathactnstructname[DIM];
+ 	char pathactnstruct[DIM];
+ 	char pathactbstructname[DIM];
+ 	char pathactbstruct[DIM];
+ 	char pathf[DIM];
+ 	char pathaccess[DIM];
+ 	int flag = 1;
 
- strcpy(pathf,PYPATH);
- sprintf(pathactcname,"%sAction.c",categoryName);
- sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
+ 	strcpy(pathf,PYPATH);
+ 	sprintf(pathactcname,"%sAction.c",categoryName);
+ 	sprintf(pathactclist,"%s/%s",pathf,PY_ACT_LIST);
 
 
- sprintf(pathaccess,"%s/%s",pathf, PY_CATEGACCESS_STRUCT);
+ 	sprintf(pathaccess,"%s/%s",pathf, PY_CATEGACCESS_STRUCT);
 
- sprintf(pathactstructname,"%s_",categoryName);
- sprintf(pathactstruct,"%s/%s",pathf,PY_ACT_STRUCT);
+ 	sprintf(pathactstructname,"%s_",categoryName);
+ 	sprintf(pathactstruct,"%s/%s",pathf,PY_ACT_STRUCT);
  
- sprintf(pathactnstructname,"%s_",categoryName);
- sprintf(pathactnstruct,"%s/%s",pathf,PY_ACT_NAME_STRUCT);
+ 	sprintf(pathactnstructname,"%s_",categoryName);
+ 	sprintf(pathactnstruct,"%s/%s",pathf,PY_ACT_NAME_STRUCT);
 
- sprintf(pathactbstructname,"%s_",categoryName);
- sprintf(pathactbstruct,"%s/%s",pathf,PY_ACT_NUMBER_STRUCT);
+ 	sprintf(pathactbstructname,"%s_",categoryName);
+ 	sprintf(pathactbstruct,"%s/%s",pathf,PY_ACT_NUMBER_STRUCT);
 
- sprintf(pyListcategname,"%s.h",categoryName);
- sprintf(pyListcateg,"%s/%s",pathf,LISTCATEG_FILE);
-
- 
- sprintf(pathpyc,"%s/%s/%s/%sInterface.c",pathf,PYACCORDS,PYACCORDSG,categoryName);
- sprintf(pathpycl,"%s/%s/%s/%sClass.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
- sprintf(pathpyp,"%s/%s/%s/%sInterface.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
- sprintf(pathpyi,"%s/%s/%s/%s.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
-
- sprintf(pathactc,"%s/%s/%s/%sAction.c",pathf,PYACCORDS,PYACCORDSG,categoryName);
- sprintf(pathactpy,"%s/%s/%s/%sAction.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
- sprintf(pathactpyi,"%s/%s/%s/%sAct.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
-
- sprintf(pyincname,"%sInterface.c",categoryName);
- sprintf(pyinc,"%s/%s",pathf,PY_CRUD_INCLUDE);
-
- sprintf(pathpystructname,"%s",categoryName);
- sprintf(pathpystruct,"%s/%s",pathf,PY_CRUD_STRUCT);
+ 	sprintf(pyListcategname,"%s.h",categoryName);
+ 	sprintf(pyListcateg,"%s/%s",pathf,LISTCATEG_FILE);
 
  
- sprintf(pathfh,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
- sprintf(pathfc,"%s/%s/%s.c",pathf,CORDS_SRC,categoryName);
- sprintf(occipath,"%s/%s/occi%s.c",pathf,CORDS_SRC,categoryName);
- 
- sprintf(cordsh,"%s/%s",pathf,INCLUDE_CORDS_H);
- sprintf(occibuilder,"%s/%s",pathf,INCLUDE_OCCI_BUILDER);
- sprintf(occibuilderb,"%s/%s",pathf,INCLUDE_OCCI_PROVIDER_BUILDER);
- 
- sprintf(cordshname,"%s.h",categoryName);
- sprintf(occibuildername,"_%s_",categoryName);
- 
- sprintf(cordsbase,"%s/%s",pathf,INCLUDE_CORDS_BASE);
- sprintf(cordsbasename,"%s.c",categoryName);
+ 	sprintf(pathpyc,"%s/%s/%s/%sInterface.c",pathf,PYACCORDS,PYACCORDSG,categoryName);
+ 	sprintf(pathpycl,"%s/%s/%s/%sClass.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
+ 	sprintf(pathpyp,"%s/%s/%s/%sInterface.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
+ 	sprintf(pathpyi,"%s/%s/%s/%s.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
 
- sprintf(occicords,"%s/%s",pathf,OCCI_CORDS);
- sprintf(occicordsname,"occi%s.c",categoryName);
+ 	sprintf(pathactc,"%s/%s/%s/%sAction.c",pathf,PYACCORDS,PYACCORDSG,categoryName);
+ 	sprintf(pathactpy,"%s/%s/%s/%sAction.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
+ 	sprintf(pathactpyi,"%s/%s/%s/%sAct.py",pathf,PYACCORDS,PYACCORDSG,categoryName);
+
+ 	sprintf(pyincname,"%sInterface.c",categoryName);
+ 	sprintf(pyinc,"%s/%s",pathf,PY_CRUD_INCLUDE);
+
+ 	sprintf(pathpystructname,"%s",categoryName);
+ 	sprintf(pathpystruct,"%s/%s",pathf,PY_CRUD_STRUCT);
+
  
- if( remove( pathfh) != 0 )
- {
-   printf( "Error in delete category (CORDS_SRC H):No such category name\n" );
-   return 0;
- }
- else if( remove( pathfc) != 0 )
- {
-  printf( "Error in delete category (CORDS_SRC C):No such category name\n" );
-  return 0;
- }
- else if( remove( occipath) != 0 )
- {
-  printf( "Error in delete category (OCCI_PATH):No such category name\n" );
-  return 0;
- }
- else if( remove( pathpyc) != 0 )
- {
-   printf( "Error in delete category (INTERFACE C):No such category name\n" );
-   return 0;
- }
- else if( remove( pathpyi) != 0 )
- {
-  printf( "Error in delete category (CATEGORY PY):No such category name\n" );
-  return 0;
- }
- else if( remove( pathpyp) != 0 )
- {
-  printf( "Error in delete category (INTERFACE PY):No such category name\n" );
-  return 0;
- }
- else if( remove( pathpycl) != 0 )
- {
-  printf( "Error in delete category( CLASS PY):No such category name\n" );
-  return 0;
- } 
+ 	sprintf(pathfh,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
+ 	sprintf(pathfc,"%s/%s/%s.c",pathf,CORDS_SRC,categoryName);
+ 	sprintf(occipath,"%s/%s/occi%s.c",pathf,CORDS_SRC,categoryName);
  
- if(indice != 0)
- {
-  if( remove( pathactc) != 0 )
-  {
-   printf( "Error in delete category( ACTION C):No such file name\n" );
-   return 0;
-  }
-  else if( remove( pathactpyi) != 0 )
-  {
-   printf( "Error in delete category( ACTION PYI):No such file name\n" );
-   return 0;
-  }
-  else if( remove( pathactpy) != 0 )
-  {
-   printf( "Error in delete category( ACTION PY):No such file name\n" );
-   return 0;
-  }
+ 	sprintf(cordsh,"%s/%s",pathf,INCLUDE_CORDS_H);
+ 	sprintf(occibuilder,"%s/%s",pathf,INCLUDE_OCCI_BUILDER);
+ 	sprintf(occibuilderb,"%s/%s",pathf,INCLUDE_OCCI_PROVIDER_BUILDER);
+ 
+ 	sprintf(cordshname,"%s.h",categoryName);
+ 	sprintf(occibuildername,"_%s_",categoryName);
+ 
+ 	sprintf(cordsbase,"%s/%s",pathf,INCLUDE_CORDS_BASE);
+ 	sprintf(cordsbasename,"%s.c",categoryName);
+
+ 	sprintf(occicords,"%s/%s",pathf,OCCI_CORDS);
+ 	sprintf(occicordsname,"occi%s.c",categoryName);
+ 
+ 	if( remove( pathfh) != 0 )
+ 	{
+   		printf( "Error in delete category (CORDS_SRC H):No such category name\n" );
+   		return 0;
+ 	}
+ 	else if( remove( pathfc) != 0 )
+ 	{
+  		printf( "Error in delete category (CORDS_SRC C):No such category name\n" );
+  		return 0;
+ 	}
+ 	else if( remove( occipath) != 0 )
+ 	{
+  		printf( "Error in delete category (OCCI_PATH):No such category name\n" );
+  		return 0;
+ 	}
+ 	else if( remove( pathpyc) != 0 )
+ 	{
+   		printf( "Error in delete category (INTERFACE C):No such category name\n" );
+   		return 0;
+ 	}
+ 	else if( remove( pathpyi) != 0 )
+ 	{
+ 		printf( "Error in delete category (CATEGORY PY):No such category name\n" );
+  		return 0;
+ 	}
+ 	else if( remove( pathpyp) != 0 )
+ 	{
+  		printf( "Error in delete category (INTERFACE PY):No such category name\n" );
+  		return 0;
+ 	}
+ 	else if( remove( pathpycl) != 0 )
+ 	{
+  		printf( "Error in delete category( CLASS PY):No such category name\n" );
+  		return 0;
+ 	} 
+ 
+ 	if(indice != 0)
+ 	{
+  		if( remove( pathactc) != 0 )
+  		{
+   			printf( "Error in delete category( ACTION C):No such file name\n" );
+   			return 0;
+  		}
+  		else if( remove( pathactpyi) != 0 )
+  		{
+   			printf( "Error in delete category( ACTION PYI):No such file name\n" );
+   			return 0;
+  		}
+  		else if( remove( pathactpy) != 0 )
+  		{
+   			printf( "Error in delete category( ACTION PY):No such file name\n" );
+   			return 0;
+  		}		
   
-  if(!(deleteInFile(pathactclist,pathactcname)))
-     return 0; 
-  else if(!(deleteInFile(pathactstruct,pathactstructname)))
-     return 0; 
-  else if(!(deleteInFile(pathactnstruct,pathactnstructname)))
-     return 0;
-  else if(!(deleteInFile(pathactbstruct,pathactbstructname)))
-     return 0;  
- }
+  		if(!(deleteInFile(pathactclist,pathactcname)))
+     			return 0; 
+  		else if(!(deleteInFile(pathactstruct,pathactstructname)))
+     			return 0; 
+  		else if(!(deleteInFile(pathactnstruct,pathactnstructname)))
+     			return 0;
+  		else if(!(deleteInFile(pathactbstruct,pathactbstructname)))
+     			return 0;  
+ 	}
 
- if(!flag)
- {
-  if(!(deleteInFile(cordsh,cordshname)))
-     return 0;
-  else if(!(deleteInFile(occibuilder,occibuildername)))
-     return 0;
- }
+ 	if(!flag)
+ 	{
+  		if(!(deleteInFile(cordsh,cordshname)))
+     			return 0;
+  		else if(!(deleteInFile(occibuilder,occibuildername)))
+     			return 0;
+ 	}
 
- if(!(deleteInFile(cordsbase,cordsbasename)))
-    return 0;
- else if(!(deleteInFile(occicords,occicordsname)))
-    return 0;
- else if(!(deleteInFile(pyinc,pyincname)))
-    return 0;
- else if(!(deleteInFile(pathpystruct,pathpystructname)))
-    return 0;
- else if(!(deleteInFile(pyListcateg,pyListcategname)))
-    return 0; 
- else if(!(deleteInFile(occibuilderb,occibuildername)))
-    return 0;
- else if(!(deleteInFile(pathaccess, categoryName)))
-    return 0;
- else
-    return 1;
+ 	if(!(deleteInFile(cordsbase,cordsbasename)))
+    		return 0;
+ 	else if(!(deleteInFile(occicords,occicordsname)))
+    		return 0;
+ 	else if(!(deleteInFile(pyinc,pyincname)))
+   	 	return 0;
+ 	else if(!(deleteInFile(pathpystruct,pathpystructname)))
+    		return 0;
+ 	else if(!(deleteInFile(pyListcateg,pyListcategname)))
+    		return 0; 
+ 	else if(!(deleteInFile(occibuilderb,occibuildername)))
+    		return 0;
+ 	else if(!(deleteInFile(pathaccess, categoryName)))
+    		return 0;
+ 	else
+    		return 1;
 }
 
 
@@ -260,133 +260,165 @@ int generateAccordsCategory(
 	char *categoryActions,
 	char * categoryAccess)
 {
- FILE *f;
- char *token=NULL;
- int dim=0;
- char pathff[DIM];
- char pathact[DIM];
- char pathactname[DIM];
- char pathactnumber[DIM];
- char pathcategaccess[DIM];
- listc categoryAtr;
- listc categoryAtrB;
- listc categoryAct;
- char occipath[DIM];
- char categoryAttributesB[1024]="id";
- int indice = 0;
- int indiceA = 0;
- char pathf[1024];
- int flag = 1;
+ 	FILE *f;
+	FILE *h;
+ 	char *token=NULL;
+ 	int dim=0;
+ 	char pathff[DIM];
+ 	char pathfilter[DIM];
+	char pathact[DIM];
+ 	char pathactname[DIM];
+ 	char pathactnumber[DIM];
+ 	char pathcategaccess[DIM];
+ 	listc categoryAtr;
+ 	listc categoryAtrB;
+ 	listc categoryAct;
+ 	char occipath[DIM];
+ 	char categoryAttributesB[1024]="id";
+ 	int indice = 0;
+ 	int indiceA = 0;
+ 	char pathf[1024];
+ 	int flag = 1;
   
- strcpy(pathf,PYPATH);
- sprintf(pathff,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
- sprintf(occipath,"%s/%s/occi%s.c",pathf,CORDS_SRC,categoryName);
+ 	strcpy(pathf,PYPATH);
+ 	sprintf(pathff,"%s/%s/%s.h",pathf,CORDS_SRC,categoryName);
+ 	sprintf(pathfilter,"%s/%s/%s_occi_filter.h",pathf,CORDS_SRC,categoryName);
+ 	sprintf(occipath,"%s/%s/occi%s.c",pathf,CORDS_SRC,categoryName);
 
- if(categoryActions[0]!='\0') indice=1;
- if(categoryAccess[0] != '\0') indiceA = 1;
+ 	if(categoryActions[0]!='\0') indice=1;
+ 	if(categoryAccess[0] != '\0') indiceA = 1;
 
- /*---------------------------------*/
- /*create category.h file           */
- /*---------------------------------*/
- if((f=fopen(pathff,"w"))==NULL)
- {
-  printf("Error create category file H: No such file or directory: %s\n",pathff);
-  return 0;
- }
- else
- {
-    if(!flag)
-    {
-       fprintf(f,"#ifndef _cords_%s_h_\n",categoryName);
-       fprintf(f,"#define _cords_%s_h_\n",categoryName);
-       fprintf(f,"\n");
-       fprintf(f,"struct cords_%s\n",categoryName);
-    }
-    else
-    {
-       fprintf(f,"#ifndef _%s_h_\n",categoryName);
-       fprintf(f,"#define _%s_h_\n",categoryName);
-       fprintf(f,"\n");
-       fprintf(f,"struct %s\n",categoryName);  
-    }
-    fprintf(f,"{\n");
-    resetList(&categoryAtr);
-    strConcat(categoryAttributesB,categoryAttributes,' ');
-    token= strtok(categoryAttributesB," ");
-    for(; token != NULL ;)
-    {
-      fprintf(f,"\tchar * %s;\n",token);
-      dim++;
-      addBack(&categoryAtr,token);
-      token=strtok(NULL, " ");
-    }
-    fprintf(f,"};\n");
-    fprintf(f,"\n");
-    fprintf(f,"#endif");
-    fclose(f);
- }   
-  /*-----------------------------------------*/
-  /* for generating category interface files */
-  /*-----------------------------------------*/
-  resetList(&categoryAtrB);
-  token= strtok(categoryAttributes," ");
-  for(;token != NULL;)
-  {
-       addBack(&categoryAtrB,token);
-       token=strtok(NULL," ");
-  }
+ 	/*---------------------------------*/
+ 	/*create category.h file           */
+ 	/*---------------------------------*/
+ 	if((f=fopen(pathff,"w"))==NULL)
+ 	{
+  		printf("Error create category file H: No such file or directory: %s\n",pathff);
+  		return 0;
+ 	}
+	else if((h=fopen(pathfilter,"w"))==NULL)
+ 	{
+  		printf("Error create category filter file H: No such file or directory: %s\n",pathfilter);
+  		return 0;
+ 	}
+ 	else
+ 	{
+		if(!flag)
+    		{
+       			fprintf(f,"#ifndef _cords_%s_h_\n",categoryName);
+       			fprintf(f,"#define _cords_%s_h_\n",categoryName);
+       			fprintf(f,"\n");
+       			fprintf(f,"struct cords_%s\n",categoryName);
+
+			fprintf(h,"#ifndef _cords_%s_occi_filter_h_\n",categoryName);
+       			fprintf(h,"#define _cords_%s_occi_filter_h_\n",categoryName);
+       			fprintf(h,"\n");
+       			fprintf(h,"struct cords_%s_occi_filter\n",categoryName);
+			fprintf(h,"{\n");
+			fprintf(h,"\tstruct cords_%s *attributes;\n",categoryName);
+
+
+    		}
+    		else
+    		{
+       			fprintf(f,"#ifndef _%s_h_\n",categoryName);
+       			fprintf(f,"#define _%s_h_\n",categoryName);
+       			fprintf(f,"\n");
+       			fprintf(f,"struct %s\n",categoryName); 
+			
+			fprintf(h,"#ifndef _%s_occi_filter_h_\n",categoryName);
+       			fprintf(h,"#define _%s_occi_filter_h_\n",categoryName);
+       			fprintf(h,"\n");
+       			fprintf(h,"struct %s_occi_filter\n",categoryName);
+			fprintf(h,"{\n");
+			fprintf(h,"\tstruct %s *attributes;\n",categoryName);
+  
+    		}
+    		fprintf(f,"{\n");
+    		resetList(&categoryAtr);
+    		strConcat(categoryAttributesB,categoryAttributes,' ');
+    		token= strtok(categoryAttributesB," ");
+    		for(; token != NULL ;)
+    		{
+      			fprintf(f,"\tchar * %s;\n",token);
+			fprintf(h,"\tchar * %s;\n",token);
+      			dim++;
+      			addBack(&categoryAtr,token);
+      			token=strtok(NULL, " ");
+    		}
+    		fprintf(f,"};\n");
+    		fprintf(f,"\n");
+    		fprintf(f,"#endif");
+		
+		fprintf(h,"};\n");
+    		fprintf(h,"\n");
+    		fprintf(h,"#endif");
+
+    		fclose(f);
+		fclose(h);
+ 	}   
+  	/*-----------------------------------------*/
+  	/* for generating category interface files */
+  	/*-----------------------------------------*/
+  	resetList(&categoryAtrB);
+  	token= strtok(categoryAttributes," ");
+  	for(;token != NULL;)
+  	{
+      	 	addBack(&categoryAtrB,token);
+       		token=strtok(NULL," ");
+  	}
     
-  /*----------------------------------------*/
-  /* for generating category actions files  */
-  /*----------------------------------------*/
-  if(indice)
-  {
-     resetList(&categoryAct);
-     token= strtok(categoryActions," ");
-     for(;token != NULL;)
-     {
-        addBack(&categoryAct,token);
-        token=strtok(NULL," ");
-     }
+  	/*----------------------------------------*/
+  	/* for generating category actions files  */
+  	/*----------------------------------------*/
+  	if(indice)
+  	{
+     		resetList(&categoryAct);
+     		token= strtok(categoryActions," ");
+     		for(;token != NULL;)
+     		{
+        		addBack(&categoryAct,token);
+        		token=strtok(NULL," ");
+     		}
      
-     sprintf(pathact,"%s/%s",PYPATH,PY_ACT_STRUCT);
-     sprintf(pathactname,"%s/%s",PYPATH,PY_ACT_NAME_STRUCT);
-     sprintf(pathactnumber,"%s/%s",PYPATH,PY_ACT_NUMBER_STRUCT);
+     		sprintf(pathact,"%s/%s",PYPATH,PY_ACT_STRUCT);
+     		sprintf(pathactname,"%s/%s",PYPATH,PY_ACT_NAME_STRUCT);
+     		sprintf(pathactnumber,"%s/%s",PYPATH,PY_ACT_NUMBER_STRUCT);
 
-     if(!(generateCategoryActionCfile(categoryName,categoryAtrB,categoryAct,flag,pathf)))
-         return 0;
-     else if(!(generateCategoryActionPyfile(categoryName,categoryAtrB,categoryAct,pathf)))
-         return 0;
-     else if(!(generateCategoryActionStruct(categoryName,categoryAct,0,pathact)))
-         return 0;
-     else if(!(generateCategoryActionStruct(categoryName,categoryAct,1,pathactname)))
-         return 0;
-     else if(!(generateCategoryActionStruct(categoryName,categoryAct,2,pathactnumber)))
-         return 0;
-  }
+     		if(!(generateCategoryActionCfile(categoryName,categoryAtrB,categoryAct,flag,pathf)))
+         		return 0;
+     		else if(!(generateCategoryActionPyfile(categoryName,categoryAtrB,categoryAct,pathf)))
+         		return 0;
+     		else if(!(generateCategoryActionStruct(categoryName,categoryAct,0,pathact)))
+         		return 0;
+     		else if(!(generateCategoryActionStruct(categoryName,categoryAct,1,pathactname)))
+         		return 0;
+     		else if(!(generateCategoryActionStruct(categoryName,categoryAct,2,pathactnumber)))
+         		return 0;
+  	}
   
-  if(indiceA)
-  {
-         sprintf(pathcategaccess,"%s/%s",PYPATH, PY_CATEGACCESS_STRUCT);
-         if(!generatePyCategoryTypeStruct(categoryName,categoryAccess, pathcategaccess))
-           return 0;          
-  }
+  	if(indiceA)
+  	{
+         	sprintf(pathcategaccess,"%s/%s",PYPATH, PY_CATEGACCESS_STRUCT);
+         	if(!generatePyCategoryTypeStruct(categoryName,categoryAccess, pathcategaccess))
+           		return 0;          
+  	}
 
 
-  if(!(createCategoryCordsCfile(categoryName,categoryAtr,dim,flag,pathff)))         /* create category.c file */
-      return 0;
-  else if(!(createCategoryOcciFile(categoryName,categoryAtr,dim,flag,occipath)))    /* create occicategory.c file */
-      return 0;
-  else if(!(insertCategory(pathf,categoryName,indice,flag)))                        /* inserte include files   */
-      return 0;
-  else if(!(generateCategoryPySourcefile(categoryName,categoryAtrB,pathf)))         /* generate python files   */
-      return 0;
-  else if(!(generateCategoryInterfaceCfile(categoryName,categoryAtrB,flag,pathf)))  /* generate C files        */
-      return 0;
-  else if(!(generateCategoryInterfceStructFile(pathf)))                             /* genearte struct c files  */
-      return 0;
-  else  
-      return dim;
+  	if(!(createCategoryCordsCfile(categoryName,categoryAtr,dim,flag,pathff)))         /* create category.c file */
+      		return 0;
+  	else if(!(createCategoryOcciFile(categoryName,categoryAtr,dim,flag,occipath)))    /* create occicategory.c file */
+      		return 0;
+  	else if(!(insertCategory(pathf,categoryName,indice,flag)))                        /* inserte include files   */
+      		return 0;
+  	else if(!(generateCategoryPySourcefile(categoryName,categoryAtrB,pathf)))         /* generate python files   */
+      		return 0;
+  	else if(!(generateCategoryInterfaceCfile(categoryName,categoryAtrB,flag,pathf)))  /* generate C files        */
+      		return 0;
+  	else if(!(generateCategoryInterfceStructFile(pathf)))                             /* genearte struct c files  */
+      		return 0;
+  	else  
+      		return dim;
  
 }
 
@@ -453,80 +485,80 @@ int generatePyCategoryTypeStruct(char *categoryName, char * categoryAccess, char
 
 int generateCategoryActionStruct(char *categoryName, listc categoryAct,int n, char pathf[])
 {
-  FILE *fIn;
-  FILE *fOut;
-  int a=0;
-  char line[256];
-  char pathtmp[1024];
-  char strcats[20];
+  	FILE *fIn;
+  	FILE *fOut;
+  	int a=0;
+  	char line[256];
+  	char pathtmp[1024];
+  	char strcats[20];
 
-  sprintf(pathtmp,"%s/pyaccords/pysrc/listaction.tmp",PYPATH);
+  	sprintf(pathtmp,"%s/pyaccords/pysrc/listaction.tmp",PYPATH);
   
-  if((fIn=fopen(pathf,"r"))==NULL)
-  {
-   printf("Error in generate category Action struct file: No such file or directory\n");
-   return 0;
-  }
-  if((fOut=fopen(pathtmp,"w")) == NULL)
-  {
-   fclose(fIn);
-   printf("Error in generate category Action struct file tmp: No such file or directory\n");
-   return 0;
-  }
+  	if((fIn=fopen(pathf,"r"))==NULL)
+  	{
+   		printf("Error in generate category Action struct file: No such file or directory\n");
+   		return 0;
+  	}
+  	if((fOut=fopen(pathtmp,"w")) == NULL)
+  	{
+   		fclose(fIn);
+   		printf("Error in generate category Action struct file tmp: No such file or directory\n");
+   		return 0;
+  	}	
  
-  while( fgets(line,256, fIn) != NULL)
-  {
-    if(searchWord(categoryName,line))
-    {
-       a=1;
-       fprintf(fOut,"%s",line);
-    }
-    else
-    {
-       str_sub(line,0,1,strcats);
-       if(!(strcmp(strcats,"};"))) 
-       {
-          break;
-       }
-       else 
-       {
-         fprintf(fOut,"%s",line);
-       }
-    }
-  }
+  	while( fgets(line,256, fIn) != NULL)
+  	{
+    		if(searchWord(categoryName,line))
+    		{
+       			a=1;
+       			fprintf(fOut,"%s",line);
+    		}
+    		else
+    		{
+       			str_sub(line,0,1,strcats);
+       			if(!(strcmp(strcats,"};"))) 
+       			{
+          			break;
+       			}
+       			else 
+       			{
+         			fprintf(fOut,"%s",line);
+       			}
+    		}
+  	}
   
-  if(!a)
-  {
-    elem *pelem=categoryAct.first;
-    switch(n)
-    {
-         case 0:
-               while(pelem)
-	      {
-		 fprintf(fOut,"\t{\"%s_%s\", %s_%s },\n",categoryName,pelem->value,pelem->value,categoryName); 
-		 pelem = pelem->next;
-	      }
-	      break;
-         case 1:
-              fprintf(fOut,"\t{\"%s\", %s_getname },\n",categoryName,categoryName);
-              break;
-         case 2:
-              fprintf(fOut,"\t{\"%s\", %s_getnumber },\n",categoryName,categoryName);
-              break;
-         case 3:
-	      fprintf(fOut,"\t{\"%s\", 1 },\n",categoryName);
-	      break;
-    }
- }
+  	if(!a)
+  	{
+    		elem *pelem=categoryAct.first;
+    		switch(n)
+    		{
+         		case 0:
+              			while(pelem)
+	      			{
+		 			fprintf(fOut,"\t{\"%s_%s\", %s_%s },\n",categoryName,pelem->value,pelem->value,categoryName);
+		 			pelem = pelem->next;
+	      			}
+	      			break;
+         		case 1:
+              			fprintf(fOut,"\t{\"%s\", %s_getname },\n",categoryName,categoryName);
+              			break;
+         		case 2:
+              			fprintf(fOut,"\t{\"%s\", %s_getnumber },\n",categoryName,categoryName);
+              			break;
+         		case 3:
+	      			fprintf(fOut,"\t{\"%s\", 1 },\n",categoryName);
+	      			break;
+    		}
+ 	}
   
-  fprintf(fOut,"};\n");
-  fprintf(fOut,"#endif\n");
-  fclose(fIn);
-  fclose(fOut);
-  if(rename(pathtmp,pathf) < 0)
-     return 0;
-  else
-     return 1;
+  	fprintf(fOut,"};\n");
+  	fprintf(fOut,"#endif\n");
+  	fclose(fIn);
+  	fclose(fOut);
+  	if(rename(pathtmp,pathf) < 0)
+     		return 0;
+  	else
+     		return 1;
 }
 
 /*------------------------------------------------------------------------------------------------*/
