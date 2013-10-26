@@ -17,7 +17,7 @@
 
 class CamazonEc2:
 	"""Class to define the amazonEc2 category structure"""
-	def __init__( self,Id, name,flavor,image,original,profile,node,price,account,number,rootpass,reference,network,access,accessip,keypair,placementgroup,publicaddr,privateaddr,firewall,group,zone,hostname,workload,agent,when,state ):
+	def __init__( self,Id, name,flavor,image,original,profile,node,price,account,number,rootpass,reference,network,access,accessip,keypair,placementgroup,publicaddr,privateaddr,firewall,group,zone,hostname,workload,agent,when,state,keyfile,agentstatus ):
 		"""Constructor of the class"""
 		self.Id = Id
 		self.name = name
@@ -46,4 +46,6 @@ class CamazonEc2:
                 self.agent = agent
 		self.when = when
 		self.state = state
+		self.keyfile = keyfile
+		self.agentstatus = agentstatus
 

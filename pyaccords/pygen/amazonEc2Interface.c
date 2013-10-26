@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------------*/
 /* ACCORDS Platform                                                              */
-/* copyright 2012 ,Hamid MEDJAHE & Elyes ZEKRI  (hmedjahed@prologue.fr) Prologue */
+/* copyright 2013 ,Hamid MEDJAHE   (hmedjahed@prologue.fr) Prologue 		 */
 /*-------------------------------------------------------------------------------*/
 /* Licensed under the Apache License, Version 2.0 (the "License");               */
 /* you may not use this file except in compliance with the License.              */

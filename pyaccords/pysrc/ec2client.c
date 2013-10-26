@@ -518,6 +518,17 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 	if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
+	if(!(strValid(pptr->keyfile))){
+		strcpy(strtmp," ");
+		strConcat(sendstr,strtmp,',');
+	}
+	else strConcat(sendstr,pptr->keyfile,',');
+
+	sprintf(strtmp,"%d",pptr->agentstatus);
+	strcmptr = allocate_string(strtmp);
+	if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
+	else strConcat(sendstr," ",',');
+
 	//           python interface
 	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
 	PyEval_AcquireLock();
@@ -664,6 +675,14 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 	}
 	if(pelem){
 		pptr->state = atoi(pelem->value);
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->keyfile = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->agentstatus = atoi(pelem->value);
 	}
 
 	return status;
@@ -863,7 +882,19 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	
 	sprintf(strtmp,"%d",pptr->state);
 	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
-	else strConcat(sendstr," ",',');	
+	else strConcat(sendstr," ",',');
+
+	if(!(strValid(pptr->keyfile))){
+		strcpy(strtmp," ");
+		strConcat(sendstr,strtmp,',');
+	}
+	else strConcat(sendstr,pptr->keyfile,',');
+
+	sprintf(strtmp,"%d",pptr->agentstatus);
+	strcmptr = allocate_string(strtmp);
+	if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
+	else strConcat(sendstr," ",',');
+
 
 	//           python interface
 	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
@@ -1011,6 +1042,14 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	}
 	if(pelem){
 		pptr->state = atoi(pelem->value);
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->keyfile = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->agentstatus = atoi(pelem->value);
 	}
 
 	//delete_ec2_secgroup(subptr, pptr);
@@ -1220,7 +1259,19 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	
 	sprintf(strtmp,"%d",pptr->state);
 	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
-	else strConcat(sendstr," ",',');	
+	else strConcat(sendstr," ",',');
+
+	if(!(strValid(pptr->keyfile))){
+		strcpy(strtmp," ");
+		strConcat(sendstr,strtmp,',');
+	}
+	else strConcat(sendstr,pptr->keyfile,',');
+
+	sprintf(strtmp,"%d",pptr->agentstatus);
+	strcmptr = allocate_string(strtmp);
+	if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
+	else strConcat(sendstr," ",',');
+	
 
 	//           python interface
 	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
@@ -1368,6 +1419,14 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	}
 	if(pelem){
 		pptr->state = atoi(pelem->value);
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->keyfile = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->agentstatus = atoi(pelem->value);
 	}
 
 	return status;
@@ -1551,7 +1610,19 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	
 	sprintf(strtmp,"%d",pptr->state);
 	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
-	else strConcat(sendstr," ",',');	
+	else strConcat(sendstr," ",',');
+
+	if(!(strValid(pptr->keyfile))){
+		strcpy(strtmp," ");
+		strConcat(sendstr,strtmp,',');
+	}
+	else strConcat(sendstr,pptr->keyfile,',');
+
+	sprintf(strtmp,"%d",pptr->agentstatus);
+	strcmptr = allocate_string(strtmp);
+	if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
+	else strConcat(sendstr," ",',');
+	
 
 	//           python interface
 	sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
@@ -1699,6 +1770,14 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	}
 	if(pelem){
 		pptr->state = atoi(pelem->value);
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->keyfile = pelem->value;
+		pelem = pelem->next;
+	}
+	if(pelem){
+		pptr->agentstatus = atoi(pelem->value);
 	}
 
 	return status;
@@ -1890,6 +1969,18 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		sprintf(strtmp,"%d",pptr->state);
 		if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 		else strConcat(sendstr," ",',');
+	
+		if(!(strValid(pptr->keyfile))){
+		strcpy(strtmp," ");
+		strConcat(sendstr,strtmp,',');
+		}
+		else strConcat(sendstr,pptr->keyfile,',');
+
+		sprintf(strtmp,"%d",pptr->agentstatus);
+		strcmptr = allocate_string(strtmp);
+		if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
+		else strConcat(sendstr," ",',');
+
 
 		//           python interface
 		sprintf(srcdir,"%s/pyaccords/pygen",PYPATH);
@@ -2037,7 +2128,16 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		}
 		if(pelem){
 			pptr->state = atoi(pelem->value);
+			pelem = pelem->next;
 		}
+		if(pelem){
+			pptr->keyfile = pelem->value;
+			pelem = pelem->next;
+		}
+		if(pelem){
+			pptr->agentstatus = atoi(pelem->value);
+		}
+
 	}
 
 	return status;

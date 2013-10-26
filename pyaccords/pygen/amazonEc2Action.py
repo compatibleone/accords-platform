@@ -60,6 +60,8 @@ from amazonEc2Class import *
 		- agent
 		- when 
 		- state 
+		- keyfile
+		- agentstatus
 """
 
 def amazonEc2_start(accesskey,secretkey,zone,keypair,amazonEc2):

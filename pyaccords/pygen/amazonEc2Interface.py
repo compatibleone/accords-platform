@@ -51,7 +51,9 @@ from amazonEc2Class import *
 		- hostname 
 		- workload 
 		- when 
-		- state 
+		- state
+		- keyfile
+		- agentstatus 
 """
 
 def amazonEc2_create(amazonEc2):
