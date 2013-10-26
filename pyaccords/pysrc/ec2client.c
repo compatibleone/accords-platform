@@ -701,6 +701,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	char * token;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
+	char * strcmptr = NULL;
 	listcc	categoryAtr;
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
@@ -1094,6 +1095,7 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	char * token;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
+	char * strcmptr = NULL;
 	listcc	categoryAtr;
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
@@ -1445,6 +1447,7 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	char * token;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
+	char * strcmptr = NULL;
 	listcc	categoryAtr;
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
@@ -1799,6 +1802,7 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 	char * token;
 	char sendstr[1024]=" ";
 	char strtmp[1024]=" ";
+	char * strcmptr = NULL;
 	listcc	categoryAtr;
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
