@@ -84,6 +84,11 @@ private	struct rest_response * occi_head(
 		struct rest_client * cptr, 
 		struct rest_request * rptr );
 
+public	struct rest_header * occi_allowed_headers(
+		void * vptr, 
+		struct rest_client * cptr,
+		struct rest_request * rptr,
+		struct rest_response * aptr);
 
 public	struct rest_response * occi_alert(
 		void * vptr,
@@ -111,7 +116,6 @@ private	struct rest_response *  (*occi_alert_relay)(
 		int status, char * message, 
 		char * nature, 
 		char * agent, char * tls)=&occi_alert_relay_impl;
-
 
 /*	---------------------------------------------------------	*/
 /*		s e t _ o c c i _ a l e r t _ r e l a y 		*/
@@ -1852,6 +1856,24 @@ private	struct rest_response * occi_head(
 }
 
 /*	---------------------------------------------	*/  
+/*	  o c c i _ a l l o w e d _ h e a d e r s	*/
+/*	---------------------------------------------	*/  
+#define _OCCI_HEADERS               _OCCI_AUTHORIZE           \
+                                    "," _OCCI_ACCOUNT         \
+                                    "," _OCCI_LINKHEAD        \
+                                    "," _OCCI_LOCATION        \
+                                    "," _OCCI_ATTRIBUTE       \
+                                    "," _OCCI_CATEGORY
+public	struct rest_header * occi_allowed_headers(
+		void * vptr, 
+		struct rest_client * cptr,
+		struct rest_request * rptr,
+		struct rest_response * aptr)
+{
+  return rest_response_header( aptr, _HTTP_CORS_EXP_HEADERS, _OCCI_HEADERS);
+}
+
+/*	---------------------------------------------	*/  
 /*	  o c c i _ p r o c e s s _ a t r i b u t s	*/
 /*	---------------------------------------------	*/  
 public	int	occi_process_atributs(
@@ -2233,12 +2255,14 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		occi_put,
 		occi_delete,
 		occi_head,
+		(void *) 0,
 		occi_extension,
 		(void *) 0,
 		(void *) 0,
 		occi_security,
 		(void *) 0,
-		occi_alert_relay
+		occi_alert_relay,
+		occi_allowed_headers
 	};
 
 	set_default_agent( nptr );

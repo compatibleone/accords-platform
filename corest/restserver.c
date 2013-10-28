@@ -35,6 +35,9 @@ private	struct	rest_server * rest_allocate_server();
 private	struct	rest_client * rest_new_client(struct rest_server * sptr);
 public 	struct	rest_client * rest_drop_client( struct rest_client * rptr );
 private	struct	rest_response * rest_incorrect_method(void * vptr, struct rest_client * cptr, struct rest_request * rptr );
+public	struct	rest_response * rest_fallback_options(void * vptr, struct rest_client * cptr, struct rest_request * rptr);
+private	struct	rest_response * rest_process_cors(struct rest_client * cptr, struct rest_request * rptr, struct rest_response * aptr);
+private char * rest_allowed_methods(struct rest_client * cptr);
 
 /*	-----------------------------------------------------------	*/
 /*		   l o c k _ r e s t _ s e r v e r			*/
@@ -270,6 +273,12 @@ private	struct rest_server * 	rest_open_server( int port, char * tls, int max, s
 		if ( iptr->head)
 			sptr->method.head = iptr->head;
 		else	sptr->method.head = rest_incorrect_method;
+		if ( iptr->options)
+			sptr->method.options = iptr->options;
+		else	sptr->method.options = rest_fallback_options;
+		if ( iptr->allowed_headers)
+			sptr->method.allowed_headers = iptr->allowed_headers;
+		else	sptr->method.allowed_headers = 0;
 		if ( iptr->extension )
 			sptr->method.extension = iptr->extension;
 		else	sptr->method.extension = 0;
@@ -908,6 +917,67 @@ public	struct	rest_response * rest_incorrect_method(void * vptr,struct rest_clie
 }
 
 /*	------------------------------------------------	*/
+/*	   r e s t _ f a l l b a c k _ o p t i o n s		*/
+/*	------------------------------------------------	*/
+public	struct	rest_response * rest_fallback_options(void * vptr, struct rest_client * cptr, struct rest_request * rptr)
+{
+	struct 	rest_response* aptr;
+	struct  rest_header * hptr;
+	struct  rest_header * ohptr;
+	char * methods;
+
+	if (!( aptr = rest_allocate_response(cptr) ))
+	  return( aptr );
+	else
+	  {
+	    if (!( methods = rest_allowed_methods(cptr) ))
+	      return ( aptr );
+
+	    rest_response_header( aptr, _HTTP_ALLOW, methods);
+	    
+	    liberate(methods);
+	  }
+
+	return rest_response_status( aptr, 200, "OK" );
+}
+
+/*	---------------------------------------------------------	*/
+/*			r e s t _ a l l o w e d _ m e t h o d s		*/
+/*	---------------------------------------------------------	*/
+/*	this local function returns allowed methods by looking at       */
+/*	defined callbacks                                               */
+/*	---------------------------------------------------------	*/
+private	char * rest_allowed_methods(struct rest_client * cptr)
+{
+  char * result = (char *)0;
+
+  if ( cptr->server->method.get )
+    if (! (result = join_string_sep(result, "GET", ",")))
+      return result;
+  
+  if ( cptr->server->method.post )
+    if (! (result = join_string_sep(result, "POST", ",")))
+      return result;
+  
+  if ( cptr->server->method.post )
+    if (! (result = join_string_sep(result, "PUT", ",")))
+      return result;
+  
+  if ( cptr->server->method.post )
+    if (! (result = join_string_sep(result, "DELETE", ",")))
+      return result;
+  
+  if ( cptr->server->method.post )
+    if (! (result = join_string_sep(result, "HEAD", ",")))
+      return result;
+  
+  if (! (result = join_string_sep(result, "OPTIONS", ",")))
+    return result;
+  
+  return result;
+}
+
+/*	------------------------------------------------	*/
 /*	   r e s t _ r e s p o n s e _ f a i l u r e		*/
 /*	------------------------------------------------	*/
 public	struct rest_response * rest_response_failure(struct rest_client * cptr, int status, char * message )
@@ -1133,7 +1203,7 @@ private	struct rest_response *	rest_ll_process_request(
 		else if (!((*cptr->server->method.authorise)(cptr->server->method.instance,cptr, username,password)))
 			return( rest_authentication_challenge( cptr, 401, "Not Authorised" ) );
 	}
-
+	  
 	/* dispatch the message to the appropriate handler */
 	/* ----------------------------------------------- */
 	if (!( strcasecmp( rptr->method, "GET" ) ))
@@ -1166,6 +1236,12 @@ private	struct rest_response *	rest_ll_process_request(
 			return((*cptr->server->method.head)(cptr->server->method.instance,cptr,rptr));
 		else	return( rest_response_failure(cptr, 405, "Incorrect Method" ) );
 	}
+	else if (!( strcasecmp( rptr->method, "OPTIONS" )))
+	  {
+		if ( cptr->server->method.options )
+			return((*cptr->server->method.options)(cptr->server->method.instance,cptr,rptr));
+		else	return( rest_fallback_options( cptr->server->method.instance, cptr, rptr ) );
+	  }
 	else	return( rest_response_failure(cptr, 405, "Incorrect Method" ) );
 }
 
@@ -1181,9 +1257,60 @@ private	struct rest_response * rest_process_request(
 	if ( cptr->server->method.before )
 		(*cptr->server->method.before)(cptr->server->method.instance,cptr,rptr);
 	aptr = rest_ll_process_request( cptr, rptr );
+	aptr = rest_process_cors( cptr, rptr, aptr );
 	if ( cptr->server->method.after )
 		(*cptr->server->method.after)(cptr->server->method.instance,cptr,rptr);
 	return( aptr );
+}
+
+/*	------------------------------------------------	*/
+/*	     r e s t _ p r o c e s s _ c o r s   		*/
+/*	------------------------------------------------	*/
+private	struct rest_response * rest_process_cors( 
+		struct rest_client  * cptr, 
+		struct rest_request * rptr,
+		struct rest_response * aptr)
+{
+  struct rest_header * hptr;
+  char * methods;
+
+  if ( hptr = rest_resolve_header(rptr->first, _HTTP_ORIGIN) )
+    /* Handling CORS request */
+    {
+      if (! (hptr = rest_response_header( aptr, _HTTP_CORS_ORIGIN, hptr->value)) )
+	return ( aptr );
+      
+      if (! (hptr = rest_response_header( aptr, _HTTP_CORS_CREDENTIALS, "true")) )
+	return ( aptr );
+
+      if ( hptr = rest_resolve_header(rptr->first, _HTTP_CORS_REQ_METHOD) )
+	/* Preflight request */
+	{		    
+	  // TODO: check _HTTP_CORS_REQ_METHOD header validity
+	  if (!( methods = rest_allowed_methods(cptr) ))
+	    return ( aptr );
+
+	  if (! (hptr = rest_response_header( aptr, _HTTP_CORS_METHODS, methods )))
+	    return ( aptr );
+
+	  liberate(methods);
+	  
+	  if (! (hptr = rest_resolve_header(rptr->first, _HTTP_CORS_REQ_HEADERS)) )
+	    // TODO: check header validity
+	    if ( cptr->server->method.allowed_headers )
+	      if (! (hptr = (*cptr->server->method.allowed_headers)(cptr->server->method.instance, cptr, rptr, aptr)))
+		return (aptr);
+	}
+      else
+	/* CORS actual request */
+	{
+	  if ( cptr->server->method.allowed_headers )
+	    if (! (hptr = (*cptr->server->method.allowed_headers)(cptr->server->method.instance, cptr, rptr, aptr)))
+	      return (aptr);		
+	}
+    }
+
+  return( aptr );
 }
 
 /*	------------------------------------------------	*/
