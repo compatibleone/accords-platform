@@ -1294,6 +1294,9 @@ private	struct rest_response * rest_process_cors(
 	    return ( aptr );
 
 	  liberate(methods);
+
+	  if (! (hptr = rest_response_header( aptr, _HTTP_CORS_MAX_AGE, _HTTP_CORS_DFT_AGE )))
+	    return ( aptr );
 	  
 	  if (! (hptr = rest_resolve_header(rptr->first, _HTTP_CORS_REQ_HEADERS)) )
 	    // TODO: check header validity

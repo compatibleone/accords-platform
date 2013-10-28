@@ -39,6 +39,8 @@
 #define	_MAX_RESTBUFFER 16000
 #define	_REST_THREAD_WORKER	1
 
+#define _HTTP_CORS_DFT_AGE      "86400"
+
 #define	_CORDS_REST_PATH	"rest/"
 #define	_CORDS_REST_STUB	"resttemp"
 #define	_CORDS_LAUNCH_CFG	"/etc/compatibleOneLaunch.cfg"
