@@ -108,5 +108,23 @@ public	char *	join_strings( char * rptr, char * sptr )
 	}
 }
 
+/*	-----------------------------------------------------------------------    */
+/*	      j o i n _ s t r i n g _ s e p                                        */
+/*	-----------------------------------------------------------------------    */
+/*	join left string with right string adding sep in between if left           */
+/*	is not empty. Left string is released.                                     */
+/*	-----------------------------------------------------------------------    */
+public	char *	join_string_sep( char * rptr, char * sptr, char * sep )
+{
+  char * wptr;
+
+  if (! (rptr) )
+    return ( allocate_string(sptr) );
+  else if (! (wptr = join_string(rptr, sep)))
+    return wptr;
+  else
+    return ( join_string(wptr, sptr) );
+}
+
 #endif
 
