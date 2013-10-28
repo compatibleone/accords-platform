@@ -1133,3 +1133,8 @@ testrest/testrest
 tools/strukt/_license.h
 tools/strukt/_strukt_wrapper
 tools/strukt/strukt
+cords/endpoint.c
+cords/endpoint.h
+cords/endpoint.xsd
+cords/endpoint_occi_filter.h
+cords/occiendpoint.c
