@@ -354,7 +354,7 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 	char * strcmptr = NULL;
 	int  status= 0;
         char srcdir[1024];
-	char * response;
+	char * response = NULL;
 	char * token;
 
 	listcc categoryAtr;
@@ -536,20 +536,52 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
         if(pythr == NULL) printf("interpreter init error \n");
 	PyThreadState_Swap(pythr);
 	python_path(srcdir);
-	pName = PyString_FromString("amazonEc2Act");
-	if(pName == NULL) printf("erro: in amazonEc2Act.py no such file name\n");
-	else pModule = PyImport_Import(pName);
-	if(pModule == NULL) printf("error: failed to load amazonEc2Act module\n");
-	else pDict = PyModule_GetDict(pModule);
-	if(pDict == NULL) printf("error: failed to load dict name in amazonEc2Act module\n");
-	else pFunc = PyDict_GetItemString(pDict,"start");
-	if(pFunc == NULL) printf("error: failed to load start function in amazonEc2Act module\n");
+	if((pName = PyString_FromString("amazonEc2Act")) == NULL) 
+	{
+		rest_log_message("error: in amazonEc2Act.py no such file name");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock(); 
+		return (1);
+	}
+	else if((pModule = PyImport_Import(pName)) == NULL) 
+	{
+		rest_log_message("error: failed to load amazonEc2Act module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock(); 
+		return (1);	
+	}
+	else if((pDict = PyModule_GetDict(pModule)) == NULL) 
+	{
+		rest_log_message("error: failed to load dict name in amazonEc2Act module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock(); 
+		return (1);
+	}
+	else if((pFunc = PyDict_GetItemString(pDict,"start")) == NULL) 
+	{
+		rest_log_message("error: failed to load start function in amazonEc2Act module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock(); 
+		return (1);
+	}
 	else result=PyObject_CallFunction(pFunc,"sssss",subptr->accesskey,subptr->secretkey,subptr->zone,subptr->keypair,sendstr);
 	
 	if (!result || PyErr_Occurred())
         {
        		PyErr_Print();
-       		return (0);
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock(); 
+		return (1);
        	}
 
 	response=allocate_string(PyString_AsString( result ));
