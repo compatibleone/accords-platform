@@ -155,7 +155,7 @@ _co_platform() {
     _co_run_serv fileserver "accords file services"
     _co_run_serv coss "accords security services" 
     _co_run_serv comons "accords monitoring services"
-    _co_run_serv billing "accords accounting services"
+    _co_run_serv cobill "accords accounting services"
     _co_run_serv cosched "accords scheduling services" 
     _co_run_serv conets "accords networking services"
     _co_run_serv cops "accords placement services"
