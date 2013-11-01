@@ -44,6 +44,7 @@
 #define	_CORDS_LAUNCH_CFG	"/etc/compatibleOneLaunch.cfg"
 #define	_HTTP_USER_AGENT	"User-Agent"
 #define	_HTTP_ACCEPT		"Accept"
+#define	_HTTP_ORIGIN		"Origin"
 #define	_HTTP_SERVER		"Server"
 #define	_HTTP_HOST		"Host"
 #define	_HTTP_CONTENT_TYPE	"Content-Type"
@@ -55,6 +56,7 @@
 #define	_HTTP_TRANSFER_ENCODING	"Transfer-Encoding"
 #define	_HTTP_CHUNKED		"Chunked"
 #define	_HTTP_BASIC		"Basic realm=*"
+#define	_HTTP_CORS_ORIGIN	"access-control-allow-origin"
 
 #define	_HTTP_OK  		200
 #define	_HTTP_CREATED		201
