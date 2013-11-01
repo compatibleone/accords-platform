@@ -3,6 +3,9 @@
 
 #include "rest.h"
 #include "restclient.h"
+#include "accords.h"
+#include "user.h"
+#include "account.h"
 
 #ifndef	public	
 #define	public
@@ -12,15 +15,7 @@
 #define	private static
 #endif
 
-
-struct	orga_user
-{
-	char *	id;
-	char * 	name;
-	char *	password;
-	char *	role;
-	char *	email;
-};
+#define	_ORGA_CLIENT_CONFIG "orga-client.xml"
 
 
 struct	orga_account
@@ -37,7 +32,6 @@ struct	orga_transaction
 	char *	type;
 	char *	account;
 	char *	label;
-	char *	quantity;
 	char *	value;
 	char *	currency;
 };
@@ -51,22 +45,24 @@ struct	orga_subscription
 	char *	host;
 	char *	base;
 	char *	version;
+	char *	tls;
+	char *	endUserId;
 };
 
 /* ----------------------- */
 /* subscription interfaces */
 /* ----------------------- */
-public	struct orga_subscription * orga_initialise_subscription( char * account );
+public	struct orga_subscription * orga_initialise_subscription( char * host, char * account, char * pass, char * version, char * tls );
 public	struct orga_subscription * orga_liberate_subscription( struct orga_subscription * sptr );
 
 /* -------------------------- */
 /* user management interfaces */
 /* -------------------------- */
-public struct rest_response *  orga_create_user  ( struct orga_subscription * sptr, struct orga_user * uptr );
-public struct rest_response *  orga_update_user  ( struct orga_subscription * sptr, struct orga_user * uptr );
-public struct rest_response *  orga_retrieve_user( struct orga_subscription * sptr, struct orga_user * uptr );
-public struct rest_response *  orga_list_user( struct orga_subscription * sptr, struct orga_user * uptr );
-public struct rest_response *  orga_delete_user  ( struct orga_subscription * sptr, struct orga_user * uptr );
+public struct rest_response *  orga_create_user  ( struct orga_subscription * sptr, struct cords_account * uptr );
+public struct rest_response *  orga_update_user  ( struct orga_subscription * sptr, struct cords_account * uptr );
+public struct rest_response *  orga_retrieve_user( struct orga_subscription * sptr, struct cords_account * uptr );
+public struct rest_response *  orga_list_user( struct orga_subscription * sptr, struct cords_account * uptr );
+public struct rest_response *  orga_delete_user  ( struct orga_subscription * sptr, struct cords_account * uptr );
 
 /* ----------------------------- */
 /* account management interfaces */
