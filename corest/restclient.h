@@ -42,6 +42,10 @@ public	struct	rest_response *
 	rest_client_get_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr );
 
+public	struct	rest_response * 
+	rest_client_get_request_body(
+		char * target, char * tls, char * nptr, struct rest_header * hptr, char * filename );
+
 /*	---	*/
 /*	COPY	*/
 /*	---	*/
@@ -63,6 +67,10 @@ public	struct	rest_response *
 public	struct	rest_response * 
 	rest_client_delete_request(
 		char * target, char * tls, char * nptr, struct rest_header * hptr );
+
+public	struct	rest_response * 
+	rest_client_delete_request_body(
+		char * target, char * tls, char * nptr, struct rest_header * hptr, char * filename );
 
 /*	----	*/
 /*	HEAD	*/

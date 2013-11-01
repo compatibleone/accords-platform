@@ -981,6 +981,65 @@ public	struct	rest_response * rest_client_get_request(
 
 }
 
+/*	------------------------------------------------	*/
+/*	 r e s t _ c l i e n t _ g e t _ r e q u e s t 		*/
+/*	------------------------------------------------	*/
+public	struct	rest_response * rest_client_get_request_body( 
+		char * target, char * tls, char * agent, struct rest_header * hptr, char * filename )
+{
+	struct	rest_response 	* aptr;
+	struct	url		* uptr;
+	struct	rest_client 	* cptr;
+	struct	rest_request 	* rptr;
+	char 	buffer[2048];
+	
+	while (1)
+	{
+	if ( check_debug() )
+		printf("REST Client Request : GET %s \n",target );
+
+	if (!( rest_valid_string( target ) ))
+		return( rest_client_response( 599, "NULL URL", agent ) );
+
+	if (!( uptr = analyse_url( target ) ))
+		return( rest_client_response( 600, "Url Anaysis", agent ) );
+
+	else if (!( uptr = validate_url( uptr )))
+	{
+		return( rest_client_response( 601, "Url Validation", agent ) );
+	}
+
+	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+	{
+		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+		rest_log_message( buffer );
+		liberate_url( uptr );
+		return( rest_client_response( 602, "Client Failure", agent ) );
+	}
+	else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
+		return( rest_client_response( 603, "Request Creation", agent ) );
+	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+		return( rest_client_response( 603, "Request Headers", agent ) );
+	else if (!( rptr = rest_client_body( rptr, filename ) ))
+		return( rest_client_response( 603, "Request Body", agent ) );
+	else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		return( rest_client_response( 603, "Request Send", agent ) );
+	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
+	}
+
+}
+
 /*	--------------------------------------------------------	*/
 /*	 r e s t _ c l i e n t _ t r y _ g e t _ r e q u e s t 		*/
 /*	--------------------------------------------------------	*/
@@ -1067,6 +1126,56 @@ public	struct	rest_response * rest_client_delete_request(
 		return( rest_client_response( 603, "Request Creation", agent ) );
 	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
 		return( rest_client_response( 603, "Request Headers", agent ) );
+	else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		return( rest_client_response( 603, "Request Send", agent ) );
+	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return( aptr );
+	}
+	else
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+	}
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	r e s t _ c l i e n t _ d e l e t e _ r e q u e s t 	*/
+/*	---------------------------------------------------	*/
+public	struct	rest_response * rest_client_delete_request_body( 
+		char * target, char * tls, char * agent, struct rest_header * hptr, char * filename )
+{
+	struct	rest_response 	* aptr;
+	struct	url		* uptr;
+	struct	rest_client 	* cptr;
+	struct	rest_request 	* rptr;
+	char 	buffer[2048];
+	
+	while(1)
+	{
+	if ( check_debug() )
+		printf("REST Client Request : DELETE %s \n",target );
+
+	if (!( uptr = analyse_url( target ) ))
+		return( rest_client_response( 600, "Incorrect Url", agent ) );
+
+	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+	{
+		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+		rest_log_message( buffer );
+		liberate_url( uptr );
+		return( rest_client_response( 602, "Client Failure", agent ) );
+	}
+	else if (!( rptr = rest_client_request( cptr, "DELETE", uptr, agent )))
+		return( rest_client_response( 603, "Request Creation", agent ) );
+	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+		return( rest_client_response( 603, "Request Headers", agent ) );
+	else if (!( rptr = rest_client_body( rptr, filename ) ))
+		return( rest_client_response( 603, "Request Body", agent ) );
 	else if (!( rptr = rest_send_request( cptr, rptr ) ))
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
