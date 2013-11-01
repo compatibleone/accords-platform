@@ -155,7 +155,7 @@ _co_platform() {
     _co_run_serv fileserver "accords file services"
     _co_run_serv coss "accords security services" 
     _co_run_serv comons "accords monitoring services"
-    _co_run_serv $billing "accords accounting services"
+    _co_run_serv billing "accords accounting services"
     _co_run_serv cosched "accords scheduling services" 
     _co_run_serv conets "accords networking services"
     _co_run_serv cops "accords placement services"
@@ -450,12 +450,8 @@ _run_conets() {
     conets --config $target CO-NETS/1.0
 }
 
-_run_orgabas() {
-    orgabas --config $target CO-BAS/1.0
-}
-
-_run_coobas() {
-    coobas --config $target CO-BAS/1.0
+_run_cobill() {
+    $billing --config $target CO-BAS/1.0
 }
 
 _run_cosacs() {
@@ -1190,8 +1186,8 @@ case `basename $0` in
     run-conets)
 	_run_conets $*
 	;;
-    run-coobas)
-	_run_coobas $*
+    run-cobill)
+	_run_cobill $*
 	;;
     run-orgabas)
 	_run_orgabas $*
