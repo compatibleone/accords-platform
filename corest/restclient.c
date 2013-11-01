@@ -141,6 +141,15 @@ public	struct	url *	analyse_url( char * target )
 			if (!( *sptr ))
 				return( uptr );
 		}	
+		if ((!( uptr->port ))
+		&&  ( rest_valid_string( uptr->service ) ))
+		{
+			if (!( strcmp( uptr->service, "http" ) ))
+				uptr->port = 80;
+			else if (!( strcmp( uptr->service, "https" ) ))
+				uptr->port = 443;
+			else	uptr->port = 80;
+		}
 		wptr = sptr;
 	}
 	if (!( uptr->object = allocate_string( wptr ) ))
