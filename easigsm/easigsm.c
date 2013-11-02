@@ -83,8 +83,8 @@ private	void	easigsm_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	easigsm_banner()
 {
-	printf("\n   CompatibleOne Easiclouds Generic Service Manager: Version 1.0a.0.01");
-	printf("\n   Beta Version : 08/09/2013 ");
+	printf("\n   CompatibleOne Easiclouds Generic Service Manager: Version 1.0a.0.02");
+	printf("\n   Beta Version : 02/11/2013 ");
 	printf("\n   Copyright (c) 2013 Iain James Marshall ");
 	printf("\n");
 	accords_configuration_options();
@@ -162,6 +162,66 @@ private	struct	rest_response * gsm_start_instance(
 		{
 			pptr->state = _OCCI_RUNNING;
 			autosave_gsm_instance_nodes();
+		 	return( rest_html_response( aptr, 200, "OK Started" ) );
+		}
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	   g s m _ s c a l e u p _ s e r v i c e	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * gsm_scaleup_instance(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	gsm_instance * pptr;
+	int	status;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->state != _OCCI_RUNNING )
+	 	return( rest_html_response( aptr, 200, "OK Not Started" ) );
+	else
+	{
+		if ( rest_valid_string( pptr->scaleup ) )
+		{
+			evaluate_category_cordscript( "easigsm", "instance", pptr->id, pptr->scaleup, "" );
+		 	return( rest_html_response( aptr, 200, "OK Started" ) );
+		}
+		else
+		{
+		 	return( rest_html_response( aptr, 200, "OK Started" ) );
+		}
+	}
+}
+
+/*	-------------------------------------------	*/
+/* 	 g s m _ s c a l e d o w n _ s e r v i c e	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * gsm_scaledown_instance(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	gsm_instance * pptr;
+	int	status;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->state != _OCCI_RUNNING )
+	 	return( rest_html_response( aptr, 200, "OK Not Started" ) );
+	else
+	{
+		if ( rest_valid_string( pptr->scaledown ) )
+		{
+			evaluate_category_cordscript( "easigsm", "instance", pptr->id, pptr->scaledown, "" );
+		 	return( rest_html_response( aptr, 200, "OK Started" ) );
+		}
+		else
+		{
 		 	return( rest_html_response( aptr, 200, "OK Started" ) );
 		}
 	}
@@ -266,6 +326,39 @@ private	struct	rest_response * gsm_accept_agreement(
 	}
 }
 
+/*	-------------------------------------------	*/
+/* 	  g s m _ r e f u s e _ a g r e e m e n t 	*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * gsm_refuse_agreement(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	gsm_agreement * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else if ( pptr->state != _OCCI_IDLE )
+	 	return( rest_html_response( aptr, 200, "OK Accepted" ) );
+	else
+	{
+		if ( rest_valid_string( pptr->refuse ) )
+		{
+			evaluate_category_cordscript( "easigsm", "agreement", pptr->id, pptr->refuse, "" );
+			pptr->state = _OCCI_RUNNING;
+			autosave_gsm_agreement_nodes();
+		 	return( rest_html_response( aptr, 200, "OK Started" ) );
+		}
+		else
+		{
+			pptr->state = _OCCI_RUNNING;
+			autosave_gsm_agreement_nodes();
+		 	return( rest_html_response( aptr, 200, "OK Accepted" ) );
+		}
+	}
+}
+
 /*	--------------------------------------------	*/
 /*	e a s i g s m _ o p e r a t i o n 		*/
 /*	--------------------------------------------	*/
@@ -304,6 +397,8 @@ private	int	easigsm_operation( char * nptr )
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,"accept","",gsm_accept_agreement)))
 		return( 27 );
+	else if (!( optr = occi_add_action( optr,"refuse","",gsm_refuse_agreement)))
+		return( 27 );
 
 	if (!( optr = occi_gsm_instance_builder( EasiGsm.domain, "gsm_instance" ) ))
 		return( 27 );
@@ -313,6 +408,10 @@ private	int	easigsm_operation( char * nptr )
 	last = optr;
 
 	if (!( optr = occi_add_action( optr,"start","",gsm_start_instance)))
+		return( 27 );
+	if (!( optr = occi_add_action( optr,"scaleup","",gsm_scaleup_instance)))
+		return( 27 );
+	if (!( optr = occi_add_action( optr,"scaledown","",gsm_scaledown_instance)))
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,"stop","",gsm_stop_instance)))
 		return( 27 );
