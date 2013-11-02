@@ -311,6 +311,10 @@ private	struct	rest_response * ecslam_negotiate_negotiation(
 		struct rest_response * aptr, 
 		void * vptr )
 {
+	char	buffer[2048];
+	struct	occi_element * dptr;
+	struct	occi_response * zptr;
+	char *	ihost;
 	struct	ecslam_negotiation * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 400, "Invalid Action" ) );
@@ -318,11 +322,32 @@ private	struct	rest_response * ecslam_negotiate_negotiation(
 	 	return( rest_html_response( aptr, 400, "Cannot Negotiate" ) );
 	else
 	{
-		pptr->state = 1;
-		autosave_ecslam_negotiation_nodes();
-	 	return( rest_html_response( aptr, 200, "OK") );
+		if (!( ihost = occi_resolve_category_provider( "ecslam_agreement", _CORDS_CONTRACT_AGENT, default_tls() ) ))
+			return( rest_html_response( aptr, 500, "ECSLAM Agremeent Missing" ) );
+		else	sprintf(buffer,  "%s/%s/",ihost,"ecslam_agreement");
+
+		if (!( dptr = occi_create_element("occi.ecslam_agreement.name",pptr->name) ))
+		 	return( rest_html_response( aptr, 500, "Server Failure" ) );
+		else if (!( zptr = occi_simple_post( buffer, dptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+		 	return( rest_html_response( aptr, 500, "Server Failure" ) );
+		else if (!( ihost = occi_extract_location( zptr ) ))
+		{
+			zptr = occi_remove_response( zptr );
+		 	return( rest_html_response( aptr, 500, "Server Failure" ) );
+		}
+		else if (!( pptr->offer = allocate_string( ihost ) ))
+		{
+			zptr = occi_remove_response( zptr );
+		 	return( rest_html_response( aptr, 500, "Server Failure" ) );
+		}
+		else
+		{
+			zptr = occi_remove_response( zptr );
+			pptr->state = 1;
+			autosave_ecslam_negotiation_nodes();
+		 	return( rest_html_response( aptr, 200, "OK") );
+		}
 	}
-	return( 0 );
 }
 
 /*	-------------------------------------------	*/
