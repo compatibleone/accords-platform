@@ -1,6 +1,8 @@
 #ifndef	_easigsm_c	
 #define	_easigsm_c
 
+#define	_DUMMY_ECSLAM 1
+
 #include "standard.h"
 #include "broker.h"
 #include "rest.h"
@@ -55,11 +57,17 @@ public	int	failure( int e, char * m1, char * m2 )
 	return( e );
 }
 
-#include "gsm_template.c"
+#include "ecslam_serviceTemplate.c"
+#include "ecslam_agreement.c"
+#include "ecslam_negotiation.c"
+
 #include "gsm_agreement.c"
 #include "gsm_instance.c"
 
-#include "occigsm_template.c"
+#include "occiecslam_serviceTemplate.c"
+#include "occiecslam_agreement.c"
+#include "occiecslam_negotiation.c"
+
 #include "occigsm_agreement.c"
 #include "occigsm_instance.c"
 
@@ -294,6 +302,76 @@ private	struct	rest_response * gsm_verify_agreement(
 }
 
 /*	-------------------------------------------	*/
+/*		ecslam_negotiate_negotiation		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * ecslam_negotiate_negotiation(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	ecslam_negotiation * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 400, "Invalid Action" ) );
+	else if ( pptr->state )
+	 	return( rest_html_response( aptr, 400, "Cannot Negotiate" ) );
+	else
+	{
+		pptr->state = 1;
+		autosave_ecslam_negotiation_nodes();
+	 	return( rest_html_response( aptr, 200, "OK") );
+	}
+	return( 0 );
+}
+
+/*	-------------------------------------------	*/
+/*		ecslam_agree_negotiation		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * ecslam_agree_negotiation(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	ecslam_negotiation * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 400, "Invalid Action" ) );
+	else if ( pptr->state != 1 )
+	 	return( rest_html_response( aptr, 400, "Not Negotiated" ) );
+	else
+	{
+		pptr->state = 2;
+		autosave_ecslam_negotiation_nodes();
+	 	return( rest_html_response( aptr, 200, "OK") );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*		ecslam_decline_negotiation		*/
+/*	-------------------------------------------	*/
+private	struct	rest_response * ecslam_decline_negotiation(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	ecslam_negotiation * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 400, "Invalid Action" ) );
+	else if ( pptr->state != 1 )
+	 	return( rest_html_response( aptr, 400, "Not Negotiated" ) );
+	else
+	{
+		pptr->state = 4;
+		autosave_ecslam_negotiation_nodes();
+	 	return( rest_html_response( aptr, 200, "OK") );
+	}
+}
+
+/*	-------------------------------------------	*/
 /* 	  g s m _ a c c e p t _ a g r e e m e n t 	*/
 /*	-------------------------------------------	*/
 private	struct	rest_response * gsm_accept_agreement(
@@ -379,12 +457,37 @@ private	int	easigsm_operation( char * nptr )
 	/* preparation of application category list */
 	/* ---------------------------------------- */
 
-	if (!( optr = occi_gsm_template_builder( EasiGsm.domain, "gsm_template" ) ))
+#ifdef	_DUMMY_ECSLAM
+
+	if (!( optr = occi_ecslam_serviceTemplate_builder( EasiGsm.domain, "ecslam_serviceTemplate" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
+
+	if (!( optr = occi_ecslam_negotiation_builder( EasiGsm.domain, "ecslam_negotiation" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+	if (!( optr = occi_add_action( optr,"Negotiate","",ecslam_negotiate_negotiation)))
+		return( 27 );
+	if (!( optr = occi_add_action( optr,"Agree","",ecslam_agree_negotiation)))
+		return( 27 );
+	if (!( optr = occi_add_action( optr,"Decline","",ecslam_decline_negotiation)))
+		return( 27 );
+
+	if (!( optr = occi_ecslam_agreement_builder( EasiGsm.domain, "ecslam_agreement" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
+#endif
 
 	if (!( optr = occi_gsm_agreement_builder( EasiGsm.domain, "gsm_agreement" ) ))
 		return( 27 );

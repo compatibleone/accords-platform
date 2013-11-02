@@ -1,19 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema version='0.1.0'>
 <model name='easigsm' description='easiclouds generic service management' version='0.1.0'>
-	<category term='gsm_template' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/gsm_template/' rel='http://schemas.ogf.org/occi/core#resource' structname='gsm_template'>
+	<category term='ecslam_serviceTemplate' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/ecslam_serviceTemplate/' rel='http://schemas.ogf.org/occi/core#resource' structname='ecslam_serviceTemplate'>
 	    <attributes>
 	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='url' type='string' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='true'/>
 	    </attributes>
 	    <actions>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
 	    </actions>
 	</category>
+	<category term='ecslam_agreement' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/ecslam_agreement/' rel='http://schemas.ogf.org/occi/core#resource' structname='ecslam_agreement'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='url' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
+	<category term='ecslam_negotiation' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/ecslam_negotiation/' rel='http://schemas.ogf.org/occi/core#resource' structname='ecslam_negotiation'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='service' type='string' required='false' immutable='false'/>
+	        <attribute name='offer' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#Negotiate'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#Agree'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#Decline'/>
+	    </actions>
+	</category>
 	<category term='gsm_agreement' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/gsm_agreement/' rel='http://schemas.ogf.org/occi/core#resource' structname='gsm_agreement'>
 	    <attributes>
 	        <attribute name='name' type='string' required='false' immutable='false'/>
 	        <attribute name='template' type='string' required='false' immutable='false'/>
+	        <attribute name='negotiation' type='string' required='false' immutable='false'/>
+	        <attribute name='agreement' type='string' required='false' immutable='false'/>
 	        <attribute name='account' type='string' required='false' immutable='false'/>
 	        <attribute name='verify' type='string' required='false' immutable='false'/>
 	        <attribute name='accept' type='string' required='false' immutable='false'/>
