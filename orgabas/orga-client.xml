@@ -1,0 +1,11 @@
+<?wml version="1.0" encoding="UTF-8"?>
+<orga_client>
+	<account>?</account>
+	<host>?</host>
+	<user>?</user>
+	<password>?</password>
+	<version>v0.1</version>
+	<tls></tls>
+</orga_client>
+
+

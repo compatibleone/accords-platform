@@ -12,6 +12,17 @@ struct cords_onapp_extras_handle
   int owner;
 };
 
+struct	oa_subscription 
+{
+	char *	name;
+	char *	user;
+	char *	password;
+	char *	host;
+	int	port;
+	char *	tls;
+	char * version;
+};
+
 struct rest_response *  oaprocci_alert_relay(
 		void * i,
 		struct rest_client * prest_client,
@@ -29,5 +40,6 @@ void close_cords_onapp_extras_handle(struct cords_onapp_extras_handle *handle);
 	/* ------------- */
 #endif 	/* _oacontract_h */
 	/* ------------- */
+
 
 

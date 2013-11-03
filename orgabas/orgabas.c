@@ -90,8 +90,8 @@ private	void	orgabas_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Ordering, Billing and Accounting ORGABAS : Version 1.1a.0.01");
-	printf("\n   Beta Version : 08/10/2013");
+	printf("\n   CompatibleOne Ordering, Billing and Accounting ORGABAS : Version 1.1a.0.02");
+	printf("\n   Beta Version : 31/10/2013");
 	printf("\n   Copyright (c) 2012, 2013 Iain James Marshall");
 	printf("\n");
 	accords_configuration_options();
@@ -213,74 +213,6 @@ private	struct	occi_interface	invoice_interface = {
 	delete_invoice
 	};
 
-/*	-------------------------------------------	*/
-/* 	      c r e a t e _ t r a n s a c t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	create_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct cords_transaction * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else if (!( pptr->account ))
-		return( 0 ); 
-	else
-	{
-		pptr->when = time((long *) 0);
-		return( 0 );
-	}
-}
-
-/*	-------------------------------------------	*/
-/* 	    r e t r i e v e _ t r a n s a c t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	retrieve_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct cords_transaction * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      u p d a t e _ t r a n s a c t i o n  	*/
-/*	-------------------------------------------	*/
-private	int	update_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct cords_transaction * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-/*	-------------------------------------------	*/
-/* 	      d e l e t e _ t r a n s a c t i o n	*/
-/*	-------------------------------------------	*/
-private	int	delete_transaction(struct occi_category * optr, void * vptr,struct rest_request * rptr)
-{
-	struct	occi_kind_node * nptr;
-	struct cords_transaction * pptr;
-	if (!( nptr = vptr ))
-		return(0);
-	else if (!( pptr = nptr->contents ))
-		return(0);
-	else	return(0);
-}
-
-private	struct	occi_interface	transaction_interface = {
-	create_transaction,
-	retrieve_transaction,
-	update_transaction,
-	delete_transaction
-	};
 
 /*	------------------------------------------------------------------	*/
 /*			p r o c e s s _ i n v o i c e				*/
@@ -322,6 +254,9 @@ private	struct rest_response * close_invoice(
 /*	  U s e r   L d a p   M a n a g e m e n t 	*/
 /*	-------------------------------------------	*/
 #include "ldapuser.c"
+#include "orgaclient.c"
+#include "orgaccount.c"
+#include "orgatrans.c"
 
 /*	------------------------------------------------------------------	*/
 /*			o r g a b a s _ o p e r a t i o n			*/
@@ -342,7 +277,7 @@ private	int	orgabas_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-	optr->callback  = (void *) 0;
+	optr->callback  = &account_interface;
 	optr->access |= _OCCI_NO_PRICING;
 
 	if (!( optr = occi_cords_transaction_builder( OrgaBas.domain, "transaction" ) ))

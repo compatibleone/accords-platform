@@ -16,7 +16,7 @@ easigsm_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $
 easigsm_LDFLAGS = $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCSPI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS)
 
 # Create auto-generated model files
-model_h_files = gsm_template.h gsm_agreement.h gsm_instance.h 
+model_h_files = ecslam_serviceTemplate.h gsm_agreement.h gsm_instance.h ecslam_negotiation.h ecslam_agreement.h
 include $(top_srcdir)/tools/Makefile_generate_model.am
 easigsm.c: $(model_c_files)
 

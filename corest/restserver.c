@@ -523,6 +523,9 @@ private	struct rest_response * rest_transmit_response(
 	rest_show_response( aptr );
 	rest_response_start( cptr );
 
+	/* Set CORS Header */
+	rest_set_cors( aptr, rptr );
+
 	rest_response_string( cptr, aptr->version, " ");
 	rest_response_value( cptr, aptr->status, " ");
 	rest_response_string( cptr, aptr->message, "\r\n");
@@ -573,6 +576,17 @@ private	struct rest_response * rest_transmit_response(
 
 	rest_response_flush( cptr );
 	return( aptr );
+}
+/*  ------------------------------------------------  */
+/*     r e s t _ s e t _ c o r s                */
+/*  ------------------------------------------------  */
+public  void rest_set_cors( struct rest_response* aptr, struct rest_request * rptr)
+{  
+	struct rest_header * hptr;
+	if ( hptr = rest_resolve_header( rptr->first, _HTTP_ORIGIN ) )
+	{
+		rest_response_header( aptr, _HTTP_CORS_ORIGIN, hptr->value );
+	}
 }
 
 /*	-----------------------------------------------------	*/

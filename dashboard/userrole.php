@@ -424,7 +424,7 @@ class user_role extends role
 		if ( $this->page->account != "" )
 		{
 			$a = array();
-			exec("grep manifest -m1 plan_sla-*.xml | cut -f 1 -d :",&$a);
+			exec("grep manifest -m1 plan_sla-*.xml | cut -f 1 -d :",$a);
 			foreach ($a as $l )
 			{
 				if ( $mode == "all" )
@@ -499,7 +499,7 @@ class user_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t service/*",$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -519,7 +519,7 @@ class user_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t service/*",$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -539,7 +539,7 @@ class user_role extends role
 	print "<table width='100%'>\n";
 	print "<tr><td>Service<td><select style='width: 50mm;' name='service'>\n";
 	$a = array();
-	exec("ls -t service/*",&$a);
+	exec("ls -t service/*",$a);
 	foreach ($a as $l )
 	{
 		print "<option value='".$l."'>".$l."</option>\n";
@@ -563,7 +563,7 @@ class user_role extends role
 			print "<table width='100%'>";
 			print "<tr><td>Account<td><select style='width: 50mm;' name='account'>\n";
 			$a = array();
-			exec("grep name cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",&$a);
+			exec("grep name cords_account.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";
@@ -578,7 +578,7 @@ class user_role extends role
 			print "<table width='100%'>";
 			print "<tr><td>Invoice<td><select style='width: 50mm;' name='invoice'>\n";
 			$a = array();
-			exec("grep document cords_invoice.xml | cut -f 12 -d = | cut -f 2 -d '\"' ",&$a);
+			exec("grep document cords_invoice.xml | cut -f 12 -d = | cut -f 2 -d '\"' ",$a);
 			foreach ($a as $l )
 			{
 				print "<option value='".$l."'>".$l."</option>\n";

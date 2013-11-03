@@ -52,6 +52,8 @@
 <cords_user
  id="fa77ed3c-coob-407c-9cd2-40cee4749af2" name="service-coobas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
+ id="fa77ed3c-orga-407c-9cd2-40cee4749af2" name="service-orgabas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
+<cords_user
  id="eba7ff7b-cofs-4bd6-bb06-c7e0a942e3bf" name="service-fileserver" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />
 <cords_user
  id="84962213-copa-41ea-b5c9-0954ba44e426" name="service-parser" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords" authorization="" when="0" state="0" />

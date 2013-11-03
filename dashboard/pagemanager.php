@@ -37,7 +37,7 @@ class	page_manager
 		global $configdir;
 		$this->user = $u;
 		$a = array();
-		exec( "grep name $configdir/cords_account.xml | grep jamie | cut -f 2 -d = | cut -f 2 -d '\"'",$a);
+		exec( "grep name $configdir/cords_account.xml | grep ".$u." | cut -f 2 -d = | cut -f 2 -d '\"'",$a);
 		$this->account = $a[0];
 	}
 

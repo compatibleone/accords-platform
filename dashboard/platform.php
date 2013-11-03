@@ -74,7 +74,7 @@ class	platform_operations
 	public function start($p)
 	{
 		$a = array();
-		exec("bash ./dashboard-start",&$a);
+		exec("bash ./dashboard-start",$a);
 		$p->command_output( "Start Platform",$a );
 		return( "start" );
 	}
@@ -85,7 +85,7 @@ class	platform_operations
 	public function analyse_log($p)
 	{
 		$a = array();
-		exec("bash ./dashboard-analyse",&$a);
+		exec("bash ./dashboard-analyse",$a);
 		$p->command_output( "Log Analysis",$a );
 		return( "analysis" );
 	}
@@ -96,7 +96,7 @@ class	platform_operations
 	public function check($p)
 	{
 		$a = array();
-		$result = exec("bash ./dashboard-check",&$a);
+		$result = exec("bash ./dashboard-check",$a);
 		$p->command_output( "Check Platform",$a );
 		return( "check" );
 	}
@@ -107,7 +107,7 @@ class	platform_operations
 	public function stop($p)
 	{
 		$a = array();
-		exec("bash ./dashboard-stop",&$a);
+		exec("bash ./dashboard-stop",$a);
 		$p->command_output( "Stop Platform", $a );
 		return( "stop" );
 	}
@@ -118,7 +118,7 @@ class	platform_operations
 	public function log($p)
 	{
 		$a = array();
-		$result = exec("bash dashboard-log",&$a);
+		$result = exec("bash dashboard-log",$a);
 		$this->log_output( $a, $p );	
 		return( "log" );
 	}
