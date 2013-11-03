@@ -39,12 +39,13 @@
 #define	_MAX_RESTBUFFER 16000
 #define	_REST_THREAD_WORKER	1
 
+#define _HTTP_CORS_DFT_AGE      "86400"
+
 #define	_CORDS_REST_PATH	"rest/"
 #define	_CORDS_REST_STUB	"resttemp"
 #define	_CORDS_LAUNCH_CFG	"/etc/compatibleOneLaunch.cfg"
 #define	_HTTP_USER_AGENT	"User-Agent"
 #define	_HTTP_ACCEPT		"Accept"
-#define	_HTTP_ORIGIN		"Origin"
 #define	_HTTP_SERVER		"Server"
 #define	_HTTP_HOST		"Host"
 #define	_HTTP_CONTENT_TYPE	"Content-Type"
@@ -56,7 +57,16 @@
 #define	_HTTP_TRANSFER_ENCODING	"Transfer-Encoding"
 #define	_HTTP_CHUNKED		"Chunked"
 #define	_HTTP_BASIC		"Basic realm=*"
-#define	_HTTP_CORS_ORIGIN	"access-control-allow-origin"
+#define _HTTP_ORIGIN            "Origin"
+#define _HTTP_ALLOW             "Allow"
+#define _HTTP_CORS_REQ_HEADERS  "Access-Control-Request-Headers"
+#define _HTTP_CORS_REQ_METHOD   "Access-Control-Request-Method"
+#define _HTTP_CORS_ORIGIN       "Access-Control-Allow-Origin"
+#define _HTTP_CORS_CREDENTIALS  "Access-Control-Allow-Credentials"
+#define _HTTP_CORS_EXP_HEADERS  "Access-Control-Expose-Headers"
+#define _HTTP_CORS_MAX_AGE      "Access-Control-Max-Age"
+#define _HTTP_CORS_METHODS      "Access-Control-Allow-Methods"
+#define _HTTP_CORS_HEADERS      "Access-Control-Allow-Headers"
 
 #define	_HTTP_OK  		200
 #define	_HTTP_CREATED		201
@@ -92,6 +102,7 @@ struct	rest_interface
 	struct rest_response  * (*put)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	struct rest_response  * (*delete)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	struct rest_response  * (*head)(void * i,struct rest_client * cptr, struct rest_request * rptr);
+	struct rest_response  * (*options)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	struct rest_extension * (*extension)(void * i,struct rest_server * sptr,struct rest_extension * xptr);
 	int 			(*before)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	int 			(*after)(void * i,struct rest_client * cptr, struct rest_request * rptr);
@@ -104,7 +115,10 @@ struct	rest_interface
 					int status, char * message, 
 					char * nature, 
 					char * agent, char * tls);
-
+	struct rest_header *    (*allowed_headers)(void * i, 
+						   struct rest_client * cptr, 
+						   struct rest_request * rptr, 
+						   struct rest_response * aptr);
 };
 
 struct	rest_client
