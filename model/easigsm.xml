@@ -41,6 +41,8 @@
 	        <attribute name='template' type='string' required='false' immutable='false'/>
 	        <attribute name='negotiation' type='string' required='false' immutable='false'/>
 	        <attribute name='agreement' type='string' required='false' immutable='false'/>
+	        <attribute name='manifest' type='string' required='false' immutable='false'/>
+	        <attribute name='plan' type='string' required='false' immutable='false'/>
 	        <attribute name='account' type='string' required='false' immutable='false'/>
 	        <attribute name='verify' type='string' required='false' immutable='false'/>
 	        <attribute name='accept' type='string' required='false' immutable='false'/>

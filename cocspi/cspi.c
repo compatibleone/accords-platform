@@ -5917,7 +5917,7 @@ private	char * compile_cordscript_value( char * expression, int argc, struct cor
 /*   ----------------------- */
 /*   compile_cordscript_file */
 /*   ----------------------- */
-public struct cordscript_context	* compile_cordscript_file( char * expression, int argc, char * argv[] )
+public struct cordscript_context * compile_cordscript_file( char * expression, int argc, char * argv[] )
 {
 	struct	cordscript_instruction * iptr;
 	struct	cordscript_context * cptr;
@@ -6060,6 +6060,34 @@ public	char *	evaluate_cordscript( char * expression, int argc, char * argv[] )
 	}
 }
 
+/*	------------------------	*/
+/*	evaluate_cordscript_file	*/
+/*	------------------------	*/
+public	char *	evaluate_cordscript_file( char * expression, int argc, char * argv[] )
+{
+	struct	cordscript_context * cptr;
+	struct	cordscript_value   * vptr;
+	char *	rptr;
+	if (!( expression ))
+		return( expression );
+	else if (!( cptr = compile_cordscript_file( expression, argc, argv ) ))
+		return((char *) 0);
+	else if (!( vptr = execute_cordscript( cptr ) ))
+	{
+		cptr = liberate_cordscript_context( cptr );
+		return((char *) 0);
+	}
+	else if (!( rptr = allocate_string( vptr->value ) ))
+	{
+		cptr = liberate_cordscript_context( cptr );
+		return((char *) 0);
+	}
+	else
+	{
+		cptr = liberate_cordscript_context( cptr );
+		return( rptr );
+	}
+}
 
 /*   ----------- */
 /*   interpreter */
@@ -6100,7 +6128,7 @@ public	int	cordscript_interpreter( char * sptr, int argc, char * argv[] )
 
 
 /*	------------------------------------------------------------------	*/
-/*	      e v a l u a t e _ c a t e g o r y _ c a r d s c r i p t		*/
+/*	      e v a l u a t e _ c a t e g o r y _ c o r d s c r i p t		*/
 /*	------------------------------------------------------------------	*/
 public	int	evaluate_category_cordscript(
 		char * component,
@@ -6135,6 +6163,44 @@ public	int	evaluate_category_cordscript(
 		argv[argc++] = default_tls();
 		argv[argc] = (char *) 0;
 		if (!( result = evaluate_cordscript( expression, argc, argv )))
+			return( 0 );
+		else	return( atoi( result ) );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*	e v a l u a t e _ c a t e g o r y _ c o r d s c r i p t _ f i l e 	*/
+/*	------------------------------------------------------------------	*/
+public	int	evaluate_category_cordscript_file(
+		char * component,
+		char * category,
+		char * id,
+		char * filename,
+		char * parameters )
+{
+	char *	argv[10];
+	int	argc=0;
+	char *	result;
+	char 	buffer[2048];
+	char 	other[1024];
+
+	if (!( rest_valid_string( filename ) ))
+		return( 0 );
+	else 
+	{
+		/* ----------------------------------------------------------------------- */
+		/* CORDSCRIPT: CALLER, INSTANCE ID, PARAMETERS, PUBLISHER, OPERATOR, TLS   */
+		/* ----------------------------------------------------------------------- */
+		sprintf(buffer,"%s/%s/%s",get_identity(), category, id );
+		sprintf(other,"%s.%s",component,category);
+		argv[argc++] = other;
+		argv[argc++] = buffer;
+		argv[argc++] = parameters;
+		argv[argc++] = default_publisher();
+		argv[argc++] = default_operator();
+		argv[argc++] = default_tls();
+		argv[argc] = (char *) 0;
+		if (!( result = evaluate_cordscript_file( filename, argc, argv )))
 			return( 0 );
 		else	return( atoi( result ) );
 	}

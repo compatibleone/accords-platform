@@ -161,7 +161,7 @@ private	struct	rest_response * gsm_start_instance(
 	{
 		if ( rest_valid_string( pptr->start ) )
 		{
-			evaluate_category_cordscript( "easigsm", "instance", pptr->id, pptr->start, "" );
+			evaluate_category_cordscript_file( "easigsm", "gsm_instance", pptr->id, pptr->start, "" );
 			pptr->state = _OCCI_RUNNING;
 			autosave_gsm_instance_nodes();
 		 	return( rest_html_response( aptr, 200, "OK Started" ) );
@@ -195,8 +195,8 @@ private	struct	rest_response * gsm_scaleup_instance(
 	{
 		if ( rest_valid_string( pptr->scaleup ) )
 		{
-			evaluate_category_cordscript( "easigsm", "instance", pptr->id, pptr->scaleup, "" );
-		 	return( rest_html_response( aptr, 200, "OK Started" ) );
+			evaluate_category_cordscript_file( "easigsm", "gsm_instance", pptr->id, pptr->scaleup, "" );
+		 	return( rest_html_response( aptr, 200, "OK Scaled" ) );
 		}
 		else
 		{
@@ -225,8 +225,8 @@ private	struct	rest_response * gsm_scaledown_instance(
 	{
 		if ( rest_valid_string( pptr->scaledown ) )
 		{
-			evaluate_category_cordscript( "easigsm", "instance", pptr->id, pptr->scaledown, "" );
-		 	return( rest_html_response( aptr, 200, "OK Started" ) );
+			evaluate_category_cordscript_file( "easigsm", "gsm_instance", pptr->id, pptr->scaledown, "" );
+		 	return( rest_html_response( aptr, 200, "OK Scaled" ) );
 		}
 		else
 		{
@@ -254,10 +254,10 @@ private	struct	rest_response * gsm_stop_instance(
 	{
 		if ( rest_valid_string( pptr->stop ) )
 		{
-			evaluate_category_cordscript( "easigsm", "instance", pptr->id, pptr->stop, "" );
-			pptr->state = _OCCI_RUNNING;
+			evaluate_category_cordscript_file( "easigsm", "gsm_instance", pptr->id, pptr->stop, "" );
+			pptr->state = _OCCI_IDLE;
 			autosave_gsm_instance_nodes();
-		 	return( rest_html_response( aptr, 200, "OK Started" ) );
+		 	return( rest_html_response( aptr, 200, "OK Stopped" ) );
 		}
 		else
 		{
@@ -287,7 +287,7 @@ private	struct	rest_response * gsm_verify_agreement(
 	{
 		if ( rest_valid_string( pptr->verify ) )
 		{
-			evaluate_category_cordscript( "easigsm", "agreement", pptr->id, pptr->verify, "" );
+			evaluate_category_cordscript_file( "easigsm", "gsm_agreement", pptr->id, pptr->verify, "" );
 			pptr->state = _OCCI_RUNNING;
 			autosave_gsm_agreement_nodes();
 		 	return( rest_html_response( aptr, 200, "OK Started" ) );
@@ -413,9 +413,9 @@ private	struct	rest_response * gsm_accept_agreement(
 	 	return( rest_html_response( aptr, 200, "OK Accepted" ) );
 	else
 	{
-		if ( rest_valid_string( pptr->verify ) )
+		if ( rest_valid_string( pptr->accept ) )
 		{
-			evaluate_category_cordscript( "easigsm", "agreement", pptr->id, pptr->accept, "" );
+			evaluate_category_cordscript_file( "easigsm", "gsm_agreement", pptr->id, pptr->accept, "" );
 			pptr->state = _OCCI_RUNNING;
 			autosave_gsm_agreement_nodes();
 		 	return( rest_html_response( aptr, 200, "OK Started" ) );
@@ -448,7 +448,7 @@ private	struct	rest_response * gsm_refuse_agreement(
 	{
 		if ( rest_valid_string( pptr->refuse ) )
 		{
-			evaluate_category_cordscript( "easigsm", "agreement", pptr->id, pptr->refuse, "" );
+			evaluate_category_cordscript_file( "easigsm", "gsm_agreement", pptr->id, pptr->refuse, "" );
 			pptr->state = _OCCI_RUNNING;
 			autosave_gsm_agreement_nodes();
 		 	return( rest_html_response( aptr, 200, "OK Started" ) );

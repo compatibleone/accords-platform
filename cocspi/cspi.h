@@ -154,7 +154,9 @@ public struct cordscript_context	* compile_cordscript_string( char * expression,
 public struct cordscript_context	* compile_cordscript_file( char * expression, int argc, char * argv[] );
 public struct cordscript_value 		* execute_cordscript( struct cordscript_context * cptr );
 public char *				  evaluate_cordscript( char * expression, int argc, char * argv[] );
+public char *				  evaluate_cordscript_file( char * expression, int argc, char * argv[] );
 public int evaluate_category_cordscript(char * component,char * category,char * id,char * expression,char * parameters);
+public int evaluate_category_cordscript_file(char * component,char * category,char * id,char * expression,char * parameters);
 
 #endif	/* _cspi_h */
 
