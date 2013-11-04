@@ -34,6 +34,7 @@ struct	orga_transaction
 	char *	operator;
 	char *	label;
 	char *	value;
+	char *	measures;
 	char *	currency;
 };
 

@@ -364,7 +364,6 @@ public struct rest_response *  orga_create_transaction  ( struct orga_subscripti
 	else
 	{
 		fprintf(h,"{\n");
-		fprintf(h,"\"paymentReservationRequest\":{\n"); 
 		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->operator); 
 		fprintf(h,"\"onBehalfOf\":\"%s|%s\"\n",tptr->operator,tptr->account); 
 		fprintf(h,"\"transactionOperationStatus\":\"%s\"\n","Charged"); 
@@ -372,9 +371,9 @@ public struct rest_response *  orga_create_transaction  ( struct orga_subscripti
 		fprintf(h,"\"serviceId\":\"%s\"\n",tptr->label);
 		fprintf(h,"\"amount\":\"%s\"\n",tptr->value);
 		fprintf(h,"\"currency\":\"%s\"\n",tptr->currency);
+		fprintf(h,"\"measures\":[\"%s\"]\n",tptr->measures);
 		fprintf(h,"\"description\":\"charged %s\"\n",tptr->label);
-
-		fprintf(h,"}\n}\n");
+		fprintf(h,"}\n");
 		fclose(h);
 	}
 	sprintf( buffer,"%s/payment/%s/transactions/amount",sptr->base,tptr->operator);
@@ -397,7 +396,6 @@ public struct rest_response *  orga_update_transaction  ( struct orga_subscripti
 	else
 	{
 		fprintf(h,"{\n");
-		fprintf(h,"\"paymentReservationRequest\":{\n"); 
 		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->operator);
 		fprintf(h,"\"onBehalfOf\":\"%s|%s\"\n",tptr->operator,tptr->account); 
 		fprintf(h,"\"transactionOperationStatus\":\"%s\"\n","Adjusted"); 
@@ -405,10 +403,9 @@ public struct rest_response *  orga_update_transaction  ( struct orga_subscripti
 		fprintf(h,"\"serviceId\":\"%s\"\n",tptr->label);
 		fprintf(h,"\"ammount\":\"%s\"\n",tptr->value);
 		fprintf(h,"\"currency\":\"%s\"\n",tptr->currency);
+		fprintf(h,"\"measures\":[\"%s\"]\n",tptr->measures);
 		fprintf(h,"\"description\":\"adjustment %s\"\n",tptr->label);
-
-
-		fprintf(h,"}\n}\n");
+		fprintf(h,"}\n");
 		fclose(h);
 	}
 	sprintf( buffer,"%s/payment/%s/transactions/amount",sptr->base,tptr->operator);
@@ -453,7 +450,6 @@ public struct rest_response *  orga_delete_transaction  ( struct orga_subscripti
 	else
 	{
 		fprintf(h,"{\n");
-		fprintf(h,"\"paymentReservationRequest\":{\n"); 
 		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->operator); 
 		fprintf(h,"\"onBehalfOf\":\"%s|%s\"\n",tptr->operator,tptr->account); 
 		fprintf(h,"\"transactionOperationStatus\":\"%s\"\n","Refunded"); 
@@ -461,8 +457,9 @@ public struct rest_response *  orga_delete_transaction  ( struct orga_subscripti
 		fprintf(h,"\"serviceId\":\"%s\"\n",tptr->label);
 		fprintf(h,"\"amount\":\"%s\"\n",tptr->value);
 		fprintf(h,"\"currency\":\"%s\"\n",tptr->currency);
+		fprintf(h,"\"measures\":[\"%s\"]\n",tptr->measures);
 		fprintf(h,"\"description\":\"deleted or refunded %s\"\n",tptr->label);
-		fprintf(h,"}\n}\n");
+		fprintf(h,"\n");
 		fclose(h);
 	}
 	sprintf( buffer,"%s/payment/%s/transactions/amount",sptr->base,tptr->operator);

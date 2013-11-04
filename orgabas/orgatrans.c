@@ -101,8 +101,9 @@ private	int	build_transaction( struct cords_transaction * pptr, struct orga_tran
 			zptr = occi_remove_response( zptr );
 		}
 	}
-
-	return( 1 );
+	if (!( tptr->measures = allocate_string("") ))
+		return( 0 );
+	else	return( 1 );
 }
 
 /* 	--------------------------------------		*/
