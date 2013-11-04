@@ -161,7 +161,7 @@ public struct rest_response *  orga_create_user  ( struct orga_subscription * sp
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/customerProfile",sptr->base,sptr->version);
+	sprintf( buffer,"%s/customerProfile/%s",sptr->base,uptr->id);
 	if ( check_verbose() ) { printf("ORGA CLIENT: CREATE USER:\n\turl=%s\n\tfile=%s\n",buffer,filename); }
 	return( orga_post_request(sptr, buffer, filename  ) );
 }
@@ -191,7 +191,7 @@ public struct rest_response *  orga_update_user  ( struct orga_subscription * sp
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/customerProfile/%s",sptr->base,sptr->version,uptr->id);
+	sprintf( buffer,"%s/customerProfile/%s",sptr->base,uptr->id);
 	if ( check_verbose() ) { printf("ORGA CLIENT: UPDATE USER:\n\turl=%s\n\tfile=%s\n",buffer,filename); }
 	return( orga_put_request( sptr,  buffer, filename ) );
 }
@@ -216,7 +216,7 @@ public struct rest_response *  orga_retrieve_user( struct orga_subscription * sp
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/customerProfile/%s",sptr->base,sptr->version,uptr->id);
+	sprintf( buffer,"%s/customerProfile/%s",sptr->base,uptr->id);
 	if ( check_verbose() ) { printf("ORGA CLIENT: RETRIEVE USER:\n\turl=%s\n\tfile=%s\n",buffer,filename); }
 	return( orga_get_request( sptr,  buffer, filename ) );
 }
@@ -227,7 +227,7 @@ public struct rest_response *  orga_retrieve_user( struct orga_subscription * sp
 public struct rest_response *  orga_list_user( struct orga_subscription * sptr, struct cords_account * uptr )
 {
 	char	buffer[2048];
-	sprintf( buffer,"%s/%s/customerProfile",sptr->base,sptr->version);
+	sprintf( buffer,"%s/customerProfile",sptr->base);
 	if ( check_verbose() ) { printf("ORGA CLIENT: LIST USER:\n\turl=%s\n",buffer); }
 	return( orga_get_request( sptr,  buffer, (char *) 0 ) );
 }
@@ -254,7 +254,7 @@ public struct rest_response *  orga_delete_user  ( struct orga_subscription * sp
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/customerProfile/%s",sptr->base,sptr->version,uptr->id);
+	sprintf( buffer,"%s/customerProfile/%s",sptr->base,uptr->id);
 	if ( check_verbose() ) { printf("ORGA CLIENT: DELETE USER:\n\turl=%s\n\tfile=%s\n",buffer,filename); }
 	return( orga_delete_request( sptr,  buffer, filename ) );
 }
@@ -285,7 +285,7 @@ public struct rest_response *  orga_create_account  ( struct orga_subscription *
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/account",sptr->base,sptr->version);
+	sprintf( buffer,"%s/account",sptr->base);
 	return( orga_post_request( sptr,  buffer,filename ) );
 }
 
@@ -309,7 +309,7 @@ public struct rest_response *  orga_update_account  ( struct orga_subscription *
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/account/%s",sptr->base,sptr->version,aptr->id);
+	sprintf( buffer,"%s/account/%s",sptr->base,aptr->id);
 	return( orga_put_request( sptr,  buffer,filename ) );
 }
 
@@ -319,7 +319,7 @@ public struct rest_response *  orga_update_account  ( struct orga_subscription *
 public struct rest_response *  orga_retrieve_account( struct orga_subscription * sptr, struct orga_account * aptr )
 {
 	char	buffer[2048];
-	sprintf( buffer,"%s/%s/account/%s",sptr->base,sptr->version,aptr->id);
+	sprintf( buffer,"%s/account/%s",sptr->base,aptr->id);
 	return( orga_get_request( sptr,buffer, (char *) 0 ) );
 }
 
@@ -329,7 +329,7 @@ public struct rest_response *  orga_retrieve_account( struct orga_subscription *
 public struct rest_response *  orga_list_account( struct orga_subscription * sptr, struct orga_account * aptr )
 {
 	char	buffer[2048];
-	sprintf( buffer,"%s/%s/account",sptr->base,sptr->version);
+	sprintf( buffer,"%s/account",sptr->base);
 	return( orga_get_request( sptr,buffer, (char *) 0 ) );
 }
 
@@ -339,7 +339,7 @@ public struct rest_response *  orga_list_account( struct orga_subscription * spt
 public struct rest_response *  orga_delete_account  ( struct orga_subscription * sptr, struct orga_account * aptr )
 {
 	char	buffer[2048];
-	sprintf( buffer,"%s/%s/account/%s",sptr->base,sptr->version,aptr->id);
+	sprintf( buffer,"%s/account/%s",sptr->base,aptr->id);
 	return( orga_delete_request( sptr,buffer, (char *) 0 ) );
 }
 
@@ -364,9 +364,9 @@ public struct rest_response *  orga_create_transaction  ( struct orga_subscripti
 	else
 	{
 		fprintf(h,"{\n");
-		fprintf(h,"\"customerTransaction\":{\n"); 
-
-		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->account); 
+		fprintf(h,"\"paymentReservationRequest\":{\n"); 
+		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->operator); 
+		fprintf(h,"\"onBehalfOf\":\"%s|%s\"\n",tptr->operator,tptr->account); 
 		fprintf(h,"\"transactionOperationStatus\":\"%s\"\n","Charged"); 
 		fprintf(h,"\"referenceCode\":\"ORGABAS-REF-%u\"\n",orga_reference_code()); 
 		fprintf(h,"\"serviceId\":\"%s\"\n",tptr->label);
@@ -377,7 +377,7 @@ public struct rest_response *  orga_create_transaction  ( struct orga_subscripti
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/payment/%s/transactions/amount",sptr->base,sptr->version,tptr->account);
+	sprintf( buffer,"%s/payment/%s/transactions/amount",sptr->base,tptr->operator);
 	if ( check_verbose() ) { printf("ORGA CLIENT: CREATE TRANSACTION:\n\turl=%s\n\tfile=%s\n",buffer,filename); }
 	return( orga_post_request( sptr,buffer,filename ) );
 }
@@ -397,9 +397,9 @@ public struct rest_response *  orga_update_transaction  ( struct orga_subscripti
 	else
 	{
 		fprintf(h,"{\n");
-		fprintf(h,"\"customerTransaction\":{\n"); 
-
-		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->account); 
+		fprintf(h,"\"paymentReservationRequest\":{\n"); 
+		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->operator);
+		fprintf(h,"\"onBehalfOf\":\"%s|%s\"\n",tptr->operator,tptr->account); 
 		fprintf(h,"\"transactionOperationStatus\":\"%s\"\n","Adjusted"); 
 		fprintf(h,"\"referenceCode\":\"ORGABAS-REF-%u\"\n",orga_reference_code()); 
 		fprintf(h,"\"serviceId\":\"%s\"\n",tptr->label);
@@ -411,7 +411,7 @@ public struct rest_response *  orga_update_transaction  ( struct orga_subscripti
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/payment/%s/transactions/amount",sptr->base,sptr->version,tptr->account);
+	sprintf( buffer,"%s/payment/%s/transactions/amount",sptr->base,tptr->operator);
 	if ( check_verbose() ) { printf("ORGA CLIENT: UPDATE TRANSACTION:\n\turl=%s\n\tfile=%s\n",buffer,filename); }
 	return( orga_put_request( sptr,buffer,filename ) );
 }
@@ -422,7 +422,7 @@ public struct rest_response *  orga_update_transaction  ( struct orga_subscripti
 public struct rest_response *  orga_retrieve_transaction( struct orga_subscription * sptr, struct orga_transaction * tptr )
 {
 	char	buffer[2048];
-	sprintf( buffer,"%s/%s/payment/%s/transactions/amount",sptr->base,sptr->version,tptr->account);
+	sprintf( buffer,"%s/payment/%s/transactions/amount",sptr->base,tptr->operator);
 	if ( check_verbose() ) { printf("ORGA CLIENT: RETRIEVE TRANSACTION:\n\turl=%s\n",buffer); }
 	return( orga_get_request( sptr,buffer, (char *) 0 ) );
 }
@@ -433,7 +433,7 @@ public struct rest_response *  orga_retrieve_transaction( struct orga_subscripti
 public struct rest_response *  orga_list_transaction( struct orga_subscription * sptr, struct orga_transaction * tptr )
 {
 	char	buffer[2048];
-	sprintf( buffer,"%s/%s/payment/%s/transactions/amount",sptr->base,sptr->version,tptr->account);
+	sprintf( buffer,"%s/payment/%s/transactions/amount",sptr->base,tptr->operator);
 	if ( check_verbose() ) { printf("ORGA CLIENT: LIST TRANSACTION:\n\turl=%s\n",buffer); }
 	return( orga_get_request( sptr,buffer, (char *) 0 ) );
 }
@@ -453,20 +453,19 @@ public struct rest_response *  orga_delete_transaction  ( struct orga_subscripti
 	else
 	{
 		fprintf(h,"{\n");
-		fprintf(h,"\"customerTransaction\":{\n"); 
-
-		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->account); 
+		fprintf(h,"\"paymentReservationRequest\":{\n"); 
+		fprintf(h,"\"endUserId\":\"%s\"\n",tptr->operator); 
+		fprintf(h,"\"onBehalfOf\":\"%s|%s\"\n",tptr->operator,tptr->account); 
 		fprintf(h,"\"transactionOperationStatus\":\"%s\"\n","Refunded"); 
 		fprintf(h,"\"referenceCode\":\"ORGABAS-REF-%u\"\n",orga_reference_code()); 
 		fprintf(h,"\"serviceId\":\"%s\"\n",tptr->label);
 		fprintf(h,"\"amount\":\"%s\"\n",tptr->value);
 		fprintf(h,"\"currency\":\"%s\"\n",tptr->currency);
 		fprintf(h,"\"description\":\"deleted or refunded %s\"\n",tptr->label);
-
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
-	sprintf( buffer,"%s/%s/payment/%s/transactions/amount",sptr->base,sptr->version,tptr->account);
+	sprintf( buffer,"%s/payment/%s/transactions/amount",sptr->base,tptr->operator);
 	if ( check_verbose() ) { printf("ORGA CLIENT: DELETE TRANSACTION:\n\turl=%s\n\tfile=%s\n",buffer,filename); }
 	return( orga_delete_request( sptr,buffer, filename ) );
 }

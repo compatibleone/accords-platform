@@ -5,7 +5,10 @@
 	    <attributes>
 	        <attribute name='name' type='string' required='false' immutable='false'/>
 	        <attribute name='url' type='string' required='false' immutable='false'/>
-	        <attribute name='state' type='int' required='false' immutable='true'/>
+	        <attribute name='mimetype' type='string' required='false' immutable='false'/>
+	        <attribute name='provider' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='string' required='false' immutable='true'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
@@ -14,7 +17,13 @@
 	<category term='ecslam_agreement' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/ecslam_agreement/' rel='http://schemas.ogf.org/occi/core#resource' structname='ecslam_agreement'>
 	    <attributes>
 	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='template' type='string' required='false' immutable='false'/>
+	        <attribute name='provider' type='string' required='false' immutable='false'/>
+	        <attribute name='consumer' type='string' required='false' immutable='false'/>
 	        <attribute name='url' type='string' required='false' immutable='false'/>
+	        <attribute name='mimetype' type='string' required='false' immutable='false'/>
+	        <attribute name='negotiation' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='string' required='false' immutable='true'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
@@ -24,8 +33,12 @@
 	<category term='ecslam_negotiation' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/ecslam_negotiation/' rel='http://schemas.ogf.org/occi/core#resource' structname='ecslam_negotiation'>
 	    <attributes>
 	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='service' type='string' required='false' immutable='false'/>
-	        <attribute name='offer' type='string' required='false' immutable='false'/>
+	        <attribute name='template' type='string' required='false' immutable='false'/>
+	        <attribute name='provider' type='string' required='false' immutable='false'/>
+	        <attribute name='consumer' type='string' required='false' immutable='false'/>
+	        <attribute name='url' type='string' required='false' immutable='false'/>
+	        <attribute name='mimetype' type='string' required='false' immutable='false'/>
+	        <attribute name='status' type='string' required='false' immutable='true'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>

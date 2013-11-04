@@ -31,6 +31,7 @@ struct	orga_transaction
 	char *	id;
 	char *	type;
 	char *	account;
+	char *	operator;
 	char *	label;
 	char *	value;
 	char *	currency;

@@ -9,6 +9,7 @@
 	        char *  id;
 	        char *  type;
 	        char *  account;
+	        char *  operator;
 	        char *  label;
 	        char *  value;
 	        char *  currency;
@@ -41,13 +42,40 @@
         	char *  operator;
 	}						*/
 /* 	--------------------------------------		*/
+private	char * operatoraccount=(char *) 0;
+
+private	char * resolve_operator_account()
+{
+	char *	operator;
+	struct	occi_response * zptr;
+	struct	occi_response * uptr;
+	struct	occi_element * dptr;
+	if (!( operatoraccount ))
+	{
+		if (!( operator = default_operator()))
+			return( (char *) 0 );
+		else if (!( zptr = cords_retrieve_named_instance_list( _CORDS_ACCOUNT, "occi.account.name", operator, get_default_agent(), default_tls() ) ))
+			return( (char *) 0 );
+		else if (!( uptr = cords_retrieve_named_instance( zptr, get_default_agent(), default_tls() ) ))
+			return( (char *) 0 );
+		else if (!( dptr = occi_locate_element ( zptr->first, "occi.core.id" )))
+			return( (char *) 0 );
+		else if (!( operatoraccount = allocate_string( dptr->value ) ))
+			return( (char *) 0 );
+	 	else if (!( operatoraccount = occi_unquoted_value( operatoraccount ) ))
+			return( (char *) 0 );
+	}
+	return( allocate_string( operatoraccount ) );
+}
 
 private	int	build_transaction( struct cords_transaction * pptr, struct orga_transaction * tptr )
 {
 	struct	occi_response * zptr;
 	struct	occi_element * eptr;
 
-	if (!( rest_valid_string( pptr->account ) ))
+	if (!( tptr->operator = resolve_operator_account()))
+		return(0);
+	else if (!( rest_valid_string( pptr->account ) ))
 		return(0);
 	else
 	{

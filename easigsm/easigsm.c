@@ -1,8 +1,6 @@
 #ifndef	_easigsm_c	
 #define	_easigsm_c
 
-#define	_DUMMY_ECSLAM 1
-
 #include "standard.h"
 #include "broker.h"
 #include "rest.h"
@@ -335,7 +333,7 @@ private	struct	rest_response * ecslam_negotiate_negotiation(
 			zptr = occi_remove_response( zptr );
 		 	return( rest_html_response( aptr, 500, "Server Failure" ) );
 		}
-		else if (!( pptr->offer = allocate_string( ihost ) ))
+		else if (!( pptr->url = allocate_string( ihost ) ))
 		{
 			zptr = occi_remove_response( zptr );
 		 	return( rest_html_response( aptr, 500, "Server Failure" ) );
@@ -473,7 +471,7 @@ private	int	easigsm_operation( char * nptr )
 	struct	occi_category * first=(struct occi_category *) 0;
 	struct	occi_category * last=(struct occi_category *) 0;
 	struct	occi_category * optr=(struct occi_category *) 0;
-
+	char *	eptr;
 	set_autosave_cords_xlink_name("links_easigsm.xml");
 
 	rest_initialise_log( EasiGsm.monitor );
@@ -481,8 +479,9 @@ private	int	easigsm_operation( char * nptr )
 	/* ---------------------------------------- */
 	/* preparation of application category list */
 	/* ---------------------------------------- */
-
-#ifdef	_DUMMY_ECSLAM
+	if ((( eptr = getenv( "DUMMY_ECSLAM" )) != (char *) 0)
+	&& ( *eptr == '1' ))
+	{
 
 	if (!( optr = occi_ecslam_serviceTemplate_builder( EasiGsm.domain, "ecslam_serviceTemplate" ) ))
 		return( 27 );
@@ -512,7 +511,7 @@ private	int	easigsm_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
-#endif
+	}
 
 	if (!( optr = occi_gsm_agreement_builder( EasiGsm.domain, "gsm_agreement" ) ))
 		return( 27 );
