@@ -159,6 +159,8 @@ private	struct	rest_response * gsm_start_instance(
 	{
 		if ( rest_valid_string( pptr->start ) )
 		{
+			pptr->state = 4;
+			autosave_gsm_instance_nodes();
 			evaluate_category_cordscript_file( "easigsm", "gsm_instance", pptr->id, pptr->start, "" );
 			pptr->state = _OCCI_RUNNING;
 			autosave_gsm_instance_nodes();
@@ -246,12 +248,14 @@ private	struct	rest_response * gsm_stop_instance(
 	struct	gsm_instance * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
-	else if ( pptr->state == _OCCI_IDLE )
+	else if ( pptr->state != _OCCI_RUNNING )
 	 	return( rest_html_response( aptr, 200, "OK Stopped" ) );
 	else
 	{
 		if ( rest_valid_string( pptr->stop ) )
 		{
+			pptr->state = 8;
+			autosave_gsm_instance_nodes();
 			evaluate_category_cordscript_file( "easigsm", "gsm_instance", pptr->id, pptr->stop, "" );
 			pptr->state = _OCCI_IDLE;
 			autosave_gsm_instance_nodes();
