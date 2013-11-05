@@ -1702,7 +1702,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		fprintf(f,"\tif (!( pptr = target_void )) return;\n");
     		fprintf(f,"\tsprintf(prefix,\"%%s.%%s.\",cptr->domain,cptr->id);\n");
     		fprintf(f,"\tif (!( strncmp( field_name, prefix, strlen(prefix) ) )) {\n");
-    		fprintf(f,"\t\tnptr += strlen(prefix);\n");
+    		fprintf(f,"\t\tfield_name += strlen(prefix);\n");
     		for(i=1;i<dim;i++)
     		{
       			fprintf(f,"\t\tif (!( strcmp( field_name, \"%s\" ) ))\n",nameAtr[i]);
