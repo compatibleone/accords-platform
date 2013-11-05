@@ -1785,7 +1785,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		}
     		for(i=0;i<dim;i++)
     		{
-     			fprintf(f,"\tif (( filter->%s ){\n",nameAtr[i]);
+     			fprintf(f,"\tif ( filter->%s ){\n",nameAtr[i]);
      			fprintf(f,"\t\tif (!( pptr->%s ))\n",nameAtr[i]);
      			fprintf(f,"\t\t\treturn(0);\n");
      			fprintf(f,"\t\telse if ( strcmp(pptr->%s,filter->attributes->%s) != 0)\n",nameAtr[i],nameAtr[i]);
@@ -1955,6 +1955,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
     		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
     		fprintf(f,"\tchar * reqhost;\n");
+		fprintf(f,"\tint reqport = 0;\n");
     		fprintf(f,"\tiptr = optr->callback;\n");
     		fprintf(f,"\tif (!( reqhost = rest_request_host( rptr ) ))\n");
     		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
@@ -2099,14 +2100,15 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		if(!flag)
     		{
        			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-       			fprintf(f,"\tstruct cords_%s_occi_filter * filter;\n",categoryName);
+       			fprintf(f,"\tstruct cords_%s_occi_filter filter;\n",categoryName);
     		}
     		else
     		{
        			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-       			fprintf(f,"\tstruct %s_occi_filter * filter;\n",categoryName);
+       			fprintf(f,"\tstruct %s_occi_filter filter;\n",categoryName);
     		}
     		fprintf(f,"\tchar * reqhost;\n");
+		fprintf(f,"\tint reqport = 0;\n");
     		fprintf(f,"\tif (!( reqhost = rest_request_host( rptr ) ))\n");
     		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
     		if(!flag) fprintf(f,"\telse if (!(filter_cords_%s_info(&filter, optr, rptr, aptr ) ))\n",categoryName);
