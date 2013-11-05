@@ -2153,12 +2153,12 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		if(!flag)
     		{
       			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-      			fprintf(f,"\tstruct cords_%s_occi_filter * filter;\n",categoryName);
+      			fprintf(f,"\tstruct cords_%s_occi_filter filter;\n",categoryName);
     		}
     		else
     		{
       			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-      			fprintf(f,"\tstruct %s * fptr;\n",categoryName);
+      			fprintf(f,"\tstruct %s_occi_filter filter;\n",categoryName);
     		}
     		fprintf(f,"\tiptr = optr->callback;\n");
     		if(!flag) fprintf(f,"\tif (!(filter_cords_%s_info( &filter, optr, rptr, aptr ) ))\n",categoryName);
@@ -2168,8 +2168,8 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		else fprintf(f,"\tnptr=%s_first;\n",categoryName);
     		fprintf(f,"\twhile (nptr != (struct occi_kind_node *) 0) {\n");
     		fprintf(f,"\t\tif ((!( pptr = nptr->contents ))\n");
-    		if(!flag) fprintf(f,"\t\t||  (!( pass_cords_%s_filter( pptr, filter ) ))) {\n",categoryName);
-    		else fprintf(f,"\t\t||  (!( pass_%s_filter( pptr, filter ) ))) {\n",categoryName);
+    		if(!flag) fprintf(f,"\t\t||  (!( pass_cords_%s_filter( pptr, &filter ) ))) {\n",categoryName);
+    		else fprintf(f,"\t\t||  (!( pass_%s_filter( pptr, &filter ) ))) {\n",categoryName);
     		fprintf(f,"\t\t\tnptr = nptr->next;\n");
     		fprintf(f,"\t\t\tcontinue;\n");
     		fprintf(f,"\t\t\t}\n");
