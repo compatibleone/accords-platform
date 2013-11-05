@@ -995,10 +995,13 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       
       			fprintf(f,"\t\t//           python interface\n");
       			fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pygen\",PYPATH);\n");
+			fprintf(f,"\t\tPyEval_AcquireLock();\n");
       			fprintf(f,"\t\tpythr = Py_NewInterpreter();\n");
+			fprintf(f,"\t\tif(pythr == NULL) printf(\"interpreter initialization error\\n\");\n");
+			fprintf(f,"\t\tPyThreadState_Swap(pythr);\n");
       			fprintf(f,"\t\tpython_path(srcdir);\n"); 
       			fprintf(f,"\t\tpName = PyString_FromString(\"%s\");\n",categoryName); 
-      			fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %s no such file name\\n\");\n",categoryName);
+      			fprintf(f,"\t\tif(pName == NULL) printf(\"error: in %s no such file name\\n\");\n",categoryName);
       			fprintf(f,"\t\telse pModule = PyImport_Import(pName);\n");
       			fprintf(f,"\t\tif(pModule == NULL) printf(\"error: failed to load %s module\\n\");\n",categoryName);
       			fprintf(f,"\t\telse pDict = PyModule_GetDict(pModule);\n");
@@ -1011,14 +1014,22 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       			fprintf(f,"\t\tif (!result || PyErr_Occurred())\n");
       			fprintf(f,"\t\t{\n");
       			fprintf(f,"\t\t\tPyErr_Print();\n");
-      			fprintf(f,"\t\t\treturn 0;\n");
+			fprintf(f,"\t\t\tPyEval_ReleaseThread(pythr);\n");
+                	fprintf(f,"\t\t\tPyEval_AcquireThread(pythr);\n");
+                	fprintf(f,"\t\t\tPy_EndInterpreter(pythr);\n");
+                	fprintf(f,"\t\t\tPyEval_ReleaseLock();\n");
+      			fprintf(f,"\t\t\treturn 1;\n");
       			fprintf(f,"\t\t}\n");
 
       
       			fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
       			fprintf(f,"\t\tPy_DECREF(pModule);\n");
       			fprintf(f,"\t\tPy_DECREF(pName);\n");
-      			fprintf(f,"\t\tPy_EndInterpreter(pythr);\n\n");
+
+			fprintf(f,"\t\tPyEval_ReleaseThread(pythr);\n"); 
+        		fprintf(f,"\t\tPyEval_AcquireThread(pythr);\n");
+        		fprintf(f,"\t\tPy_EndInterpreter(pythr);\n");
+        		fprintf(f,"\t\tPyEval_ReleaseLock();\n");
 
       			fprintf(f,"\tresetListe(&categoryAtr);\n");  
       			fprintf(f,"\ttoken= strtok(response,\",\");\n");
