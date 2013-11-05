@@ -1706,7 +1706,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		for(i=1;i<dim;i++)
     		{
       			fprintf(f,"\t\tif (!( strcmp( field_name, \"%s\" ) ))\n",nameAtr[i]);
-      			fprintf(f,"\t\t\tpptr->%s = allocate_string(vptr);\n",nameAtr[i]);
+      			fprintf(f,"\t\t\tpptr->%s = allocate_string(value);\n",nameAtr[i]);
     		}
     		fprintf(f,"\t}\n"); 
     		fprintf(f,"\treturn;\n");
