@@ -49,17 +49,17 @@
 #define J_CLASS_SRC "jaccords/jsrc/jclass/"
 #define J_CATEGACCESS_STRUCT "jaccords/jsrc/jcategaccess.h"
 
-int insertCategory(char pathf[], char categoryName[],int indice,int flag);
-void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[]);
-char *sub_str(const char *s, unsigned int start, unsigned int end);
-int insertInFile(char pathf[],char categoryName[],char categoryNames[]);
-int enTete(char pathf[]);
-char *getCategoryName(char strCt[],char *tok,int p);
-int getLineNumber(char pathf[]);
-int searchWord(char mot[], char line[]);
-int deleteInFile(char pathf[],char categoryName[]);
-void strConcat(char str1[],char str2[], char d);
+int jinsertCategory(char pathf[], char categoryName[],int indice,int flag);
+void jstr_sub(const char *s, unsigned int start, unsigned int end, char new_s[]);
+char *jsub_str(const char *s, unsigned int start, unsigned int end);
+int jinsertInFile(char pathf[],char categoryName[],char categoryNames[]);
+int jenTete(char pathf[]);
+char *jgetCategoryName(char strCt[],char *tok,int p);
+int jgetLineNumber(char pathf[]);
+int jsearchWord(char mot[], char line[]);
+int jdeleteInFile(char pathf[],char categoryName[]);
+void jstrConcat(char str1[],char str2[], char d);
 int insertInFileJStruct(char pathf[],char categoryName[],char categoryNames[]);
-int insertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[]);
+int jinsertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[]);
 
 #endif
