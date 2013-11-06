@@ -42,38 +42,12 @@
         	char *  operator;
 	}						*/
 /* 	--------------------------------------		*/
-private	char * operatoraccount=(char *) 0;
-
-private	char * resolve_operator_account()
-{
-	char *	operator;
-	struct	occi_response * zptr;
-	struct	occi_response * uptr;
-	struct	occi_element * dptr;
-	if (!( operatoraccount ))
-	{
-		if (!( operator = default_operator()))
-			return( (char *) 0 );
-		else if (!( zptr = cords_retrieve_named_instance_list( _CORDS_ACCOUNT, "occi.account.name", operator, get_default_agent(), default_tls() ) ))
-			return( (char *) 0 );
-		else if (!( uptr = cords_retrieve_named_instance( zptr, get_default_agent(), default_tls() ) ))
-			return( (char *) 0 );
-		else if (!( dptr = occi_locate_element ( zptr->first, "occi.core.id" )))
-			return( (char *) 0 );
-		else if (!( operatoraccount = allocate_string( dptr->value ) ))
-			return( (char *) 0 );
-	 	else if (!( operatoraccount = occi_unquoted_value( operatoraccount ) ))
-			return( (char *) 0 );
-	}
-	return( allocate_string( operatoraccount ) );
-}
-
 private	int	build_transaction( struct cords_transaction * pptr, struct orga_transaction * tptr )
 {
 	struct	occi_response * zptr;
 	struct	occi_element * eptr;
 
-	if (!( tptr->operator = resolve_operator_account()))
+	if (!( tptr->operator = resolve_provider_account()))
 		return(0);
 	else if (!( rest_valid_string( pptr->account ) ))
 		return(0);
@@ -140,7 +114,7 @@ private	int	create_transaction(struct occi_category * optr, void * vptr,struct r
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG) ))
+	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG,resolve_provider_account()) ))
 		return( 0 );
 	else if (!( build_transaction( pptr, &Transaction ) ))
 		return( 0 );
@@ -186,7 +160,7 @@ private	int	update_transaction(struct occi_category * optr, void * vptr,struct r
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG) ))
+	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG,resolve_provider_account()) ))
 		return( 0 );
 	else if (!( build_transaction( pptr, &Transaction ) ))
 		return( 0 );
@@ -218,7 +192,7 @@ private	int	delete_transaction(struct occi_category * optr, void * vptr,struct r
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG) ))
+	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG,resolve_provider_account()) ))
 		return( 0 );
 	else if (!( build_transaction( pptr, &Transaction ) ))
 		return( 0 );

@@ -18,7 +18,7 @@ public	char *	default_publisher()	{	return(publisher);	}
 public	char *	default_tls()		{	return(tls);		}
 public	char *	default_operator()	{	return(operator);	}
 public	char *	default_zone()		{	return(zone);		}
-
+public	char *	resolve_provider_account()	{ return( "provider"); }
 public	int	failure( int e, char * m1, char * m2 )
 {
 	if ( e )
@@ -208,7 +208,7 @@ private	int	orga_create_operation( struct orga_subscription * sptr,
 			return( 0 );
 		else if (!( orga_customer_name( p2 ) ))
 			return( 0 );
-		return( orga_check( orga_create_user( sptr, &Customer ) ));
+		return( orga_check( orga_create_user( sptr, &Customer, "Customer" ) ));
 	}
 	else if (!( strcasecmp( p1, "ACCOUNT" ) ))
 		return( orga_check( orga_create_account( sptr,&Account ) ));
@@ -237,7 +237,7 @@ private	int	orga_retrieve_operation( struct orga_subscription * sptr,
 	{
 		if (!( orga_customer_id( p2 ) ))
 			return( 0 );
-		else	return( orga_check( orga_retrieve_user( sptr, &Customer )) );
+		else	return( orga_check( orga_retrieve_user( sptr, &Customer, "Customer")) );
 	}
 	else if (!( strcasecmp( p1, "ACCOUNT" ) ))
 		return( orga_check( orga_retrieve_account( sptr,&Account )) );
@@ -256,7 +256,7 @@ private	int	orga_delete_operation( struct orga_subscription * sptr,
 	{
 		if (!( orga_customer_id( p2 ) ))
 			return( 0 );
-		else	return( orga_check( orga_delete_user( sptr, &Customer )) );
+		else	return( orga_check( orga_delete_user( sptr, &Customer, "Customer" )) );
 	}
 	else if (!( strcasecmp( p1, "ACCOUNT" ) ))
 		return( orga_check( orga_delete_account( sptr,&Account )) );
@@ -287,7 +287,7 @@ private	int	orga_update_operation( struct orga_subscription * sptr,
 			return( 0 );
 		else if (!( orga_customer_name( p3 ) ))
 			return( 0 );
-		else 	return( orga_check( orga_update_user( sptr, &Customer )) );
+		else 	return( orga_check( orga_update_user( sptr, &Customer, "Customer" )) );
 	}
 	else if (!( strcasecmp( p1, "ACCOUNT" ) ))
 		return( orga_check( orga_update_account( sptr,&Account )) );

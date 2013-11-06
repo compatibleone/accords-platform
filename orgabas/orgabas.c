@@ -99,6 +99,48 @@ private	int	banner()
 	return(0);
 
 }
+/*	-----------------------------------------------		*/
+/*	r e s o l v e _ o p e r a t o r _ a c c o u n t 	*/
+/*	-----------------------------------------------		*/
+private	char * provideraccount=(char *) 0;
+private	int	working=0;
+public 	char * ll_resolve_provider_account()
+{
+	char *	provider;
+	struct	occi_response * zptr;
+	struct	occi_response * uptr;
+	struct	occi_element * dptr;
+	if (!( provideraccount ))
+	{
+		if (!( provider = default_operator()))
+			return( (char *) 0 );
+		else if (!( zptr = cords_retrieve_named_instance_list( _CORDS_ACCOUNT, "occi.account.name", provider, get_default_agent(), default_tls() ) ))
+			return( (char *) 0 );
+		else if (!( uptr = cords_retrieve_named_instance( zptr, get_default_agent(), default_tls() ) ))
+			return( (char *) 0 );
+		else if (!( dptr = occi_locate_element ( uptr->first, "occi.core.id" )))
+			return( (char *) 0 );
+		else if (!( provideraccount = allocate_string( dptr->value ) ))
+			return( (char *) 0 );
+	 	else if (!( provideraccount = occi_unquoted_value( provideraccount ) ))
+			return( (char *) 0 );
+	}
+	return( allocate_string( provideraccount ) );
+}
+
+public 	char * resolve_provider_account()
+{
+	char * result=(char *) 0;
+	if ( working )
+		return( allocate_string( default_operator() ) );
+	else
+	{
+		working++;
+		result = ll_resolve_provider_account();
+		working--;
+		return( result );
+	}
+}
 
 /*	------------------------------------------------------------------	*/
 /*			o r g a b a s _ i n i t i a l i s e			*/

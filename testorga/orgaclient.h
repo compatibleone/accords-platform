@@ -42,6 +42,8 @@ struct	orga_subscription
 {
 	char *	name;
 	char *	password;
+	char *	operator;
+	char *	provider;
 	char *	tenant;
 	char *	account;
 	char *	host;
@@ -54,17 +56,18 @@ struct	orga_subscription
 /* ----------------------- */
 /* subscription interfaces */
 /* ----------------------- */
-public	struct orga_subscription * orga_initialise_subscription( char * host, char * account, char * pass, char * version, char * tls );
+public	char *	resolve_provider_account();
+public	struct orga_subscription * orga_initialise_subscription( char * host, char * account, char * pass, char * operator, char * provider, char * version, char * tls );
 public	struct orga_subscription * orga_liberate_subscription( struct orga_subscription * sptr );
 
 /* -------------------------- */
 /* user management interfaces */
 /* -------------------------- */
-public struct rest_response *  orga_create_user  ( struct orga_subscription * sptr, struct cords_account * uptr );
-public struct rest_response *  orga_update_user  ( struct orga_subscription * sptr, struct cords_account * uptr );
-public struct rest_response *  orga_retrieve_user( struct orga_subscription * sptr, struct cords_account * uptr );
+public struct rest_response *  orga_create_user  ( struct orga_subscription * sptr, struct cords_account * uptr, char * nature );
+public struct rest_response *  orga_update_user  ( struct orga_subscription * sptr, struct cords_account * uptr , char * nature);
+public struct rest_response *  orga_retrieve_user( struct orga_subscription * sptr, struct cords_account * uptr, char * nature );
 public struct rest_response *  orga_list_user( struct orga_subscription * sptr, struct cords_account * uptr );
-public struct rest_response *  orga_delete_user  ( struct orga_subscription * sptr, struct cords_account * uptr );
+public struct rest_response *  orga_delete_user  ( struct orga_subscription * sptr, struct cords_account * uptr, char * nature );
 
 /* ----------------------------- */
 /* account management interfaces */

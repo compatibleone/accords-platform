@@ -1,5 +1,19 @@
+
 #ifndef	_orgaccount_c
 #define	_orgaccount_c
+
+private	char *	resolve_account_nature( struct cords_account * pptr )
+{
+	char *	operator;
+
+	if (!( operator = default_operator() ))
+		return((char *) 0 );
+	else if (!( pptr->name ))
+		return( (char * ) 0 );
+	else if (!( strcmp( pptr->name, operator ) ))
+		return( "Provider" );
+	else	return( "Customer" );
+}
 
 /*	-------------------------------------------	*/
 /* 	      c r e a t e _ a c c o u n t  		*/
@@ -10,13 +24,16 @@ private	int	create_account(struct occi_category * optr, void * vptr,struct rest_
 	struct	orga_subscription * sptr;
 	struct	occi_kind_node * nptr;
 	struct cords_account * pptr;
+	char *	nature;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG) ))
+	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG,resolve_provider_account()) ))
 		return( 0 );
-	else if (!( aptr = orga_create_user( sptr, pptr ) ))
+	else if (!( nature = resolve_account_nature( pptr ) ))
+		return( 0 );
+	else if (!( aptr = orga_create_user( sptr, pptr, nature ) ))
 		return( 0 );
 	else
 	{
@@ -37,7 +54,7 @@ private	int	retrieve_account(struct occi_category * optr, void * vptr,struct res
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG) ))
+	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG,resolve_provider_account()) ))
 		return( 0 );
 	else	return(0);
 }
@@ -54,7 +71,7 @@ private	int	update_account(struct occi_category * optr, void * vptr,struct rest_
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG) ))
+	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG,resolve_provider_account()) ))
 		return( 0 );
 	else	return(0);
 }
@@ -68,13 +85,16 @@ private	int	delete_account(struct occi_category * optr, void * vptr,struct rest_
 	struct	orga_subscription * sptr;
 	struct	occi_kind_node * nptr;
 	struct cords_account * pptr;
+	char *	nature;
 	if (!( nptr = vptr ))
 		return(0);
 	else if (!( pptr = nptr->contents ))
 		return(0);
-	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG) ))
+	else if (!( sptr = check_orga_subscription(_ORGA_CLIENT_CONFIG,resolve_provider_account()) ))
 		return( 0 );
-	else if (!( aptr = orga_delete_user( sptr, pptr ) ))
+	else if (!( nature = resolve_account_nature( pptr ) ))
+		return( 0 );
+	else if (!( aptr = orga_delete_user( sptr, pptr, nature ) ))
 		return( 0 );
 	else
 	{
