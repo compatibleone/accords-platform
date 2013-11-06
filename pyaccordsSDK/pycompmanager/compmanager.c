@@ -1763,7 +1763,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		fprintf(f,"\t\treturn(0);\n");
     		if(!flag) fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_cords_%s_filter_on_field) )){\n",categoryName);
     		else fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_%s_filter_on_field) )){\n",categoryName);
-    		if(!flag) fprintf(f,"\t\tliberate_cords_%s(filter->attributtes);\n",categoryName);
+    		if(!flag) fprintf(f,"\t\tliberate_cords_%s(filter->attributes);\n",categoryName);
     		else fprintf(f,"\t\tliberate_%s(filter->attributes);\n",categoryName);
     		fprintf(f,"\t\treturn (0);\n");
     		fprintf(f,"\t}\n");
