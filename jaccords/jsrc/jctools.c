@@ -17,7 +17,7 @@
 
 #include "jctools.h"
 
-void strConcat(char str1[],char str2[],char c)
+void jstrConcat(char str1[],char str2[],char c)
 {
     	int i=0,j=0;
    

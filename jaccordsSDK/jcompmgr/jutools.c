@@ -26,7 +26,7 @@
 /* categoryName: char * the name of the category                                                             */
 /* return 1 if successfully inserted                                                                         */
 /*-----------------------------------------------------------------------------------------------------------*/
-int insertCategory(char pathf[], char categoryName[],int indice,int flag)
+int jinsertCategory(char pathf[], char categoryName[],int indice,int flag)
 {
  	char cordsh[DIM];
  	char cordshname[DIM];
@@ -74,27 +74,27 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
  
 	if(indice) 
 	{
-		if(!(insertInFile(jlistaction,jlistactionname,categoryName)))
+		if(!(jinsertInFile(jlistaction,jlistactionname,categoryName)))
 			return 0;
 	}
 
 	if(!flag)
 	{
-		if(!(insertInFile(cordsh,cordshname,categoryName)))
+		if(!(jinsertInFile(cordsh,cordshname,categoryName)))
 		 	return 0;
-		else if(!(insertInFileOcciStruct(occibuilder,occibuildername,categoryName)))
+		else if(!(jinsertInFileOcciStruct(occibuilder,occibuildername,categoryName)))
 		 	return 0;
 	}
  
-	if(!(insertInFileJStruct(occibuilderb,occibuildernameb,categoryName)))
+	if(!(jinsertInFileJStruct(occibuilderb,occibuildernameb,categoryName)))
 		return 0;
-	else if(!(insertInFile(cordsbase,cordsbasename,categoryName)))
+	else if(!(jinsertInFile(cordsbase,cordsbasename,categoryName)))
 		return 0;
-	else if(!(insertInFile(occicords,occicordsname,categoryName)))
+	else if(!(jinsertInFile(occicords,occicordsname,categoryName)))
 		return 0;
-	else if(!(insertInFile(jint,jintname,categoryName)))
+	else if(!(jinsertInFile(jint,jintname,categoryName)))
 		return 0;
-	else if(!(insertInFile(jListcateg,jListcategname,categoryName)))
+	else if(!(jinsertInFile(jListcateg,jListcategname,categoryName)))
 		return 0;
 	else
 		return 1;
@@ -106,7 +106,7 @@ int insertCategory(char pathf[], char categoryName[],int indice,int flag)
 /* categoryName: char * the name of the category                                                             */
 /* retutn 1 if successfully done                                                                             */
 /*-----------------------------------------------------------------------------------------------------------*/
-int insertInFile(char pathf[],char categoryName[],char categoryNames[])
+int jinsertInFile(char pathf[],char categoryName[],char categoryNames[])
 {
 	int a=0;
 	FILE *fIn;
@@ -137,14 +137,14 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[])
 	while(fgets(line,sizeof(line), fIn) != NULL)
 	{
 		line[strlen(line)]=0;
-		if(searchWord(categoryNames,line)==1)
+		if(jsearchWord(categoryNames,line)==1)
 		{
 			 a=1;
 			 fprintf(fOut,"%s",line);
 		}
 		else
 		{
-			 str_sub(line,0,5,strcats);
+			 jstr_sub(line,0,5,strcats);
 			 strcats[strlen(strcats)]=0;
 			 if(!(strcmp(strcats,"#endif"))) break;
 			 else fprintf(fOut,"%s",line);
@@ -173,7 +173,7 @@ int insertInFile(char pathf[],char categoryName[],char categoryNames[])
 /* categoryName: char * the name of the category                                                             */
 /* retutn 1 if successfully done                                                                             */
 /*-----------------------------------------------------------------------------------------------------------*/
-int insertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[])
+int jinsertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[])
 {
 	int a=0;
 	FILE *fIn;
@@ -203,7 +203,7 @@ int insertInFileOcciStruct(char pathf[],char categoryName[],char categoryNames[]
 	while(fgets(line,DIM, fIn) != NULL)
 	{
 		line[strlen(line)]=0;
-		if(searchWord(categoryNames,line)==1)
+		if(jsearchWord(categoryNames,line)==1)
 		{
 			  a=1;
 			  fprintf(fOut,"%s",line);
@@ -292,7 +292,7 @@ int insertInFileJStruct(char pathf[],char categoryName[],char categoryNames[])
 	while(fgets(line,sizeof(line), fIn) != NULL)
 	{
 		line[strlen(line)]=0;
-		if(searchWord(categoryNames,line)==1)
+		if(jsearchWord(categoryNames,line)==1)
 		{
 			 a=1;
 			 fprintf(fOut,"%s",line);
@@ -351,7 +351,7 @@ int insertInFileJStruct(char pathf[],char categoryName[],char categoryNames[])
 /* categoryName: char * name of the category                                                      */
 /* return 1 if succeeded                                                                          */
 /*------------------------------------------------------------------------------------------------*/
-int deleteInFile(char pathf[],char categoryName[])
+int jdeleteInFile(char pathf[],char categoryName[])
 {
 	FILE *fIn;
 	FILE *fOut;
@@ -373,7 +373,7 @@ int deleteInFile(char pathf[],char categoryName[])
 
 	while(fgets(line,sizeof line, fIn))
 	{
-		if(searchWord(categoryName,line)!=1)
+		if(jsearchWord(categoryName,line)!=1)
 		{
 			fprintf(fOut,"%s",line);
 		}
@@ -395,7 +395,7 @@ int deleteInFile(char pathf[],char categoryName[])
 /* p:(int) position of the name                                                                     */
 /* return a string the categoryName                                                                 */
 /*--------------------------------------------------------------------------------------------------*/
-char *getCategoryName(char strCt[],char * tok,int p)
+char *jgetCategoryName(char strCt[],char * tok,int p)
 {
 	 char *token=NULL;
 	 int i=0;
@@ -418,7 +418,7 @@ char *getCategoryName(char strCt[],char * tok,int p)
 /* line: char * the string                                                                        */
 /* return 1 if the word exist otherwise 0                                                         */
 /*------------------------------------------------------------------------------------------------*/
-int searchWord(char *mot,char *line)
+int jsearchWord(char *mot,char *line)
 {
     	char car = 0;
 	long i = 0;
@@ -450,7 +450,7 @@ int searchWord(char *mot,char *line)
 /* pathf: (char*) path name of the file                                                                  */
 /* return int the nubmer of line                                                                         */
 /*-------------------------------------------------------------------------------------------------------*/
-int getLineNumber(char pathf[])  
+int jgetLineNumber(char pathf[])  
 { 
 	FILE* fp = fopen (pathf, "r" );
 	unsigned long count = 0;
@@ -478,7 +478,7 @@ int getLineNumber(char pathf[])
 /* end: (int) the extracted string end                                                                              */
 /* new_s: (char*) the extracted string                                                                              */
 /*------------------------------------------------------------------------------------------------------------------*/
-void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
+void jstr_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
 {
 	if (s && (start < end))
 	{
@@ -500,7 +500,7 @@ void str_sub(const char *s, unsigned int start, unsigned int end, char new_s[])
 /* start: (int) the extracted string start                                                                           */
 /* end: (int) the extracted string end                                                                               */
 /*-------------------------------------------------------------------------------------------------------------------*/
-char *sub_str(const char *s, unsigned int start, unsigned int end)
+char *jsub_str(const char *s, unsigned int start, unsigned int end)
 {
 	char *new_s=NULL;
 	int i;
@@ -530,7 +530,7 @@ char *sub_str(const char *s, unsigned int start, unsigned int end)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Function to concatenate two string str1, str2 with  a dilimeter d                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
-void strConcat(char str1[],char str2[], char d)
+void jstrConcat(char str1[],char str2[], char d)
 {
 	int i=0,j=0;
 

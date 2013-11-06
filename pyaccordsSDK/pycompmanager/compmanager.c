@@ -656,7 +656,10 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
 
        			fprintf(f,"\t\t//           python interface\n");
        			fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pygen\",PYPATH);\n");
+			fprintf(f,"\t\tPyEval_AcquireLock();\n");
        			fprintf(f,"\t\tpythr = Py_NewInterpreter();\n");
+ 			fprintf(f,"\t\tif(pythr == NULL) printf(\"interpreter init error \\n\");\n");
+        		fprintf(f,"\t\tPyThreadState_Swap(pythr);\n");
        			fprintf(f,"\t\tpython_path(srcdir);\n"); 
        			fprintf(f,"\t\tpName = PyString_FromString(\"%sAct\");\n",categoryName); 
        			fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %sAct no such file name\\n\");\n",categoryName);
@@ -672,13 +675,21 @@ int generateCategoryActionCfile(char *categoryName,listc categoryAtr,listc categ
        			fprintf(f,"\t\tif(!result || PyErr_Occurred())\n");
        			fprintf(f,"\t\t{\n");
        			fprintf(f,"\t\t\tPyErr_Print();\n");
+			fprintf(f,"\t\t\tPyEval_ReleaseThread(pythr);\n");
+                	fprintf(f,"\t\t\tPyEval_AcquireThread(pythr);\n");
+                	fprintf(f,"\t\t\tPy_EndInterpreter(pythr);\n");
+                	fprintf(f,"\t\t\tPyEval_ReleaseLock();\n"); 	
        			fprintf(f,"\t\t\treturn(rest_html_response(aptr,1388,\"Python syntax error in file %sAction.c\"));\n",categoryName);
        			fprintf(f,"\t\t}\n");
        
        			fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
        			fprintf(f,"\t\tPy_DECREF(pModule);\n");
        			fprintf(f,"\t\tPy_DECREF(pName);\n");
-       			fprintf(f,"\t\tPy_EndInterpreter(pythr);\n\n");
+
+			fprintf(f,"\t\tPyEval_ReleaseThread(pythr);\n"); 
+        		fprintf(f,"\t\tPyEval_AcquireThread(pythr);\n");
+        		fprintf(f,"\t\tPy_EndInterpreter(pythr);\n");
+        		fprintf(f,"\t\tPyEval_ReleaseLock();\n"); 
        
        			fprintf(f,"\t\tresetListe(&restResponse);\n");
        			fprintf(f,"\t\ttoken= strtok(response,\",\");\n");
@@ -995,10 +1006,13 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       
       			fprintf(f,"\t\t//           python interface\n");
       			fprintf(f,"\t\tsprintf(srcdir,\"%%s/pyaccords/pygen\",PYPATH);\n");
+			fprintf(f,"\t\tPyEval_AcquireLock();\n");
       			fprintf(f,"\t\tpythr = Py_NewInterpreter();\n");
+			fprintf(f,"\t\tif(pythr == NULL) printf(\"interpreter initialization error\\n\");\n");
+			fprintf(f,"\t\tPyThreadState_Swap(pythr);\n");
       			fprintf(f,"\t\tpython_path(srcdir);\n"); 
       			fprintf(f,"\t\tpName = PyString_FromString(\"%s\");\n",categoryName); 
-      			fprintf(f,"\t\tif(pName == NULL) printf(\"erro: in %s no such file name\\n\");\n",categoryName);
+      			fprintf(f,"\t\tif(pName == NULL) printf(\"error: in %s no such file name\\n\");\n",categoryName);
       			fprintf(f,"\t\telse pModule = PyImport_Import(pName);\n");
       			fprintf(f,"\t\tif(pModule == NULL) printf(\"error: failed to load %s module\\n\");\n",categoryName);
       			fprintf(f,"\t\telse pDict = PyModule_GetDict(pModule);\n");
@@ -1011,14 +1025,22 @@ int generateCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int fl
       			fprintf(f,"\t\tif (!result || PyErr_Occurred())\n");
       			fprintf(f,"\t\t{\n");
       			fprintf(f,"\t\t\tPyErr_Print();\n");
-      			fprintf(f,"\t\t\treturn 0;\n");
+			fprintf(f,"\t\t\tPyEval_ReleaseThread(pythr);\n");
+                	fprintf(f,"\t\t\tPyEval_AcquireThread(pythr);\n");
+                	fprintf(f,"\t\t\tPy_EndInterpreter(pythr);\n");
+                	fprintf(f,"\t\t\tPyEval_ReleaseLock();\n");
+      			fprintf(f,"\t\t\treturn 1;\n");
       			fprintf(f,"\t\t}\n");
 
       
       			fprintf(f,"\t\tif(result) response=allocate_string(PyString_AsString( result ));\n");
       			fprintf(f,"\t\tPy_DECREF(pModule);\n");
       			fprintf(f,"\t\tPy_DECREF(pName);\n");
-      			fprintf(f,"\t\tPy_EndInterpreter(pythr);\n\n");
+
+			fprintf(f,"\t\tPyEval_ReleaseThread(pythr);\n"); 
+        		fprintf(f,"\t\tPyEval_AcquireThread(pythr);\n");
+        		fprintf(f,"\t\tPy_EndInterpreter(pythr);\n");
+        		fprintf(f,"\t\tPyEval_ReleaseLock();\n");
 
       			fprintf(f,"\tresetListe(&categoryAtr);\n");  
       			fprintf(f,"\ttoken= strtok(response,\",\");\n");
@@ -1680,11 +1702,11 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		fprintf(f,"\tif (!( pptr = target_void )) return;\n");
     		fprintf(f,"\tsprintf(prefix,\"%%s.%%s.\",cptr->domain,cptr->id);\n");
     		fprintf(f,"\tif (!( strncmp( field_name, prefix, strlen(prefix) ) )) {\n");
-    		fprintf(f,"\t\tnptr += strlen(prefix);\n");
+    		fprintf(f,"\t\tfield_name += strlen(prefix);\n");
     		for(i=1;i<dim;i++)
     		{
       			fprintf(f,"\t\tif (!( strcmp( field_name, \"%s\" ) ))\n",nameAtr[i]);
-      			fprintf(f,"\t\t\tpptr->%s = allocate_string(vptr);\n",nameAtr[i]);
+      			fprintf(f,"\t\t\tpptr->%s = allocate_string(value);\n",nameAtr[i]);
     		}
     		fprintf(f,"\t}\n"); 
     		fprintf(f,"\treturn;\n");
@@ -1739,10 +1761,10 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
 
     		}
     		fprintf(f,"\t\treturn(0);\n");
-    		if(!flag) fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_cords_%s_on_field) ))\n",categoryName);
-    		else fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_%s_on_field) ))\n",categoryName);
-    		if(!flag) fprintf(f,"\t\tliberate_cords_%s(filter->attributtes);\n",categoryName);
-    		else fprintf(f,"\t\tliberate_%s(filter->attributes));\n",categoryName);
+    		if(!flag) fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_cords_%s_filter_on_field) )){\n",categoryName);
+    		else fprintf(f,"\telse if (!( occi_process_atributs(optr, rptr, aptr, filter, set_%s_filter_on_field) )){\n",categoryName);
+    		if(!flag) fprintf(f,"\t\tliberate_cords_%s(filter->attributes);\n",categoryName);
+    		else fprintf(f,"\t\tliberate_%s(filter->attributes);\n",categoryName);
     		fprintf(f,"\t\treturn (0);\n");
     		fprintf(f,"\t}\n");
 		fprintf(f,"\telse return (1);\n");
@@ -1763,7 +1785,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		}
     		for(i=0;i<dim;i++)
     		{
-     			fprintf(f,"\tif (( filter->%s ){\n",nameAtr[i]);
+     			fprintf(f,"\tif ( filter->%s ){\n",nameAtr[i]);
      			fprintf(f,"\t\tif (!( pptr->%s ))\n",nameAtr[i]);
      			fprintf(f,"\t\t\treturn(0);\n");
      			fprintf(f,"\t\telse if ( strcmp(pptr->%s,filter->attributes->%s) != 0)\n",nameAtr[i],nameAtr[i]);
@@ -1933,6 +1955,7 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		if(!flag) fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
     		else fprintf(f,"\tstruct %s * pptr;\n",categoryName);
     		fprintf(f,"\tchar * reqhost;\n");
+		fprintf(f,"\tint reqport = 0;\n");
     		fprintf(f,"\tiptr = optr->callback;\n");
     		fprintf(f,"\tif (!( reqhost = rest_request_host( rptr ) ))\n");
     		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
@@ -2077,14 +2100,15 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		if(!flag)
     		{
        			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-       			fprintf(f,"\tstruct cords_%s_occi_filter * filter;\n",categoryName);
+       			fprintf(f,"\tstruct cords_%s_occi_filter filter;\n",categoryName);
     		}
     		else
     		{
        			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-       			fprintf(f,"\tstruct %s_occi_filter * filter;\n",categoryName);
+       			fprintf(f,"\tstruct %s_occi_filter filter;\n",categoryName);
     		}
     		fprintf(f,"\tchar * reqhost;\n");
+		fprintf(f,"\tint reqport = 0;\n");
     		fprintf(f,"\tif (!( reqhost = rest_request_host( rptr ) ))\n");
     		fprintf(f,"\t\treturn( rest_html_response( aptr, 400, \"Bad Request\" ) );\n");
     		if(!flag) fprintf(f,"\telse if (!(filter_cords_%s_info(&filter, optr, rptr, aptr ) ))\n",categoryName);
@@ -2129,12 +2153,12 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		if(!flag)
     		{
       			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
-      			fprintf(f,"\tstruct cords_%s_occi_filter * filter;\n",categoryName);
+      			fprintf(f,"\tstruct cords_%s_occi_filter filter;\n",categoryName);
     		}
     		else
     		{
       			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
-      			fprintf(f,"\tstruct %s * fptr;\n",categoryName);
+      			fprintf(f,"\tstruct %s_occi_filter filter;\n",categoryName);
     		}
     		fprintf(f,"\tiptr = optr->callback;\n");
     		if(!flag) fprintf(f,"\tif (!(filter_cords_%s_info( &filter, optr, rptr, aptr ) ))\n",categoryName);
@@ -2144,8 +2168,8 @@ int createCategoryOcciFile(char *categoryName, listc categoryAttributes, int dim
     		else fprintf(f,"\tnptr=%s_first;\n",categoryName);
     		fprintf(f,"\twhile (nptr != (struct occi_kind_node *) 0) {\n");
     		fprintf(f,"\t\tif ((!( pptr = nptr->contents ))\n");
-    		if(!flag) fprintf(f,"\t\t||  (!( pass_cords_%s_filter( pptr, filter ) ))) {\n",categoryName);
-    		else fprintf(f,"\t\t||  (!( pass_%s_filter( pptr, filter ) ))) {\n",categoryName);
+    		if(!flag) fprintf(f,"\t\t||  (!( pass_cords_%s_filter( pptr, &filter ) ))) {\n",categoryName);
+    		else fprintf(f,"\t\t||  (!( pass_%s_filter( pptr, &filter ) ))) {\n",categoryName);
     		fprintf(f,"\t\t\tnptr = nptr->next;\n");
     		fprintf(f,"\t\t\tcontinue;\n");
     		fprintf(f,"\t\t\t}\n");

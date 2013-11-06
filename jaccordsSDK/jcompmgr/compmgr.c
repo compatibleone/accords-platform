@@ -189,37 +189,37 @@ int deleteJCategory(char categoryName[], int indice)
    			return 0;
   		}
   
- 		if(!(deleteInFile(pathactclist,pathactcname)))
+ 		if(!(jdeleteInFile(pathactclist,pathactcname)))
      			return 0; 
-  		else if(!(deleteInFile(pathactstruct,pathactstructname)))
+  		else if(!(jdeleteInFile(pathactstruct,pathactstructname)))
      			return 0; 
-  		else if(!(deleteInFile(pathactnstruct,pathactnstructname)))
+  		else if(!(jdeleteInFile(pathactnstruct,pathactnstructname)))
      			return 0;
-  		else if(!(deleteInFile(pathactbstruct,pathactbstructname)))
+  		else if(!(jdeleteInFile(pathactbstruct,pathactbstructname)))
      			return 0; 
  	}
 
  	if(!flag)
  	{
-  		if(!(deleteInFile(cordsh,cordshname)))
+  		if(!(jdeleteInFile(cordsh,cordshname)))
      			return 0;
-  		else if(!(deleteInFile(occibuilder,occibuildername)))
+  		else if(!(jdeleteInFile(occibuilder,occibuildername)))
      			return 0;
  	}
 
- 	if(!(deleteInFile(cordsbase,cordsbasename)))
+ 	if(!(jdeleteInFile(cordsbase,cordsbasename)))
     		return 0;
- 	else if(!(deleteInFile(occicords,occicordsname)))
+ 	else if(!(jdeleteInFile(occicords,occicordsname)))
     		return 0;
- 	else if(!(deleteInFile(jinc,jincname)))
+ 	else if(!(jdeleteInFile(jinc,jincname)))
     		return 0;
- 	else if(!(deleteInFile(pathjstruct,pathjstructname)))
+ 	else if(!(jdeleteInFile(pathjstruct,pathjstructname)))
     		return 0;
- 	else if(!(deleteInFile(jListcateg,jListcategname)))
+ 	else if(!(jdeleteInFile(jListcateg,jListcategname)))
     		return 0; 
- 	else if(!(deleteInFile(occibuilderb,occibuildername)))
+ 	else if(!(jdeleteInFile(occibuilderb,occibuildername)))
     		return 0;
-        else if(!(deleteInFile(pathaccess, categoryName)))
+        else if(!(jdeleteInFile(pathaccess, categoryName)))
 		return 0;
  	else
     		return 1;
@@ -290,7 +290,7 @@ int generateJAccordsCategory(
     		}
     		fprintf(f,"{\n");
     		resetList(&categoryAtr);
-    		strConcat(categoryAttributesB,categoryAttributes,' ');
+    		jstrConcat(categoryAttributesB,categoryAttributes,' ');
     		token= strtok(categoryAttributesB," ");
     		for(; token != NULL ;)
     		{
@@ -396,14 +396,14 @@ int generateJCategoryTypeStruct(char *categoryName, char * categoryAccess, char 
  
   	while( fgets(line,256, fIn) != NULL)
   	{
-    		if(searchWord(categoryName,line))
+    		if(jsearchWord(categoryName,line))
     		{
        			a=1;
        			fprintf(fOut,"%s",line);
     		}
     		else
     		{
-       			str_sub(line,0,1,strcats);
+       			jstr_sub(line,0,1,strcats);
        			if(!(strcmp(strcats,"};"))) 
        			{
           			break;
@@ -456,14 +456,14 @@ int generateJCategoryActionStruct(char *categoryName, listc categoryAct, int n, 
  
   	while( fgets(line,256, fIn) != NULL)
   	{
-    		if(searchWord(categoryName,line))
+    		if(jsearchWord(categoryName,line))
     		{
        			a=1;
        			fprintf(fOut,"%s",line);
     		}
     		else
     		{
-       			str_sub(line,0,1,strcats);
+       			jstr_sub(line,0,1,strcats);
        			if(!(strcmp(strcats,"};"))) 
        			{
           			break;
@@ -598,9 +598,9 @@ int generateJCategoryActionCfile(
        			{
         			fprintf(f,"\t\tif(!(strValid(pptr->%s))){\n",pelemm->value);
         			fprintf(f,"\t\t\tstrcpy(strtmp,\" \");\n");
-        			fprintf(f,"\t\t\tstrConcat(sendstr,strtmp,',');\n");
+        			fprintf(f,"\t\t\tjstrConcat(sendstr,strtmp,',');\n");
         			fprintf(f,"\t\t}\n");
-        			fprintf(f,"\t\telse strConcat(sendstr,pptr->%s,',');\n",pelemm->value);
+        			fprintf(f,"\t\telse jstrConcat(sendstr,pptr->%s,',');\n",pelemm->value);
         			pelemm=pelemm->next;
        			}
        			fprintf(f,"\t\t//           JNI interface\n");
@@ -926,9 +926,9 @@ int generateJCategoryInterfaceCfile(char *categoryName, listc categoryAtr, int f
       			{
         			fprintf(f,"\tif(!(strValid(pptr->%s))){\n",pelem->value);
         			fprintf(f,"\t\tstrcpy(strtmp,\" \");\n");
-        			fprintf(f,"\t\tstrConcat(sendstr,strtmp,',');\n");
+        			fprintf(f,"\t\tjstrConcat(sendstr,strtmp,',');\n");
         			fprintf(f,"\t}\n");
-        			fprintf(f,"\telse strConcat(sendstr,pptr->%s,',');\n",pelem->value);
+        			fprintf(f,"\telse jstrConcat(sendstr,pptr->%s,',');\n",pelem->value);
         			pelem=pelem->next;
         			i++;
       			}
