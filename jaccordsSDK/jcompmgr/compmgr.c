@@ -1491,14 +1491,14 @@ int createJCategoryOcciFile(char *categoryName, listc categoryAttributes, int di
     		fprintf(f,"/*	------------------------------------------------------------------------------------------	*/\n");
     		if(!flag)
     		{
-       			fprintf(f,"private char*autosave_cords_%s_name=\"cords_%s.xml\";\n",categoryName,categoryName);
+       			fprintf(f,"private char* autosave_cords_%s_name=\"cords_%s.xml\";\n",categoryName,categoryName);
        			fprintf(f,"private void autoload_cords_%s_nodes() {\n",categoryName);
        			fprintf(f,"\tchar * fn=autosave_cords_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
        			fprintf(f,"\tstruct cords_%s * pptr;\n",categoryName);
     		}
     		else
     		{
-       			fprintf(f,"private char*autosave_%s_name=\"%s.xml\";\n",categoryName,categoryName);
+       			fprintf(f,"private char* autosave_%s_name=\"%s.xml\";\n",categoryName,categoryName);
        			fprintf(f,"private void autoload_%s_nodes() {\n",categoryName);
        			fprintf(f,"\tchar * fn=autosave_%s_name;	struct occi_kind_node * nptr;\n",categoryName);
        			fprintf(f,"\tstruct %s * pptr;\n",categoryName);
