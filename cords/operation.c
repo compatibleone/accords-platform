@@ -381,7 +381,7 @@ private	int	cords_nested_parser( FILE * target, struct xml_element * eptr, char 
 	{
 		if (!(status = cords_file_parser(target, xptr, domain )))
 			continue;
-		else if ( status = 78 )
+		else if ( status == 78 )
 			continue;
 		else	return( status );
 	}
