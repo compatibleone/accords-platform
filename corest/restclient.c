@@ -472,7 +472,6 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 	}
 	while ( retry )
 	{
-		retry--;
 		if (( status = socket_try_connect( cptr->net.socket, host, port, ( timeout > 1 ? timeout / 2 : 1 ) )) == 1)
 		{
 			/* ------- */
@@ -482,6 +481,7 @@ private	struct rest_client * 	rest_try_open_client( char * host, int port, char 
 		}
 		else if ( status == 0 )
 		{
+			retry--;
 			/* ------- */
 			/* failure */
 			/* ------- */
