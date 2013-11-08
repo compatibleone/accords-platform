@@ -32,6 +32,18 @@
 <metric name="cpu" period="60" samples="1" 
 	expression="top -b -n1 | grep Cpu "/>
 
+<metric name="every:minute" period="60" samples="1" 
+	expression="echo 1"/>
+
+<metric name="every:hour" period="3600" samples="1" 
+	expression="echo 1"/>
+
+<metric name="every:day" period="86400" samples="1" 
+	expression="echo 1"/>
+
+<metric name="every:week" period="604800" samples="1" 
+	expression="echo 1"/>
+
 <metric name="cpu:speed" period="60" samples="1" 
 	expression="grep MHz /proc/cpuinfo  | cut -f 2 -d : "/>
 

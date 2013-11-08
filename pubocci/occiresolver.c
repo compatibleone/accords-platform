@@ -458,10 +458,17 @@ public	char *	occi_resolve_category_provider( char * category, char * agent, cha
 	struct	occi_element  * eptr;
 	char *	hptr;
 
+	/* ------------------------------- */
+	/* handle easy case of publication */
+	/* ------------------------------- */
+	if (!( category ))
+		return( category );
+	else if (!( strcmp( category, "publication" ) ))
+		return( allocate_string( Resolver.host ) );
 	/* ---------------------------------------------------- */
 	/* attempt to resolve agency of the "provider" category */
 	/* ---------------------------------------------------- */
-	if (!( zptr = occi_resolver( category, agent ) ))
+	else if (!( zptr = occi_resolver( category, agent ) ))
 		return((char *) 0);
 
 	/* ------------------------------------------------------ */

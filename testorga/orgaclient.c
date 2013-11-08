@@ -152,6 +152,43 @@ private	struct rest_response *  orga_delete_request(struct orga_subscription * s
 /*	these interfaces allow end user customer accounts to	*/
 /*	be created, updated, retrieved, listed and destroyed	*/
 /*	----------------------------------------------------	*/
+private	void	orga_customer_address( FILE * h, struct orga_subscription * sptr, struct cords_account * pptr )
+{
+	fprintf(h,",\"addesses\":[{\n");
+	fprintf(h,"\"addressName\":\"%s\"\n",pptr->name);
+	fprintf(h,",\"city\":\"paderborn\"\n");
+	fprintf(h,",\"country\":\"DE\"\n");
+	fprintf(h,",\"houseNo\":\"1\"\n");
+	fprintf(h,",\"postcode\":\"unknown\"\n");
+	fprintf(h,",\"street\":\"unknown\"\n");
+	fprintf(h,"}]\n");
+	return;
+}
+
+private	void	orga_user_information( FILE * h, struct orga_subscription * sptr, struct cords_account * pptr )
+{
+	fprintf(h,",\"users\":[{\n");
+	fprintf(h,"\"customerNumber\":\"AP-%s\"\n",pptr->id);
+	fprintf(h,",\"isActive\":\"true\"\n");
+	fprintf(h,",\"loginName\":\"%s\"\n",pptr->name);
+	fprintf(h,",\"loginPassword\":\"%s\"\n",pptr->name);
+	fprintf(h,",\"privileges\":\"ADMIN\"\n");
+	fprintf(h,",\"userEmail\":\"%s@compatibleone.fr\"\n",pptr->name);
+	fprintf(h,",\"userName\":\"%s\"\n",pptr->name);
+	fprintf(h,"}\n");
+	return;
+}
+
+private	void	orga_bank_information( FILE * h, struct orga_subscription * sptr, struct cords_account * pptr )
+{
+	fprintf(h,",\"bankAccount\":{\n");
+	fprintf(h,"\"accountNumber\":\"%s\"\n",pptr->id);
+	fprintf(h,",\"bankId\":\"01010\"\n");
+	fprintf(h,",\"bankName\":\"CloudBank\"\n");
+	fprintf(h,"}\n");
+	fprintf(h,",\"billingClearingCycle\":\"DAILY\"\n");
+	return;
+}
 
 /*	-------------------------------		*/
 /*	o r g a _ c r e a t e _ u s e r		*/
@@ -179,6 +216,9 @@ public struct rest_response *  orga_create_user  ( struct orga_subscription * sp
 		fprintf(h,",\"customerName\":\"%s\"\n",uptr->name); 
 		fprintf(h,",\"baasRoleType\":\"%s\"\n",nature); 
 		fprintf(h,",\"isActive\":\"true\"\n");
+		orga_customer_address(h,sptr,uptr);
+		orga_user_information(h,sptr,uptr);
+		orga_bank_information(h,sptr,uptr);
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}
@@ -213,6 +253,9 @@ public struct rest_response *  orga_update_user  ( struct orga_subscription * sp
 		fprintf(h,",\"customerName\":\"%s\"\n",uptr->name); 
 		fprintf(h,",\"baasRoleType\":\"%s\"\n",nature); 
 		fprintf(h,",\"isActive\":\"true\"\n");
+		orga_customer_address(h,sptr,uptr);
+		orga_user_information(h,sptr,uptr);
+		orga_bank_information(h,sptr,uptr);
 		fprintf(h,"}\n}\n");
 		fclose(h);
 	}

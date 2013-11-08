@@ -23,6 +23,7 @@
 	        <attribute name='url' type='string' required='false' immutable='false'/>
 	        <attribute name='mimetype' type='string' required='false' immutable='false'/>
 	        <attribute name='negotiation' type='string' required='false' immutable='false'/>
+	        <attribute name='instance' type='string' required='false' immutable='false'/>
 	        <attribute name='status' type='string' required='false' immutable='true'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
