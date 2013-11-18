@@ -1001,7 +1001,7 @@ public	struct rest_response * rest_authentication_challenge(struct rest_client *
 		return( aptr );
 	else if (!( aptr = rest_response_status( aptr, status, message )))
 		return( aptr );
-	else if (!( hptr = rest_response_header( aptr, "WWW-Authenticate","BASIC realm=*" ) ))
+	else if (!( hptr = rest_response_header( aptr, "WWW-Authenticate","Basic realm=*" ) ))
 		return( aptr );	
 	else	return( aptr );
 }		
@@ -1106,7 +1106,7 @@ public	char *	rest_encode_credentials( char * username, char * password )
 	strcat( work, ":");
 	strcat( work, password);
 	EncodeBase64( bwork, work, strlen(work));
-	sprintf(buffer,"BASIC %s",bwork);
+	sprintf(buffer,"Basic %s",bwork);
 	return( allocate_string( buffer ));
 }
 
@@ -1140,8 +1140,8 @@ public	int	rest_decode_credentials( char * vptr, char * username, char * passwor
 	for (	;
 		httpAuth[value] == ' ';
 		value++);
-	/* ensure BASIC scheme */
-	if (!( strcasecmp( &httpAuth[nature], "BASIC" )))
+	/* ensure Basic scheme */
+	if (!( strcasecmp( &httpAuth[nature], "Basic" )))
 	{
 		DecodeBase64( &httpAuth[value], buffer, &bytes );
 		buffer[bytes] = 0;

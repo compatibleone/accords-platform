@@ -907,7 +907,7 @@ private	struct	rest_response *	rest_client_accept_response( struct rest_client *
 /*	---------------------------------------------------------	*/
 /*	    r e s t _ c h e c k _ a u t h e n t i c a t i o n		*/
 /*	---------------------------------------------------------	*/
-private struct rest_header * rest_check_authentication( struct rest_response * rptr, char * target, struct rest_request * qptr )
+private struct rest_header * rest_check_authentication( struct rest_response * rptr, char * target, struct rest_request * qptr, struct rest_header * template  )
 {
 	struct	rest_header * hptr;
 	char	*	vptr;
@@ -935,7 +935,11 @@ private struct rest_header * rest_check_authentication( struct rest_response * r
 		return((struct rest_header * ) 0);
 	else if (!( vptr = rest_encode_credentials( uptr, pptr ) ))
 		return((struct rest_header * ) 0);
-	else 	return( rest_create_header( _HTTP_AUTHORIZATION, vptr ) );
+	else if (!( template ))
+		return( rest_create_header( _HTTP_AUTHORIZATION, vptr ) );
+	else if (!( template = rest_duplicate_headers( template ) ))
+		return( rest_create_header( _HTTP_AUTHORIZATION, vptr ) );
+	else	return( rest_prefix_header( template, _HTTP_AUTHORIZATION, vptr ) );
 }
 
 /*	--------------------------------------------------------	*/
@@ -969,7 +973,8 @@ public	struct	rest_response * rest_client_get_request(
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
 	struct	rest_header * credentials=(struct rest_header *) 0;
-	
+	int	retries=0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;	
 	while (1)
 	{
 		if ( check_debug() )
@@ -995,15 +1000,18 @@ public	struct	rest_response * rest_client_get_request(
 		}
 		else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
 			return( rest_client_response( 603, "Request Creation", agent ) );
-		else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+
+		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
 			return( rest_client_response( 603, "Request Headers", agent ) );
 		else if (!( rptr = rest_send_request( cptr, rptr ) ))
 			return( rest_client_response( 603, "Request Send", agent ) );
 		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 			return( rest_client_response( 603, "Response Failure", agent ) );
-		else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 		{
 			rptr = liberate_rest_request( rptr );
+			if ( retries++ ) { return( aptr ); }
 			aptr = rest_liberate_response( aptr );
 			continue;
 		}
@@ -1033,6 +1041,8 @@ public	struct	rest_response * rest_client_get_request_body(
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
 	struct	rest_header * credentials=(struct rest_header *) 0;
+	int	retries=0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;	
 	
 	while (1)
 	{
@@ -1059,7 +1069,9 @@ public	struct	rest_response * rest_client_get_request_body(
 	}
 	else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
 		return( rest_client_response( 603, "Request Creation", agent ) );
-	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+
+	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
 		return( rest_client_response( 603, "Request Headers", agent ) );
 	else if (!( rptr = rest_client_body( rptr, filename ) ))
 		return( rest_client_response( 603, "Request Body", agent ) );
@@ -1067,9 +1079,10 @@ public	struct	rest_response * rest_client_get_request_body(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 	{
 		rptr = liberate_rest_request( rptr );
+		if ( retries++ ) { return( aptr ); }
 		aptr = rest_liberate_response( aptr );
 		continue;
 	}
@@ -1099,6 +1112,8 @@ public	struct	rest_response * rest_client_try_get_request(
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
 	struct	rest_header * credentials=(struct rest_header *) 0;
+	int	retries=0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;	
 	
 	while (1)
 	{
@@ -1123,15 +1138,18 @@ public	struct	rest_response * rest_client_try_get_request(
 	}
 	else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
 		return( rest_client_response( 603, "Request Creation", agent ) );
-	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+
+	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
 		return( rest_client_response( 603, "Request Headers", agent ) );
 	else if (!( rptr = rest_send_request( cptr, rptr ) ))
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 	{
 		rptr = liberate_rest_request( rptr );
+		if ( retries++ ) { return( aptr ); }
 		aptr = rest_liberate_response( aptr );
 		continue;
 	}
@@ -1161,6 +1179,8 @@ public	struct	rest_response * rest_client_delete_request(
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
 	struct	rest_header * credentials=(struct rest_header *) 0;
+	int	retries=0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;	
 	
 	while(1)
 	{
@@ -1179,15 +1199,18 @@ public	struct	rest_response * rest_client_delete_request(
 	}
 	else if (!( rptr = rest_client_request( cptr, "DELETE", uptr, agent )))
 		return( rest_client_response( 603, "Request Creation", agent ) );
-	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+
+	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
 		return( rest_client_response( 603, "Request Headers", agent ) );
 	else if (!( rptr = rest_send_request( cptr, rptr ) ))
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 	{
 		rptr = liberate_rest_request( rptr );
+		if ( retries++ ) { return( aptr ); }
 		aptr = rest_liberate_response( aptr );
 		continue;
 	}
@@ -1216,6 +1239,8 @@ public	struct	rest_response * rest_client_delete_request_body(
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
 	struct	rest_header * credentials=(struct rest_header *) 0;
+	int	retries=0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;	
 	
 	while(1)
 	{
@@ -1234,7 +1259,9 @@ public	struct	rest_response * rest_client_delete_request_body(
 	}
 	else if (!( rptr = rest_client_request( cptr, "DELETE", uptr, agent )))
 		return( rest_client_response( 603, "Request Creation", agent ) );
-	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+
+	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
 		return( rest_client_response( 603, "Request Headers", agent ) );
 	else if (!( rptr = rest_client_body( rptr, filename ) ))
 		return( rest_client_response( 603, "Request Body", agent ) );
@@ -1242,9 +1269,10 @@ public	struct	rest_response * rest_client_delete_request_body(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 	{
 		rptr = liberate_rest_request( rptr );
+		if ( retries++ ) { return( aptr ); }
 		aptr = rest_liberate_response( aptr );
 		continue;
 	}
@@ -1273,6 +1301,8 @@ public	struct	rest_response * rest_client_head_request(
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
 	struct	rest_header * credentials=(struct rest_header *) 0;
+	int	retries=0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;	
 	
 	while(1)
 	{
@@ -1291,15 +1321,18 @@ public	struct	rest_response * rest_client_head_request(
 	}
 	else if (!( rptr = rest_client_request( cptr, "HEAD", uptr, agent )))
 		return( rest_client_response( 603, "Request Creation", agent ) );
-	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+
+	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
 		return( rest_client_response( 603, "Request Headers", agent ) );
 	else if (!( rptr = rest_send_request( cptr, rptr ) ))
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 	{
 		rptr = liberate_rest_request( rptr );
+		if ( retries++ ) { return( aptr ); }
 		aptr = rest_liberate_response( aptr );
 		continue;
 	}
@@ -1328,6 +1361,8 @@ public	struct	rest_response * rest_client_post_request(
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
 	struct	rest_header * credentials=(struct rest_header *) 0;
+	int	retries=0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;	
 	
 	while(1)
 	{
@@ -1346,7 +1381,9 @@ public	struct	rest_response * rest_client_post_request(
 	}
 	else if (!( rptr = rest_client_request( cptr, "POST", uptr, agent )))
 		return( rest_client_response( 603, "Request Creation", agent ) );
-	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+
+	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
 		return( rest_client_response( 603, "Request Headers", agent ) );
 	else if (!( rptr = rest_client_body( rptr, filename ) ))
 		return( rest_client_response( 603, "Request Body", agent ) );
@@ -1354,9 +1391,10 @@ public	struct	rest_response * rest_client_post_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 	{
 		rptr = liberate_rest_request( rptr );
+		if ( retries++ ) { return( aptr ); }
 		aptr = rest_liberate_response( aptr );
 		continue;
 	}
@@ -1386,6 +1424,8 @@ public	struct	rest_response * rest_client_put_request(
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
 	struct	rest_header * credentials=(struct rest_header *) 0;
+	int	retries=0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;	
 	
 	while(1)
 	{
@@ -1404,7 +1444,9 @@ public	struct	rest_response * rest_client_put_request(
 	}
 	else if (!( rptr = rest_client_request( cptr, "PUT", uptr, agent )))
 		return( rest_client_response( 603, "Request Creation", agent ) );
-	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+
+	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
 		return( rest_client_response( 603, "Request Headers", agent ) );
 	else if (!( rptr = rest_client_body( rptr, filename ) ))
 		return( rest_client_response( 603, "Request Body", agent ) );
@@ -1412,9 +1454,10 @@ public	struct	rest_response * rest_client_put_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 	{
 		rptr = liberate_rest_request( rptr );
+		if ( retries++ ) { return( aptr ); }
 		aptr = rest_liberate_response( aptr );
 		continue;
 	}
