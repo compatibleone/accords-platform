@@ -53,6 +53,8 @@ public	void	accords_configuration_options();
 public	int	accords_configuration_option( char * aptr, int argi, char * argv[] );
 public	char *	get_identity();
 public	char *	get_component();
+public	char * 	get_default_user();
+public	char * 	get_default_password();
 public	char * 	get_default_agent();
 public	char * 	get_default_depot();
 public	int	set_default_agent( char * nptr);

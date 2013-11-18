@@ -904,6 +904,40 @@ private	struct	rest_response *	rest_client_accept_response( struct rest_client *
 }
 
 
+/*	---------------------------------------------------------	*/
+/*	    r e s t _ c h e c k _ a u t h e n t i c a t i o n		*/
+/*	---------------------------------------------------------	*/
+private struct rest_header * rest_check_authentication( struct rest_response * rptr, char * target, struct rest_request * qptr )
+{
+	struct	rest_header * hptr;
+	char	*	vptr;
+	char 	*	uptr;
+	char 	*	pptr;
+	char 	*	get_default_user();
+	char 	*	get_default_password();
+	if (!( rptr ))
+		return((struct rest_header * ) 0);
+	else if ( rptr->status != _HTTP_UNAUTHORISED )
+		return((struct rest_header * ) 0);
+	else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_WWW_AUTHENTICATE ) ))
+		return((struct rest_header * ) 0);
+	else if (!( vptr = hptr->value ))
+		return((struct rest_header * ) 0);
+	else if ( strncasecmp( vptr, "basic", strlen("basic") ) != 0 )
+		return((struct rest_header * ) 0);
+	else if (!( uptr = get_default_user() ))
+		return((struct rest_header * ) 0);
+	else if (!( rest_valid_string( uptr ) ))
+		return((struct rest_header * ) 0);
+	else if (!( pptr = get_default_password() ))
+		return((struct rest_header * ) 0);
+	else if (!( rest_valid_string( pptr ) ))
+		return((struct rest_header * ) 0);
+	else if (!( vptr = rest_encode_credentials( uptr, pptr ) ))
+		return((struct rest_header * ) 0);
+	else 	return( rest_create_header( _HTTP_AUTHORIZATION, vptr ) );
+}
+
 /*	--------------------------------------------------------	*/
 /*		r e s t _ c h e c k _ r e d i r e c t i o n		*/
 /*	--------------------------------------------------------	*/
@@ -912,9 +946,9 @@ private char * rest_check_redirection( struct rest_response * rptr, char * targe
 	struct	rest_header * hptr;
 	if (!( rptr ))
 		return((char *) 0);
-	else if ( rptr->status < 301 )
+	else if ( rptr->status < _HTTP_MOVED )
 		return((char *) 0);
-	else if ( rptr->status >= 302 )
+	else if ( rptr->status >= _HTTP_TEMPORARY )
 		return((char *) 0);
 	if (!( hptr = rest_resolve_header( rptr->first, _HTTP_LOCATION ) ))
 		return((char *) 0);
@@ -922,7 +956,6 @@ private char * rest_check_redirection( struct rest_response * rptr, char * targe
 		return( target );
 	else	return( target );
 }
-
 
 /*	------------------------------------------------	*/
 /*	 r e s t _ c l i e n t _ g e t _ r e q u e s t 		*/
@@ -935,48 +968,55 @@ public	struct	rest_response * rest_client_get_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
+	struct	rest_header * credentials=(struct rest_header *) 0;
 	
 	while (1)
 	{
-	if ( check_debug() )
-		printf("REST Client Request : GET %s \n",target );
+		if ( check_debug() )
+			printf("REST Client Request : GET %s \n",target );
 
-	if (!( rest_valid_string( target ) ))
-		return( rest_client_response( 599, "NULL URL", agent ) );
+		if (!( rest_valid_string( target ) ))
+			return( rest_client_response( 599, "NULL URL", agent ) );
 
-	if (!( uptr = analyse_url( target ) ))
-		return( rest_client_response( 600, "Url Anaysis", agent ) );
+		if (!( uptr = analyse_url( target ) ))
+			return( rest_client_response( 600, "Url Anaysis", agent ) );
 
-	else if (!( uptr = validate_url( uptr )))
-	{
-		return( rest_client_response( 601, "Url Validation", agent ) );
-	}
+		else if (!( uptr = validate_url( uptr )))
+		{
+			return( rest_client_response( 601, "Url Validation", agent ) );
+		}
 
-	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
-	{
-		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
-		rest_log_message( buffer );
-		liberate_url( uptr );
-		return( rest_client_response( 602, "Client Failure", agent ) );
-	}
-	else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
-		return( rest_client_response( 603, "Request Creation", agent ) );
-	else if (!( rptr = rest_client_headers( rptr, hptr ) ))
-		return( rest_client_response( 603, "Request Headers", agent ) );
-	else if (!( rptr = rest_send_request( cptr, rptr ) ))
-		return( rest_client_response( 603, "Request Send", agent ) );
-	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
-		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return( aptr );
-	}
-	else
-	{
-		rptr = liberate_rest_request( rptr );
-		aptr = rest_liberate_response( aptr );
-	}
+		else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+		{
+			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+			rest_log_message( buffer );
+			liberate_url( uptr );
+			return( rest_client_response( 602, "Client Failure", agent ) );
+		}
+		else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
+			return( rest_client_response( 603, "Request Creation", agent ) );
+		else if (!( rptr = rest_client_headers( rptr, hptr ) ))
+			return( rest_client_response( 603, "Request Headers", agent ) );
+		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+			return( rest_client_response( 603, "Request Send", agent ) );
+		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+			return( rest_client_response( 603, "Response Failure", agent ) );
+		else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+			continue;
+		}
+		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		{
+			rptr = liberate_rest_request( rptr );
+			return( aptr );
+		}
+		else
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+		}
 	}
 
 }
@@ -992,6 +1032,7 @@ public	struct	rest_response * rest_client_get_request_body(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
+	struct	rest_header * credentials=(struct rest_header *) 0;
 	
 	while (1)
 	{
@@ -1026,6 +1067,12 @@ public	struct	rest_response * rest_client_get_request_body(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+		continue;
+	}
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
 	{
 		rptr = liberate_rest_request( rptr );
@@ -1051,6 +1098,7 @@ public	struct	rest_response * rest_client_try_get_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
+	struct	rest_header * credentials=(struct rest_header *) 0;
 	
 	while (1)
 	{
@@ -1081,6 +1129,12 @@ public	struct	rest_response * rest_client_try_get_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+		continue;
+	}
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
 	{
 		rptr = liberate_rest_request( rptr );
@@ -1106,6 +1160,7 @@ public	struct	rest_response * rest_client_delete_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
+	struct	rest_header * credentials=(struct rest_header *) 0;
 	
 	while(1)
 	{
@@ -1130,6 +1185,12 @@ public	struct	rest_response * rest_client_delete_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+		continue;
+	}
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
 	{
 		rptr = liberate_rest_request( rptr );
@@ -1154,6 +1215,7 @@ public	struct	rest_response * rest_client_delete_request_body(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
+	struct	rest_header * credentials=(struct rest_header *) 0;
 	
 	while(1)
 	{
@@ -1180,6 +1242,12 @@ public	struct	rest_response * rest_client_delete_request_body(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+		continue;
+	}
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
 	{
 		rptr = liberate_rest_request( rptr );
@@ -1204,6 +1272,7 @@ public	struct	rest_response * rest_client_head_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
+	struct	rest_header * credentials=(struct rest_header *) 0;
 	
 	while(1)
 	{
@@ -1228,6 +1297,12 @@ public	struct	rest_response * rest_client_head_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+		continue;
+	}
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
 	{
 		rptr = liberate_rest_request( rptr );
@@ -1252,6 +1327,7 @@ public	struct	rest_response * rest_client_post_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
+	struct	rest_header * credentials=(struct rest_header *) 0;
 	
 	while(1)
 	{
@@ -1278,6 +1354,12 @@ public	struct	rest_response * rest_client_post_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+		continue;
+	}
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
 	{
 		rptr = liberate_rest_request( rptr );
@@ -1303,6 +1385,7 @@ public	struct	rest_response * rest_client_put_request(
 	struct	rest_client 	* cptr;
 	struct	rest_request 	* rptr;
 	char 	buffer[2048];
+	struct	rest_header * credentials=(struct rest_header *) 0;
 	
 	while(1)
 	{
@@ -1329,6 +1412,12 @@ public	struct	rest_response * rest_client_put_request(
 		return( rest_client_response( 603, "Request Send", agent ) );
 	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
 		return( rest_client_response( 603, "Response Failure", agent ) );
+	else if (( credentials = rest_check_authentication( aptr, target, rptr )) != (struct rest_header *) 0)
+	{
+		rptr = liberate_rest_request( rptr );
+		aptr = rest_liberate_response( aptr );
+		continue;
+	}
 	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
 	{
 		rptr = liberate_rest_request( rptr );

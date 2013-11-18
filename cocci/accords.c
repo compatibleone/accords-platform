@@ -65,6 +65,26 @@ public	int	is_alert_status( int status )
 }
 
 /*	---------------------------------------------------------	*/
+/*			g e t _ d e f a u l t _ u s e r			*/
+/*	---------------------------------------------------------	*/
+public	char *	get_default_user()
+{
+	if (!( configuration ))
+		return((char *) 0);
+	else 	return( configuration->user); 
+}
+
+/*	---------------------------------------------------------	*/
+/*		g e t _ d e f a u l t _ p a s s w o r d 		*/
+/*	---------------------------------------------------------	*/
+public	char *	get_default_password()
+{
+	if (!( configuration ))
+		return((char *) 0);
+	else 	return( configuration->password); 
+}
+
+/*	---------------------------------------------------------	*/
 /*			g e t _ i d e n t i t y				*/
 /*	---------------------------------------------------------	*/
 public	char *	get_identity()
