@@ -19,6 +19,14 @@
 #ifndef	_strukt_c
 #define	_strukt_c
 
+#include <stdio.h>
+#include <memory.h>
+#include <string.h>
+#define	public
+#define	private static
+#include "allocate.h"
+#include "allocate.c"
+#include "item.h"
 #include "strukt.h"
 
 public	struct	strukt_context C = 	{ 
@@ -73,6 +81,12 @@ public	void	strukt_set_prefix(char * value )
 public	void	strukt_set_gencrud(int value)
 {
 	C.gencrud = value;
+	return;
+}
+
+public	void	strukt_set_backend(int value)
+{
+	C.gensql = value;
 	return;
 }
 
@@ -319,9 +333,6 @@ private	void	generate_interpret_xml( FILE * h, char * nptr )
 	fprintf(h,"\treturn(0);\n");
 	fprintf(h,"\n}\n");
 }
-
-
-
 
 private	void	generate_liberate( FILE *h, char * nptr )
 {
@@ -828,7 +839,7 @@ private	void	schema_footer( FILE * h, char * nptr )
 	return;
 }
 
-private	void	file_header( FILE * h, char * nptr, char * iptr)
+private	void	file_header( FILE * h, char * nptr, char * iptr, const char *filter_name)
 {
 	char	buffer[1024];
 	if ( C.genrest )
@@ -847,6 +858,8 @@ private	void	file_header( FILE * h, char * nptr, char * iptr)
 		fprintf(h,"\n#include %c%s%c\n",0x0022,"element.h",0x0022);
 	}
 	fprintf(h,"\n#include %c%s%c\n",0x0022,iptr,0x0022);
+	if ( filter_name )
+		fprintf(h,"#include %c%s%c\n",0x0022, filter_name, 0x0022);
 	return;
 }
 
@@ -882,7 +895,7 @@ public	int	process( char * nptr )
 	}
 	else
 	{
-		file_header( C.target, tn, sn );
+		file_header( C.target, tn, sn, (char *) 0 );
 		while ((c = remove_white_space( sh )))
 		{
 			if ( is_punctuation(c) )
