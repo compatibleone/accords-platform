@@ -1276,11 +1276,11 @@ private	void	cords_rcs_style( FILE * h, char * filename )
 /*	-------------------------------------------	*/
 /*	c o r d s _ p a r s e r _ o p e r a t i o n	*/
 /*	-------------------------------------------	*/
-private	int	savestdout=1;
 private	char *	cords_script_interpreter( char * filename, char * parameters, int output )
 {
+	int	savestdout=1;
 	FILE *	h;
-	FILE *	rh;
+	int	rh=-1;
 	char *	filetype;
 	int	holdout=-1;
 	int	newout=-1;
@@ -1329,28 +1329,49 @@ private	char *	cords_script_interpreter( char * filename, char * parameters, int
 		return( (char *) 0 );
 	}
 	else
-	{
+	{	
+		/* --------------------------------- */
+		/* detect and generate HTML wrapping */
+		/* --------------------------------- */
 		if ( output )
 		{
 			fprintf(h,"<html><head><title>corsdscript execution response</title>");
 			cords_rcs_style(h,"style.css");
 			fprintf(h,"</head><body><div align=center><h1>Script Execution</h1>\n");
 			fprintf(h,"<table><tr><th>%s</th><tr><td>\n",filename);
-			if ( output & 2 )
-				fprintf(h,"<pre>\n");
+			if ( output & 2 ) fprintf(h,"<pre>\n");
 		}
-		savestdout = dup(savestdout);
-		if ((rh = freopen( newfile, "w", stdout )) != (FILE *) 0)
+		/* ---------------------------------- */
+		/* redirect std output to the newfile */
+		/* ---------------------------------- */
+		if ((savestdout = dup(1)) != -1)
 		{
-			run_cordscript_interpreter( filename, argc, argv );
-			printf("\n");	
-			fflush(stdout);
-			fclose(stdout);
-			stdout = fdopen(savestdout,"w");
-			cords_copy_file( h, newfile );
+			if (( rh = creat( newfile, 0666 )) != -1)
+			{
+				fflush(stdout);
+				if ( dup2( rh, 1 ) == 1 )
+				{
+					fprintf(h,"\n");	
+					run_cordscript_interpreter( filename, argc, argv );
+					fprintf(h,"\n");	
+					fflush(stdout);
+					dup2(savestdout,1);
+					close(savestdout);
+				}
+				close(rh);
+				cords_copy_file( h, newfile );
+	
+			}
+			else
+			{
+				fprintf(h,"**failure restoring stdout**\n");
+				close(savestdout);
+			}
 		}
-		else	close(savestdout);
-
+		else
+		{
+			fprintf(h,"**error redirecting stdout**\n");
+		}
 		if ( output & 2 )
 			fprintf(h,"\n</pre>");
 		if ( output )
