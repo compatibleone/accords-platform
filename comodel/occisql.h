@@ -34,15 +34,15 @@
 #endif
 
 #ifdef	OCCI_MYSQL
-#include <mysql/mysql.h>
+#include <mysql.h>
 #endif
 
 #define	_CREATE_DATABASE	"CREATE DATABASE IF NOT EXISTS "
 #define	_CREATE_TABLE		"CREATE TABLE IF NOT EXISTS "
-#define	_DEFAULT_HOST		"127.0.0.1"
-#define	_DEFAULT_USER		"admin"
-#define	_DEFAULT_PASS		"admin"
-#define	_DEFAULT_BASE		"database"
+#define	_DEFAULT_MYSQL_HOST	"127.0.0.1"
+#define	_DEFAULT_MYSQL_USER	"admin"
+#define	_DEFAULT_MYSQL_PASS	"admin"
+#define	_DEFAULT_MYSQL_BASE	"database"
 
 struct	occi_table
 {

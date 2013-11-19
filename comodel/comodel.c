@@ -62,12 +62,15 @@ struct	occi_production
 {
 	char *	path;
 	int	nature;
+	int	backend;
+	char *	prefix;
 	struct	occi_component * first;
 	struct	occi_component * last;
 } production = 
 {
 	"",
-	0,
+	0, 0,
+	"occi",
 	(struct occi_component *) 0,
 	(struct occi_component *) 0
 };
@@ -128,8 +131,8 @@ public int	comodel_category_filter( struct occi_category * cptr )
 /*	------------------------------------------------------------------	*/
 private	int	comodel_banner()
 {
-	printf("\n   CompatibleOne Model Generator : Version 1.0a.0.01");
-	printf("\n   Beta Version : 05/04/2013");
+	printf("\n   CompatibleOne Model Generator : Version 1.0a.0.02");
+	printf("\n   Beta Version : 19/11/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue");
 	printf("\n\n");
 	return(0);
@@ -614,6 +617,10 @@ private	int	comodel_by_category( struct xml_element * eptr )
 			if ( check_verbose() )
 			{
 				printf("comodel loaded category : %s\n",sptr);
+			}
+
+			if ( check_debug() )
+			{
 				comodel_show_category( optr );
 			}
 			liberate( sptr );
@@ -702,15 +709,17 @@ private	int	comodel_prepare_strukt(int mode)
 	reset_strukt();
 	switch ( mode )
 	{
-	case	0:	/* c scrtucture generation */
+	case	0:	/* c structure generation */
 		strukt_set_license("license.h");
+		strukt_set_backend(production.backend);
 		strukt_set_prefix("");
 		strukt_set_genxml(1);
 		strukt_set_genocci(1);
 		break;
 	case	1:	/* occi rest generation */
 		strukt_set_license("license.h");
-		strukt_set_prefix("occi");
+		strukt_set_backend(production.backend);
+		strukt_set_prefix(production.prefix);
 		strukt_set_gencrud(1);
 		strukt_set_genrest(_OCCI_KIND);
 		break;
@@ -736,6 +745,16 @@ private	int	comodel_c_production()
 	if ( check_verbose() )
 		printf("comodel c production\n");
 
+	switch ( production.backend )
+	{
+	case	1	:
+		production.prefix = "sql";
+		break;
+	default		:
+		production.prefix = "occi";
+		break;
+	}
+
 	for (	cptr=production.first;
 		cptr != (struct occi_component *) 0;
 		cptr = cptr->next )
@@ -747,7 +766,8 @@ private	int	comodel_c_production()
 			/* generate the component source if component configuration loaded */
 			/* --------------------------------------------------------------- */
 			save_accords_configuration( &cptr->configuration, buffer );
-			generate_service_component( cptr->name, cptr->first );
+			generate_service_component( cptr->name, cptr->first, production.prefix );
+			generate_service_makefile( cptr->name, cptr->first, production.prefix );
 		}
 		for (	optr=cptr->first;
 			optr != (struct occi_category *) 0;
@@ -894,6 +914,9 @@ private	int	co_model(int argc, char * argv[] )
 				continue;
 			case	'd'	:
 				CoModel.debug = 0xFFFF;
+				continue;
+			case	'q'	:
+				production.backend = 1;
 				continue;
 			case	'x'	:
 				production.nature = 1;

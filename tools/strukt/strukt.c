@@ -1,24 +1,23 @@
-/* ---------------------------------------------------------------------------- */
-/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
-/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
+#ifndef	_strukt_c
+#define	_strukt_c
 
 #include <stdio.h>
 #include <memory.h>
@@ -30,12 +29,13 @@
 #include "item.h"
 #include "strukt.h"
 
-struct	strukt_context C = 	{ 
+public	struct	strukt_context C = 	{ 
 		0,		/* schema */
 		(char *) 0,	/* license */
 		(char *) 0,	/* scheme */
 		(char *) 0,	/* klass */
 		(char *) 0,	/* rel */
+		"",		/* prefix */
 		0,0,0,0,
 		0,0,0,0,
 		0,0,
@@ -49,7 +49,66 @@ struct	strukt_context C = 	{
 
 #include "item.c"
 
-int	failure(int v, char * m, char * n)
+public	void	reset_strukt()
+{
+	struct	item * iptr;
+	while ((iptr=C.first) != (struct item *) 0)
+	{
+		C.first = iptr->next;
+		liberate_item( iptr );
+	}
+	C.first = C.last = (struct item *) 0;
+	if ( C.license ) C.license = liberate( C.license );
+	if ( C.scheme ) C.scheme = liberate( C.scheme );
+	if ( C.klass ) C.klass = liberate( C.klass );
+	if ( C.rel ) C.rel = liberate( C.rel );
+	memset( &C, 0, sizeof( struct strukt_context ));
+	return;
+}
+
+public	int	strukt_set_license(char * filename)
+{
+	if (!( C.license = allocate_string(filename) ))
+		return(27);
+	else	return(0);
+}
+
+public	void	strukt_set_prefix(char * value )
+{
+	C.prefix = allocate_string( value );
+}
+
+public	void	strukt_set_gencrud(int value)
+{
+	C.gencrud = value;
+	return;
+}
+
+public	void	strukt_set_genxml(int value)
+{
+	C.genxml = value;
+	return;
+}
+
+public	void	strukt_set_schema(int value)
+{
+	C.schema = value;
+	return;
+}
+
+public	void	strukt_set_genrest(int value)
+{
+	C.genrest = value;
+	return;
+}
+
+public	void	strukt_set_genocci(int value)
+{
+	C.genocci = value;
+	return;
+}
+
+private	int	failure(int v, char * m, char * n)
 {
 	if ( v )
 	{
@@ -58,7 +117,7 @@ int	failure(int v, char * m, char * n)
 	return(v);
 }
 
-void	expand( FILE * h, char * sptr )
+private	void	expand( FILE * h, char * sptr )
 {
 	int	c;
 	while ((c = *(sptr++)) != 0)
@@ -66,13 +125,13 @@ void	expand( FILE * h, char * sptr )
 	return;
 }
 
-void	gener( FILE * h, int c ,int n )
+private	void	gener( FILE * h, int c ,int n )
 {
 	while ( n-- ) fprintf(h,"%c",c);		
 	return;
 }
 
-void	title( FILE * h, char * sptr )
+public	void	title( FILE * h, char * sptr )
 {
 	fprintf(h,"\n/*\t");
 	gener( h, '-', strlen( sptr ) * 2 );
@@ -88,7 +147,7 @@ void	title( FILE * h, char * sptr )
 	return;
 }
 
-void	generate_reset( FILE *h, char * nptr )
+private	void	generate_reset( FILE *h, char * nptr )
 {
 	int	i;
 	struct	item * iptr;
@@ -133,7 +192,7 @@ void	generate_reset( FILE *h, char * nptr )
 
 }
 
-void	generate_allocate( FILE *h, char * nptr )
+private	void	generate_allocate( FILE *h, char * nptr )
 {
 	int	i;
 	struct	item * iptr;
@@ -147,7 +206,7 @@ void	generate_allocate( FILE *h, char * nptr )
 	fprintf(h,"\n}\n");
 }
 
-void	generate_add( FILE *h, char * nptr )
+private	void	generate_add( FILE *h, char * nptr )
 {
 	int	i;
 	struct	item * iptr;
@@ -169,7 +228,7 @@ void	generate_add( FILE *h, char * nptr )
 	fprintf(h,"\n}\n");
 }
 
-void	generate_drop( FILE *h, char * nptr )
+private	void	generate_drop( FILE *h, char * nptr )
 {
 	int	i;
 	struct	item * iptr;
@@ -204,7 +263,7 @@ void	generate_drop( FILE *h, char * nptr )
 	fprintf(h,"\n}\n");
 }
 
-void	generate_occi_request2file( FILE * h, char * nptr )
+private	void	generate_occi_request2file( FILE * h, char * nptr )
 {
 	char	* prefix;
 	int	item=0;
@@ -240,7 +299,7 @@ void	generate_occi_request2file( FILE * h, char * nptr )
 	fprintf(h,"\n}\n");
 }
 
-void	generate_interpret_xml( FILE * h, char * nptr )
+private	void	generate_interpret_xml( FILE * h, char * nptr )
 {
 	char	* prefix;
 	int	item=0;
@@ -278,10 +337,7 @@ void	generate_interpret_xml( FILE * h, char * nptr )
 	fprintf(h,"\n}\n");
 }
 
-
-
-
-void	generate_liberate( FILE *h, char * nptr )
+private	void	generate_liberate( FILE *h, char * nptr )
 {
 	char	buffer[512];
 	struct	item * iptr;
@@ -331,7 +387,7 @@ void	generate_liberate( FILE *h, char * nptr )
 	fprintf(h,"\n}\n");
 }
 
-int	generate()
+public	int	generate()
 {
 	struct	item * iptr;
 	if ( C.schema )
@@ -354,24 +410,24 @@ int	generate()
 		switch ( C.genrest )
 		{
 		case	_OCCI_KIND	:
-			C.klass  = "kind";
-			C.scheme = "http://scheme.compatibleone.fr/scheme/compatible#";
-			C.rel    = "http://scheme.ogf.org/occi/resource#";
+			C.klass  = allocate_string("kind");
+			C.scheme = allocate_string("http://scheme.compatibleone.fr/scheme/compatible#");
+			C.rel    = allocate_string("http://scheme.ogf.org/occi/resource#");
 			break;
 		case	_OCCI_LINK	:
-			C.klass  = "link";
-			C.scheme = "http://scheme.compatibleone.fr/scheme/compatible#";
-			C.rel    = "http://scheme.ogf.org/occi/link#";
+			C.klass  = allocate_string("link");
+			C.scheme = allocate_string("http://scheme.compatibleone.fr/scheme/compatible#");
+			C.rel    = allocate_string("http://scheme.ogf.org/occi/link#");
 			break;
-		case	_OCCI_ACTION	:
-			C.klass  = "action";
-			C.scheme = "http://scheme.compatibleone.fr/scheme/compatible#";
-			C.rel    = "http://scheme.ogf.org/occi/mixin#";
+		case	_STRUKT_OCCI_ACTION	:
+			C.klass  = allocate_string("action");
+			C.scheme = allocate_string("http://scheme.compatibleone.fr/scheme/compatible#");
+			C.rel    = allocate_string("http://scheme.ogf.org/occi/mixin#");
 			break;
-		case	_OCCI_MIXIN	:
-			C.klass  = "mixin";
-			C.scheme = "http://scheme.compatibleone.fr/scheme/compatible#";
-			C.rel    = "http://scheme.ogf.org/occi/action#";
+		case	_STRUKT_OCCI_MIXIN	:
+			C.klass  = allocate_string("mixin");
+			C.scheme = allocate_string("http://scheme.compatibleone.fr/scheme/compatible#");
+			C.rel    = allocate_string("http://scheme.ogf.org/occi/action#");
 			break;
 		default	:
 			return( failure(30,"incorrect","cords value") );
@@ -410,7 +466,7 @@ int	generate()
 	return(0);
 }
 
-int	is_punctuation(int c)
+private	int	is_punctuation(int c)
 {
 	if (( c >= 0x0021 ) && ( c <= 0x002F ))
 		return(1);
@@ -423,12 +479,12 @@ int	is_punctuation(int c)
 	else	return(0);
 }
 
-int	ungetch(int c)
+private	int	ungetch(int c)
 {
 	return((C.ungotc = c));
 }
 
-int	getch(FILE *h)
+private	int	getch(FILE *h)
 {
 	int	c;
 	if ((c = C.ungotc) != 0)
@@ -440,7 +496,7 @@ int	getch(FILE *h)
 	return( c );
 }
 
-int	is_white( int c )
+private	int	is_white( int c )
 {
 	switch ( c )
 	{
@@ -452,7 +508,7 @@ int	is_white( int c )
 	}
 }
 
-int	remove_white_space(FILE * h)
+private	int	remove_white_space(FILE * h)
 {
 	int	c;
 	while (1)
@@ -475,7 +531,7 @@ int	remove_white_space(FILE * h)
 
 }
 
-int	get_token( FILE * h, char * token, int tlen )
+private	int	get_token( FILE * h, char * token, int tlen )
 {
 	int	c;
 	int	i=0;
@@ -521,7 +577,7 @@ int	get_token( FILE * h, char * token, int tlen )
 	return(i);
 }
 
-int	add_member()
+public	int	add_member()
 {
 	struct	item * iptr;
 	if (!( iptr = allocate_item()))
@@ -568,13 +624,46 @@ int	add_member()
 	}
 }
 
-int	handle_punctuation( FILE * sh, int c )
+private	int	handle_comment( FILE * sh )
+{
+	int	c;
+	int	state=0;
+	switch ( getch(sh) )
+	{
+	case	'/'	:
+		while (((c = getch(sh)) > 0) && ( c != '\n'));
+		break;
+	case	'*'	:
+		while ((c = getch(sh)) > 0)
+		{
+			if (!( state ))
+			{
+				if ( c == '*' )
+					state = 1;
+			}
+			else if ( c == '/' )
+				break;
+			else	state = 0;
+		}
+		break;
+
+	}
+	return(0);
+}	
+
+private	int	handle_punctuation( FILE * sh, int c )
 {
 	int	status;
 	char 	b[2];
 	switch ( C.state )
 	{
 	case	0 :	/* awaiting struct */
+		if ( c == '/' )
+		{
+			handle_comment(sh);
+			return(0);
+		}
+			
 	case	1 :	/* awaiting struct name */
 		break;
 	case	2 :
@@ -591,7 +680,13 @@ int	handle_punctuation( FILE * sh, int c )
 			C.state = 9;
 			return(0);
 		}
+		else if ( c == '/' )
+		{
+			handle_comment(sh);
+			return(0);
+		}
 		else	break;
+
 	case	4 :	/* awaiting extended type */
 	case	5 :	/* awaiting name or pointer */
 		if ( c == '*' )
@@ -629,13 +724,18 @@ int	handle_punctuation( FILE * sh, int c )
 			C.state = 0;
 			return(generate());
 		}
+		else if ( c == '/' )
+		{
+			handle_comment(sh);
+			return(0);
+		}
 	}
 	b[0] = c;
 	b[1] = 0;
 	return(failure(30,"incorrect punctuation",b));
 }
 
-char *	is_basic_type(char * tptr)
+private	char *	is_basic_type(char * tptr)
 {
 	if (!(strcmp( tptr,"struct")))
 		return( "struct" );
@@ -656,7 +756,7 @@ char *	is_basic_type(char * tptr)
 	else	return( (char *) 0);
 }
 
-int	handle_token( FILE * sh, char * tptr )
+private	int	handle_token( FILE * sh, char * tptr )
 {
 	switch ( C.state )
 	{
@@ -703,7 +803,7 @@ int	handle_token( FILE * sh, char * tptr )
 }
 
 
-void	file_symbol( FILE * h, char * sptr )
+private	void	file_symbol( FILE * h, char * sptr )
 {
 	int	c;
 	fprintf(h,"_");
@@ -717,7 +817,7 @@ void	file_symbol( FILE * h, char * sptr )
 	return;
 }
 
-void	prepend_license( FILE * target, char * filename )
+private	void	prepend_license( FILE * target, char * filename )
 {
 	int	c;
 	FILE * h;
@@ -730,19 +830,19 @@ void	prepend_license( FILE * target, char * filename )
 	return;
 }
 
-void	schema_header( FILE * h, char * nptr, char * iptr)
+private	void	schema_header( FILE * h, char * nptr, char * iptr)
 {
 	fprintf(h,"\n<xsd:sxhema xmlns:xsd=%chttp://www.w3c.org/2001/XMLSchema%c>\n",0x0022,0x0022);
 	return;
 }
 
-void	schema_footer( FILE * h, char * nptr )
+private	void	schema_footer( FILE * h, char * nptr )
 {
 	fprintf(h,"\n</xsd:sxhema>\n");
 	return;
 }
 
-void	file_header( FILE * h, char * nptr, char * iptr, const char *filter_name)
+private	void	file_header( FILE * h, char * nptr, char * iptr, const char *filter_name)
 {
 	char	buffer[1024];
 	if ( C.genrest )
@@ -765,7 +865,7 @@ void	file_header( FILE * h, char * nptr, char * iptr, const char *filter_name)
 	return;
 }
 
-void	file_footer( FILE * h, char * nptr)
+private	void	file_footer( FILE * h, char * nptr)
 {
 	char	buffer[1024];
 	if ( C.genrest )
@@ -777,7 +877,7 @@ void	file_footer( FILE * h, char * nptr)
 	return;
 }
 
-int	process( char * struct_name )
+public	int	process( char * struct_name )
 {
 	int	status;
 	int	c;
@@ -822,7 +922,7 @@ int	process( char * struct_name )
 	return( 0 );
 }
 
-int	schema( char * nptr )
+public	int	schema( char * nptr )
 {
 	int	status;
 	int	c;
@@ -867,8 +967,8 @@ int	schema( char * nptr )
 
 private	int	banner()
 {
-	printf("\n Structure Constructor : Version 3.1a.0.0.3");
-	printf("\n Provisoire du 23/09/2013");
+	printf("\n Structure Constructor : Version 3.1a.0.0.4");
+	printf("\n Provisoire du 19/11/2013");
 	printf("\n Copyright (c) 2013 Iain James Marshall\n");
 	printf("\n Options : \n");
 	printf("\n --verbose                 activate verbose messages ");
@@ -884,7 +984,7 @@ private	int	banner()
 	return(0);
 }
 
-int	main(int argc, char * argv[])
+public	int	main(int argc, char * argv[])
 {
 	int	status=0;
 	int	argi=1;
@@ -913,7 +1013,7 @@ int	main(int argc, char * argv[])
 						else if (!( strcmp( aptr,"link" )))
 							C.genrest = _OCCI_LINK;
 						else if (!( strcmp( aptr,"action" )))
-							C.genrest = _OCCI_ACTION;
+							C.genrest = _STRUKT_OCCI_ACTION;
 						else if (!( strcmp( aptr,"mixin" )))
 							C.genrest = _OCCI_KIND;
 						else return(failure( 30,"cords","incorrect parameter" ));
@@ -959,4 +1059,7 @@ int	main(int argc, char * argv[])
 	return(0);
 }
 
+	/* --------- */
+#endif	/* _strukt_c */
+	/* --------- */
 

@@ -27,8 +27,8 @@
 
 #define	_OCCI_KIND	1
 #define	_OCCI_LINK	2
-#define	_OCCI_ACTION	3
-#define	_OCCI_MIXIN	4
+#define	_STRUKT_OCCI_ACTION	3
+#define	_STRUKT_OCCI_MIXIN	4
 
 struct	strukt_context	{
 	int	schema;
@@ -36,6 +36,7 @@ struct	strukt_context	{
 	char *	scheme;
 	char *	klass;
 	char *	rel;
+	char *	prefix;
 	int	gencrud;
 	int	genrest;
 	int	genocci;

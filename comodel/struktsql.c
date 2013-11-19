@@ -405,7 +405,8 @@ void	generate_occi_sql_builder( FILE * h, char * nptr )
 	generate_occi_sql_on_next(h, nptr, buffer );
 
 	title(h,buffer );
-
+	if ( 1 > 2 )
+	{	
 	fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return( %s_first ); }\n",
 		C.klass,C.klass,C.name);
 	fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return( %s_last ); }\n",
@@ -414,13 +415,28 @@ void	generate_occi_sql_builder( FILE * h, char * nptr )
 		C.klass,C.klass,C.name);
 	fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return( %s_last ); }\n",
 		C.klass,C.klass,C.name);
-	fprintf(h,"public  void set_autosave_%s_name(char * fn) {\nreturn;\n",C.name);
+	}
+	fprintf(h,"public  void set_autosave_%s_name(char * fn) {\nreturn;\n}\n",C.name);
 
-	fprintf(h,"public  void autosave_%s_nodes() {\nreturn;\n}",C.name);
+	fprintf(h,"public  void autosave_%s_nodes() {\nreturn;\n}\n",C.name);
 
 	/* ------------ */
 	/* generate get */
 	/* ------------ */
+	title(h,"occi category rest interface method get list");
+	fprintf(h,"private struct rest_response * %s_get_list(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
+	title(h,"occi category rest interface method get item");
+	fprintf(h,"private struct rest_response * %s_get_item(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr, char * id)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
 	title(h,"occi category rest interface method get");
 	fprintf(h,"private struct rest_response * %s_get(",buffer);
 	fprintf(h,"void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n");
@@ -454,6 +470,13 @@ void	generate_occi_sql_builder( FILE * h, char * nptr )
 	/* ------------- */
 	/* generate head */
 	/* ------------- */
+	title(h,"occi category rest interface method head item");
+	fprintf(h,"private struct rest_response * %s_head_item(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr, char * id)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
 	title(h,"occi category rest interface method head");
 	fprintf(h,"private struct rest_response * %s_head(",buffer);
 	fprintf(h,"void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n");
@@ -483,6 +506,34 @@ void	generate_occi_sql_builder( FILE * h, char * nptr )
 	/* ------------- */
 	/* generate post */
 	/* ------------- */
+	title(h,"occi category rest interface method post item");
+	fprintf(h,"private struct rest_response * %s_post_item(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
+	title(h,"occi category rest interface method post action");
+	fprintf(h,"private struct rest_response * %s_post_action(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr, char * id)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
+	title(h,"occi category rest interface method post link");
+	fprintf(h,"private struct rest_response * %s_post_link(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr, char * id)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
+	title(h,"occi category rest interface method post mixin");
+	fprintf(h,"private struct rest_response * %s_post_mixin(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr, char * id)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
 	title(h,"occi category rest interface method post");
 	fprintf(h,"private struct rest_response * %s_post(",buffer);
 	fprintf(h,"void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n");
@@ -533,6 +584,13 @@ void	generate_occi_sql_builder( FILE * h, char * nptr )
 	/* ------------ */
 	/* generate put */
 	/* ------------ */
+	title(h,"occi category rest interface method put item");
+	fprintf(h,"private struct rest_response * %s_put_item(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr, char * id)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
 	title(h,"occi category rest interface method put");
 	fprintf(h,"private struct rest_response * %s_put(",buffer);
 	fprintf(h,"void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n");
@@ -562,6 +620,20 @@ void	generate_occi_sql_builder( FILE * h, char * nptr )
 	/* --------------- */
 	/* generate delete */
 	/* --------------- */
+	title(h,"occi category rest interface method delete all");
+	fprintf(h,"private struct rest_response * %s_delete_all(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
+	title(h,"occi category rest interface method delete item");
+	fprintf(h,"private struct rest_response * %s_delete_item(",C.name);
+	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr, char * id)\n");
+	fprintf(h,"{\n");
+	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"}\n");
+
 	title(h,"occi category rest interface method delete");
 	fprintf(h,"private struct rest_response * %s_delete(",buffer);
 	fprintf(h,"void * vptr, struct rest_client * cptr, struct rest_request * rptr)\n");
@@ -642,7 +714,7 @@ void	generate_occi_sql_builder( FILE * h, char * nptr )
 	/* ----------------------------------------------------------- */
 	/* start the sql database connection for the required category */
 	/* ----------------------------------------------------------- */
-	fprintf(h,"\telse if (!( initialise_occi_sql_table(%c%s%c) ))\n",0x0022,C.name,0X0022);
+	fprintf(h,"\telse if (!( initialise_occi_sql_table(%c%s%c,%ctable %s%c) ))\n",0x0022,C.name,0X0022,0x0022,C.name,0X0022);
 	fprintf(h,"\t\treturn(liberate_occi_category(optr));\n");
 
 	/* -------------------------------------- */

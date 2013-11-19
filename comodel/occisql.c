@@ -161,16 +161,16 @@ private	int	create_occi_sql_database( struct occi_table * tptr )
 private	int	default_occi_sql_host( struct occi_table * tptr )
 {
 	if (!( tptr->host ))
-		if (!( tptr->host = allocate_string( _DEFAULT_HOST ) ))
+		if (!( tptr->host = allocate_string( _DEFAULT_MYSQL_HOST ) ))
 			return(0);
 	if (!( tptr->user ))
-		if (!( tptr->user = allocate_string( _DEFAULT_USER ) ))
+		if (!( tptr->user = allocate_string( _DEFAULT_MYSQL_USER ) ))
 			return(0);
 	if (!( tptr->pass ))
-		if (!( tptr->pass = allocate_string( _DEFAULT_PASS ) ))
+		if (!( tptr->pass = allocate_string( _DEFAULT_MYSQL_PASS ) ))
 			return(0);
 	if (!( tptr->base ))
-		if (!( tptr->base = allocate_string( _DEFAULT_BASE ) ))
+		if (!( tptr->base = allocate_string( _DEFAULT_MYSQL_BASE ) ))
 			return(0);
 	return(1);
 }
@@ -251,31 +251,31 @@ private	int	occi_sql_field( struct occi_expression *expression, char * nptr, cha
 /*	-------------------------------------------	*/
 private	int	occi_sql_record( struct	occi_table * tptr,  struct occi_expression *expression )
 {
-	MYSQL_RES *	rptr;
-	MYSQL_ROW	row;
+	MYSQL_RES *	result;
+	MYSQL_ROW 	row;
 	MYSQL_FIELD *	fields;
 	unsigned long *	lengths;
 	unsigned int	fieldcount;
 	unsigned int	i;
 
-	if (!( rptr = mysql_use_result( tptr->handle )))
+	if (!( result = mysql_use_result( tptr->handle )))
 		return(118);
 
-	else if (!( fieldcount = mysql_num_fields(rptr) ))
+	else if (!( fieldcount = mysql_num_fields(result) ))
 	{
-		mysql_free_result( rptr );
+		mysql_free_result( result );
 		return(119);
 	}
-	else if (!( fields = mysql_fetch_fields(rptr) ))
+	else if (!( fields = mysql_fetch_fields(result) ))
 	{
-		mysql_free_result( rptr );
+		mysql_free_result( result );
 		return(119);
 	}
 	else
 	{
-		while ((row = mysql_fetch_row(rptr)))
+		while ((row = mysql_fetch_row(result)))
 		{
-			if (!( lengths = mysql_fetch_lengths(rptr) ))
+			if (!( lengths = mysql_fetch_lengths(result) ))
 				continue;
 			else
 			{
@@ -284,7 +284,7 @@ private	int	occi_sql_record( struct	occi_table * tptr,  struct occi_expression *
 					occi_sql_field( expression, fields[i].name, row[i], lengths[i] );				
 			}
 		}
-		mysql_free_result( rptr );
+		mysql_free_result( result );
 		return(0);
 	}
 }
