@@ -148,20 +148,29 @@ public	int	initialise_occi_sql( char * hostname, char * basename, char * usernam
 	char * eptr;
 	if (!( Database.status ))
 	{
+		if (( eptr = getenv("OCCISQLHOST")) != (char *) 0)
+			hostname = eptr;
+
+		if (( eptr = getenv("OCCISQLBASE")) != (char *) 0)
+			basename = eptr;
+
+		if (( eptr = getenv("OCCISQLUSER")) != (char *) 0)
+			username = eptr;
+
+		if (( eptr = getenv("OCCISQLPASSWD")) != (char *) 0)
+			password = eptr;
+
 		if ( hostname )
 			if (!( strcmp( hostname , "storage" ) ))
 				hostname =  "localhost";
+
 		if (!( Database.hostname = allocate_string( hostname ) ))
 			return( 27 );
 		else if (!( Database.basename = allocate_string( basename ) ))
 			return( 27 );
-		if (( eptr = getenv("OCCISQLUSER")) != (char *) 0)
-			username = eptr;
-		if (( eptr = getenv("OCCISQLPASSWD")) != (char *) 0)
-			password = eptr;
-		if (!( Database.username = allocate_string( username ) ))
+		else if (!( Database.username = allocate_string( username ) ))
 			return( 27 );
-		if (!( Database.password = allocate_string( password ) ))
+		else if (!( Database.password = allocate_string( password ) ))
 			return( 27 );
 		Database.status = 1;
 	}
