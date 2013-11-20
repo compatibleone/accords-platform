@@ -21,8 +21,17 @@
 
 #include "occisql.h"
 
-private	struct	occi_table * OcciTableFirst=(struct occi_table *) 0;
-private	struct	occi_table * OcciTableLast=(struct occi_table *) 0;
+private	struct	occi_database Database = 
+	{
+	0,
+	(MYSQL*) 0,
+	(char *) 0,
+	(char *) 0, 
+	(char *) 0, 
+	(char *) 0,
+	(struct occi_table *) 0,
+	(struct occi_table *) 0
+	};
 
 /*	-------------------------------------------	*/
 /*	   l i b e r a t e _ o c c i _ t a b l e	*/
@@ -57,8 +66,6 @@ private	struct	occi_table *	allocate_occi_table( char * catname )
 		memset( tptr, 0, sizeof( struct occi_table ) );
 		if (!( tptr->name = allocate_string( catname ) ))
 			return( liberate_occi_table( tptr ) );
-		else if (!( tptr->handle = mysql_init( (MYSQL *) 0 ) ))
-			return( liberate_occi_table( tptr ) );
 		else	return( tptr );
 	}
 }
@@ -69,7 +76,7 @@ private	struct	occi_table *	allocate_occi_table( char * catname )
 private	struct occi_table * locate_occi_sql_table( char * tablename )
 {
 	struct	occi_table * tptr;
-	for (	tptr=OcciTableFirst;
+	for (	tptr=Database.FirstTable;
 		tptr != (struct occi_table *) 0;
 		tptr = tptr->next )
 	{
@@ -90,13 +97,14 @@ private	struct occi_table * new_occi_sql_table( char * tablename, char * descrip
 
 	if (!( tptr = allocate_occi_table( tablename ) ))
 		return( tptr );
+
 	else if (!( tptr->description = allocate_string( description )))
 		return( liberate_occi_table( tptr ) );
 	{
-		if (!( tptr->previous = OcciTableLast ))
-			OcciTableFirst = tptr;
+		if (!( tptr->previous = Database.LastTable ))
+			Database.FirstTable = tptr;
 		else	tptr->previous->next = tptr;
-		OcciTableLast = tptr;
+		Database.LastTable = tptr;
 		return( tptr );
 	}
 }
@@ -104,8 +112,23 @@ private	struct occi_table * new_occi_sql_table( char * tablename, char * descrip
 /*	-------------------------------------------	*/
 /*	  i n i t i a l i s e _ o c c i _ s q l 	*/
 /*	-------------------------------------------	*/
-public	int	initialise_occi_sql( char * databasename, char * username, char * password )
+public	int	initialise_occi_sql( char * hostname, char * basename, char * username, char * password )
 {
+	if (!( Database.status ))
+	{
+		if ( hostname )
+			if (!( strcmp( hostname , "storage" ) ))
+				hostname =  "localhost";
+		if (!( Database.hostname = allocate_string( hostname ) ))
+			return( 27 );
+		else if (!( Database.basename = allocate_string( basename ) ))
+			return( 27 );
+		else if (!( Database.username = allocate_string( username ) ))
+			return( 27 );
+		else if (!( Database.password = allocate_string( password ) ))
+			return( 27 );
+		else	Database.status = 1;
+	}
 	return( 0 );
 }
 
@@ -114,6 +137,18 @@ public	int	initialise_occi_sql( char * databasename, char * username, char * pas
 /*	-------------------------------------------	*/
 public	void	terminate_occi_sql()
 {
+	if ( Database.status )
+	{
+		Database.status = 0;
+		if ( Database.hostname )	
+			Database.hostname = liberate( Database.hostname );
+		if ( Database.basename )	
+			Database.basename = liberate( Database.basename );
+		if ( Database.username )
+			Database.username = liberate( Database.username );
+		if ( Database.password )
+			Database.password = liberate( Database.password );
+	}
 	return;
 }
 
@@ -161,16 +196,16 @@ private	int	create_occi_sql_database( struct occi_table * tptr )
 private	int	default_occi_sql_host( struct occi_table * tptr )
 {
 	if (!( tptr->host ))
-		if (!( tptr->host = allocate_string( _DEFAULT_MYSQL_HOST ) ))
+		if (!( tptr->host = allocate_string( Database.hostname ) ))
 			return(0);
 	if (!( tptr->user ))
-		if (!( tptr->user = allocate_string( _DEFAULT_MYSQL_USER ) ))
+		if (!( tptr->user = allocate_string( Database.username ) ))
 			return(0);
 	if (!( tptr->pass ))
-		if (!( tptr->pass = allocate_string( _DEFAULT_MYSQL_PASS ) ))
+		if (!( tptr->pass = allocate_string( Database.password ) ))
 			return(0);
 	if (!( tptr->base ))
-		if (!( tptr->base = allocate_string( _DEFAULT_MYSQL_BASE ) ))
+		if (!( tptr->base = allocate_string( Database.basename ) ))
 			return(0);
 	return(1);
 }
@@ -178,28 +213,45 @@ private	int	default_occi_sql_host( struct occi_table * tptr )
 /*	-------------------------------------------------	*/
 /*	i n i t i a l i s e _ o c c i _ s q l _ t a b l e  	*/
 /*	-------------------------------------------------	*/
-public	int	initialise_occi_sql_table( char * tablename, char * description )
+public	struct	occi_table * initialise_occi_sql_table( char * tablename, char * description )
 {
 	MYSQL		   * rptr;
 	struct	occi_table * tptr;
 
+	/* --------------------------- */
+	/* retrieve the table if known */
+	/* --------------------------- */
 	if (!( tptr = locate_occi_sql_table( tablename )))
 		if (!( tptr = new_occi_sql_table( tablename, description ) ))
-			return( 27 );
+			return( tptr );
 
+	/* --------------------------- */
+	/* set the database table info */
+	/* --------------------------- */
 	if ((!( tptr->host ))
+	||  (!( tptr->base ))
 	||  (!( tptr->user ))
 	||  (!( tptr->pass )))
 		if (!( default_occi_sql_host( tptr ) ))
-			return( 27 );
+			return( tptr );
 
-	if (!( rptr = mysql_real_connect( tptr->handle, tptr->host, tptr->user, tptr->pass, tptr->base, 0, 0, 0 ) ))
-		return( 50 );
-	else  if ( create_occi_sql_database( tptr ) != 0 )
-		return( tptr->status );
-	else if ( create_occi_sql_table( tptr ) != 0 )
-		return( tptr->status );
-	else	return( 0 );
+	/* -------------------------------- */
+	/* validate the database connection */
+	/* -------------------------------- */
+	while (!( tptr->handle = Database.handle ))
+	{
+		if (!( Database.handle = mysql_real_connect( tptr->handle, tptr->host, tptr->user, tptr->pass, tptr->base, 0, 0, 0 ) ))
+			return( tptr );
+		else if ( create_occi_sql_database( tptr ) != 0 )
+			return( tptr );
+	}
+
+	/* -------------------------------- */
+	/* validate the datatable existance */
+	/* -------------------------------- */
+	if ( create_occi_sql_table( tptr ) != 0 )
+		return( tptr );
+	else	return( tptr );
 }
 
 /*	-------------------------------------------	*/
@@ -214,14 +266,14 @@ public	int	drop_occi_sql_table( char * tablename )
 	{
 		if (!( tptr->previous ))
 		{
-			if (!(OcciTableFirst = tptr->next))
-				OcciTableLast = (struct occi_table *) 0;
-			else	OcciTableFirst->previous = (struct occi_table *) 0;
+			if (!(Database.FirstTable = tptr->next))
+				Database.LastTable = (struct occi_table *) 0;
+			else	Database.FirstTable->previous = (struct occi_table *) 0;
 		}
 		else
 		{
 			if (!( tptr->previous->next = tptr->next ))
-				OcciTableLast = tptr->previous;
+				Database.LastTable = tptr->previous;
 			else 	tptr->next->previous = tptr->previous;
 		}
 		tptr = liberate_occi_table( tptr );
@@ -326,12 +378,23 @@ public	int	previous_occi_sql_record( char * category,  struct occi_expression *e
 /*	-------------------------------------------	*/
 public	int	insert_occi_sql_record( char * category,  struct occi_expression *expression )
 {
+	int	status;
+	char *	xptr=(char *) 0;
 	struct	occi_table * tptr;
-	if (!( tptr = locate_occi_sql_table( category ) ))
+	if (!( expression ))
+		return( 118 );
+	else if (!( expression->value ))
+		return( 118 );
+	else if (!( tptr = locate_occi_sql_table( category ) ))
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if ( mysql_query( tptr->handle, expression->value ) != 0)
+	else if (!( xptr = allocate( strlen( expression->value ) + strlen( tptr->name ) + strlen( _INSERT_INTO ) + 16 ) ))
+		return( 27 );
+	else	sprintf( xptr,"%s %s %s",_INSERT_INTO,tptr->name,expression->value);
+	status = mysql_query( tptr->handle, xptr );
+	liberate( xptr );
+	if ( status )
 		return( 81 );
 	else	return( 0 );
 }
@@ -341,14 +404,25 @@ public	int	insert_occi_sql_record( char * category,  struct occi_expression *exp
 /*	-------------------------------------------	*/
 public	int	search_occi_sql_record( char * category,  struct occi_expression *expression )
 {
+	int	status;
+	char *	xptr=(char *) 0;
 	struct	occi_table * tptr;
-	if (!( tptr = locate_occi_sql_table( category ) ))
+	if (!( expression ))
+		return( 118 );
+	else if (!( expression->value ))
+		return( 118 );
+	else if (!( tptr = locate_occi_sql_table( category ) ))
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if ( mysql_query( tptr->handle, expression->value ) != 0)
-		return( 78 );
-	else	return( occi_sql_record( tptr, expression ) );
+	else if (!( xptr = allocate( strlen( expression->value ) + strlen( tptr->name ) + strlen( _SELECT_ALL_FROM ) + 16 ) ))
+		return( 27 );
+	else	sprintf( xptr,"%s %s %s",_SELECT_ALL_FROM,tptr->name,expression->value);
+	status = mysql_query( tptr->handle, xptr );
+	liberate( xptr );
+	if ( status )
+		return( 81 );
+	else	return( 0 );
 }
 
 /*	-------------------------------------------	*/
@@ -356,13 +430,24 @@ public	int	search_occi_sql_record( char * category,  struct occi_expression *exp
 /*	-------------------------------------------	*/
 public	int	update_occi_sql_record( char * category,  struct occi_expression *expression )
 {
+	int	status;
+	char *	xptr=(char *) 0;
 	struct	occi_table * tptr;
-	if (!( tptr = locate_occi_sql_table( category ) ))
+	if (!( expression ))
+		return( 118 );
+	else if (!( expression->value ))
+		return( 118 );
+	else if (!( tptr = locate_occi_sql_table( category ) ))
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if ( mysql_query( tptr->handle, expression->value ) != 0)
-		return( 78 );
+	else if (!( xptr = allocate( strlen( expression->value ) + strlen( tptr->name ) + strlen( _UPDATE_WHERE ) + 16 ) ))
+		return( 27 );
+	else	sprintf( xptr,"%s %s %s",_UPDATE_WHERE,tptr->name,expression->value);
+	status = mysql_query( tptr->handle, xptr );
+	liberate( xptr );
+	if ( status )
+		return( 81 );
 	else	return( 0 );
 }
 
@@ -371,13 +456,24 @@ public	int	update_occi_sql_record( char * category,  struct occi_expression *exp
 /*	-------------------------------------------	*/
 public	int	delete_occi_sql_record( char * category,  struct occi_expression *expression )
 {
+	int	status;
+	char *	xptr=(char *) 0;
 	struct	occi_table * tptr;
-	if (!( tptr = locate_occi_sql_table( category ) ))
+	if (!( expression ))
+		return( 118 );
+	else if (!( expression->value ))
+		return( 118 );
+	else if (!( tptr = locate_occi_sql_table( category ) ))
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if ( mysql_query( tptr->handle, expression->value ) != 0)
-		return( 78 );
+	else if (!( xptr = allocate( strlen( expression->value ) + strlen( tptr->name ) + strlen( _DELETE_FROM ) + 16 ) ))
+		return( 27 );
+	else	sprintf( xptr,"%s %s %s",_DELETE_FROM,tptr->name,expression->value);
+	status = mysql_query( tptr->handle, xptr );
+	liberate( xptr );
+	if ( status )
+		return( 81 );
 	else	return( 0 );
 }
 

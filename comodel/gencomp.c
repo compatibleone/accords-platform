@@ -73,6 +73,7 @@ private	void	generate_file_inclusion( FILE * h, char * nptr )
 private	void	generate_accords_config( FILE * h, char * nptr )
 {
 	char	datebuffer[256];
+	title(h,"accords configuration");
 	fprintf(h,"private struct accords_configuration Configuration = {\n");
 	fprintf(h,"\t0,0,0,0,0,0,\n");
 	fprintf(h,"\t(char *) 0,\n");
@@ -92,13 +93,16 @@ private	void	generate_accords_config( FILE * h, char * nptr )
 	fprintf(h,"\t(struct occi_category *) 0\n");
 	fprintf(h,"\t};\n");
 
+	title(h,"standard relays");
 	fprintf(h,"public int check_debug() { return( Configuration.debug ); }\n");
 	fprintf(h,"public int check_verbose() { return( Configuration.verbose ); }\n");
 	fprintf(h,"public char * default_publisher() { return(Configuration.publisher); }\n");
 	fprintf(h,"public char * default_operator() { return(Configuration.operator); }\n");
+	fprintf(h,"public char * default_storage() { return(Configuration.storage); }\n");
 	fprintf(h,"public char * default_tls() { return(Configuration.tls); }\n");
 	fprintf(h,"public char * default_zone() { return(Configuration.zone); }\n");
 
+	title(h,"failure");
 	fprintf(h,"public int failure( int e, char * m1, char * m2 )\n{\n");
 	fprintf(h,"\tif ( e )\n\t{\n");
 	fprintf(h,"\t\tprintf(\"\\n*** failure %cu\",e);\n",0x0025);
@@ -110,6 +114,7 @@ private	void	generate_accords_config( FILE * h, char * nptr )
 	fprintf(h,"\tload_accords_configuration( &Configuration, \"%s\");\n",nptr);
 	fprintf(h,"\treturn;\n}\n");
 
+	title(h,"banner");
 	fprintf(h,"private int %s_banner()\n{\n",nptr);
 	fprintf(h,"\tprintf(\"\\n   CompatibleOne Generated Service %s: Version 1.0a.0.01\");\n",nptr);
 	date_string( datebuffer);
@@ -164,6 +169,7 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr, c
 				continue;
 			else
 			{
+				title( h, nptr );
 				fprintf(h,"private struct rest_response * _%s_%s(\n",nptr,cptr->id);
 				fprintf(h,"\tstruct occi_category * optr,\n");
 				fprintf(h,"\tstruct rest_client * cptr,\n");
@@ -234,14 +240,25 @@ private	void	generate_file_actions( FILE * h, struct occi_category * cptr, char 
 /*	--------------------------------------------------	*/
 /*	  g e n e r a t e _ f i l e _ o p e r a t i o n		*/
 /*	--------------------------------------------------	*/
-private	void	generate_file_operation( FILE * h, char * nptr, struct occi_category * cptr )
+private	void	generate_file_operation( FILE * h, char * nptr, struct occi_category * cptr, char * prefix )
 {
+	title(h,"operation");
 	fprintf(h,"\nprivate int %s_operation( char * sptr )\n{\n",nptr);
+	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tstruct occi_category * first=(struct occi_category *) 0;\n");
 	fprintf(h,"\tstruct occi_category * last=(struct occi_category *) 0;\n");
 	fprintf(h,"\tstruct occi_category * optr=(struct occi_category *) 0;\n");
 	fprintf(h,"\tset_autosave_cords_xlink_name(\"links_%s.xml\");\n",nptr);
 	fprintf(h,"\trest_initialise_log( Configuration.monitor );\n");
+	if ( prefix )
+	{
+		if (!( strcmp( prefix, "sql" ) ))
+		{
+			fprintf(h,"\tsprintf(buffer,%c%cs_database%c,default_operator());\n",
+				0x0022,0x0025,0x0022);
+			fprintf(h,"\tinitialise_occi_sql(default_storage(),buffer,get_default_user(),get_default_password());\n");
+		}
+	}
 	for (	;	
 		cptr != (struct occi_category *) 0; 
 		cptr = cptr->next )
@@ -263,6 +280,7 @@ private	void	generate_file_operation( FILE * h, char * nptr, struct occi_categor
 /*	--------------------------------------------------	*/
 private	void	generate_file_start( FILE * h, char * nptr )
 {
+	title(h,"start");
 	fprintf(h,"\nprivate int %s( int argc, char * argv[] )\n{\n",nptr);
 	fprintf(h,"\tint argi=0;\n");
 	fprintf(h,"\tchar * aptr;\n");
@@ -284,6 +302,7 @@ private	void	generate_file_start( FILE * h, char * nptr )
 /*	--------------------------------------------------	*/
 private	void	generate_file_main( FILE * h, char * nptr )
 {
+	title(h,"main");
 	fprintf(h,"\npublic int main( int argc, char * argv[] )\n{\n");
 	fprintf(h,"\tif ( argc == 1 ) return( %s_banner() );\n",nptr);
 	fprintf(h,"\telse return( %s(argc,argv) );\n",nptr);
@@ -323,7 +342,7 @@ public	int	generate_service_component( char * name, struct occi_category * cptr,
 		}
 		generate_accords_config(h,name);
 		generate_file_actions(h,cptr,prefix);
-		generate_file_operation(h,name,cptr);
+		generate_file_operation(h,name,cptr,prefix);
 		generate_file_start(h,name);
 		generate_file_main(h,name);
 		generate_file_exclusion(h,buffer,2);
@@ -411,7 +430,7 @@ public	int	generate_procci_component( char * name, struct occi_category * cptr, 
 		generate_accords_config(h,name);
 		
 		generate_file_actions(h,cptr, prefix);
-		generate_file_operation(h,name,cptr);
+		generate_file_operation(h,name,cptr,prefix);
 		generate_file_start(h,name);
 		generate_file_main(h,name);
 		generate_file_exclusion(h,buffer,2);

@@ -39,10 +39,10 @@
 
 #define	_CREATE_DATABASE	"CREATE DATABASE IF NOT EXISTS "
 #define	_CREATE_TABLE		"CREATE TABLE IF NOT EXISTS "
-#define	_DEFAULT_MYSQL_HOST	"127.0.0.1"
-#define	_DEFAULT_MYSQL_USER	"admin"
-#define	_DEFAULT_MYSQL_PASS	"admin"
-#define	_DEFAULT_MYSQL_BASE	"database"
+#define	_INSERT_INTO		"INSERT INTO"
+#define	_UPDATE_WHERE		"UPDATE"
+#define	_SELECT_ALL_FROM	"SELECT * FROM"
+#define	_DELETE_FROM	"DELETE FROM"
 
 struct	occi_table
 {
@@ -59,6 +59,18 @@ struct	occi_table
 	MYSQL *	handle;
 };
 
+struct	occi_database 
+{
+	int	status;
+	MYSQL*	handle;
+	char *	hostname;
+	char *	basename;
+	char *	username;
+	char *	password;
+	struct	occi_table * FirstTable;
+	struct	occi_table * LastTable;
+};
+
 struct	occi_expression
 {
 	char *	value;
@@ -69,9 +81,10 @@ public	void *	allocate(int);
 public	void *	liberate(void *);
 public	char *	allocate_string(char *);
 
-public	int	initialise_occi_sql( char * databasename, char * username, char * password );
+
+public	int	initialise_occi_sql( char * hostname, char * databasename, char * username, char * password );
 public	void	terminate_occi_sql();
-public	int	initialise_occi_sql_table( char * tablename, char * description );
+public	struct	occi_table * initialise_occi_sql_table( char * tablename, char * description );
 public	int	drop_occi_sql_table( char * tablename );
 public	int	first_occi_sql_record( char * category, struct occi_expression *expression );
 public	int	previous_occi_sql_record( char * category, struct occi_expression *expression );
