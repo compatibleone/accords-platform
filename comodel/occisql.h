@@ -34,7 +34,7 @@
 #endif
 
 #ifdef	OCCI_MYSQL
-#include <mysql.h>
+#include <mysql/mysql.h>
 #endif
 
 #define	_CREATE_DATABASE	"CREATE DATABASE IF NOT EXISTS "

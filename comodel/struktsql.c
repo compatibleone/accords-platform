@@ -244,8 +244,8 @@ private	void	generate_file_description( FILE * h )
 	if ( xptr )
 	{
 		xptr = join_string( xptr, " ) ");
-		liberate( xptr );
 		fprintf(h,"\tchar * description=%c%s%c;\n",0x0022,xptr,0x0022);
+		liberate( xptr );
 	}
 	return;
 }
@@ -422,7 +422,7 @@ private	void	generate_occi_sql_on_update( FILE * h, char * nptr, char * fullname
 			if (!( strcmp( iptr->name, "id" ) ))
 				fprintf(h,"\tsprintf(buffer,%cid = '%cs'%c,id);\n",0x0022,0x0025,0x0022);
 			else if (!( strcmp( iptr->basic, "int" ) ))
-			 	fprintf(h,"\tsprintf(buffer,%c'%s = %cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
+			 	fprintf(h,"\tsprintf(buffer,%c%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
 			else 	fprintf(h,"\tsprintf(buffer,%c%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
 			fprintf(h,"\tif (!( xptr )) { if (!( xptr = allocate_string(buffer) )) return(27); else separator =','; }\n");
 			fprintf(h,"\telse if (!( wptr = allocate( strlen( xptr ) + strlen( buffer ) + 8 ) )) return( 27 );\n");
@@ -590,7 +590,7 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 
 	title(h,"OCCI MYSQL BUILDER START");
 
-	fprintf(h,"\n#include <%s>\n","mysql.h");
+	fprintf(h,"\n#include <%s>\n","mysql/mysql.h");
 	fprintf(h,"#include %c%s%c\n",0x0022,"occisql.h",0x0022);
 
 
