@@ -55,6 +55,9 @@ struct	accords_configuration CoModel =
 	(struct occi_category *) 0
 };
 
+private	int	testflag=0;
+public	int	check_testflag()	{	return( testflag);	}
+
 /*	------------------------------------------------------------------	*/
 /*	c o m o d e l _ o c c i _ p r o d u c i o n _ p a r a m e t e r s	*/
 /*	------------------------------------------------------------------	*/
@@ -906,6 +909,9 @@ private	int	co_model(int argc, char * argv[] )
 			aptr++;
 			switch( *(aptr++) )
 			{
+			case	't'	:
+				testflag=1;
+				continue;
 			case	'e'	:
 				set_xml_echo(1);
 				continue;

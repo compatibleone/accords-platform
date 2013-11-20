@@ -336,7 +336,8 @@ public	int	generate_service_component( char * name, struct occi_category * cptr,
 			if (!( strcmp( prefix, "sql" ) ))
 			{
 				generate_file_inclusion(h,"occisql.h");
-			//	generate_file_inclusion(h,"mysql.c");
+				if ( check_testflag() )
+					generate_file_inclusion(h,"mysql.c");
 				generate_file_inclusion(h,"occisql.c");
 			}
 		}
