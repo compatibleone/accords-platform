@@ -70,7 +70,7 @@ private	void	generate_file_inclusion( FILE * h, char * nptr )
 /*	--------------------------------------------------	*/
 /*	  g e n e r a t e _ a c c o r d s _ c o n f i g  	*/
 /*	--------------------------------------------------	*/
-private	void	generate_accords_config( FILE * h, char * nptr )
+private	void	generate_accords_config( FILE * h, char * nptr, char * prefix )
 {
 	char	datebuffer[256];
 	title(h,"accords configuration");
@@ -119,6 +119,12 @@ private	void	generate_accords_config( FILE * h, char * nptr )
 	fprintf(h,"\tprintf(\"\\n   CompatibleOne Generated Service %s: Version 1.0a.0.01\");\n",nptr);
 	date_string( datebuffer);
 	fprintf(h,"\tprintf(\"\\n   Beta Version : %s \");\n",datebuffer);
+	if ( prefix )
+	{
+		if (!( strcmp( prefix, "sql" ) ))
+			fprintf(h,"\tprintf(\"\\n   Back End : SQL%s \\n\");\n",(check_testflag() ? "(test)" : "") );
+		else	fprintf(h,"\tprintf(\"\\n   Back End : XML%s \\n\");\n",(check_testflag() ? "(test)" : "") );
+	}
 	fprintf(h,"\tprintf(\"\\n   Copyright (c) 2013 Iain James Marshall\");\n",nptr);
 	fprintf(h,"\tprintf(\"\\n\");\n",nptr);
 	fprintf(h,"\taccords_configuration_options();\n",nptr);
@@ -341,7 +347,7 @@ public	int	generate_service_component( char * name, struct occi_category * cptr,
 				generate_file_inclusion(h,"occisql.c");
 			}
 		}
-		generate_accords_config(h,name);
+		generate_accords_config(h,name,prefix);
 		generate_file_actions(h,cptr,prefix);
 		generate_file_operation(h,name,cptr,prefix);
 		generate_file_start(h,name);
@@ -428,7 +434,7 @@ public	int	generate_procci_component( char * name, struct occi_category * cptr, 
 		generate_file_inclusion(h,"document.h");
 		generate_file_inclusion(h,"cordspublic.h");
 		generate_file_inclusion(h,"occispublisher.h");
-		generate_accords_config(h,name);
+		generate_accords_config(h,name,prefix);
 		
 		generate_file_actions(h,cptr, prefix);
 		generate_file_operation(h,name,cptr,prefix);
