@@ -839,14 +839,14 @@ private	struct rest_response * build_application(
 			pptr->completed = time((long *) 0);
 			pptr->duration  = (pptr->completed - pptr->started);
 			sprintf(buffer,"Application Build Failure Phase #%u",pptr->state);
-			autosave_cords_application_nodes();
+			autosave_cords_application_node(pptr);
 			return( rest_html_response( aptr, status, buffer ) );
 		}
 		else
 		{
 			pptr->completed = time((long *) 0);
 			pptr->duration  = (pptr->completed - pptr->started);
-			autosave_cords_application_nodes();
+			autosave_cords_application_node(pptr);
 			return( rest_html_response( aptr, 200, "OK" ) );
 		}
 	}

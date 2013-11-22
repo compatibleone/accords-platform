@@ -1,24 +1,21 @@
-/* ---------------------------------------------------------------------------- */
-/* Advanced Capabilities for Compatible One Resources Delivery System - ACCORDS	*/
-/* (C) 2011 by Iain James Marshall <ijm667@hotmail.com>				*/
-/* ---------------------------------------------------------------------------- */
-/*										*/
-/* This is free software; you can redistribute it and/or modify it		*/
-/* under the terms of the GNU Lesser General Public License as			*/
-/* published by the Free Software Foundation; either version 2.1 of		*/
-/* the License, or (at your option) any later version.				*/
-/*										*/
-/* This software is distributed in the hope that it will be useful,		*/
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of		*/
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU		*/
-/* Lesser General Public License for more details.				*/
-/*										*/
-/* You should have received a copy of the GNU Lesser General Public		*/
-/* License along with this software; if not, write to the Free			*/
-/* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA		*/
-/* 02110-1301 USA, or see the FSF site: http://www.fsf.org.			*/
-/*										*/
-/* ---------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------- */
+/*  ACCORDS PLATFORM                                                    */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/* -------------------------------------------------------------------- */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
+/* you may not use this file except in compliance with the License. 	*/
+/* You may obtain a copy of the License at 				*/
+/*  									*/
+/*  http://www.apache.org/licenses/LICENSE-2.0 				*/
+/*  									*/
+/* Unless required by applicable law or agreed to in writing, software 	*/
+/* distributed under the License is distributed on an "AS IS" BASIS, 	*/
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 	*/
+/* implied. 								*/
+/* See the License for the specific language governing permissions and 	*/
+/* limitations under the License. 					*/
+/* -------------------------------------------------------------------- */
+
 #ifndef	_occirest_c
 #define	_occirest_c
 
@@ -31,7 +28,7 @@ extern	struct	strukt_context C;
 
 #define	_CRUD_DELETE
 
-void	generate_occi_rest_builder( FILE * h, char * nptr )
+public	void	generate_occi_rest_builder( FILE * h, char * nptr )
 {
 	char	* prefix;
 	int	item=0;
@@ -323,8 +320,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 			if ( iptr->indirection )
 			{
 				fprintf(h, "\t\tfprintf_xml_string_attribute(h, \"%%s\", (pptr->%s?pptr->%s:\"\"));\n",
-					iptr->name, iptr->name
-				);
+					iptr->name, iptr->name );
 			}
 			else
 			{
@@ -345,6 +341,8 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\tpthread_mutex_unlock( &list_%s_control );\n",C.name);
 	fprintf(h,"\treturn;\n");
 	fprintf(h,"}\n");
+
+	fprintf(h,"public  void autosave_%s_node(struct %s * pptr) { autosave_%s_nodes(); }\n",C.name,C.name,C.name);
 
 	/* ------------------------ */
 	/* generate activate filter */
@@ -570,7 +568,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\telse if (!( pptr = nptr->contents ))\n");
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 404, %cNot Found%c) );\n",0x0022,0x0022);
 	fprintf(h,"\tif (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,nptr,rptr);\n");
-	fprintf(h,"\tautosave_%s_nodes();\n",C.name);
+	fprintf(h,"\tautosave_%s_node(pptr);\n",C.name);
 	fprintf(h,"\treturn( %s_occi_response(optr,cptr,rptr,aptr,pptr));\n",C.name);
 	fprintf(h,"}\n");
 
@@ -699,7 +697,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	
 	fprintf(h,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,nptr,rptr);\n");
 
-	fprintf(h,"\tautosave_%s_nodes();\n",C.name);
+	fprintf(h,"\tautosave_%s_node(pptr);\n",C.name);
 	fprintf(h,"\tprepare_%s_location(cptr->buffer,reqhost,reqport,optr->location, pptr->id);\n",C.name);
 	fprintf(h,"\tif (!( hptr = rest_response_header( aptr, %cX-OCCI-Location%c,cptr->buffer) ))\n",
 			0x0022,0x0022);
@@ -734,7 +732,7 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\tif (!( occi_process_atributs(optr,rptr,aptr, pptr, set_%s_field ) ))\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500, %cServer Failure%c) );\n",0x0022,0x0022);
 	fprintf(h,"\tif (( iptr ) && (iptr->update)) (*iptr->update)(optr,nptr,rptr);\n");
-	fprintf(h,"\tautosave_%s_nodes();\n",C.name);
+	fprintf(h,"\tautosave_%s_node(pptr);\n",C.name);
 	fprintf(h,"\treturn( %s_occi_response(optr,cptr,rptr,aptr,pptr));\n",C.name);
 	fprintf(h,"}\n");
 
@@ -794,7 +792,6 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\tstruct occi_%s_node * sptr;\n",C.klass);
 	fprintf(h,"\tstruct %s * pptr;\n",C.name);
 	fprintf(h,"\tstruct %s_occi_filter filter;\n",C.name);
-
 	fprintf(h,"\tchar * reqhost;\n");
 	fprintf(h,"\tint reqport=0;\n");
 
@@ -861,8 +858,8 @@ void	generate_occi_rest_builder( FILE * h, char * nptr )
 	fprintf(h,"\t\t\tsptr = nptr->next;\n");
 	fprintf(h,"\t\t\tdrop_%s_node( nptr );\n",C.name);
 	fprintf(h,"\t\t\tnptr = sptr;\n");
+	fprintf(h,"\t\t\t}\n");
 	fprintf(h,"\t\t}\n");
-	fprintf(h,"\t}\n");
 	fprintf(h,"\tliberate_%s(filter.attributes);\n", C.name);
 	fprintf(h,"\tautosave_%s_nodes();\n",C.name);
 	fprintf(h,"\tif (!( occi_success( aptr ) ))\n");

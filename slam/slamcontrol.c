@@ -675,7 +675,7 @@ private	struct rest_response * timer_control( struct cords_control * pptr, struc
 	}
 
 	pptr->state = 1;
-	autosave_cords_control_nodes();
+	autosave_cords_control_node(pptr);
 
 	if (( zptr = cords_invoke_action( pptr->timer, _CORDS_START, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 		zptr = occi_remove_response( zptr );
@@ -697,7 +697,7 @@ private	struct rest_response * consume_control( struct cords_control * pptr, str
 		return( rest_html_response( aptr, 802, "Control Start Failure" ) );
 	default	   : 
 		pptr->state = 1;
-		autosave_cords_control_nodes();
+		autosave_cords_control_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -780,7 +780,7 @@ private	struct rest_response * stop_control(
 	else
 	{
 		stop_control_activity(pptr);
-		autosave_cords_control_nodes();
+		autosave_cords_control_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }

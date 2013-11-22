@@ -377,7 +377,7 @@ private	struct rest_response * consume_placement(
 	else 
 	{
 		pptr->state=2;
-		autosave_cords_placement_nodes();
+		autosave_cords_placement_node(pptr);
 		invoke_placement_action( pptr, "consume" );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -404,7 +404,7 @@ private	struct rest_response * restore_placement(
 	else 
 	{
 		pptr->state=1;
-		autosave_cords_placement_nodes();
+		autosave_cords_placement_node(pptr);
 		invoke_placement_action( pptr, "restore" );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -430,7 +430,7 @@ private	struct rest_response * release_placement(
 	else 
 	{
 		pptr->state=0;
-		autosave_cords_placement_nodes();
+		autosave_cords_placement_node(pptr);
 		invoke_placement_action( pptr, "release" );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -457,7 +457,7 @@ private	struct rest_response * choose_placement(
 	else 
 	{
 		pptr->state = 1;
-		autosave_cords_placement_nodes();
+		autosave_cords_placement_node(pptr);
 		invoke_placement_action( pptr, "reserve" );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

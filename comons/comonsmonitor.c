@@ -54,7 +54,7 @@ private	struct rest_response * start_monitor(
 			}
 		}
 		pptr->state = 1;
-		autosave_cords_monitor_nodes();
+		autosave_cords_monitor_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }
@@ -105,7 +105,7 @@ private	int	stop_monitor_controls( struct cords_monitor * pptr )
 	/* perform book keeping */
 	/* -------------------- */
 	pptr->state = 0;
-	autosave_cords_monitor_nodes();
+	autosave_cords_monitor_node(pptr);
 
 	/* --------------------------------------- */
 	/* delete any residual control agent links */

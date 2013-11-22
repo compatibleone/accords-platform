@@ -357,6 +357,21 @@ private	int	occi_sql_field( struct occi_expression *expression, char * nptr, cha
 }
 
 /*	-------------------------------------------	*/
+/*	       o c c i _ s q l _ f i e l d  		*/
+/*	-------------------------------------------	*/
+/*	this function will transfer back the field	*/
+/*	data to the caller for storage or processing	*/
+/*	-------------------------------------------	*/
+private	int	occi_sql_list_item( struct occi_expression *expression, struct rest_response * aptr, char * nptr, char * vptr, int length )
+{
+	if (!( expression ))
+		return(0);
+	else if (!( expression->handler ))
+		return(0);
+	else	return( (*expression->handler)( nptr, vptr, length ) );
+}
+
+/*	-------------------------------------------	*/
 /*	       o c c i _ s q l _ r e c o r d 		*/
 /*	-------------------------------------------	*/
 /*	parses a result set and delivers field data	*/
@@ -392,6 +407,50 @@ private	int	occi_sql_record( struct	occi_table * tptr,  struct occi_expression *
 					if (!( field = mysql_fetch_field( result )))
 						break;
 					else	occi_sql_field( expression, field->name, row[i], lengths[i] );				
+				}
+			}
+		}
+		mysql_free_result( result );
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	       o c c i _ s q l _ r e c o r d s 		*/
+/*	-------------------------------------------	*/
+/*	parses a result set and delivers record set	*/
+/*	-------------------------------------------	*/
+private	int	occi_sql_records( struct occi_table * tptr,  struct occi_expression *expression, struct rest_response * aptr )
+{
+	MYSQL_RES *	result;
+	MYSQL_ROW 	row;
+	MYSQL_FIELD *	field;
+	unsigned long *	lengths;
+	unsigned int	fieldcount;
+	unsigned int	i;
+
+	if (!( result = mysql_use_result( tptr->handle )))
+		return(118);
+
+	else if (!( fieldcount = mysql_num_fields(result) ))
+	{
+		mysql_free_result( result );
+		return(119);
+	}
+	else
+	{
+		while ((row = mysql_fetch_row(result)))
+		{
+			if (!( lengths = mysql_fetch_lengths(result) ))
+				continue;
+			else
+			{
+				for(	i=0; 
+					i < fieldcount; i++)
+				{
+					if (!( field = mysql_fetch_field( result )))
+						break;
+					else	occi_sql_list_item( expression, aptr, field->name, row[i], lengths[i] );				
 				}
 			}
 		}
@@ -486,6 +545,31 @@ public	int	search_occi_sql_record( char * category,  struct occi_expression *exp
 	if ( status )
 		return( occi_sql_failure( tptr, 78 ) );
 	else	return( occi_sql_record( tptr, expression ) );
+}
+
+/*	-------------------------------------------	*/
+/*	s e a r c h _ o c c i _ s q l _ r e c o r d 	*/
+/*	-------------------------------------------	*/
+public	int	collect_occi_sql_records( char * category,  struct occi_expression *expression, struct rest_response * aptr )
+{
+	int	status;
+	char *	xptr=(char *) 0;
+	struct	occi_table * tptr;
+	if (!( expression ))
+		return( 118 );
+	else if (!( tptr = locate_occi_sql_table( category ) ))
+		return( 40 );
+	else if (!( tptr->handle ))
+		return( 50 );
+	else if (!( xptr = allocate( strlen( ( expression->value ? expression->value : "" ) ) + strlen( tptr->name ) + strlen( _SELECT_ALL_FROM ) + 16 ) ))
+		return( 27 );
+	else	sprintf( xptr,"%s %s %s",_SELECT_ID_FROM,tptr->name,( expression->value ? expression->value : "" ));
+	debug_sql_query( tptr, xptr );
+	status = mysql_query( tptr->handle, xptr );
+	liberate( xptr );
+	if ( status )
+		return( occi_sql_failure( tptr, 78 ) );
+	else	return( occi_sql_records( tptr, expression,aptr ) );
 }
 
 /*	-------------------------------------------	*/

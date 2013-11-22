@@ -61,7 +61,7 @@ private	struct rest_response * start_session(
 			}
 		}
 		pptr->state = 1;
-		autosave_cords_session_nodes();
+		autosave_cords_session_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }
@@ -124,7 +124,7 @@ private	struct rest_response * stop_session(
 			}
 		}
 		pptr->state = 0;
-		autosave_cords_session_nodes();
+		autosave_cords_session_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }

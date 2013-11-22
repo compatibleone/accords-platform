@@ -373,7 +373,7 @@ private	struct	rest_response * start_contract(
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
 			pptr->commons= 1;
-			autosave_cords_contract_nodes();
+			autosave_cords_contract_node(pptr);
 		}
 		else if ( is_common_scope( pptr ) )
 		{
@@ -485,7 +485,7 @@ private	struct	rest_response * restart_contract(
 			}
 			pptr->when  = time((long*)0); 
 			pptr->state = _OCCI_RUNNING;
-			autosave_cords_contract_nodes();
+			autosave_cords_contract_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -564,7 +564,7 @@ private	struct	rest_response * suspend_contract(
 			}
 			pptr->when  = time((long*) 0);
 			pptr->state = _OCCI_SUSPENDED;
-			autosave_cords_contract_nodes();
+			autosave_cords_contract_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -704,7 +704,7 @@ private	struct	rest_response * stop_contract(
 			}
 			pptr->stopduration = (time((long*)0) - pptr->when);
 			reset_contract( pptr );
-			autosave_cords_contract_nodes();
+			autosave_cords_contract_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -751,7 +751,7 @@ private	char *	contract_can_scale( struct cords_contract * pptr )
 			return((char *) 0);
 		else
 		{
-			autosave_cords_contract_nodes();
+			autosave_cords_contract_node(pptr);
 			return( pptr->scaling );
 		}
 	}
@@ -976,7 +976,7 @@ private	struct	rest_response * save_contract(
 			}
 			pptr->saveduration = (time((long*)0) - pptr->when);
 			pptr->when  = time((long*) 0);
-			autosave_cords_contract_nodes();
+			autosave_cords_contract_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -1053,7 +1053,7 @@ private	struct	rest_response * snapshot_contract(
 				retrieve_provider_information( pptr );
 			}
 			pptr->when  = time((long*) 0);
-			autosave_cords_contract_nodes();
+			autosave_cords_contract_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

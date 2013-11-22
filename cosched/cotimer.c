@@ -656,7 +656,7 @@ private	struct	rest_response * hit_counter(
 	else
 	{
 		pptr->value = pptr->value + 1;
-		autosave_cords_counter_nodes();
+		autosave_cords_counter_node(pptr);
 	 	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -688,7 +688,7 @@ private	struct	rest_response * start_timer(
 		sprintf(buffer,"%lu",time((long *) 0));
 		pptr->activated = allocate_string( buffer );
 		pptr->state=1;
-		autosave_cords_timer_nodes();
+		autosave_cords_timer_node(pptr);
 	 	return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -703,7 +703,7 @@ private	int	stop_job_timer( struct cords_timer * pptr )
 		if ( pptr->reference ) 
 			pptr->reference = release_timer( pptr->reference ); 
 		pptr->state=0;
-		autosave_cords_timer_nodes();
+		autosave_cords_timer_node(pptr);
 	}
 	return(0);
 }

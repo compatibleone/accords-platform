@@ -144,7 +144,7 @@ private	struct rest_response * consume_monitoring( struct cords_connection * ppt
 	case	-1 : 
 		return( rest_html_response( aptr, 802, "Connection Start Failure" ) );
 	default	   : 
-		autosave_cords_connection_nodes();
+		autosave_cords_connection_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -187,7 +187,7 @@ private	struct rest_response * capture_connection(
 	else
 	{
 		capture_monitoring( pptr ) ;
-		autosave_cords_connection_nodes();
+		autosave_cords_connection_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -270,7 +270,7 @@ private	struct rest_response * start_connection(
 			}
 		}
 		pptr->state = 1;
-		autosave_cords_connection_nodes();
+		autosave_cords_connection_node(pptr);
 		if ( rest_valid_string( pptr->monitor ) )
 		{
 			if (!(zptr = cords_invoke_action( pptr->monitor, _CORDS_START, _CORDS_SERVICE_AGENT, default_tls() )))
@@ -353,7 +353,7 @@ private	int	stop_connection_probes( struct cords_connection * pptr )
 	if (!( rest_valid_string( pptr->monitor ) ))
 		capture_monitoring( pptr );
 	pptr->state = 0;
-	autosave_cords_connection_nodes();
+	autosave_cords_connection_node(pptr);
 	if ( strlen(buffer) )
 		if ((zptr = occi_delete_links( buffer, _CORDS_SERVICE_AGENT, default_tls())) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );

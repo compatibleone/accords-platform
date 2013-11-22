@@ -11,7 +11,7 @@ bin_PROGRAMS = comodel
 
 EXTRA_DIST = 
 
-comodel_SOURCES = comodel.c comodel.h strukt.c strukt.h occirest.c struktsql.c gencomp.c
+comodel_SOURCES = comodel.c comodel.h strukt.c strukt.h genoccixml.c genoccisql.c gencomp.c
 
 comodel_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_OCCI) $(CFLAGS_COREST) $(CFLAGS_COCCI) \
 	$(CFLAGS_PUBOCCI) $(CFLAGS_CORDS) $(CFLAGS_COCARRIER) $(CFLAGS_COPABR) $(CFLAGS_COCSPI)

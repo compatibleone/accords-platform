@@ -422,7 +422,7 @@ private	struct rest_response * start_probe(
 		default		:
 			pptr->pid = pid;
 			pptr->state = 1;
-			autosave_cords_probe_nodes();
+			autosave_cords_probe_node(pptr);
 			return( rest_html_response( aptr, 200, "OK" ) );
 		}
 	}		
@@ -454,7 +454,7 @@ private	struct rest_response * stop_probe(
 			pptr->pid = 0;
 		}
 		pptr->state = 0;
-		autosave_cords_probe_nodes();
+		autosave_cords_probe_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}		
 }
@@ -525,7 +525,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	/* -------------------------------------------- */
 	if ( metadatas )
 	{
-		autosave_cords_metadata_nodes();
+		autosave_cords_metadata_node(pptr);
 		sync();
 	}
 
@@ -595,7 +595,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	/* --------------------------------------------- */
 	if ( scripts )
 	{
-		autosave_cords_script_nodes();
+		autosave_cords_script_node(pptr);
 		sync();
 	}
 

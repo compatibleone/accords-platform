@@ -42,6 +42,7 @@
 #define	_INSERT_INTO		"INSERT INTO"
 #define	_UPDATE_WHERE		"UPDATE"
 #define	_SELECT_ALL_FROM	"SELECT * FROM"
+#define	_SELECT_ID_FROM		"SELECT id FROM"
 #define	_DELETE_FROM	"DELETE FROM"
 
 struct	occi_table

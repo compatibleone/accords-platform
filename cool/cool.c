@@ -282,7 +282,7 @@ private	struct rest_response * scaleup_job(
 		pptr->floor     = Elastic.floor;
 		pptr->ceiling   = Elastic.ceiling;
 		pptr->strategy  = Elastic.strategy;
-		autosave_cords_job_nodes();
+		autosave_cords_job_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 	else	return( rest_html_response( aptr, 400, "Elastic Ceiling Reached" ) );
@@ -315,7 +315,7 @@ private	struct rest_response * scaledown_job(
 		pptr->floor     = Elastic.floor;
 		pptr->ceiling   = Elastic.ceiling;
 		pptr->strategy  = Elastic.strategy;
-		autosave_cords_job_nodes();
+		autosave_cords_job_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 	else	return( rest_html_response( aptr, 400, "Elastic Floor Reached" ) );
@@ -353,7 +353,7 @@ private	struct rest_response * scaleback_job(
 			pptr->floor     = Elastic.floor;
 			pptr->ceiling   = Elastic.ceiling;
 			pptr->strategy  = Elastic.strategy;
-			autosave_cords_job_nodes();
+			autosave_cords_job_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

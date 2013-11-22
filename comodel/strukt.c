@@ -435,8 +435,8 @@ public	int	generate()
 		}
 		else
 		{
-			generate_occi_rest_builder( C.target, "occi" );
-			generate_occi_rest_request( C.target, "rest_occi" );
+			generate_occi_xml_builder( C.target, "occi" );
+			generate_occi_xml_request( C.target, "rest_occi" );
 		}
 	}
 	else
@@ -839,7 +839,7 @@ private	void	schema_footer( FILE * h, char * nptr )
 	return;
 }
 
-private	void	file_header( FILE * h, char * nptr, char * iptr, const char *filter_name)
+private	void	file_header( FILE * h, char * nptr, char * iptr, char *filter_name)
 {
 	char	buffer[1024];
 	if ( C.genrest )
@@ -858,8 +858,7 @@ private	void	file_header( FILE * h, char * nptr, char * iptr, const char *filter
 		fprintf(h,"\n#include %c%s%c\n",0x0022,"element.h",0x0022);
 	}
 	fprintf(h,"\n#include %c%s%c\n",0x0022,iptr,0x0022);
-	if ( filter_name )
-		fprintf(h,"#include %c%s%c\n",0x0022, filter_name, 0x0022);
+	fprintf(h,"#include %c%s%c\n",0x0022, filter_name, 0x0022);
 	return;
 }
 
@@ -882,9 +881,11 @@ public	int	process( char * nptr )
 	int	l;
 	char	sn[512];
 	char	tn[512];
+	char	fn[512];
 	char 	token[512];
 	FILE * sh;
 	sprintf(sn,"%s.h",nptr);
+	sprintf(fn,"%s_filter.h",nptr);
 	sprintf(tn,"%s%s.c",C.prefix,nptr);
 	if (!( sh = fopen( sn, "r" )))
 		return( failure(40,"file not found",sn) );
@@ -895,7 +896,7 @@ public	int	process( char * nptr )
 	}
 	else
 	{
-		file_header( C.target, tn, sn, (char *) 0 );
+		file_header( C.target, tn, sn, fn );
 		while ((c = remove_white_space( sh )))
 		{
 			if ( is_punctuation(c) )

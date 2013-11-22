@@ -155,7 +155,7 @@ private	struct rest_response * consume_quantity(
 	else 
 	{
 		pptr->state=2;
-		autosave_cords_quantity_nodes();
+		autosave_cords_quantity_node(pptr);
 		invoke_quantity_action(pptr,3);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -182,7 +182,7 @@ private	struct rest_response * restore_quantity(
 	else 
 	{
 		pptr->state=1;
-		autosave_cords_quantity_nodes();
+		autosave_cords_quantity_node(pptr);
 		invoke_quantity_action(pptr,2);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -208,7 +208,7 @@ private	struct rest_response * release_quantity(
 	else 
 	{
 		pptr->state=0;
-		autosave_cords_quantity_nodes();
+		autosave_cords_quantity_node(pptr);
 		invoke_quantity_action(pptr,0);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -233,7 +233,7 @@ private	struct rest_response * reserve_quantity(
 	else 
 	{
 		pptr->state = 1;
-		autosave_cords_quantity_nodes();
+		autosave_cords_quantity_node(pptr);
 		invoke_quantity_action(pptr,1);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

@@ -189,7 +189,7 @@ private	struct rest_response * build_vm(
 			zptr = occi_remove_response( zptr );
 			return( rest_html_response( aptr, 500, "build failure" ) );
 		}
-		else	autosave_cords_vm_nodes();
+		else	autosave_cords_vm_node(pptr);
 		zptr = occi_remove_response( zptr );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

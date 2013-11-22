@@ -900,7 +900,7 @@ private	struct rest_response * process_invoice(
 	else 
 	{
 		process_invoice_transactions( pptr );
-		autosave_cords_invoice_nodes();
+		autosave_cords_invoice_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -987,7 +987,7 @@ private	struct rest_response * close_invoice(
 	else 
 	{
 		pptr->state = 1;
-		autosave_cords_invoice_nodes();
+		autosave_cords_invoice_node(pptr);
 		close_invoice_transactions( pptr );
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
