@@ -75,7 +75,16 @@ struct	occi_database
 struct	occi_expression
 {
 	char *	value;
-	int	(*handler)(char *, char *, int);
+	void *	context;
+	int	(*handler)(void *, char *, char *, int);
+};
+
+struct	response_context
+{
+	struct	rest_response * response;
+	char *	host;
+	int	port;
+	char *	location;
 };
 
 public	void *	allocate(int);

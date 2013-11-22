@@ -281,7 +281,13 @@ private	void	generate_occi_sql_on_field( FILE * h, char * nptr, char * fullname 
 	struct	item * iptr;
 	int	items=0;
 	title(h,"sql on set field");
-	fprintf(h,"\nprivate int %s_sql_on_field( char * nptr, char * vptr, int vlen )\n{\n",fullname);
+	fprintf(h,"\nprivate int %s_sql_on_field( void * context, char * nptr, char * vptr, int vlen )\n{\n",fullname);
+	fprintf(h,"\tstruct %s * pptr;\n",C.name);
+	fprintf(h,"\tchar buffer[2048];\n");
+	fprintf(h,"\tmemcpy(buffer,vptr,vlen);\n");
+	fprintf(h,"\tbuffer[vlen] = 0;\n");
+	fprintf(h,"\tvptr=buffer;\n");
+	fprintf(h,"\tif (!( pptr = context ))\n\t\treturn(0);\n");
 	for ( 	iptr= C.first;
 		iptr != (struct item *) 0;
 		iptr = iptr->next )
@@ -298,10 +304,18 @@ private	void	generate_occi_sql_on_field( FILE * h, char * nptr, char * fullname 
 			continue;
 		else
 		{
-			if (items++)
-				fprintf(h,"\telse if (!( strcmp(nptr,%c%s%c) ))\n",0x0022,iptr->name,0x0022);
-			else	fprintf(h,"\tif (!( strcmp(nptr,%c%s%c) ))\n",0x0022,iptr->name,0x0022);
-			fprintf(h,"\t\tvlen=0;\n");
+			fprintf(h,"\telse if (!( strcmp(nptr,%c%s%c) ))\n\t{\n",0x0022,iptr->name,0x0022);
+			if (!( strcmp( iptr->basic, "int" ) ))
+			{
+				fprintf(h,"\t\tpptr->%s = atoi(vptr);\n",iptr->name);
+				fprintf(h,"\t\treturn(0);\n");
+			}
+			else
+			{
+				fprintf(h,"\t\tif (!(pptr->%s = allocate_string(vptr)))\n\t\t\treturn(0);\n",iptr->name);
+				fprintf(h,"\t\telse\treturn(0);\n");
+			}
+			fprintf(h,"\t}\n");
 		}
 	}
 	fprintf(h,"\treturn(0);\n");
@@ -314,30 +328,29 @@ private	void	generate_occi_sql_on_collection( FILE * h, char * nptr, char * full
 	struct	item * iptr;
 	int	items=0;
 	title(h,"sql on set collection");
-	fprintf(h,"\nprivate int %s_sql_on_collection( char * nptr, char * vptr, int vlen )\n{\n",fullname);
-	for ( 	iptr= C.first;
-		iptr != (struct item *) 0;
-		iptr = iptr->next )
-	{
-		if (!( strcmp( iptr->name, "previous" ) ))
-			continue;
-		else if (!( strcmp( iptr->name, "next" ) ))
-			continue;
-		else if (!( strcmp( iptr->name, "parent" ) ))
-			continue;
-		else if (!( strncmp( iptr->name, "first", strlen("first") ) ))
-			continue;
-		else if (!( strncmp( iptr->name, "last", strlen("last") ) ))
-			continue;
-		else
-		{
-			if (items++)
-				fprintf(h,"\telse if (!( strcmp(nptr,%c%s%c) ))\n",0x0022,iptr->name,0x0022);
-			else	fprintf(h,"\tif (!( strcmp(nptr,%c%s%c) ))\n",0x0022,iptr->name,0x0022);
-			fprintf(h,"\t\tvlen=0;\n");
-		}
-	}
-	fprintf(h,"\treturn(0);\n");
+	fprintf(h,"\nprivate int %s_sql_on_collection( void * context, char * nptr, char * vptr, int vlen )\n{\n",fullname);
+	fprintf(h,"\tstruct response_context * cptr=(struct response_context *) 0;\n");
+	fprintf(h,"\tstruct rest_response * rptr=(struct rest_response *) 0;\n");
+	fprintf(h,"\tstruct rest_header * hptr=(struct rest_header *) 0;\n");
+	fprintf(h,"\tchar * host=(char *) 0;\n");
+	fprintf(h,"\tchar * location=(char *) 0;\n");
+	fprintf(h,"\tint  port=0;\n");
+	fprintf(h,"\tchar buffer[2048];\n");
+	fprintf(h,"\tchar value[2048];\n");
+	fprintf(h,"\tif (!( cptr = context )) return(0);\n");
+	fprintf(h,"\telse if (!( rptr = cptr->response )) return(0);\n");
+	fprintf(h,"\telse if (!( host = cptr->host )) return(0);\n");
+	fprintf(h,"\telse if (!( port = cptr->port )) return(0);\n");
+	fprintf(h,"\telse if (!( location = cptr->location )) return(0);\n");
+	fprintf(h,"\tmemcpy(value,vptr,vlen);\n");
+	fprintf(h,"\tvalue[vlen] = 0;\n");
+	fprintf(h,"\tvptr=value;\n");
+	fprintf(h,"\tif (!( strcmp(nptr,%c%s%c) ))\n\t{\n",0x0022,"id",0x0022);
+	fprintf(h,"\t\tprepare_%s_location(buffer,host,port,location,vptr);\n",C.name);
+	fprintf(h,"\t\tif (!( hptr = rest_response_header( rptr, %cX-OCCI-Location%c,buffer) ))\n\t\treturn(0);\n",0x0022,0x0022);
+	fprintf(h,"\t\telse\treturn(0);\n");
+	fprintf(h,"\t}\n");
+	fprintf(h,"\telse\treturn(0);\n");
 	fprintf(h,"}\n");
 	return;
 }
@@ -396,7 +409,7 @@ private	void	generate_occi_sql_on_create( FILE * h, char * nptr, char * fullname
 
 	title(h,"sql on create table");
 	fprintf(h,"\nprivate int %s_sql_on_create()\n{\n",fullname);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0};\n");
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0, (void *) 0};\n");
 
 	generate_file_description( h );
 
@@ -413,7 +426,7 @@ private	void	generate_occi_sql_on_remove( FILE * h, char * nptr, char * fullname
 	int	items=0;
 	title(h,"sql on remove table");
 	fprintf(h,"\nprivate int %s_sql_on_remove()\n{\n",fullname);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0};\n");
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0, (void *) 0};\n");
 	fprintf(h,"\treturn(0);\n");
 	fprintf(h,"}\n");
 	return;
@@ -428,7 +441,7 @@ private	void	generate_occi_sql_on_insert( FILE * h, char * nptr, char * fullname
 	char *	wptr=(char *) 0;
 	title(h,"sql on insert record");
 	fprintf(h,"\nprivate int %s_sql_on_insert(char * id, struct %s *pptr)\n{\n",fullname,C.name);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0};\n");
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0, (void *) 0};\n");
 	fprintf(h,"\tchar * xptr=(char *) 0;\n");
 	fprintf(h,"\tchar * wptr=(char *) 0;\n");
 	fprintf(h,"\tchar buffer[1024];\n");
@@ -515,7 +528,7 @@ private	void	generate_occi_sql_on_search( FILE * h, char * nptr, char * fullname
 	int	items=0;
 	title(h,"sql on search record");
 	fprintf(h,"\nprivate int %s_sql_on_search(char * id, struct %s *pptr)\n{\n",fullname,C.name);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field };\n",fullname);
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) pptr };\n",fullname);
 	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE id = '%cs'%c,id);\n",0x0022,0x0025,0x0022);
 	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return( 27 );\n");
@@ -531,8 +544,8 @@ private	void	generate_occi_sql_on_collect( FILE * h, char * nptr, char * fullnam
 	int	items=0;
 
 	title(h,"sql on search record");
-	fprintf(h,"\nprivate int %s_sql_on_collect(struct %s_occi_filter *fptr,struct rest_response * aptr)\n{\n",fullname,C.name);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_collection };\n",fullname);
+	fprintf(h,"\nprivate int %s_sql_on_collect(struct %s_occi_filter *fptr,struct response_context * cptr)\n{\n",fullname,C.name);
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_collection, (void *) cptr };\n",fullname);
 	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tstruct %s * pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tchar * xptr=(char *) 0;\n");
@@ -559,7 +572,7 @@ private	void	generate_occi_sql_on_collect( FILE * h, char * nptr, char * fullnam
 			continue;
 		else
 		{
-			fprintf(h,"\tif (!( fptr->%s != 0 ))\n\t{\n",iptr->name);
+			fprintf(h,"\tif (( fptr->%s != 0 ))\n\t{\n",iptr->name);
 			if (!( strcmp( iptr->basic, "int" ) ))
 			 	fprintf(h,"\t\tsprintf(buffer,%c%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
 			else 	fprintf(h,"\t\tsprintf(buffer,%c%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
@@ -577,7 +590,7 @@ private	void	generate_occi_sql_on_collect( FILE * h, char * nptr, char * fullnam
 	}
 	
 	fprintf(h,"\tif ((xptr != (char *) 0) && (!( expression.value = allocate_string(buffer)))) { return( 27 ); }\n");
-	fprintf(h,"\treturn(collect_occi_sql_records(%c%s%c,&expression,aptr));\n",0x0022,C.name,0x0022);
+	fprintf(h,"\treturn(collect_occi_sql_records(%c%s%c,&expression));\n",0x0022,C.name,0x0022);
 	fprintf(h,"}\n");
 	return;
 }
@@ -588,7 +601,7 @@ private	void	generate_occi_sql_on_update( FILE * h, char * nptr, char * fullname
 	int	items=0;
 	title(h,"sql on update record");
 	fprintf(h,"\nprivate int %s_sql_on_update(char * id, struct %s *pptr)\n{\n",fullname,C.name);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0};\n");
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0, (void *) 0};\n");
 	fprintf(h,"\tchar * xptr=(char *) 0;\n");
 	fprintf(h,"\tchar * wptr=(char *) 0;\n");
 	fprintf(h,"\tchar buffer[2048];\n");
@@ -642,7 +655,7 @@ private	void	generate_occi_sql_on_delete( FILE * h, char * nptr, char * fullname
 	int	items=0;
 	title(h,"sql on delete record");
 	fprintf(h,"\nprivate int %s_sql_on_delete(char * id)\n{\n",fullname);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0};\n");
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0, (void *) 0};\n");
 	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE id = '%cs'%c,id);\n",0x0022,0x0025,0x0022);
 	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return( 27 );\n");
@@ -657,7 +670,7 @@ private	void	generate_occi_sql_on_first( FILE * h, char * nptr, char * fullname 
 	int	items=0;
 	title(h,"sql on first record");
 	fprintf(h,"\nprivate int %s_sql_on_first(struct %s *pptr)\n{\n",fullname,C.name);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field };\n",fullname);
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) pptr };\n",fullname);
 	for ( 	iptr= C.first;
 		iptr != (struct item *) 0;
 		iptr = iptr->next )
@@ -688,7 +701,7 @@ private	void	generate_occi_sql_on_previous( FILE * h, char * nptr, char * fullna
 	int	items=0;
 	title(h,"sql on previous record");
 	fprintf(h,"\nprivate int %s_sql_on_previous(struct %s *pptr)\n{\n",fullname,C.name);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field };\n",fullname);
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) pptr };\n",fullname);
 	for ( 	iptr= C.first;
 		iptr != (struct item *) 0;
 		iptr = iptr->next )
@@ -719,7 +732,7 @@ private	void	generate_occi_sql_on_next( FILE * h, char * nptr, char * fullname )
 	int	items=0;
 	title(h,"sql on next record");
 	fprintf(h,"\nprivate int %s_sql_on_next(struct %s *pptr)\n{\n",fullname,C.name);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field };\n",fullname);
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) pptr };\n",fullname);
 	for ( 	iptr= C.first;
 		iptr != (struct item *) 0;
 		iptr = iptr->next )
@@ -750,7 +763,7 @@ private	void	generate_occi_sql_on_last( FILE * h, char * nptr, char * fullname )
 	int	items=0;
 	title(h,"sql on last record");
 	fprintf(h,"\nprivate int %s_sql_on_last(struct %s *pptr)\n{\n",fullname,C.name);
-	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field };\n",fullname);
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) pptr };\n",fullname);
 	for ( 	iptr= C.first;
 		iptr != (struct item *) 0;
 		iptr = iptr->next )
@@ -792,6 +805,11 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 
 	sprintf(fullname,"%s_%s",nptr,C.name);
 
+	generate_set_occi_field( h );
+	generate_prepare_location( h );
+	generate_prepare_response( h );
+	generate_occi_response( h );
+
 	generate_occi_sql_on_field(h, nptr, fullname );
 	generate_occi_sql_on_collection(h, nptr, fullname );
 	generate_occi_sql_on_create(h, nptr, fullname );
@@ -828,11 +846,6 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\telse return(%s_sql_on_update(pptr->id, pptr));\n",fullname);
 	fprintf(h,"}\n");
 
-	generate_set_occi_field( h );
-	generate_prepare_location( h );
-	generate_prepare_response( h );
-	generate_occi_response( h );
-
 	/* ----------------------- */
 	/* generate occi collector */
 	/* ----------------------- */
@@ -858,7 +871,17 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr)\n");
 	fprintf(h,"{\n");
 	fprintf(h,"\tint\tstatus=0;\n");
+	fprintf(h,"\tstruct response_context context;\n");
 	fprintf(h,"\tstruct %s_occi_filter filter;\n",C.name);
+	fprintf(h,"\tchar * reqhost=(char *) 0;\n");
+	fprintf(h,"\tint    reqport=0;\n");
+
+	/* prepare the response context */
+	fprintf(h,"\tif (!( context.host = rest_request_host(rptr) ))\n");
+	fprintf(h,"\t\treturn(rest_html_response( aptr, 400, %cBad Request Host%c ));\n",0x0022,0x0022);
+	fprintf(h,"\telse\tcontext.port = rptr->port;\n");
+	fprintf(h,"\tcontext.response = aptr;\n");
+	fprintf(h,"\tcontext.location = optr->location;\n");
 
 	/* collect the selection criteria filter */
 	fprintf(h,"\tif (!( filter_%s_info(&filter, optr, rptr, aptr ) ))\n",C.name);
@@ -866,7 +889,7 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 		0x0022,0x0022);
 
 	/* locate the sql records in the table */
-	fprintf(h,"\telse if ((status = %s_sql_on_collect(&filter,aptr)) != 0)\n\t{\n",fullname);
+	fprintf(h,"\telse if ((status = %s_sql_on_collect(&filter,&context)) != 0)\n\t{\n",fullname);
 	fprintf(h,"\t\tliberate_%s(filter.attributes);\n", C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 404, %cNOT FOUND%c) );\n",0x0022,0x0022);
 	fprintf(h,"\t}\n\telse\n\t{\n");
@@ -980,8 +1003,8 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\tstruct occi_interface * iptr;\n");
 	fprintf(h,"\tstruct %s * pptr=(struct %s *) 0;\n",C.name,C.name);
 	fprintf(h,"\tchar * reqhost=(char *) 0;\n");
-	fprintf(h,"\tchar * id=(char *) 0;\n");
 	fprintf(h,"\tint    reqport=0;\n");
+	fprintf(h,"\tchar * id=(char *) 0;\n");
 	fprintf(h,"\tint    status=0;\n");
 	fprintf(h,"\tiptr = optr->callback;\n");
 

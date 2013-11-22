@@ -353,7 +353,7 @@ private	int	occi_sql_field( struct occi_expression *expression, char * nptr, cha
 		return(0);
 	else if (!( expression->handler ))
 		return(0);
-	else	return( (*expression->handler)( nptr, vptr, length ) );
+	else	return( (*expression->handler)( expression->context, nptr, vptr, length ) );
 }
 
 /*	-------------------------------------------	*/
@@ -362,13 +362,13 @@ private	int	occi_sql_field( struct occi_expression *expression, char * nptr, cha
 /*	this function will transfer back the field	*/
 /*	data to the caller for storage or processing	*/
 /*	-------------------------------------------	*/
-private	int	occi_sql_list_item( struct occi_expression *expression, struct rest_response * aptr, char * nptr, char * vptr, int length )
+private	int	occi_sql_list_item( struct occi_expression *expression, char * nptr, char * vptr, int length )
 {
 	if (!( expression ))
 		return(0);
 	else if (!( expression->handler ))
 		return(0);
-	else	return( (*expression->handler)( nptr, vptr, length ) );
+	else	return( (*expression->handler)(expression->context, nptr, vptr, length ) );
 }
 
 /*	-------------------------------------------	*/
@@ -420,7 +420,7 @@ private	int	occi_sql_record( struct	occi_table * tptr,  struct occi_expression *
 /*	-------------------------------------------	*/
 /*	parses a result set and delivers record set	*/
 /*	-------------------------------------------	*/
-private	int	occi_sql_records( struct occi_table * tptr,  struct occi_expression *expression, struct rest_response * aptr )
+private	int	occi_sql_records( struct occi_table * tptr,  struct occi_expression *expression )
 {
 	MYSQL_RES *	result;
 	MYSQL_ROW 	row;
@@ -450,7 +450,7 @@ private	int	occi_sql_records( struct occi_table * tptr,  struct occi_expression 
 				{
 					if (!( field = mysql_fetch_field( result )))
 						break;
-					else	occi_sql_list_item( expression, aptr, field->name, row[i], lengths[i] );				
+					else	occi_sql_list_item( expression, field->name, row[i], lengths[i] );				
 				}
 			}
 		}
@@ -550,7 +550,7 @@ public	int	search_occi_sql_record( char * category,  struct occi_expression *exp
 /*	-------------------------------------------	*/
 /*	s e a r c h _ o c c i _ s q l _ r e c o r d 	*/
 /*	-------------------------------------------	*/
-public	int	collect_occi_sql_records( char * category,  struct occi_expression *expression, struct rest_response * aptr )
+public	int	collect_occi_sql_records( char * category,  struct occi_expression *expression )
 {
 	int	status;
 	char *	xptr=(char *) 0;
@@ -569,7 +569,7 @@ public	int	collect_occi_sql_records( char * category,  struct occi_expression *e
 	liberate( xptr );
 	if ( status )
 		return( occi_sql_failure( tptr, 78 ) );
-	else	return( occi_sql_records( tptr, expression,aptr ) );
+	else	return( occi_sql_records( tptr, expression ) );
 }
 
 /*	-------------------------------------------	*/
