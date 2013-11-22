@@ -51,6 +51,7 @@ int			mysql_num_fields( MYSQL_RES * result );
 MYSQL_FIELD *	mysql_fetch_field( MYSQL_RES * result );
 MYSQL_ROW 	mysql_fetch_row( MYSQL_RES * result );
 unsigned long * mysql_fetch_lengths( MYSQL_RES * result );
+void		mysql_field_seek( MYSQL_RES * result, int offset );
 void		mysql_close( MYSQL * handle );
 void 		mysql_free_result(MYSQL_RES *result);
 char *		mysql_error(MYSQL * handle);

@@ -93,9 +93,16 @@ int		mysql_num_fields( MYSQL_RES * result )
 
 MYSQL_FIELD *	mysql_fetch_field( MYSQL_RES * result )
 {
-	printf("mysql_num_field(%s)\n",
+	printf("mysql_fetch_field(%s)\n",
 		(result ? "MYSQL_RES" : "NULL" ));
 	return((MYSQL_FIELD *)0);
+}
+
+void	mysql_field_seek( MYSQL_RES * result, int offset )
+{
+	printf("mysql_field_seek(%s,%u)\n",
+		(result ? "MYSQL_RES" : "NULL" ),offset);
+	return;
 }
 
 MYSQL_ROW 	mysql_fetch_row( MYSQL_RES * result )
