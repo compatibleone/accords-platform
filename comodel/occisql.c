@@ -446,6 +446,7 @@ private	int	occi_sql_records( struct occi_table * tptr,  struct occi_expression 
 				continue;
 			else
 			{
+				mysql_field_seek( result, 0 );
 				for(	i=0; 
 					i < fieldcount; i++)
 				{
