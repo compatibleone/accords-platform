@@ -75,8 +75,8 @@ struct	occi_database
 struct	occi_expression
 {
 	char *	value;
-	void *	context;
 	int	(*handler)(void *, char *, char *, int);
+	void *	context;
 };
 
 struct	response_context
