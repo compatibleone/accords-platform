@@ -149,6 +149,8 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr, c
 	fprintf(h,"/* Category : %s */\n",cptr->id);
 	sprintf(buffer,"%s.h",cptr->id);
 	generate_file_inclusion(h,buffer);
+	sprintf(buffer,"%s_filter.h",cptr->id);
+	generate_file_inclusion(h,buffer);
 	sprintf(buffer,"%s.c",cptr->id);
 	generate_file_inclusion(h,buffer);
 	sprintf(buffer,"%s%s.c",prefix,cptr->id);
