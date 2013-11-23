@@ -577,9 +577,9 @@ private	void	generate_occi_sql_on_collect( FILE * h, char * nptr, char * fullnam
 			 	fprintf(h,"\t\tsprintf(buffer,%c%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
 			else 	fprintf(h,"\t\tsprintf(buffer,%c%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
 			fprintf(h,"\t\tif (!( xptr ))\n\t\t{\n");
-			fprintf(h,"\t\t\tif (!( xptr = allocate( strlen(separator) + strlen(buffer) + 8 ) )) { return(27); }\n");
+			fprintf(h,"\t\t\tif (!( wptr = allocate( strlen(separator) + strlen(buffer) + 8 ) )) { return(27); }\n");
 			fprintf(h,"\t\t\telse\n\t\t\t{\n");
-			fprintf(h,"\t\t\t\tsprintf(wptr,\"%cs \%cs\",xptr,separator,buffer);\n",0x0025,0x0025);
+			fprintf(h,"\t\t\t\tsprintf(wptr,\"%cs \%cs\",separator,buffer);\n",0x0025,0x0025);
 			fprintf(h,"\t\t\t\tliberate( xptr ); xptr = wptr; separator = \" AND \";\n");
 			fprintf(h,"\t\t\t}\n\t\t}\n");
 			fprintf(h,"\t\telse if (!( wptr = allocate( strlen( xptr ) + strlen( buffer ) + 8 ) )) return( 27 );\n");
@@ -589,7 +589,7 @@ private	void	generate_occi_sql_on_collect( FILE * h, char * nptr, char * fullnam
 		}
 	}
 	
-	fprintf(h,"\tif ((xptr != (char *) 0) && (!( expression.value = allocate_string(buffer)))) { return( 27 ); }\n");
+	fprintf(h,"\tif ((xptr != (char *) 0) && (!( expression.value = allocate_string(xptr)))) { return( 27 ); }\n");
 	fprintf(h,"\treturn(collect_occi_sql_records(%c%s%c,&expression));\n",0x0022,C.name,0x0022);
 	fprintf(h,"}\n");
 	return;
