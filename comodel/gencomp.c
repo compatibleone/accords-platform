@@ -135,6 +135,92 @@ private	void	generate_accords_config( FILE * h, char * nptr, char * prefix )
 }
 
 /*	--------------------------------------------------	*/
+/*	    c a t e g o r y _ a c t i o n _ f i l e		*/
+/*	--------------------------------------------------	*/
+private	char * category_action_file( char * category, char * action, char * suffix )
+{
+	char	filename[2048];
+	FILE *	h;
+	sprintf(filename,"%s_%s.%s",action,category,suffix);
+	if (( h = fopen( filename, "r" )) != (FILE *) 0)
+	{
+		fclose(h);
+		return( allocate_string( filename ) );
+	}
+	sprintf(filename,"%s_%s.%s",category,action,suffix);
+	if (( h = fopen( filename, "r" )) != (FILE *) 0)
+	{
+		fclose(h);
+		return( allocate_string( filename ) );
+	}
+	sprintf(filename,"%s-%s.%s",action,category,suffix);
+	if (( h = fopen( filename, "r" )) != (FILE *) 0)
+	{
+		fclose(h);
+		return( allocate_string( filename ) );
+	}
+	sprintf(filename,"%s-%s.%s",category,action,suffix);
+	if (( h = fopen( filename, "r" )) != (FILE *) 0)
+	{
+		fclose(h);
+		return( allocate_string( filename ) );
+	}
+	sprintf(filename,"%s/%s.%s",category,action,suffix);
+	if (( h = fopen( filename, "r" )) != (FILE *) 0)
+	{
+		fclose(h);
+		return( allocate_string( filename ) );
+	}
+	return((char *) 0);
+}
+
+/*	----------------------------------------------------------------	*/
+/*	 g e n e r a t e _ c a t e g o r y  _ a c t i o n _ s c r i p t	 	*/
+/*	----------------------------------------------------------------	*/
+private	int	generate_category_action_script( struct occi_category * cptr, char * action )
+{
+	FILE * h;
+	char buffer[2048];
+	char filename[1024];
+
+	/* ------------------------ */
+	/* check for file existance */
+	/* ------------------------ */
+	sprintf(filename,"csp-action-%s-%s.txt",action,cptr->id);
+	if (( h = fopen( filename, "r" )) != (FILE *) 0)
+	{
+		fclose(h);
+		return(1);
+	}
+	/* ------------------------ */
+	/* create cords script file */
+	/* ------------------------ */
+	else if (( h = fopen( filename, "w" )) != (FILE *) 0)
+	{
+		sprintf(buffer,"category action script: %s",filename);
+		title( h, buffer );
+		fprintf(h,"$caller    = $1;\n");
+		fprintf(h,"$instance  = $2;\n");
+		fprintf(h,"$action    = $3;\n");
+		fprintf(h,"$publisher = $4;\n");
+		fprintf(h,"$operator  = $5;\n");
+		fprintf(h,"if ( $caller == '%s.%s' )\n",cptr->id,action);
+		fprintf(h,"{\n");
+		fprintf(h,"\t$instance.display();\n");
+		fprintf(h,"\t$record = $instance.get();\n");
+		fprintf(h,"\tforeach ($record as $tuple)\n");
+		fprintf(h,"\t{\n");
+		fprintf(h,"\t\t$tuple.display();\n");
+		fprintf(h,"\t}\n");
+		fprintf(h,"}\n");
+		fclose(h);
+		return(1);
+	}
+	else	return( 0 );
+}
+	
+
+/*	--------------------------------------------------	*/
 /*	g e n e r a t e _ c a t e g o r y  _ a c t i o n s 	*/
 /*	--------------------------------------------------	*/
 private	void	generate_category_actions( FILE * h, struct occi_category * cptr, char * prefix )
@@ -142,6 +228,8 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr, c
 	struct	occi_action * aptr;
 	char *	nptr;
 	char	buffer[1024];
+	char * mh;
+	int	c;
 
 	if (!( comodel_category_filter( cptr ) ))
 		return;
@@ -175,16 +263,27 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr, c
 			else	nptr++;
 			if (!( strcmp( nptr, "DELETE" )))
 				continue;
-			else
+			else if (!( mh = category_action_file( cptr->id, nptr, "c" ) ))
 			{
 				title( h, nptr );
 				fprintf(h,"private struct rest_response * _%s_%s(\n",nptr,cptr->id);
 				fprintf(h,"\tstruct occi_category * optr,\n");
 				fprintf(h,"\tstruct rest_client * cptr,\n");
 				fprintf(h,"\tstruct rest_request * rptr,\n");
-				fprintf(h,"\tstruct rest_response * aptr )\n{\n");
-				fprintf(h,"\treturn( rest_html_response( aptr, 200, \"OK\" ) );\n");
+				fprintf(h,"\tstruct rest_response * aptr,\n");
+				fprintf(h,"\tvoid * vptr )\n{\n");
+				fprintf(h,"\tstruct cords_%s * pptr;\n",cptr->id);
+				fprintf(h,"\tif (!( pptr = (struct cords_%s *) vptr ))\n",cptr->id);
+				fprintf(h,"\t\treturn( rest_html_response( aptr, 400, \"Incorrect Request\" ) );\n");
+				fprintf(h,"\telse\treturn( category_action_script( aptr, \"%s\", \"%s\", pptr->id ) );\n",cptr->id, nptr);
 				fprintf(h,"}\n");
+				generate_category_action_script( cptr, nptr );
+			}
+			else
+			{
+				title( h, nptr );
+				generate_file_inclusion(h,mh);
+				liberate( mh );
 			}
 		}
 	}
@@ -339,6 +438,7 @@ public	int	generate_service_component( char * name, struct occi_category * cptr,
 		generate_file_inclusion(h,"cordspublic.h");
 		generate_file_inclusion(h,"occipublisher.h");
 		generate_file_inclusion(h,"accords.h");
+		generate_file_inclusion(h,"cspi.h");
 		if ( prefix )
 		{
 			if (!( strcmp( prefix, "sql" ) ))

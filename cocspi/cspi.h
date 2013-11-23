@@ -157,6 +157,7 @@ public char *				  evaluate_cordscript( char * expression, int argc, char * argv
 public char *				  evaluate_cordscript_file( char * expression, int argc, char * argv[] );
 public int evaluate_category_cordscript(char * component,char * category,char * id,char * expression,char * parameters);
 public int evaluate_category_cordscript_file(char * component,char * category,char * id,char * expression,char * parameters);
+public	struct	rest_response *	category_action_script( struct rest_response * aptr, char * category, char * action, char * id );
 
 #endif	/* _cspi_h */
 

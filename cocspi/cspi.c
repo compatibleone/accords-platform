@@ -6206,5 +6206,18 @@ public	int	evaluate_category_cordscript_file(
 	}
 }
 
+/*	-------------------------------------------	*/
+/*	c a t e g o r y _ a c t i o n _ s c r i p t	*/
+/*	-------------------------------------------	*/
+public	struct	rest_response *	category_action_script( struct rest_response * aptr, char * category, char * action, char * id )
+{
+	char	filename[1024];
+	int	result;
+	sprintf(filename,"csp-action-%s-%s.txt",action,category);
+	result = evaluate_category_cordscript_file( action, category, id, filename, action );
+	return( rest_html_response( aptr, 200, "OK" ) );
+}
+
+
 #endif	/* _cspi_c */
 

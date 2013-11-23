@@ -134,8 +134,8 @@ public int	comodel_category_filter( struct occi_category * cptr )
 /*	------------------------------------------------------------------	*/
 private	int	comodel_banner()
 {
-	printf("\n   CompatibleOne Model Generator : Version 1.0a.0.02");
-	printf("\n   Beta Version : 19/11/2013");
+	printf("\n   CompatibleOne Model Generator : Version 1.0a.0.03");
+	printf("\n   Beta Version : 23/11/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue");
 	printf("\n\n");
 	return(0);
