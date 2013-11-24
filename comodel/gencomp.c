@@ -445,9 +445,6 @@ public	int	generate_service_component( char * name, struct occi_category * cptr,
 			if (!( strcmp( prefix, "sql" ) ))
 			{
 				generate_file_inclusion(h,"occisql.h");
-				if ( check_testflag() )
-					generate_file_inclusion(h,"mysql.c");
-				generate_file_inclusion(h,"occisql.c");
 			}
 		}
 		generate_accords_config(h,name,prefix);
@@ -482,8 +479,8 @@ public	int	generate_service_makefile( char * name, struct occi_category * cptr, 
 		fprintf(h,"bin_PROGRAMS = %s \n",name);
 		fprintf(h,"extra_DIST = \n");
 		fprintf(h,"%s_SOURCES = %s.c\n",name,name);
-		fprintf(h,"%s_CFLAGS  = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COCARRIER) $(CFLAGS_PUBOCCI) $(CFLAGS_PROCCI) $(CFLAGS_COSACS) $(CFLAGS_COPABR) $(CFLAGS_COMONS) $(CFLAGS_COCSPI)\n",name);
-		fprintf(h,"%s_LDFLAGS = $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCSPI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_MYSQL) $(LDFLAGS_THREADS)\n",name);
+		fprintf(h,"%s_CFLAGS  = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_COSQL) $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COCARRIER) $(CFLAGS_PUBOCCI) $(CFLAGS_PROCCI) $(CFLAGS_COSACS) $(CFLAGS_COPABR) $(CFLAGS_COMONS) $(CFLAGS_COCSPI)\n",name);
+		fprintf(h,"%s_LDFLAGS = $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCSPI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LD_COSQL) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_MYSQL) $(LDFLAGS_THREADS)\n",name);
 		fclose(h);
 		return(0);
 	}

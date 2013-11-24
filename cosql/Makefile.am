@@ -7,11 +7,11 @@
 #   Iain James Marshall <ijm667@hotmail.com>
 #
 lib_LTLIBRARIES = libcosql.la
-EXTRA_DIST = occisql.h 
+EXTRA_DIST = occisql.h stubmysql.h stubmysql.c
 
 AM_CPPFLAGS = -DUNIX -Dunix
 
-libcosql_la_SOURCES = occisql.c stubmysql.c
+libcosql_la_SOURCES = occisql.c 
 
 libcosql_la_LDFLAGS = $(LDFLAGS_MYSQL)
 
