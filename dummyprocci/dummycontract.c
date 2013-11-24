@@ -311,10 +311,11 @@ private	struct	dummy_config * resolve_dummy_configuration( char * sptr )
 	struct	occi_kind_node * nptr;
 	struct	dummy_config * pptr=(struct dummy_config *) 0;
 	struct	occi_kind_node  * occi_first_dummy_config_node();
+	struct	occi_kind_node  * occi_next_dummy_config_node();
 
 	for (	nptr = occi_first_dummy_config_node();
 		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_dummy_config_node(nptr) )
 	{
 		if (!( pptr = nptr->contents ))
 		{

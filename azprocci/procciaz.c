@@ -33,9 +33,10 @@ private	struct	az_config * resolve_az_configuration( char * sptr )
 	struct	occi_kind_node * nptr;
 	struct	az_config * pptr=(struct az_config *) 0;
 	struct	occi_kind_node  * occi_first_az_config_node();
+	struct	occi_kind_node  * occi_next_az_config_node();
 	for (	nptr = occi_first_az_config_node();
 		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_az_config_node(nptr) )
 	{
 		if (!( pptr = nptr->contents ))
 			continue;

@@ -1322,10 +1322,11 @@ struct oa_config * resolve_oa_configuration( char * sptr )
 	struct	occi_kind_node * nptr;
 	struct	oa_config * pptr=(struct oa_config *) 0;
 	struct	occi_kind_node  * occi_first_oa_config_node();
+	struct	occi_kind_node  * occi_next_oa_config_node();
 
 	for (	nptr = occi_first_oa_config_node();
 		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_oa_config_node(nptr) )
 	{
 		if (!( pptr = nptr->contents ))
 		{

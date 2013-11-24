@@ -464,6 +464,8 @@ private	struct rest_response * stop_probe(
 /*	-------------------------------------------	*/
 public	struct	occi_kind_node * occi_first_cords_metadata_node();
 public	struct	occi_kind_node * occi_first_cords_script_node();
+public	struct	occi_kind_node * occi_next_cords_metadata_node();
+public	struct	occi_kind_node * occi_next_cords_script_node();
 
 private	int	cosacs_launch(struct occi_category * optr, struct cords_script * pptr )
 {
@@ -486,7 +488,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	/* ------------------------------------ */
 	for ( 	kptr=occi_first_cords_metadata_node();
 		kptr != (struct occi_kind_node *) 0;
-		kptr = kptr->next )
+		kptr = occi_next_cords_metadata_node(kptr) )
 	{
 		if (!( mptr = (struct cords_metadata *) kptr->contents ))
 			continue;
@@ -534,7 +536,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	/* --------------------------------- */
 	for ( 	kptr=occi_first_cords_script_node();
 		kptr != (struct occi_kind_node *) 0;
-		kptr = kptr->next )
+		kptr = occi_next_cords_script_node(kptr) )
 	{
 		if (!( sptr = (struct cords_script *) kptr->contents ))
 			continue;

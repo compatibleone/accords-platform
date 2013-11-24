@@ -42,9 +42,10 @@ private	struct	on_config * resolve_on_configuration( char * sptr )
 	struct	occi_kind_node * nptr;
 	struct	on_config * pptr=(struct on_config *) 0;
 	struct	occi_kind_node  * occi_first_on_config_node();
+	struct	occi_kind_node  * occi_next_on_config_node();
 	for (	nptr = occi_first_on_config_node();
 		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_on_config_node(nptr) )
 	{
 		if (!( pptr = nptr->contents ))
 			continue;

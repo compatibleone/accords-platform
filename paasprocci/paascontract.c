@@ -58,11 +58,12 @@ private	struct	paas_config * ll_resolve_paas_configuration( char * sptr )
 	struct	occi_kind_node * nptr;
 	struct	paas_config * pptr=(struct paas_config *) 0;
 	struct	occi_kind_node  * occi_first_paas_config_node();
+	struct	occi_kind_node  * occi_next_paas_config_node();
 	rest_log_message("resolve_paas_configuration");
 	rest_log_message( sptr );
 	for (	nptr = occi_first_paas_config_node();
 		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_paas_config_node(nptr) )
 	{
 		if (!( pptr = nptr->contents ))
 			continue;
