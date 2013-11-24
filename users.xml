@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="users" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<user
+name="service-conets" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-command" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-conets-paas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-paprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-dcprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-eziprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-coeasy" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-easigsm" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-cnprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-osocciprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-oaprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-dummyprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-copaas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-conagios" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-paasprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-comons" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-coss" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-cops" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-coees" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-slam" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-ezvm" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-cosacs" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-cool" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-cosched" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-coips" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-coobas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-orgabas" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-fileserver" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-parser" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-broker" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-procci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-osprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-onprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-azprocci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="test-parser" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="test-broker" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-compo" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="service-ec2procci" password="co-system" role="agent" email="accords@compatibleone.fr" account="accords"    />
+<user
+name="admin" password="admin" role="administrator" email="admin@compatibleone.fr" account="compatibleone"    />
+<user
+name="jamie" password="cuimhne" role="user" email="jamie@compatibleone.fr" account="jamie" authorization="administrator"   />
+<user
+name="fabio" password="cuimhne" role="user" email="fabio@compatibleone.fr" account="fabio"    />
+<user
+name="accords" password="platform" role="operator" email="fabio@compatibleone.fr" account="fabio"    />
+<user
+name="operator" password="" role="admin" email="" account=""    />
+<user
+name="osprocci" password="" role="admin" email="" account=""    />
+<user
+name="osocciprocci" password="" role="admin" email="" account=""    />
+<user
+name="onprocci" password="" role="admin" email="" account=""    />
+<user
+name="azprocci" password="" role="admin" email="" account=""    />
+<user
+name="dcprocci" password="" role="admin" email="" account=""    />
+<user
+name="cnprocci" password="" role="admin" email="" account=""    />
+<user
+name="paprocci" password="" role="admin" email="" account=""    />
+<user
+name="eziprocci" password="" role="admin" email="" account=""    />
+<user
+name="paasprocci" password="" role="admin" email="" account=""    />
+<user
+name="pcprocci" password="" role="admin" email="" account=""    />
+<user
+name="oaprocci" password="" role="admin" email="" account=""    />
+<user
+name="dummyprocci" password="" role="admin" email="" account=""    />
+<user
+name="ec2procci" password="" role="admin" email="" account=""    />
+
+</import>
+
