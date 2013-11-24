@@ -42,7 +42,7 @@ runcops=1
 nethsm=
 # -------------------------------------
 resthost=127.0.0.1
-export OCCISQLHOST=$resthost
+export OCCISQLHOST=127.0.0.1
 export OCCISQLUSER=root
 export OCCISQLPASSWD=root
 zone="europe"
@@ -157,8 +157,12 @@ _co_platform() {
     _co_run_serv publisher "accords publication services"
     _co_run_serv fileserver "accords file services"
     _co_run_serv coss "accords security services" 
+	sleep 5
+	co-parser users
     _co_run_serv comons "accords monitoring services"
     _co_run_serv cobill "accords accounting services"
+	sleep 5
+	co-parser prices
     _co_run_serv cosched "accords scheduling services" 
     _co_run_serv conets "accords networking services"
     _co_run_serv cops "accords placement services"
@@ -455,7 +459,6 @@ _run_conets() {
 
 _run_cobill() {
     $billing --config $target CO-BAS/1.0
-    co-parser prices
 }
 
 _run_cosacs() {
@@ -472,7 +475,6 @@ _run_command() {
 
 _run_coss() {
     coss --config $target CO-SS/1.0
-    co-parser users
 }
 
 _run_ezvm() {
