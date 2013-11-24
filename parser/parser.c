@@ -178,13 +178,6 @@ private	int	parser_operation( char * nptr )
 	last = optr;
 	optr->callback  = (void *) 0;
 
-	if (!( optr = occi_cords_import_builder( Parser.domain, _CORDS_IMPORT ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	last = optr;
-
 	rest_initialise_log( Parser.monitor );
 
 	if (!( Parser.identity ))
