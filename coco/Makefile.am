@@ -1,0 +1,15 @@
+#
+# cocomodel Makefile.am
+#
+# Copyright 2013, All rights reserved
+#
+# Authors: 
+#	Comodel Version 1.0a
+#	Strukt  Version 3.0a
+#
+bin_PROGRAMS = cocomodel 
+extra_DIST = 
+cocomodel_SOURCES = cocomodel.c
+cocomodel_CFLAGS  = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COCARRIER) $(CFLAGS_PUBOCCI) $(CFLAGS_PROCCI) $(CFLAGS_COSACS) $(CFLAGS_COPABR) $(CFLAGS_COMONS) $(CFLAGS_COCSPI)
+cocomodel_LDFLAGS = $(LD_COCARRIER) $(LD_COPABR) $(LD_PUBOCCI) $(LD_COCSPI) $(LD_COCCI) $(LD_OCCI) $(LD_CORDS) $(LD_COREST) $(LD_COXML) $(LD_COSQL) $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_MYSQL) $(LDFLAGS_THREADS)
+
