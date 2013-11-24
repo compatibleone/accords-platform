@@ -213,6 +213,7 @@ private	int	generate_category_action_script( struct occi_category * cptr, char *
 		fprintf(h,"\t\t$tuple.display();\n");
 		fprintf(h,"\t}\n");
 		fprintf(h,"}\n");
+		title(h,"end of file");
 		fclose(h);
 		return(1);
 	}
@@ -489,6 +490,331 @@ public	int	generate_service_makefile( char * name, struct occi_category * cptr, 
 }
 
 /*	---------------------------------------------------	*/
+/*	        g e n e r a t e _ c s p _ i n p u t  		*/
+/*	---------------------------------------------------	*/
+private	int	generate_csp_input( struct occi_category * cptr, char * name )
+{
+	struct	occi_attribute * iptr;
+	FILE * h;
+	char buffer[1024];
+	sprintf(buffer,"csp-input-%s.txt",cptr->id);
+	if (!( h = fopen( buffer, "w" ) ))
+		return( 46 );
+	else
+	{
+		title(h,buffer);
+		fprintf(h,"\"<html><head><title>%s</title>\".display();\n",buffer);
+		fprintf(h,"\"<link href='style.css' rel='STYLESHEET' type='text/css' media='SCREEN'>\".display();\n");
+		fprintf(h,"\"</head><body>\".display();\n");
+		fprintf(h,"\"<form method=POST action='%s.php'/>\".display();\n",name);
+		fprintf(h,"\"<div align=center><table class=create></div>\".display();\n");
+		fprintf(h,"\"<tr><th colspan=2>Create %s</th></tr>\".display();\n",cptr->id);
+		for ( 	iptr= cptr->first;
+			iptr != (struct occi_attribute *) 0;
+			iptr = iptr->next )
+		{
+			fprintf(h,"\"<tr><th class=label>%s</th>\".display();\n",iptr->name);
+			fprintf(h,"\"<th class=data><input type=text name=%s value=''></th>\".display();\n",iptr->name);
+		}
+		fprintf(h,"\"<tr><th class=label>action</th>\".display();\n");
+		fprintf(h,"\"<th class=data><input type=submit name=action value='create-%s'></th>\".display();\n",cptr->id);
+		fprintf(h,"\"</table></div>\".display();\n");
+		fprintf(h,"\"</form>\".display();\n");
+		fprintf(h,"\"</body></html>\".display();\n");
+		title(h,"end of file");
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	        g e n e r a t e _ c s p _ c r e a t e		*/
+/*	---------------------------------------------------	*/
+private	int	generate_csp_create( struct occi_category * cptr, char * name )
+{
+	struct	occi_attribute * iptr;
+	int	item=0;
+	FILE * h;
+	char buffer[1024];
+	sprintf(buffer,"csp-create-%s.txt",cptr->id);
+	if (!( h = fopen( buffer, "w" ) ))
+		return( 46 );
+	else
+	{
+		title(h,buffer);
+		fprintf(h,"$o = {};\n");
+		for ( 	iptr= cptr->first;
+			iptr != (struct occi_attribute *) 0;
+			iptr = iptr->next )
+		{
+			fprintf(h,"$%s = $%u;\n",iptr->name,++item);
+			fprintf(h,"$t = \"'occi.%s.%s':'\"#$%s#\"'\";\n",cptr->id,iptr->name,iptr->name);
+			fprintf(h,"$o = $o + $t;\n");
+		}
+		fprintf(h,"$r = %s.post($o);\n",cptr->id);
+		fprintf(h,"include 'csp-list-%s.txt';\n");
+		title(h,"end of file");
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	        g e n e r a t e _ c s p _ c r e a t e		*/
+/*	---------------------------------------------------	*/
+private	int	generate_csp_update( struct occi_category * cptr, char * name )
+{
+	struct	occi_attribute * iptr;
+	int	item=0;
+	FILE * h;
+	char buffer[1024];
+	sprintf(buffer,"csp-update-%s.txt",cptr->id);
+	if (!( h = fopen( buffer, "w" ) ))
+		return( 46 );
+	else
+	{
+		title(h,buffer);
+		fprintf(h,"$o = {};\n");
+		for ( 	iptr= cptr->first;
+			iptr != (struct occi_attribute *) 0;
+			iptr = iptr->next )
+		{
+			fprintf(h,"$%s = $%u;\n",iptr->name,++item);
+			fprintf(h,"$t = \"'occi.%s.%s':'\"#$%s#\"'\";\n",cptr->id,iptr->name,iptr->name);
+			fprintf(h,"$o = $o + $t;\n");
+		}
+		fprintf(h,"$r = $id.put($o);\n");
+		fprintf(h,"include 'csp-list-%s.txt';\n");
+		title(h,"end of file");
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	        g e n e r a t e _ c s p _ r e t r ie v e	*/
+/*	---------------------------------------------------	*/
+private	int	generate_csp_retrieve( struct occi_category * cptr, char * name )
+{
+	struct	occi_attribute * iptr;
+	FILE * h;
+	char buffer[1024];
+	sprintf(buffer,"csp-retrieve-%s.txt",cptr->id);
+	if (!( h = fopen( buffer, "w" ) ))
+		return( 46 );
+	else
+	{
+		title(h,buffer);
+		fprintf(h,"if ( $1.length() > 0 )\n{\n");
+		fprintf(h,"\t$id = $1;\n");
+		fprintf(h,"\t$r = $1.get();\n");
+		fprintf(h,"\"<html><head><title>%s</title>\".display();\n",buffer);
+		fprintf(h,"\"<link href='style.css' rel='STYLESHEET' type='text/css' media='SCREEN'>\".display();\n");
+		fprintf(h,"\"</head><body>\".display();\n");
+		fprintf(h,"\"<form method=POST action='%s.php'/>\".display();\n",name);
+		fprintf(h,"\"<div align=center><table class=create></div>\".display();\n");
+		fprintf(h,"$m = \"<tr><th colspan=2>\"#$id#\"</th></tr>\";\n");
+		fprintf(h,"$m.display();\n");
+		fprintf(h,"$v = $r['occi.core.id'];\n");
+		fprintf(h,"$m = \"<tr><th class=label>id</th>\";\n");
+		fprintf(h,"$m = $m#\"<th class=data><input type=text name=id readonly \";\n");
+		fprintf(h,"$m = $m#\"value='\"#$v#\"'></th>\";\n");
+		fprintf(h,"$m.display();\n");
+
+		for ( 	iptr= cptr->first;
+			iptr != (struct occi_attribute *) 0;
+			iptr = iptr->next )
+		{
+			fprintf(h,"$v = $r['occi.%s.%s'];\n",cptr->id,iptr->name);
+			fprintf(h,"$m = \"<tr><th class=label>%s</th>\";\n",iptr->name);
+			fprintf(h,"$m = $m#\"<th class=data><input type=text name=%s \";\n",iptr->name);
+			fprintf(h,"$m = $m#\"value='\"#$v#\"'></th>\";\n");
+			fprintf(h,"$m.display();\n");
+		}
+		fprintf(h,"\"<tr><th class=label>action</th>\".display();\n");
+		fprintf(h,"\"<th class=data><input type=submit name=action value='update-%s'>\".display();\n",cptr->id);
+		fprintf(h,"\"&nbsp;<input type=submit name=action value='delete-%s'></th>\".display();\n",cptr->id);
+		fprintf(h,"\"<tr><th colspan=2><a href='%s.php?action=list-%s'>list %s records</a></th></tr>\".display();\n",
+				name, cptr->id, cptr->id );
+		fprintf(h,"\"</table></div>\".display();\n");
+		fprintf(h,"\"</form>\".display();\n");
+		fprintf(h,"\"</body></html>\".display();\n");
+		fprintf(h,"}\nelse\n{\n");
+		fprintf(h,"include 'csp-list-%s.txt';\n");
+		fprintf(h,"}\n");
+		title(h,"end of file");
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	        g e n e r a t e _ c s p _ d e l e t e 		*/
+/*	---------------------------------------------------	*/
+private	int	generate_csp_delete( struct occi_category * cptr, char * name )
+{
+	struct	occi_attribute * iptr;
+	FILE * h;
+	char buffer[1024];
+	sprintf(buffer,"csp-delete-%s.txt",cptr->id);
+	if (!( h = fopen( buffer, "w" ) ))
+		return( 46 );
+	else
+	{
+		title(h,buffer);
+		fprintf(h,"if ( $1.length() > 0 )\n{\n");
+		fprintf(h,"\t$id = $1;\n");
+		fprintf(h,"\t$id.delete();\n}\n");
+		fprintf(h,"include 'csp-list-%s.txt';\n");
+		title(h,"end of file");
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	        g e n e r a t e _ c s p _ l i s t     		*/
+/*	---------------------------------------------------	*/
+private	int	generate_csp_list( struct occi_category * cptr, char * name )
+{
+	struct	occi_attribute * iptr;
+	FILE * h;
+	char buffer[1024];
+	sprintf(buffer,"csp-list-%s.txt",cptr->id);
+	if (!( h = fopen( buffer, "w" ) ))
+		return( 46 );
+	else
+	{
+		title(h,buffer);
+		fprintf(h,"\"<html><head><title>%s</title>\".display();\n");
+		fprintf(h,"\"<link href='style.css' rel='STYLESHEET' type='text/css' media='SCREEN'>\".display();\n");
+		fprintf(h,"\"</head><body>\".display();\n");
+		fprintf(h,"\"<div align=center><table border=0><tr>\".display();\n");
+		for ( 	iptr= cptr->first;
+			iptr != (struct occi_attribute *) 0;
+			iptr = iptr->next )
+			fprintf(h,"\"<th class=label>%s</th>\".display();\n",iptr->name);
+		fprintf(h,"\"</tr>\".display();\n");
+	
+		fprintf(h,"$l = %s.list();\n",cptr->id);
+		fprintf(h,"foreach ( $l as $r )\n{\n",cptr->id);
+		fprintf(h,"\t\"<tr>\".display();\n");
+
+		fprintf(h,"\t$v = $r['occi.core.id'];\n");
+		fprintf(h,"\t$m = \"<td>\";\n");
+		fprintf(h,"\t$m = $m#\"<a href='%s.php?action=retrieve-%s&id=\"#$v#\"'>\";\n",name,cptr->id);
+		fprintf(h,"\t$m = $m#$v#;\n");
+		fprintf(h,"\t$m = $m#\"</a>\";\n");
+		fprintf(h,"\t$m.display();\n");
+
+		for ( 	iptr= cptr->first;
+			iptr != (struct occi_attribute *) 0;
+			iptr = iptr->next )
+		{
+			fprintf(h,"\t$v = $r['occi.%s.%s'];\n",cptr->id,iptr->name);
+			fprintf(h,"\t$m = \"<td>\";\n");
+			fprintf(h,"\t$m = $m#$v;\n");
+			fprintf(h,"\t$m.display();\n");
+		}
+
+		fprintf(h,"}\n");
+		fprintf(h,"\"<tr><th colspan=2><a href='%s.php?action=input-%s'>create new %s record</a></th></tr>\".display();\n",
+				name, cptr->id, cptr->id );
+
+		fprintf(h,"\"</table></div>\".display();\n");
+		fprintf(h,"\"</body></html>\".display();\n");
+		title(h,"end of file");
+		fclose(h);
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------	*/
+/*	g e n e r a t e _ s e r v i c e _ i n t e r f a c e 	*/
+/*	---------------------------------------------------	*/
+public	int	generate_service_interface( char * name, struct occi_category * cptr, char * prefix )
+{
+	FILE * h;
+	struct	occi_attribute * iptr;
+	char buffer[1024];
+	sprintf(buffer,"%s.php");
+	if (!( h = fopen( buffer, "w" ) ))
+		return( 46 );
+	else
+	{
+		fprintf(h,"<?php\n");
+		sprintf(buffer,"web user interface for component : %s ",name);
+		title(h,buffer);
+
+		fprintf(h,"function compile_cordscript($s, $o, $a ) { return; }\n");
+
+		fprintf(h,"switch ( $_REQUEST['action'] )\n{\n");
+		for (	;	
+			cptr != (struct occi_category *) 0; 
+			cptr = cptr->next )
+		{
+			generate_csp_input( cptr, name );
+			generate_csp_create( cptr, name );
+			generate_csp_retrieve( cptr, name  );
+			generate_csp_update( cptr, name );
+			generate_csp_delete( cptr, name  );
+			generate_csp_list( cptr, name  );
+
+			title( h, cptr->id );
+
+			fprintf(h,"case 'input-%s' :\n",cptr->id);
+			fprintf(h,"\t$args = '';\n");
+			fprintf(h,"\tcompile_cordscript('csp-input-%s.txt', 'HTML', $args );\n",cptr->id);
+			fprintf(h,"\tbreak;\n");
+
+			fprintf(h,"case 'create-%s' :\n",cptr->id);
+			fprintf(h,"\t$args = '';\n");
+
+			for ( 	iptr= cptr->first;
+				iptr != (struct occi_attribute *) 0;
+				iptr = iptr->next )
+				fprintf(h,"\t$args = $args.' '.$_REQUEST['%s'];\n",iptr->name);
+
+			fprintf(h,"\tcompile_cordscript('csp-create-%s.txt', 'HTML', $args );\n",cptr->id);
+			fprintf(h,"\tbreak;\n");
+
+			fprintf(h,"case 'retrieve-%s' :\n",cptr->id);
+			fprintf(h,"\t$args = $_REQUEST['id'];\n");
+			fprintf(h,"\tcompile_cordscript('csp-retrieve-%s.txt', 'HTML', $args );\n",cptr->id);
+			fprintf(h,"\tbreak;\n");
+
+			fprintf(h,"case 'update-%s' :\n",cptr->id);
+			fprintf(h,"\t$args = $_REQUEST['id'];\n");
+
+			for ( 	iptr= cptr->first;
+				iptr != (struct occi_attribute *) 0;
+				iptr = iptr->next )
+				fprintf(h,"\t$args = $args.' '.$_REQUEST['%s'];\n",iptr->name);
+
+			fprintf(h,"\tcompile_cordscript('csp-update-%s.txt', 'HTML', $args );\n",cptr->id);
+			fprintf(h,"\tbreak;\n");
+
+			fprintf(h,"case 'delete-%s' :\n",cptr->id);
+			fprintf(h,"\t$args = $_REQUEST['id'];\n");
+			fprintf(h,"\tcompile_cordscript('csp-delete-%s.txt', 'HTML', $args );\n",cptr->id);
+			fprintf(h,"\tbreak;\n");
+
+			fprintf(h,"case 'list-%s' :\n",cptr->id);
+			fprintf(h,"\t$args = '';\n");
+			fprintf(h,"\tcompile_cordscript('csp-list-%s.txt', 'HTML', $args );\n",cptr->id);
+			fprintf(h,"\tbreak;\n");
+
+
+		}
+		fprintf(h,"}\n");
+		title(h,"end of file");
+		fprintf(h,"?>\n");
+		fclose(h);
+		return( 0 );
+	}
+}
+
+/*	---------------------------------------------------	*/
 /*	  g e n e r a t e _ p r o c c i _ m a k e f i l e 	*/
 /*	---------------------------------------------------	*/
 public	int	generate_procci_makefile( char * name, struct occi_category * cptr, char * prefix )
@@ -547,5 +873,6 @@ public	int	generate_procci_component( char * name, struct occi_category * cptr, 
 		return(0);
 	}
 }
+
 
 #endif	/* _gencomp_c */

@@ -29,7 +29,7 @@
 #include "comodel.h"
 #include "strukt.h"
 
-#define	_COMODEL_VERSION "1.0.01"
+#define	_COMODEL_VERSION "1.0.04"
 
 /*	------------------------------------------------------------------	*/
 /*	   a c c o r d s _ p l a t f o r m _ c o n f i g u r a t i o n		*/
@@ -57,6 +57,8 @@ struct	accords_configuration CoModel =
 
 private	int	testflag=0;
 public	int	check_testflag()	{	return( testflag);	}
+private	int	webflag=0;
+public	int	check_webflag()		{	return( webflag);	}
 
 /*	------------------------------------------------------------------	*/
 /*	c o m o d e l _ o c c i _ p r o d u c i o n _ p a r a m e t e r s	*/
@@ -134,7 +136,7 @@ public int	comodel_category_filter( struct occi_category * cptr )
 /*	------------------------------------------------------------------	*/
 private	int	comodel_banner()
 {
-	printf("\n   CompatibleOne Model Generator : Version 1.0a.0.03");
+	printf("\n   CompatibleOne Model Generator : Version %s ",_COMODEL_VERSION);
 	printf("\n   Beta Version : 23/11/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue");
 	printf("\n\n");
@@ -809,6 +811,7 @@ private	int	comodel_c_production()
 			save_accords_configuration( &cptr->configuration, buffer );
 			generate_service_component( cptr->name, cptr->first, production.prefix );
 			generate_service_makefile( cptr->name, cptr->first, production.prefix );
+			if ( webflag ) generate_service_interface( cptr->name, cptr->first, production.prefix );
 		}
 		for (	optr=cptr->first;
 			optr != (struct occi_category *) 0;
@@ -949,6 +952,9 @@ private	int	co_model(int argc, char * argv[] )
 			aptr++;
 			switch( *(aptr++) )
 			{
+			case	'i'	:
+				webflag=1;
+				continue;
 			case	't'	:
 				testflag=1;
 				continue;
