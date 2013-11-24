@@ -57,7 +57,7 @@ AC_CHECK_HEADERS([mysql/mysql.h],
 		[AC_MSG_ERROR([You are missing mysql development files])])
 
 if test "$(uname -s)" = 'Linux' ; then
-	AC_SUBST([LDFLAGS_LDAP], ["-lmysqlclient"])
+	AC_SUBST([LDFLAGS_MYSQL], ["-lmysqlclient"])
 fi
 
 AC_CHECK_HEADERS([uuid/uuid.h uuid.h],
