@@ -799,6 +799,8 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 
 	title(h,"OCCI MYSQL BUILDER START");
 
+	fprintf(h,"private struct occi_kind_node KindNode;\n");
+
 	fprintf(h,"\n#include <%s>\n","mysql/mysql.h");
 	fprintf(h,"#include %c%s%c\n",0x0022,"occisql.h",0x0022);
 
@@ -829,24 +831,24 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	switch ( C.genrest )
 	{
 	case	_OCCI_LINK :
-		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return((struct  occi_%s_node *) 0); }\n",
-			C.klass,C.klass,C.klass);
-		fprintf(h,"public struct  occi_%s_node * occi_next_%s_node(struct occi_%s_node * nptr ) { if (!( nptr )) return( nptr ); else return((struct  occi_%s_node *) 0); }\n",
-			C.klass,C.klass,C.klass);
-		fprintf(h,"public struct  occi_%s_node * occi_previous_%s_node(struct occi_%s_node * nptr ) { if (!( nptr )) return( nptr ); else return((struct  occi_%s_node *) 0); }\n",
-			C.klass,C.klass,C.klass);
-		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return((struct  occi_%s_node *) 0); }\n",
-			C.klass,C.klass,C.klass);
+		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return(&KindNode); }\n",
+			C.klass,C.klass);
+		fprintf(h,"public struct  occi_%s_node * occi_next_%s_node(struct occi_%s_node * nptr ) { return( &KindNode ); }\n",
+			C.klass,C.klass);
+		fprintf(h,"public struct  occi_%s_node * occi_previous_%s_node(struct occi_%s_node * nptr ) { return( &KindNode ); }\n",
+			C.klass,C.klass);
+		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return( &KindNode ); }\n",
+			C.klass,C.klass);
 		break;
 	case	_OCCI_KIND :
-		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return((struct  occi_%s_node *) 0); }\n",
-			C.klass,C.name,C.klass);
-		fprintf(h,"public struct  occi_%s_node * occi_next_%s_node(struct occi_%s_node * nptr ) { if (!( nptr )) return( nptr ); else return((struct  occi_%s_node *) 0); }\n",
-			C.klass,C.name,C.klass);
-		fprintf(h,"public struct  occi_%s_node * occi_previous_%s_node(struct occi_%s_node * nptr ) { if (!( nptr )) return( nptr ); else return((struct  occi_%s_node *) 0); }\n",
-			C.klass,C.name,C.klass);
-		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return((struct  occi_%s_node *) 0); }\n",
-			C.klass,C.name,C.klass);
+		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return(&KindNode); }\n",
+			C.klass,C.name);
+		fprintf(h,"public struct  occi_%s_node * occi_next_%s_node(struct occi_%s_node * nptr ) { return( &KindNode ); }\n",
+			C.klass,C.name);
+		fprintf(h,"public struct  occi_%s_node * occi_previous_%s_node(struct occi_%s_node * nptr ) { return( &KindNode ); }\n",
+			C.klass,C.name);
+		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return( &KindNode ); }\n",
+			C.klass,C.name);
 		break;
 
 	}
