@@ -246,7 +246,7 @@ private	struct	occi_response * occi_resolver_operation( char * category, char * 
 		cptr = occi_remove_client( cptr );
 		return((struct occi_response * )0);
 	}
-	else if ((!( eptr = occi_request_element( rptr, "occi.publication.where",Resolver.room	)))
+	else if ((!( eptr = occi_request_element( rptr, "occi.publication.region",Resolver.room	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category 	))))
 	{
 		rptr = occi_remove_request( rptr );
@@ -539,7 +539,7 @@ public	struct	occi_response * occi_pricing( char * category, char * agent )
 		cptr = occi_remove_client( cptr );
 		return((struct occi_response * )0);
 	}
-	else if ((!( eptr = occi_request_element( rptr, "occi.publication.where",Resolver.room	)))
+	else if ((!( eptr = occi_request_element( rptr, "occi.publication.region",Resolver.room	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category 	))))
 	{
 		rptr = occi_remove_request( rptr );

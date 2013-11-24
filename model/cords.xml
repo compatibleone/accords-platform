@@ -6,7 +6,7 @@
 	    <attributes>
 	        <attribute name='remote' type='string' required='false' immutable='false'/>
 	        <attribute name='what' type='string' required='false' immutable='false'/>
-	        <attribute name='where' type='string' required='false' immutable='false'/>
+	        <attribute name='region' type='string' required='false' immutable='false'/>
 	        <attribute name='why' type='string' required='false' immutable='false'/>
 	        <attribute name='when' type='int' required='false' immutable='false'/>
 	        <attribute name='uptime' type='int' required='false' immutable='false'/>
@@ -29,7 +29,7 @@
 	</category>
 	<category term='enquiry' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/enquiry/' rel='http://schemas.ogf.org/occi/core#resource'>
 	    <attributes>
-	        <attribute name='where' type='string' required='false' immutable='false'/>
+	        <attribute name='region' type='string' required='false' immutable='false'/>
 	        <attribute name='what' type='string' required='false' immutable='false'/>
 	        <attribute name='who' type='string' required='false' immutable='false'/>
 	        <attribute name='pass' type='string' required='false' immutable='false'/>

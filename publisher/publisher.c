@@ -276,7 +276,7 @@ private	struct occi_element * build_master_instance( struct cords_publication * 
 	else	foot->next = eptr;
 	foot = eptr;
 
-	if (!( eptr = occi_create_element( "occi.publisher.where", pptr->where ) ))
+	if (!( eptr = occi_create_element( "occi.publisher.region", pptr->region ) ))
 		return( occi_remove_elements( root ) );
 	else if (!( eptr->previous = foot ))
 		root = eptr;
@@ -364,11 +364,11 @@ private	int	store_master_instance( struct cords_publication * pptr, struct occi_
 		if (!( pptr->what = allocate_string( vptr ) ))
 			return(27);
 	}
-	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "where" ))!=(char *) 0)
+	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "region" ))!=(char *) 0)
 	{
-		if ( pptr->where ) 
-			pptr->where = liberate( pptr->where );
-		if (!( pptr->where = allocate_string( vptr ) ))
+		if ( pptr->region ) 
+			pptr->region = liberate( pptr->region );
+		if (!( pptr->region = allocate_string( vptr ) ))
 			return(27);
 	}
 	if (( vptr = occi_extract_atribut( zptr, "occi", _CORDS_PUBLICATION, "why" ))!=(char *) 0)

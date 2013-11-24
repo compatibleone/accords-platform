@@ -850,7 +850,7 @@ public	int	publish_occi_category(
 	}
 	else if ((!( eptr = occi_request_element( rptr, "occi.publication.who",username		)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.pass",password 	)))
-	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.where",
+	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.region",
 			( category->access & _OCCI_CONTRACT ? 
 			( contract ? contract : Publisher.room ) : Publisher.room)	)))
 	     ||  (!( eptr = occi_request_element( rptr, "occi.publication.what",category->id 	)))
