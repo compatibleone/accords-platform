@@ -52,6 +52,14 @@ if test "$(uname -s)" = 'Linux' ; then
 	AC_SUBST([LDFLAGS_LDAP], ["-lldap"])
 fi
 
+AC_CHECK_HEADERS([mysql/mysql.h],
+                [break],
+		[AC_MSG_ERROR([You are missing mysql development files])])
+
+if test "$(uname -s)" = 'Linux' ; then
+	AC_SUBST([LDFLAGS_LDAP], ["-lmysqlclient"])
+fi
+
 AC_CHECK_HEADERS([uuid/uuid.h uuid.h],
                 [break],
 		[AC_MSG_ERROR([You are missing uuid development files])])
