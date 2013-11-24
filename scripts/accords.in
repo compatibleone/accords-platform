@@ -42,9 +42,9 @@ runcops=1
 nethsm=
 # -------------------------------------
 resthost=127.0.0.1
-OCCISQLHOST=$resthost
-OCCISQLUSER=root
-OCCISQLPASSWD=root
+export OCCISQLHOST=$resthost
+export OCCISQLUSER=root
+export OCCISQLPASSWD=root
 zone="europe"
 trace=1
 threads=1
