@@ -10,8 +10,8 @@ lib_LTLIBRARIES = libcords.la
 EXTRA_DIST = operation.c cordselements.h cords.h cordspublic.h
 
 libcords_la_SOURCES = cords2occi.c cordsbase.c
-libcords_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COREST) $(CFLAGS_OCCI) 
-libcords_la_LDFLAGS = $(LD_COXML)
+libcords_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COSQL) $(CFLAGS_COREST) $(CFLAGS_OCCI) 
+libcords_la_LDFLAGS = $(LD_COXML) $(LD_COSQL)
 
 # Build the model files
 model_h_files = azconfig.h paconfig.h publication.h placement.h account.h instruction.h		\

@@ -1,7 +1,12 @@
 #ifndef	_mysql_c
 #define	_mysql_c
 
+#include <stdio.h>
 #include <mysql/mysql.h>
+
+void * allocate(int);
+void * liberate(void *);
+char * allocate_string(char *);
 
 char *	mysql_error( MYSQL * handle )
 {

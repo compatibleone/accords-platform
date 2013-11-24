@@ -87,6 +87,15 @@ AC_SUBST([abs_top_builddir])
 ###
 ### Modules configuration
 ###
+AC_ARG_ENABLE([cosql],
+      [AS_HELP_STRING([--disable-cosql],
+		      [Disable cosql @<:@default=enable@:>@])],
+      [],
+      [enable_cosql=yes])
+AM_CONDITIONAL([ENABLE_COSQL], [test "$enable_cosql" = "yes"])
+AC_SUBST([CFLAGS_COSQL], [-I\${abs_top_srcdir}/cosql])
+AC_SUBST([LD_COSQL], ["-L\${abs_top_builddir}/cosql -lcosql"])
+
 AC_ARG_ENABLE([coxml],
       [AS_HELP_STRING([--disable-coxml],
 		      [Disable coxml @<:@default=enable@:>@])],
@@ -663,6 +672,7 @@ AC_CONFIG_FILES([tools/Makefile tools/strukt/Makefile])
 AC_CONFIG_FILES([manifests/Makefile])
 AC_CONFIG_FILES([manpages/Makefile])
 AC_CONFIG_FILES([coxml/Makefile])
+AC_CONFIG_FILES([cosql/Makefile])
 AC_CONFIG_FILES([occi/Makefile])
 AC_CONFIG_FILES([cords/Makefile])
 AC_CONFIG_FILES([corest/Makefile])
@@ -737,6 +747,7 @@ echo "  CompatibleOne ACCORDS configuration is now complete"
 echo "********************************************************************"
 echo ""
 echo "    - coxml                    : $enable_coxml"
+echo "    - cosql                    : $enable_cosql"
 echo "    - occi                     : $enable_occi"
 echo "    - cords                    : $enable_cords"
 echo "    - corest                   : $enable_corest"
