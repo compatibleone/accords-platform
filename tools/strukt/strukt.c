@@ -867,8 +867,8 @@ int	schema( char * nptr )
 
 private	int	banner()
 {
-	printf("\n Structure Constructor : Version 3.1a.0.0.3");
-	printf("\n Provisoire du 23/09/2013");
+	printf("\n Structure Constructor : Version 3.1a.0.0.4");
+	printf("\n Provisoire du 24/11/2013");
 	printf("\n Copyright (c) 2013 Iain James Marshall\n");
 	printf("\n Options : \n");
 	printf("\n --verbose                 activate verbose messages ");
@@ -889,11 +889,16 @@ int	main(int argc, char * argv[])
 	int	status=0;
 	int	argi=1;
 	char *	aptr;
+	char *	eptr;
 	if ( argc == 1 )
 		return( banner() );
 
 	else	
 	{
+		if ((eptr = getenv("STRUKTSQL")) != (char *) 0)
+			C.gensql = atoi(eptr);
+		else	C.gensql = 0;
+
 		while ( argi < argc )
 		{
 			if (!( aptr = argv[argi++] ))
