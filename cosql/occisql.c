@@ -247,6 +247,9 @@ private	int	create_occi_sql_database( struct occi_table * tptr )
 /*	-------------------------------------------------	*/
 private	int	default_occi_sql_host( struct occi_table * tptr )
 {
+	if (!( Database.status ))
+		initialise_occi_sql( "storage", "accords_database", "root", "root" );
+
 	if (!( tptr->host ))
 		if (!( tptr->host = allocate_string( Database.hostname ) ))
 			return(0);
