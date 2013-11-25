@@ -22,7 +22,7 @@ if ( $un.length() > 0 )
 				$r = '"occi.authorization.user":"'#$uid#'"';
 				$s = $s + $r;
 				$secs = "now".time();
-				$r = '"occi.authorization.from":"'#$secs#'"';
+				$r = '"occi.authorization.start":"'#$secs#'"';
 				$s = $s + $r;
 				$r = '"occi.authorization.ttl":"300"';
 				$s = $s + $r;

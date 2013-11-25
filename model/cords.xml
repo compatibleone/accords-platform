@@ -111,7 +111,7 @@
 	        <instance name='account' category='http://scheme.compatibleone.fr/scheme/compatible#account' multiplicity='[0..1]'/>
 	        <instance name='user' category='http://scheme.compatibleone.fr/scheme/compatible#user' multiplicity='[0..1]'/>
 	        <attribute name='pass' type='string' required='false' immutable='false'/>
-	        <attribute name='from' type='int' required='false' immutable='false'/>
+	        <attribute name='start' type='int' required='false' immutable='false'/>
 	        <attribute name='till' type='int' required='false' immutable='false'/>
 	        <attribute name='ttl' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
@@ -425,9 +425,9 @@
 	        <attribute name='name' type='string' required='false' immutable='false'/>
 	        <attribute name='description' type='string' required='false' immutable='false'/>
 	        <attribute name='protocol' type='string' required='false' immutable='false'/>
-	        <attribute name='range' type='string' required='false' immutable='false'/>
-	        <attribute name='from' type='string' required='false' immutable='false'/>
-	        <attribute name='to' type='string' required='false' immutable='false'/>
+	        <attribute name='iprange' type='string' required='false' immutable='false'/>
+	        <attribute name='first' type='string' required='false' immutable='false'/>
+	        <attribute name='last' type='string' required='false' immutable='false'/>
 	        <attribute name='direction' type='string' required='false' immutable='false'/>
 	        <attribute name='target' type='string' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>

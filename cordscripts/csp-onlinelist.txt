@@ -12,7 +12,7 @@ function OnlineList( $selector )
 		$arecord = $aid.get();
 		$id      = $arecord["occi.core.id"];
 		$who     = $arecord["occi.authorization.user"];
-		$when    = $arecord["occi.authorization.from"];
+		$when    = $arecord["occi.authorization.start"];
 		$when = $when.date();
 		$urec = $who.get();
 		$name = $urec["occi.user.name"];

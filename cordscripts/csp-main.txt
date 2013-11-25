@@ -14,7 +14,7 @@
 					if ( $name == "link" )
 					{
 						$p = $value.get();
-						$port = $p["occi.port.from"];
+						$port = $p["occi.port.first"];
 						$pn   = $p["occi.port.name"];
 						if ( $pn == $e )
 						{

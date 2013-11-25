@@ -35,8 +35,8 @@
 #define	_CORDS_COMMON	"common"
 #define	_CORDS_NORMAL	"normal"
 #define	_CORDS_GLOBAL	"global"
-#define	_CORDS_TO	"to"
-#define	_CORDS_FROM	"from"
+#define	_CORDS_TO	"last"
+#define	_CORDS_FROM	"first"
 #define	_CORDS_PROTOCOL "protocol"
 
 /*	------------------------	*/

@@ -22,16 +22,16 @@
 					{
 						$m = $m#' name="'#$n#'"';
 					}
-					$n = $port["occi.port.from"];
+					$n = $port["occi.port.first"];
 					if ( $n == "(null)" ) { $n = ""; }
 					if ( $n.length() > 0 )
 					{
-						$m = $m#' from="'#$n#'"';
+						$m = $m#' first="'#$n#'"';
 					}
-					$n = $port["occi.port.to"];
+					$n = $port["occi.port.last"];
 					if ( $n.length() > 0 )
 					{
-						$m = $m#' to="'#$n#'"';
+						$m = $m#' last="'#$n#'"';
 					}
 					$n = $port["occi.port.protocol"];
 					if ( $n.length() > 0 )
@@ -600,4 +600,3 @@
 	$m = "<tr><th><a href='dashboard.php?action=compile&output=HTML&script=csp-delete-manifest.txt&option="#$what#"'>Delete This Manifest</a></th></tr>";
 	$m.display();
 
-	HtmlFooter();
