@@ -158,11 +158,11 @@ _co_platform() {
     _co_run_serv fileserver "accords file services"
     _co_run_serv coss "accords security services" 
 	sleep 5
-	co-parser users
+	co-command --noauth parser users.xml
     _co_run_serv comons "accords monitoring services"
     _co_run_serv cobill "accords accounting services"
 	sleep 5
-	co-parser prices
+	co-command parser prices.xml
     _co_run_serv cosched "accords scheduling services" 
     _co_run_serv conets "accords networking services"
     _co_run_serv cops "accords placement services"
