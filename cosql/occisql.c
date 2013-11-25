@@ -474,7 +474,12 @@ public	int	first_occi_sql_record( char * category,  struct occi_expression *expr
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
+	else if (!( expression->value = allocate( strlen( tptr->name ) + strlen( _SELECT_MIN_ID_FROM ) + 16 ) ))
+		return( 27 );
+	else	sprintf(expression->value,"%s %s",_SELECT_MIN_ID_FROM,tptr->name);
+
 	debug_sql_query( tptr, expression->value );
+
 	if ( mysql_query( tptr->handle, expression->value ) != 0)
 		return( occi_sql_failure( tptr, 64 ) );
 	else	return( occi_sql_record( tptr, expression ) );
@@ -485,6 +490,7 @@ public	int	first_occi_sql_record( char * category,  struct occi_expression *expr
 /*	------------------------------------------------	*/
 public	int	previous_occi_sql_record( char * category,  struct occi_expression *expression )
 {
+	char *	xptr;
 	struct	occi_table * tptr;
 	if (!( tptr = locate_occi_sql_table( category ) ))
 		return( 40 );
@@ -492,8 +498,15 @@ public	int	previous_occi_sql_record( char * category,  struct occi_expression *e
 		return( 50 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	debug_sql_query( tptr, expression->value );
-	if ( mysql_query( tptr->handle, expression->value ) != 0)
+	else if (!( xptr = allocate( 
+				strlen( ( expression->value ? expression->value : "" ) ) + 
+				strlen( tptr->name ) + 
+				strlen( _SELECT_ID_FROM ) + 
+				strlen( _SINGLE_ROW ) + 16 ) ))
+		return( 27 );
+	else	sprintf( xptr,"%s %s %s %s",_SELECT_ID_FROM,tptr->name,( expression->value ? expression->value : "" ),_SINGLE_ROW);
+	debug_sql_query( tptr, xptr );
+	if ( mysql_query( tptr->handle, xptr ) != 0)
 		return( occi_sql_failure( tptr, 64 ) );
 	else	return( occi_sql_record( tptr, expression ) );
 }
@@ -636,13 +649,21 @@ public	int	delete_occi_sql_record( char * category,  struct occi_expression *exp
 /*	-------------------------------------------	*/
 public	int	next_occi_sql_record( char * category,  struct occi_expression *expression )
 {
+	char *	xptr;
 	struct	occi_table * tptr;
 	if (!( tptr = locate_occi_sql_table( category ) ))
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	debug_sql_query( tptr, expression->value );
-	if ( mysql_query( tptr->handle, expression->value ) != 0)
+	else if (!( xptr = allocate( 
+				strlen( ( expression->value ? expression->value : "" ) ) + 
+				strlen( tptr->name ) + 
+				strlen( _SELECT_ID_FROM ) + 
+				strlen( _SINGLE_ROW ) + 16 ) ))
+		return( 27 );
+	else	sprintf( xptr,"%s %s %s %s",_SELECT_ID_FROM,tptr->name,( expression->value ? expression->value : "" ),_SINGLE_ROW);
+	debug_sql_query( tptr, xptr );
+	if ( mysql_query( tptr->handle, xptr ) != 0)
 		return( occi_sql_failure( tptr, 48 ) );
 	else	return( occi_sql_record( tptr, expression ) );
 }
@@ -657,6 +678,9 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
+	else if (!( expression->value = allocate( strlen( tptr->name ) + strlen( _SELECT_MIN_ID_FROM ) + 16 ) ))
+		return( 27 );
+	else	sprintf(expression->value,"%s %s",_SELECT_MAX_ID_FROM,tptr->name);
 	debug_sql_query( tptr, expression->value );
 	if ( mysql_query( tptr->handle, expression->value ) != 0)
 		return( occi_sql_failure( tptr, 48 ) );

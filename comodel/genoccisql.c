@@ -384,8 +384,8 @@ private	void	generate_file_description( FILE * h )
 		else
 		{
 			if (!( strcmp( iptr->basic, "int" ) ))
-				sprintf(buffer, "%s %s INTEGER",(xptr ? "," : " ("),iptr->name);
-			else 	sprintf(buffer, "%s %s CHAR(128)",(xptr ? "," : " ("),iptr->name);
+				sprintf(buffer, "%s _%s INTEGER",(xptr ? "," : " ("),iptr->name);
+			else 	sprintf(buffer, "%s _%s CHAR(128)",(xptr ? "," : " ("),iptr->name);
 			if (!( wptr = allocate( strlen( xptr ) + strlen( buffer ) + 3 ) ))
 				break;
 			else	sprintf(wptr,"%s%s",xptr,buffer);
@@ -469,7 +469,7 @@ private	void	generate_occi_sql_on_insert( FILE * h, char * nptr, char * fullname
 		{
 			if (!( wptr = allocate( strlen( xptr ) + strlen( iptr->name ) + 8 ) ))
 				break;
-			else	sprintf(wptr,"%s, %s",xptr,iptr->name);
+			else	sprintf(wptr,"%s, _%s",xptr,iptr->name);
 			liberate( xptr );
 			xptr = wptr;
 		}
@@ -574,8 +574,8 @@ private	void	generate_occi_sql_on_collect( FILE * h, char * nptr, char * fullnam
 		{
 			fprintf(h,"\tif (( fptr->%s != 0 ))\n\t{\n",iptr->name);
 			if (!( strcmp( iptr->basic, "int" ) ))
-			 	fprintf(h,"\t\tsprintf(buffer,%c%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
-			else 	fprintf(h,"\t\tsprintf(buffer,%c%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
+			 	fprintf(h,"\t\tsprintf(buffer,%c_%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
+			else 	fprintf(h,"\t\tsprintf(buffer,%c_%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
 			fprintf(h,"\t\tif (!( xptr ))\n\t\t{\n");
 			fprintf(h,"\t\t\tif (!( wptr = allocate( strlen(separator) + strlen(buffer) + 8 ) )) { return(27); }\n");
 			fprintf(h,"\t\t\telse\n\t\t\t{\n");
@@ -631,8 +631,8 @@ private	void	generate_occi_sql_on_update( FILE * h, char * nptr, char * fullname
 			if (!( strcmp( iptr->name, "id" ) ))
 				fprintf(h,"\tsprintf(buffer,%cid = '%cs'%c,id);\n",0x0022,0x0025,0x0022);
 			else if (!( strcmp( iptr->basic, "int" ) ))
-			 	fprintf(h,"\tsprintf(buffer,%c%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
-			else 	fprintf(h,"\tsprintf(buffer,%c%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
+			 	fprintf(h,"\tsprintf(buffer,%c_%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
+			else 	fprintf(h,"\tsprintf(buffer,%c_%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
 			fprintf(h,"\tif (!( xptr )) { if (!( xptr = allocate_string(buffer) )) return(27); else separator =','; }\n");
 			fprintf(h,"\telse if (!( wptr = allocate( strlen( xptr ) + strlen( buffer ) + 8 ) )) return( 27 );\n");
 			fprintf(h,"\telse { sprintf(wptr,%c%cs%cc%cs%c,xptr,separator,buffer); liberate( xptr ); xptr = wptr; separator = ','; }\n",0x0022,0x0025,0x0025,0x0025,0x0022);
@@ -689,6 +689,7 @@ private	void	generate_occi_sql_on_previous( FILE * h, char * nptr, char * fullna
 {
 	title(h,"sql on previous record");
 	fprintf(h,"\nprivate struct occi_kind_node * %s_sql_on_previous(struct occi_kind_node * nptr)\n{\n",fullname,C.name);
+	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tint status=0;\n");
 	fprintf(h,"\tstruct %s *pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
@@ -697,6 +698,8 @@ private	void	generate_occi_sql_on_previous( FILE * h, char * nptr, char * fullna
 	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
+	fprintf(h,"\tsprintf(buffer,%cWHERE id < '%cs'%c,pptr->id);\n",0x0022,0x0025,0x0022);
+	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return((struct occi_kind_node *)0);\n");
 	fprintf(h,"\tif ((status = previous_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
  	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
@@ -710,6 +713,7 @@ private	void	generate_occi_sql_on_next( FILE * h, char * nptr, char * fullname )
 {
 	title(h,"sql on next record");
 	fprintf(h,"\nprivate struct occi_kind_node * %s_sql_on_next(struct occi_kind_node * nptr)\n{\n",fullname,C.name);
+	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tint status=0;\n");
 	fprintf(h,"\tstruct %s *pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
@@ -718,6 +722,8 @@ private	void	generate_occi_sql_on_next( FILE * h, char * nptr, char * fullname )
 	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
+	fprintf(h,"\tsprintf(buffer,%cWHERE id > '%cs'%c,pptr->id);\n",0x0022,0x0025,0x0022);
+	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return((struct occi_kind_node *)0);\n");
 	fprintf(h,"\tif ((status = next_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
  	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
