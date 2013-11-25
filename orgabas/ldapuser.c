@@ -15,7 +15,7 @@ struct	ldap_user
 	char *	role;
 	char *	account;
 	char *	authorization;
-	int	when;
+	int	stamp;
 	int	state;
 };
 
