@@ -690,6 +690,8 @@ private	void	generate_occi_sql_on_first( FILE * h, char * nptr, char * fullname 
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tif ((status = first_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
+	fprintf(h,"\tif (!( pptr->id ))\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse\treturn(nptr);\n");
@@ -722,8 +724,11 @@ private	void	generate_occi_sql_on_previous( FILE * h, char * nptr, char * fullna
 	fprintf(h,"\tif (!( pptr->id )) { return((struct occi_%s_node *) 0); }\n",nature);
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE id < '%cs'%c,pptr->id);\n",0x0022,0x0025,0x0022);
+	fprintf(h,"\tpptr->id = liberate( pptr->id );\n");
 	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return((struct occi_%s_node *)0);\n",nature);
 	fprintf(h,"\tif ((status = previous_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
+	fprintf(h,"\tif (!( pptr->id ))\n");
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
@@ -757,8 +762,11 @@ private	void	generate_occi_sql_on_next( FILE * h, char * nptr, char * fullname )
 	fprintf(h,"\tif (!( pptr->id )) { return((struct occi_%s_node *) 0); }\n",nature);
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE id > '%cs'%c,pptr->id);\n",0x0022,0x0025,0x0022);
+	fprintf(h,"\tpptr->id = liberate( pptr->id );\n");
 	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return((struct occi_%s_node *)0);\n",nature);
 	fprintf(h,"\tif ((status = next_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
+	fprintf(h,"\tif (!( pptr->id ))\n");
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
@@ -790,6 +798,8 @@ private	void	generate_occi_sql_on_last( FILE * h, char * nptr, char * fullname )
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tif ((status = last_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
+	fprintf(h,"\tif (!( pptr->id ))\n");
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
