@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="UTF8"?>
-
-<import name="prices" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
-
-<cords_price
+<import name="prices2" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+<price
 name="service" operator="accords" description="standard accords service instance flatrate cost" currency="euros" fixed="yes" rate="10" units="" period="1"  />
-<cords_price
+<price
 name="openstack" operator="osprocci" description="standard accords openstack instance flatrate cost" currency="euros" fixed="yes" rate="20" units="" period="1"  />
-<cords_price
+<price
 name="opennebula" operator="onprocci" description="standard accords opennebula instance flatrate cost" currency="euros" fixed="yes" rate="18" units="" period="1"  />
-<cords_price
+<price
 name="windowsazure" operator="azprocci" description="standard accords windowsazure" currency="euros" fixed="yes" rate="15" units="" period="1"  />
-<cords_price
+<price
 name="amazonEc2" operator="ec2procci" description="standard accords amazonEc2" currency="euros" fixed="yes" rate="15" units="" period="1"  />
-<cords_price
+<price
 name="onapp" operator="oaprocci" description="standard accords onapp instance flatrate cost" currency="euros" fixed="yes" rate="20" units="" period="1"  />
-<cords_price
+<price
 name="dummy" operator="dummyprocci" description="standard accords dummy instance flatrate cost" currency="euros" fixed="yes" rate="20" units="" period="1"  />
-<cords_price
+<price
 name="contract" operator="accords" description="standard accords contract instance flatrate cost" currency="euros" fixed="yes" rate="2" units="" period="1"  />
-<cords_price
+<price
 name="session" operator="accords" description="standard accords monitoring session instance flatrate cost" currency="euros" fixed="yes" rate="5" units="" period="1"  />
-
 </import>
 
