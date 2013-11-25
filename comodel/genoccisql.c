@@ -666,20 +666,30 @@ private	void	generate_occi_sql_on_delete( FILE * h, char * nptr, char * fullname
 
 private	void	generate_occi_sql_on_first( FILE * h, char * nptr, char * fullname )
 {
+	char *	nature;
 	title(h,"sql on first record");
-	fprintf(h,"\nprivate struct occi_kind_node * %s_sql_on_first(struct occi_kind_node * nptr)\n{\n",fullname,C.name);
+	switch ( C.genrest )
+	{
+	case	_OCCI_LINK :
+		nature = "link";
+		break;
+	case	_OCCI_KIND	:
+		nature = "kind";
+		break;
+	}
+	fprintf(h,"\nprivate struct occi_%s_node * %s_sql_on_first(struct occi_%s_node * nptr)\n{\n",nature,fullname,nature);
 	fprintf(h,"\tint status=0;\n");
 	fprintf(h,"\tstruct %s *pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
 	fprintf(h,"\tif (!( nptr ))\n\t\treturn( nptr );\n");
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents ))\n\t{\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_kind_node *) 0 );\n",C.name,C.name);
+	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_%s_node *) 0 );\n",C.name,C.name,nature);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tif ((status = first_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
- 	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
- 	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse\treturn(nptr);\n");
 	fprintf(h,"}\n");
 	return;
@@ -687,23 +697,33 @@ private	void	generate_occi_sql_on_first( FILE * h, char * nptr, char * fullname 
 
 private	void	generate_occi_sql_on_previous( FILE * h, char * nptr, char * fullname )
 {
+	char *	nature;
 	title(h,"sql on previous record");
-	fprintf(h,"\nprivate struct occi_kind_node * %s_sql_on_previous(struct occi_kind_node * nptr)\n{\n",fullname,C.name);
+	switch ( C.genrest )
+	{
+	case	_OCCI_LINK :
+		nature = "link";
+		break;
+	case	_OCCI_KIND	:
+		nature = "kind";
+		break;
+	}
+	fprintf(h,"\nprivate struct occi_%s_node * %s_sql_on_previous(struct occi_%s_node * nptr)\n{\n",nature,fullname,nature);
 	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tint status=0;\n");
 	fprintf(h,"\tstruct %s *pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
 	fprintf(h,"\tif (!( nptr ))\n\t\treturn( nptr );\n");
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents ))\n\t{\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_kind_node *) 0 );\n",C.name,C.name);
+	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_%s_node *) 0 );\n",C.name,C.name,nature);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE id < '%cs'%c,pptr->id);\n",0x0022,0x0025,0x0022);
-	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return((struct occi_kind_node *)0);\n");
+	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return((struct occi_%s_node *)0);\n",nature);
 	fprintf(h,"\tif ((status = previous_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
- 	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
- 	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse\treturn(nptr);\n");
 	fprintf(h,"}\n");
 	return;
@@ -711,23 +731,33 @@ private	void	generate_occi_sql_on_previous( FILE * h, char * nptr, char * fullna
 
 private	void	generate_occi_sql_on_next( FILE * h, char * nptr, char * fullname )
 {
+	char *	nature;
 	title(h,"sql on next record");
-	fprintf(h,"\nprivate struct occi_kind_node * %s_sql_on_next(struct occi_kind_node * nptr)\n{\n",fullname,C.name);
+	switch ( C.genrest )
+	{
+	case	_OCCI_LINK :
+		nature = "link";
+		break;
+	case	_OCCI_KIND	:
+		nature = "kind";
+		break;
+	}
+	fprintf(h,"\nprivate struct occi_%s_node * %s_sql_on_next(struct occi_%s_node * nptr)\n{\n",nature,fullname,nature);
 	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tint status=0;\n");
 	fprintf(h,"\tstruct %s *pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
 	fprintf(h,"\tif (!( nptr ))\n\t\treturn( nptr );\n");
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents ))\n\t{\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_kind_node *) 0 );\n",C.name,C.name);
+	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_%s_node *) 0 );\n",C.name,C.name,nature);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE id > '%cs'%c,pptr->id);\n",0x0022,0x0025,0x0022);
-	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return((struct occi_kind_node *)0);\n");
+	fprintf(h,"\tif (!( expression.value = allocate_string(buffer))) return((struct occi_%s_node *)0);\n",nature);
 	fprintf(h,"\tif ((status = next_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
- 	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
- 	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse\treturn(nptr);\n");
 	fprintf(h,"}\n");
 	return;
@@ -735,20 +765,30 @@ private	void	generate_occi_sql_on_next( FILE * h, char * nptr, char * fullname )
 
 private	void	generate_occi_sql_on_last( FILE * h, char * nptr, char * fullname )
 {
+	char *	nature;
 	title(h,"sql on last record");
-	fprintf(h,"\nprivate struct occi_kind_node * %s_sql_on_last(struct occi_kind_node * nptr)\n{\n",fullname,C.name);
+	switch ( C.genrest )
+	{
+	case	_OCCI_LINK :
+		nature = "link";
+		break;
+	case	_OCCI_KIND	:
+		nature = "kind";
+		break;
+	}
+	fprintf(h,"\nprivate struct occi_%s_node * %s_sql_on_last(struct occi_%s_node * nptr)\n{\n",nature,fullname,nature);
 	fprintf(h,"\tint status=0;\n");
 	fprintf(h,"\tstruct %s *pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
 	fprintf(h,"\tif (!( nptr ))\n\t\treturn( nptr );\n");
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents ))\n\t{\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_kind_node *) 0 );\n",C.name,C.name);
+	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_%s_node *) 0 );\n",C.name,C.name,nature);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tif ((status = last_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
- 	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse if ((status = %s_sql_on_search(pptr->id,pptr)) != 0)\n",fullname);
- 	fprintf(h,"\t\treturn((struct occi_kind_node *) 0);\n");
+ 	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\telse\treturn(nptr);\n");
 	fprintf(h,"}\n");
 	return;
@@ -765,15 +805,31 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 
 	title(h,"OCCI MYSQL BUILDER START");
 
-	fprintf(h,"private struct occi_kind_node %s_kind_node =\n{\n",C.name);
-	fprintf(h,"\t(struct occi_kind_node *) 0,\n");
-	fprintf(h,"\t(struct occi_kind_node *) 0,\n");
-	fprintf(h,"\t(void *) 0,\n");
-	fprintf(h,"\t(struct occi_mixin *) 0,\n");
-	fprintf(h,"\t(struct occi_mixin *) 0,\n");
-	fprintf(h,"\t(struct occi_link *) 0,\n");
-	fprintf(h,"\t(struct occi_link *) 0\n");
-	fprintf(h,"};\n");
+	switch ( C.genrest )
+	{
+	case	_OCCI_LINK :
+		fprintf(h,"private struct occi_link_node %s_link_node =\n{\n",C.name);
+		fprintf(h,"\t(struct occi_link_node *) 0,\n");
+		fprintf(h,"\t(struct occi_link_node *) 0,\n");
+		fprintf(h,"\t(void *) 0,\n");
+		fprintf(h,"\t(char * ) 0,\n");
+		fprintf(h,"\t(char * ) 0\n");
+		fprintf(h,"};\n");
+		break;
+
+	case	_OCCI_KIND :
+		fprintf(h,"private struct occi_kind_node %s_kind_node =\n{\n",C.name);
+		fprintf(h,"\t(struct occi_kind_node *) 0,\n");
+		fprintf(h,"\t(struct occi_kind_node *) 0,\n");
+		fprintf(h,"\t(void *) 0,\n");
+		fprintf(h,"\t(struct occi_mixin *) 0,\n");
+		fprintf(h,"\t(struct occi_mixin *) 0,\n");
+		fprintf(h,"\t(struct occi_link *) 0,\n");
+		fprintf(h,"\t(struct occi_link *) 0\n");
+		fprintf(h,"};\n");
+		break;
+	}
+
 	fprintf(h,"\n#include <%s>\n","mysql/mysql.h");
 	fprintf(h,"#include %c%s%c\n",0x0022,"occisql.h",0x0022);
 
@@ -807,13 +863,13 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	switch ( C.genrest )
 	{
 	case	_OCCI_LINK :
-		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return(%s_sql_on_first(&%s_kind_node)); }\n",
+		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return(%s_sql_on_first(&%s_link_node)); }\n",
 			C.klass,C.klass,fullname,C.name);
-		fprintf(h,"public struct  occi_%s_node * occi_next_%s_node(struct occi_%s_node * nptr ) { return(%s_sql_on_next( &%s_kind_node)); }\n",
+		fprintf(h,"public struct  occi_%s_node * occi_next_%s_node(struct occi_%s_node * nptr ) { return(%s_sql_on_next( &%s_link_node)); }\n",
 			C.klass,C.klass,C.klass,fullname,C.name);
-		fprintf(h,"public struct  occi_%s_node * occi_previous_%s_node(struct occi_%s_node * nptr ) { return(%s_sql_on_previous( &%s_kind_node)); }\n",
+		fprintf(h,"public struct  occi_%s_node * occi_previous_%s_node(struct occi_%s_node * nptr ) { return(%s_sql_on_previous( &%s_link_node)); }\n",
 			C.klass,C.klass,C.klass,fullname,C.name);
-		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return(%s_sql_on_last( &%s_kind_node)); }\n",
+		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return(%s_sql_on_last( &%s_link_node)); }\n",
 			C.klass,C.klass,fullname,C.name);
 		break;
 	case	_OCCI_KIND :
