@@ -312,7 +312,7 @@ private	void	generate_occi_sql_on_field( FILE * h, char * nptr, char * fullname 
 			}
 			else
 			{
-				fprintf(h,"\t\tif (!(pptr->%s = allocate_string(vptr)))\n\t\t\treturn(0);\n",iptr->name);
+				fprintf(h,"\t\tif (!(pptr->%s = sql_unescaped_value(vptr)))\n\t\t\treturn(0);\n",iptr->name);
 				fprintf(h,"\t\telse\treturn(0);\n");
 			}
 			fprintf(h,"\t}\n");
@@ -504,7 +504,7 @@ private	void	generate_occi_sql_on_insert( FILE * h, char * nptr, char * fullname
 				fprintf(h,"\tsprintf(buffer,%c'%cs'%c,id);\n",0x0022,0x0025,0x0022);
 			else if (!( strcmp( iptr->basic, "int" ) ))
 			 	fprintf(h,"\tsprintf(buffer,%c'%cu'%c,pptr->%s);\n",0x0022,0x0025,0x0022,iptr->name);
-			else 	fprintf(h,"\tsprintf(buffer,%c'%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
+			else 	fprintf(h,"\tsprintf(buffer,%c'%cs'%c,(rest_valid_string(pptr->%s)?sql_escaped_value(pptr->%s):%c%c));\n",0x0022,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
 			fprintf(h,"\tif (!( xptr )) { if (!( xptr = allocate_string(buffer) )) return(27); else separator =','; }\n");
 			fprintf(h,"\telse if (!( wptr = allocate( strlen( xptr ) + strlen( buffer ) + 8 ) )) return( 27 );\n");
 			fprintf(h,"\telse { sprintf(wptr,%c%cs%cc%cs%c,xptr,separator,buffer); liberate( xptr ); xptr = wptr; separator = ','; }\n",0x0022,0x0025,0x0025,0x0025,0x0022);
@@ -575,7 +575,7 @@ private	void	generate_occi_sql_on_collect( FILE * h, char * nptr, char * fullnam
 			fprintf(h,"\tif (( fptr->%s != 0 ))\n\t{\n",iptr->name);
 			if (!( strcmp( iptr->basic, "int" ) ))
 			 	fprintf(h,"\t\tsprintf(buffer,%c_%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
-			else 	fprintf(h,"\t\tsprintf(buffer,%c_%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
+			else 	fprintf(h,"\t\tsprintf(buffer,%c_%s = '%cs'%c,(rest_valid_string(pptr->%s)?sql_escaped_filter(pptr->%s):%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
 			fprintf(h,"\t\tif (!( xptr ))\n\t\t{\n");
 			fprintf(h,"\t\t\tif (!( wptr = allocate( strlen(separator) + strlen(buffer) + 8 ) )) { return(27); }\n");
 			fprintf(h,"\t\t\telse\n\t\t\t{\n");
@@ -632,7 +632,7 @@ private	void	generate_occi_sql_on_update( FILE * h, char * nptr, char * fullname
 				fprintf(h,"\tsprintf(buffer,%cid = '%cs'%c,id);\n",0x0022,0x0025,0x0022);
 			else if (!( strcmp( iptr->basic, "int" ) ))
 			 	fprintf(h,"\tsprintf(buffer,%c_%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
-			else 	fprintf(h,"\tsprintf(buffer,%c_%s = '%cs'%c,(rest_valid_string(pptr->%s)?pptr->%s:%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
+			else 	fprintf(h,"\tsprintf(buffer,%c_%s = '%cs'%c,(rest_valid_string(pptr->%s)?sql_escaped_value(pptr->%s):%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
 			fprintf(h,"\tif (!( xptr )) { if (!( xptr = allocate_string(buffer) )) return(27); else separator =','; }\n");
 			fprintf(h,"\telse if (!( wptr = allocate( strlen( xptr ) + strlen( buffer ) + 8 ) )) return( 27 );\n");
 			fprintf(h,"\telse { sprintf(wptr,%c%cs%cc%cs%c,xptr,separator,buffer); liberate( xptr ); xptr = wptr; separator = ','; }\n",0x0022,0x0025,0x0025,0x0025,0x0022);

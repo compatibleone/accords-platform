@@ -687,6 +687,174 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 	else	return( occi_sql_record( tptr, expression ) );
 }
 
+/*	-------------------------------------------	*/
+/*	     s q l _ e s c a p e d _ v a l u e 		*/
+/*	-------------------------------------------	*/
+private	char	sql_escape_buffer[4096];
+public	char *	sql_escaped_value( char * sptr )
+{
+	char *	rptr;
+	char *	wptr;
+	int	c;
+	int	extra=0;
+	int	total=0;
+	for (	wptr=sptr;
+		*wptr != 0;
+		wptr++ )
+	{
+		switch ( *wptr )
+		{
+		case	'\t'	:
+		case	'\r'	:
+		case	'\n'	:
+		case	'"'	:
+		case	0x0027:
+		case	0x005C	:
+			extra++;
+		}
+		total++;
+	}
+	if (!( extra ))
+		return( sptr );
+	else if ((extra + total) > 4096 )
+		return( sptr );
+	else if (!( rptr = sql_escape_buffer ))
+		return( sptr );
+	else
+	{
+		wptr = rptr;
+		while ((c = *(sptr++)) != 0)
+		{
+			switch ( c )
+			{
+			case	'\t'	:
+				*(wptr++) = 0x005C;
+				*(wptr++) = 't';
+				break;
+			case	'\r'	:
+				*(wptr++) = 0x005C;
+				*(wptr++) = 'n';
+				break;
+			case	'\n'	:
+				*(wptr++) = 0x005C;
+				*(wptr++) = 'n';
+				break;
+			case	'"'	:
+			case	0x0027	:	/* ' */
+			case	0x005C	:	/* \ */
+				*(wptr++) = 0x005C;
+				*(wptr++) = c;
+			}
+		}
+		*(wptr++) = 0;
+		return( rptr );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	   s q l _ u n e s c a p e d _ v a l u e 	*/
+/*	-------------------------------------------	*/
+public	char *	sql_unescaped_value( char * sptr )
+{
+	int	c;
+	char * rptr;
+	char * wptr;
+	if (!( sptr ))
+		return( sptr );
+	else if (!( rptr = allocate_string( sptr ) ))
+		return( rptr );
+	else
+	{
+		wptr = rptr;
+		while ((c = *(sptr++)) != 0)
+		{
+			if ( c == 0x005C )
+			{
+				switch ((c = *(sptr++)))
+				{
+				case	't'	:
+					c = '\t';
+					break;
+				case	'n'	:
+					c = '\n';
+					break;
+				case	'r'	:
+					c = '\r';
+					break;
+				}
+			}
+			*(wptr++) = c;
+		}
+		return( rptr );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	     s q l _ e s c a p e d _ f i l t e r	*/
+/*	-------------------------------------------	*/
+public	char *	sql_escaped_filter( char * sptr )
+{
+	char *	rptr;
+	char *	wptr;
+	int	c;
+	int	extra=0;
+	int	total=0;
+	for (	wptr=sptr;
+		*wptr != 0;
+		wptr++ )
+	{
+		switch ( *wptr )
+		{
+		case	'\t'	:
+		case	'\r'	:
+		case	'\n'	:
+		case	'"'	:
+		case	'_'	:
+		case	0x0025	:
+		case	0x0027	:
+		case	0x005C	:
+			extra++;
+		}
+		total++;
+	}
+	if (!( extra ))
+		return( sptr );
+	else if ((extra + total) > 4096 )
+		return( sptr );
+	else if (!( rptr = sql_escape_buffer ))
+		return( sptr );
+	else
+	{
+		wptr = rptr;
+		while ((c = *(sptr++)) != 0)
+		{
+			switch ( c )
+			{
+			case	'\t'	:
+				*(wptr++) = 0x005C;
+				*(wptr++) = 't';
+				break;
+			case	'\r'	:
+				*(wptr++) = 0x005C;
+				*(wptr++) = 'n';
+				break;
+			case	'\n'	:
+				*(wptr++) = 0x005C;
+				*(wptr++) = 'n';
+				break;
+			case	'"'	:
+			case	0x0027	:	/* ' */
+			case	0x0025	:	/* % */
+			case	'_'	:
+			case	0x005C	:	/* \ */
+				*(wptr++) = 0x005C;
+				*(wptr++) = c;
+			}
+		}
+		*(wptr++) = 0;
+		return( rptr );
+	}
+}
 
 	/* ----------- */
 #endif	/* _occi_sql_c */
