@@ -777,6 +777,9 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\n#include <%s>\n","mysql/mysql.h");
 	fprintf(h,"#include %c%s%c\n",0x0022,"occisql.h",0x0022);
 
+	title(h,"allocation prototypes");
+	fprintf(h,"public struct %s * allocate_%s();\n",C.name,C.name);
+	fprintf(h,"public struct %s * liberate_%s(struct %s * pptr);\n",C.name,C.name,C.name);
 
 	sprintf(fullname,"%s_%s",nptr,C.name);
 
