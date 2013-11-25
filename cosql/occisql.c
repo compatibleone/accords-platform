@@ -474,9 +474,9 @@ public	int	first_occi_sql_record( char * category,  struct occi_expression *expr
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if (!( expression->value = allocate( strlen( tptr->name ) + strlen( _SELECT_MIN_ID_FROM ) + 16 ) ))
+	else if (!( expression->value = allocate( strlen( tptr->name ) + strlen( _SELECT_ID_FROM ) + strlen( _ORDER_BY_ID_FIRST ) + 16 ) ))
 		return( 27 );
-	else	sprintf(expression->value,"%s %s",_SELECT_MIN_ID_FROM,tptr->name);
+	else	sprintf(expression->value,"%s %s %s",_SELECT_ID_FROM,tptr->name,_ORDER_BY_ID_FIRST);
 
 	debug_sql_query( tptr, expression->value );
 
@@ -678,9 +678,10 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if (!( expression->value = allocate( strlen( tptr->name ) + strlen( _SELECT_MIN_ID_FROM ) + 16 ) ))
+	else if (!( expression->value = allocate( strlen( tptr->name ) + strlen( _SELECT_ID_FROM ) + strlen( _ORDER_BY_ID_LAST ) + 16 ) ))
 		return( 27 );
-	else	sprintf(expression->value,"%s %s",_SELECT_MAX_ID_FROM,tptr->name);
+	else	sprintf(expression->value,"%s %s %s",_SELECT_ID_FROM,tptr->name,_ORDER_BY_ID_LAST);
+
 	debug_sql_query( tptr, expression->value );
 	if ( mysql_query( tptr->handle, expression->value ) != 0)
 		return( occi_sql_failure( tptr, 48 ) );
