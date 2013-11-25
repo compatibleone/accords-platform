@@ -304,7 +304,7 @@ private	void	generate_occi_sql_on_field( FILE * h, char * nptr, char * fullname 
 			continue;
 		else
 		{
-			fprintf(h,"\telse if (!( strcmp(nptr,%c%s%c) ))\n\t{\n",0x0022,iptr->name,0x0022);
+			fprintf(h,"\telse if (!( strcmp(nptr,%c_%s%c) ))\n\t{\n",0x0022,iptr->name,0x0022);
 			if (!( strcmp( iptr->basic, "int" ) ))
 			{
 				fprintf(h,"\t\tpptr->%s = atoi(vptr);\n",iptr->name);
