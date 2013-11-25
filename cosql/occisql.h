@@ -19,9 +19,7 @@
 #ifndef	_occi_sql_h
 #define	_occi_sql_h
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "standard.h"
 
 #define	OCCI_MYSQL 
 
