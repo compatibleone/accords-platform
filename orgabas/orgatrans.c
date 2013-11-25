@@ -19,7 +19,7 @@
 	        char *  id;
 	        char *  description;
 	        char *  reference;
-	        int     when;
+	        int     stamp;
 	        int     validity;
 	        char *  source;
 	        int     state;

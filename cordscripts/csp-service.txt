@@ -23,7 +23,7 @@
 		{	$m = $m#"<td>Deployed since";		}
 		else
 		{	$m = $m#"<td>&nbsp;";		}
-		$n = $contract["occi.contract.when"];
+		$n = $contract["occi.contract.stamp"];
 		$n = $n.date();
 		$m = $m#"<td>"#$kool#"<td>"#$n;
 		$m.display();
@@ -131,7 +131,7 @@
 		$m = "<td colspan=2><b>Expires</b><td>"#$value;
 		$m.display();
 		"<tr><td colspan=4>&nbsp;".display();
-		$value = $record["occi.service.when"];
+		$value = $record["occi.service.stamp"];
 		$value = $value.date(); 
 		$state = $record["occi.service.state"];
 		switch ( $state )

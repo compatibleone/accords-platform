@@ -57,7 +57,7 @@
 			{
 				$transaction = $v.get();
 				$source = $transaction["occi.transaction.source"];
-				$stamp  = $transaction["occi.transaction.when"];
+				$stamp  = $transaction["occi.transaction.stamp"];
 				$when   = $stamp.date();
 				$desc   = $transaction["occi.transaction.description"];
 				$action = $desc / "=";

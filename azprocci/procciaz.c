@@ -406,7 +406,7 @@ private	int	connect_windowsazure_server(
 	{
 		uptr = liberate_url( uptr );
 		zptr = liberate_az_response( zptr );
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
 		autosave_windowsazure_nodes();
 		return(0);
@@ -1016,7 +1016,7 @@ private	struct	rest_response * stop_windowsazure(
 	{
 		stop_windowsazure_provisioning( pptr );
 		reset_windowsazure_server( pptr );
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		autosave_windowsazure_nodes();
 		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
@@ -1058,7 +1058,7 @@ private	struct	rest_response * restart_windowsazure(
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
 		{
-			pptr->when = time((long *) 0);
+			pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_RUNNING;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
@@ -1095,7 +1095,7 @@ private	struct	rest_response * suspend_windowsazure(
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
-			pptr->when = time((long *) 0);
+			pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_SUSPENDED;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );

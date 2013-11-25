@@ -26,7 +26,7 @@
 	        <attribute name='group' type='string' required='false' immutable='false'/>
 	        <attribute name='zone' type='string' required='false' immutable='false'/>
 	        <attribute name='hostname' type='string' required='false' immutable='false'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
@@ -35,4 +35,3 @@
 	</category>
 	<!-- End of "missing" categories. -->
 </model>
-</schema>

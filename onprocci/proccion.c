@@ -303,7 +303,7 @@ private	int	connect_opennebula_server( struct on_subscription * subptr, struct o
 		/* ------------------------------------------------- */
 		/* The instance is ready for use ( or more or less ) */
 		/* ------------------------------------------------- */
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
 		autosave_opennebula_nodes();
 		return(0);
@@ -767,7 +767,7 @@ private	struct	rest_response * stop_opennebula(
 	else
 	{
 		reset_opennebula_server( pptr );
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		onptr = liberate_on_response( onptr );
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))

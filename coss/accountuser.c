@@ -36,7 +36,7 @@ private	struct	rest_response * login_user(
 		if ( pptr->state == _OCCI_IDLE )
 		{
 			/* cords_invoke_action( pptr->provider, "save", _CORDS_CONTRACT_AGENT ); */
-			pptr->when  = time((long*) 0);
+			pptr->stamp  = time((long*) 0);
 			pptr->state = _OCCI_ACTIVE;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
@@ -61,7 +61,7 @@ private	struct	rest_response * logout_user(
 		if ( pptr->state != _OCCI_IDLE )
 		{
 			/* cords_invoke_action( pptr->provider, "save", _CORDS_CONTRACT_AGENT ); */
-			pptr->when  = time((long*) 0);
+			pptr->stamp  = time((long*) 0);
 			pptr->state = _OCCI_IDLE;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );

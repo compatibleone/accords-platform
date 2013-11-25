@@ -204,7 +204,7 @@
 	        <attribute name='workload' type='string' required='false' immutable='false'/>
 	        <attribute name='blob' type='string' required='false' immutable='false'/>
 	        <attribute name='agent' type='string' required='false' immutable='false'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
@@ -215,4 +215,3 @@
 	    </actions>
 	</category>
 </model>
-</schema>

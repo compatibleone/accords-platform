@@ -469,7 +469,7 @@ private	void	invoice_document_transaction(
 	/* ---------------------- */
 	/* transaction date field */
 	/* ---------------------- */
-	if (( vptr = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"when")))
+	if (( vptr = occi_extract_atribut( yptr, "occi", _CORDS_TRANSACTION,"stamp")))
 	{
 		if (!( dptr = transaction_date_and_time( atoi( vptr ) ) ))
 			fprintf(h,"%s",vptr);
@@ -765,7 +765,7 @@ private	int	create_transaction(struct occi_category * optr, void * vptr,struct r
 		return( 0 ); 
 	else
 	{
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		return( 0 );
 	}
 }

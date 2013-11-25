@@ -490,7 +490,7 @@ private	struct	rest_response * start_occi_openstack(
 		/* ------------------------------------------------------- */
 		/* indicate that the machine is running and set start time */
 		/* ------------------------------------------------------- */
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
 		status = 0;
 		if (!( status ))
@@ -616,7 +616,7 @@ private	struct	rest_response * stop_occi_openstack(
 		else	qptr = liberate_rest_response( qptr );
 
 		pptr->state = _OCCI_IDLE;
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		sprintf(reference,"%s/%s/%s",OsOcciProcci.identity,_CORDS_OPENSTACK,pptr->id);
 
 		if (!( rest_valid_string( pptr->price ) ))

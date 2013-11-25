@@ -662,7 +662,7 @@ private	int	connect_openstack_server(
 		/* ------------------------------------------------- */
 		/* The instance is ready for use ( or more or less ) */
 		/* ------------------------------------------------- */
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
 		if ( check_debug() )
 		{
@@ -1784,7 +1784,7 @@ private	struct	rest_response * stop_openstack(
 	{
 		osptr = liberate_os_response( osptr );
 		reset_openstack_server( pptr );
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -1815,7 +1815,7 @@ private	struct	rest_response * restart_openstack(
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
 		{
-			pptr->when = time((long *) 0);
+			pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_RUNNING;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
@@ -1842,7 +1842,7 @@ private	struct	rest_response * suspend_openstack(
 	{
 		if ( pptr->state == _OCCI_RUNNING )
 		{
-			pptr->when = time((long *) 0);
+			pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_SUSPENDED;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );

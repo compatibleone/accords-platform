@@ -70,7 +70,7 @@ class	pricecalculator
 		$priceid  = $transaction["occi.transaction.price"];
 		$reference = $transaction["occi.transaction.reference"];
 		$description = $transaction["occi.transaction.description"];
-		$timestamp = $transaction["occi.transaction.when"];
+		$timestamp = $transaction["occi.transaction.stamp"];
 		$datestring = $timestamp.date();
 		$source = $transaction["occi.transaction.source"];
 	}

@@ -41,7 +41,7 @@
 				$pid  = $transaction["occi.transaction.price"];
 				$pref = $transaction["occi.transaction.reference"];
 				$pdsc = $transaction["occi.transaction.description"];
-				$pwhn = $transaction["occi.transaction.when"];
+				$pwhn = $transaction["occi.transaction.stamp"];
 				$pdat = $pwhn.date();
 				$psrc = $transaction["occi.transaction.source"];
 				/* ------------------------------------------- */

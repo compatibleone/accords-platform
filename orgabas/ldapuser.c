@@ -453,7 +453,7 @@ private	struct rest_response * occi_ldap_user_response(
 	sprintf(cptr->buffer,"%s.%s.password=%c%s%c",optr->domain,optr->id,0x0022,uptr->password,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
-	sprintf(cptr->buffer,"%s.%s.when=%c%u%c",optr->domain,optr->id,0x0022,uptr->when,0x0022);
+	sprintf(cptr->buffer,"%s.%s.stamp=%c%u%c",optr->domain,optr->id,0x0022,uptr->stamp,0x0022);
 	if (!( hptr = rest_response_header( aptr, "X-OCCI-Attribute",cptr->buffer) ))
 		return( rest_html_response( aptr, 500, "Server Failure" ) );
 	sprintf(cptr->buffer,"%s.%s.state=%c%u%c",optr->domain,optr->id,0x0022,uptr->state,0x0022);
@@ -740,7 +740,7 @@ private	struct	occi_category * occi_ldap_user_builder( char * domain, char * cat
 		redirect_occi_ldap_user_mt( optr->interface );
 		if (!( optr = occi_add_attribute(optr, "name",0,0) ))
 			return(optr);
-		else if (!( optr = occi_add_attribute(optr, "when",0,0) ))
+		else if (!( optr = occi_add_attribute(optr, "stamp",0,0) ))
 			return(optr);
 		else if (!( optr = occi_add_attribute(optr, "state",0,0) ))
 			return(optr);

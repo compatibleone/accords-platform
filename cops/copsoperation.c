@@ -612,7 +612,7 @@ private	struct	cops_solution *	build_cops_quantities( struct cords_placement * p
 		/* the timestamp when occured    */
 		/* ----------------------------- */
 		sprintf(value,"%u",time((long *) 0));
-		if (!( eptr = occi_create_element( "occi.quantity.when", value ) ))
+		if (!( eptr = occi_create_element( "occi.quantity.stamp", value ) ))
 			return( build_cops_failure( pptr,sptr ) );
 		else
 		{

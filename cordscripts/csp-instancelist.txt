@@ -15,7 +15,7 @@ function InstanceList( $selection )
 		$m    = $service["occi.service.manifest"];
 		$ml   = $m.get();
 		$man  = $ml["occi.manifest.name"];
-		$w    = $service["occi.service.when"];
+		$w    = $service["occi.service.stamp"];
 		$when = $w.date();
 		$state = $service["occi.service.state"];
 		$sm = "<tr><td><img src=images/bluecloud.png>"#$id;

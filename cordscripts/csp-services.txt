@@ -73,7 +73,7 @@
 			$cname=$record["occi.contract.name"];
 
 			$chost=$record["occi.contract.hostname"];
-			$ctime=$record["occi.contract.when"];
+			$ctime=$record["occi.contract.stamp"];
 			$cnode=$record["occi.contract.node"];
 			$cdate=$ctime.date();
 			$cprov=$record["occi.contract.profile"];

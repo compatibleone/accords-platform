@@ -220,7 +220,7 @@ private	struct	rest_response * suspend_publication(
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
 	{
-		pptr->when = 0;
+		pptr->stamp = 0;
 		pptr->state = _OCCI_SUSPENDED;
 		autosave_cords_publication_nodes("publication.xml");
 	  	return( rest_html_response( aptr, 200, "OK" ) );
@@ -243,7 +243,7 @@ private	struct	rest_response * restart_publication(
 	else
 	{
 		pptr->uptime = 0;
-		pptr->when = time((long*) 0);
+		pptr->stamp = time((long*) 0);
 		pptr->state = _OCCI_RUNNING;
 		autosave_cords_publication_nodes("publication.xml");
 	  	return( rest_html_response( aptr, 200, "OK" ) );
@@ -487,7 +487,7 @@ private	int	create_publication(struct occi_category * optr, void * vptr,struct r
 		return(0);
 	else
 	{
-		pptr->when  = time((long *) 0);
+		pptr->stamp  = time((long *) 0);
 		pptr->uptime = 0;
 		pptr->state  = _OCCI_RUNNING;
 		return( master_create_publication( pptr ) );
@@ -530,7 +530,7 @@ private	int	retrieve_publication(struct occi_category * optr, void * vptr,struct
 	else if (!( pptr = nptr->contents ))
 		return(0);
 	{
-		pptr->uptime = (time((long*) 0) - pptr->when);
+		pptr->uptime = (time((long*) 0) - pptr->stamp);
 		return( master_retrieve_publication( pptr ) );
 	}
 }
@@ -576,7 +576,7 @@ private	int	update_publication(struct occi_category * optr, void * vptr,struct r
 		return(0);
 	else
 	{
-		pptr->uptime = (time((long*) 0) - pptr->when);
+		pptr->uptime = (time((long*) 0) - pptr->stamp);
 		return( master_update_publication( pptr ) );
 	}
 }

@@ -8,7 +8,7 @@
 	        <attribute name='what' type='string' required='false' immutable='false'/>
 	        <attribute name='region' type='string' required='false' immutable='false'/>
 	        <attribute name='why' type='string' required='false' immutable='false'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <attribute name='uptime' type='int' required='false' immutable='false'/>
 	        <attribute name='who' type='string' required='false' immutable='false'/>
 	        <attribute name='pass' type='string' required='false' immutable='false'/>
@@ -96,7 +96,7 @@
 	        <!-- It is assumed this references an account. From looking at a live system it is not clear if it does? -->
 	        <instance name='account' category='http://scheme.compatibleone.fr/scheme/compatible#account' multiplicity='[0..1]'/>
 	        <instance name='authorization' category='http://scheme.compatibleone.fr/scheme/compatible#account' multiplicity='[0..1]'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
@@ -266,7 +266,7 @@
 	        <instance name='quota' category='http://scheme.compatibleone.fr/scheme/compatible#quota' multiplicity='[0..1]'/>
 	        <attribute name='property' type='string' required='false' immutable='false'/>
 	        <attribute name='value' type='string' required='false' immutable='false'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
@@ -490,7 +490,7 @@
 	        <!-- This is a collection of sorts - how should it be handled? -->
 	        <attribute name='reference' type='string' required='false' immutable='false'/>
 	        <instance name='price' category='http://scheme.compatibleone.fr/scheme/compatible#price' multiplicity='[0..1]'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <attribute name='validity' type='int' required='false' immutable='false'/>
 	        <attribute name='type' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
@@ -686,7 +686,7 @@
 	        <instance name='session' category='http://scheme.compatibleone.fr/scheme/compatible#session' multiplicity='[0..1]'/>
 	        <attribute name='initiation' type='string' required='false' immutable='false'/>
 	        <attribute name='expiration' type='string' required='false' immutable='false'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <collection name='instructions' category='http://scheme.compatibleone.fr/scheme/compatible#instruction' multiplicity='[0..*]'/>
 	        <collection name='contracts' category='http://scheme.compatibleone.fr/scheme/compatible#contract' multiplicity='[0..*]'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
@@ -771,7 +771,7 @@
 	        <collection name='instructions' category='http://scheme.compatibleone.fr/scheme/compatible#instruction' multiplicity='[0..*]'/>
 	        <!-- Is this in fact a many-many relationship between client instances and contracts? -->
 	        <attribute name='commons' type='int' required='false' immutable='false'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
@@ -1452,7 +1452,7 @@
 	        <attribute name='keyfile' type='string' required='false' immutable='false'/>
 	        <attribute name='agent' type='string' required='false' immutable='false'/>
 	        <attribute name='agentstatus' type='int' required='false' immutable='false'/>
-	        <attribute name='when' type='int' required='false' immutable='false'/>
+	        <attribute name='stamp' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
