@@ -932,15 +932,21 @@ private	int	cords_parser_operation( char * filename )
 
 	set_xml_echo(echo);
 
-	if (!( auth = login_occi_user( "test-parser",Command.password,agent, default_tls() ) ))
-		return(403);
-	else 	(void) occi_client_authentication( auth );
+	if (!( noauth ))
+	{
+		if (!( auth = login_occi_user( "test-parser",Command.password,agent, default_tls() ) ))
+			return(403);
+		else 	(void) occi_client_authentication( auth );
+	}
 
 	if ( Cp.result ) { Cp.result = liberate( Cp.result ); }
 
 	status = ll_cords_parser_operation( filename, Cp.agent, &Cp.result, Cp.xsd );
 
-	(void) logout_occi_user( "test-parser",Command.password,agent, auth, default_tls() );	
+	if (!( noauth ))
+	{
+		(void) logout_occi_user( "test-parser",Command.password,agent, auth, default_tls() );	
+	}
 
 	return( status );
 }
