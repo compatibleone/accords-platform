@@ -827,14 +827,6 @@ private	int	publisher_operation( char * nptr )
 	optr->callback  = &publication_interface;
 	optr->access |= (_OCCI_NO_PRICING | _OCCI_NO_AUTHORIZE);
 
-	if (!( optr = occi_cords_import_builder( Publisher.domain, _CORDS_IMPORT ) ))
-		return( 27 );
-	else if (!( optr->previous = last ))
-		first = optr;
-	else	optr->previous->next = optr;
-	optr->access |= (_OCCI_NO_PRICING | _OCCI_NO_AUTHORIZE);
-	last = optr;
-
 	if (!( optr = occi_add_action( optr,"suspend","",suspend_publication)))
 		return( 27 );
 	else if (!( optr = occi_add_action( optr,"restart","",restart_publication)))

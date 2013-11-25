@@ -158,6 +158,14 @@ private	int	coss_operation( char * nptr )
 	optr->callback  = (void *) 0;
 	optr->access |= _OCCI_NO_PRICING;
 
+	if (!( optr = occi_cords_import_builder( Coss.domain, "import" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	optr->access |= (_OCCI_NO_PRICING | _OCCI_NO_AUTHORIZE);
+	last = optr;
+
 	if (!( optr = account_user_builder( Coss.domain, "user" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
