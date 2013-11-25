@@ -215,7 +215,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	for (	pptr->contracts=0,
 		nptr=occi_first_link_node();
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_link_node(nptr) )
 	{
 		if (!( lptr = nptr->contents ))
 			continue;
@@ -775,7 +775,7 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 	buffer[0] = 0;
 	for (	nptr=occi_first_link_node();
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_link_node(nptr) )
 	{
 		if (!( lptr = nptr->contents ))
 			continue;

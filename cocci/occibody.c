@@ -617,7 +617,7 @@ public	char *	occi_html_body(
 			fprintf(h,"<tr><th>Links</th><td><div align=center><table>\n");
 			for (	nptr=occi_first_link_node();
 				nptr != (struct occi_link_node *) 0;
-				nptr = nptr->next )
+				nptr = occi_next_link_node(nptr) )
 			{
 				if (!( lptr = nptr->contents ))
 					continue;

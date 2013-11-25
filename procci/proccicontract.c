@@ -1091,7 +1091,7 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	/* ----------------------------------------------------- */
 	for (	nptr=occi_first_link_node(); 
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_link_node(nptr) )
 	{
 		if (!( lptr = nptr->contents ))
 			continue;

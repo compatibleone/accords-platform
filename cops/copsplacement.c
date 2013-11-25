@@ -330,7 +330,7 @@ private	int	invoke_placement_action( struct cords_placement * pptr, char * actio
 
 	for (	nptr=occi_first_link_node();
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_link_node(nptr) )
 	{
 		if (!( lptr = nptr->contents ))
 			continue;
@@ -523,7 +523,7 @@ private	int	delete_placement_quantities( struct cords_placement * pptr )
 	buffer[0] = 0;
 	for (	nptr=occi_first_link_node();
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_link_node(nptr) )
 	{
 		if (!( lptr = nptr->contents ))
 			continue;

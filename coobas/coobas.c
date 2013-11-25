@@ -922,7 +922,7 @@ private	int	close_invoice_transactions( struct cords_invoice * pptr )
     /* ----------------------------------------------------- */
     for (	nptr=occi_first_link_node();
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_link_node(nptr) )
     {
 	if (!( lptr = nptr->contents ))
 	    continue;

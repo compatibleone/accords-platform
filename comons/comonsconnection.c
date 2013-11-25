@@ -103,7 +103,7 @@ private	int	connection_worker( struct cords_connection * pptr )
 	{
 		for (	nptr=occi_first_link_node();
 			nptr != (struct occi_link_node *) 0;
-			nptr = nptr->next )
+			nptr = occi_next_link_node(nptr) )
 		{
 			if (!( lptr = nptr->contents ))
 				continue;
@@ -237,7 +237,7 @@ private	struct rest_response * start_connection(
 		for (	pptr->probes=0,
 			nptr=occi_first_link_node();
 			nptr != (struct occi_link_node *) 0;
-			nptr = nptr->next )
+			nptr = occi_next_link_node(nptr) )
 		{
 			if (!( lptr = nptr->contents ))
 				continue;
