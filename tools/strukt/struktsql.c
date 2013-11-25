@@ -673,7 +673,7 @@ private	void	generate_occi_sql_on_first( FILE * h, char * nptr, char * fullname 
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
 	fprintf(h,"\tif (!( nptr )) return( nptr );\n");
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents )) return( nptr );\n\t{\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name);
+	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name,C.name);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tif ((status = first_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
@@ -695,7 +695,7 @@ private	void	generate_occi_sql_on_previous( FILE * h, char * nptr, char * fullna
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
 	fprintf(h,"\tif (!( nptr )) return( nptr );\n");
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents )) return( nptr );\n\t{\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name);
+	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name,C.name);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE id < '%cs'%c,pptr->id);\n",0x0022,0x0025,0x0022);
@@ -719,7 +719,7 @@ private	void	generate_occi_sql_on_next( FILE * h, char * nptr, char * fullname )
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
 	fprintf(h,"\tif (!( nptr )) return( nptr );\n");
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents )) return( nptr );\n\t{\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name);
+	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name,C.name);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE id > '%cs'%c,pptr->id);\n",0x0022,0x0025,0x0022);
@@ -742,7 +742,7 @@ private	void	generate_occi_sql_on_last( FILE * h, char * nptr, char * fullname )
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
 	fprintf(h,"\tif (!( nptr )) return( nptr );\n");
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents )) return( nptr );\n\t{\n",C.name);
-	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name);
+	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() )) return((struct occi_kind_node *) 0 );\n",C.name,C.name);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tif ((status = last_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
