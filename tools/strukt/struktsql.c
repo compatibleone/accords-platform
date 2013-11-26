@@ -1212,7 +1212,16 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\telse\tpptr->id = id;\n");
 
 	/* invoke overloaded method */
-	fprintf(h,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,&node,rptr);\n");
+	fprintf(h,"\tif (( iptr ) && (iptr->create))\n");
+	fprintf(h,"\t{\n");
+	fprintf(h,"\t\tif ((status = (*iptr->create)(optr,&node,rptr)) != 0)\n");
+	fprintf(h,"\t\t{\n");
+	fprintf(h,"\t\t\t(void) %s_sql_on_delete(id);\n",fullname);
+	fprintf(h,"\t\t\treturn( rest_html_response( aptr, 500+status, %cSQL Create Failure %c) );\n",0x0022,0x0022);
+	fprintf(h,"\t\t}\n");
+	fprintf(h,"\t\telse if ((status = %s_sql_on_update(id, pptr)) != 0)\n",fullname);
+	fprintf(h,"\t\t\treturn( rest_html_response( aptr, 500+status, %cSQL Create-Update Failure %c) );\n",0x0022,0x0022);
+	fprintf(h,"\t}\n");
 
 	/* prepare the result location */
 	fprintf(h,"\tprepare_%s_location(cptr->buffer,reqhost,reqport,optr->location, id);\n",C.name);
