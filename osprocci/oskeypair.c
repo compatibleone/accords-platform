@@ -204,8 +204,9 @@ public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openst
 					return( 1127 );
 				else if (!( pptr->keyfile = allocate_string( pathname ) ))
 					return( 1127 );
+				else
 				{
-					autosave_openstack_nodes();
+					autosave_openstack_node(pptr);
 					return( 0 );
 				}
 			}
@@ -270,7 +271,7 @@ public	int	resolve_contract_keypair(struct os_subscription * sptr, struct openst
 			/* set ultra restrictive permissions */
 			/* --------------------------------- */
 			chmod(pptr->keyfile,0400);
-			autosave_openstack_nodes();
+			autosave_openstack_node(pptr);
 			return( 0 );
 		}
 	}
