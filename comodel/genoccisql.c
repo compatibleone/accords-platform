@@ -591,8 +591,63 @@ private	void	generate_occi_sql_on_collect( FILE * h, char * nptr, char * fullnam
 		}
 	}
 	
-	fprintf(h,"\tif ((xptr != (char *) 0) && (!( expression.value = allocate_string(xptr)))) { return( 27 ); }\n");
+	fprintf(h,"\tif ((xptr != (char *) 0) && (!( expression.value = xptr ))) { return( 27 ); }\n");
 	fprintf(h,"\treturn(collect_occi_sql_records(%c%s%c,&expression));\n",0x0022,C.name,0x0022);
+	fprintf(h,"}\n");
+	return;
+}
+
+private	void	generate_occi_sql_on_delete_list( FILE * h, char * nptr, char * fullname )
+{
+	struct	item * iptr;
+	int	items=0;
+	title(h,"sql on delete record");
+	fprintf(h,"\nprivate int %s_sql_on_delete_list(struct %s_occi_filter * fptr)\n{\n",fullname,C.name);
+	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0, (void *) 0};\n");
+	fprintf(h,"\tchar buffer[2048];\n");
+	fprintf(h,"\tstruct %s * pptr=(struct %s*) 0;\n",C.name,C.name);
+	fprintf(h,"\tchar * xptr=(char *) 0;\n");
+	fprintf(h,"\tchar * wptr=(char *) 0;\n");
+	fprintf(h,"\tchar * separator=\"WHERE\";\n");
+
+	fprintf(h,"\tif (!( pptr = fptr->attributes )) return( 118 );\n");
+
+	for ( 	iptr= C.first;
+		iptr != (struct item *) 0;
+		iptr = iptr->next )
+	{
+		if (!( strcmp( iptr->name, "previous" ) ))
+			continue;
+		else if (!( strcmp( iptr->name, "next" ) ))
+			continue;
+		else if (!( strcmp( iptr->name, "parent" ) ))
+			continue;
+		else if (!( strcmp( iptr->name, "id" ) ))
+			continue;
+		else if (!( strncmp( iptr->name, "first", strlen("first") ) ))
+			continue;
+		else if (!( strncmp( iptr->name, "last", strlen("last") ) ))
+			continue;
+		else
+		{
+			fprintf(h,"\tif (( fptr->%s != 0 ))\n\t{\n",iptr->name);
+			if (!( strcmp( iptr->basic, "int" ) ))
+			 	fprintf(h,"\t\tsprintf(buffer,%c_%s = '%cu'%c,pptr->%s);\n",0x0022,iptr->name,0x0025,0x0022,iptr->name);
+			else 	fprintf(h,"\t\tsprintf(buffer,%c_%s = '%cs'%c,(rest_valid_string(pptr->%s)?sql_escaped_filter(pptr->%s):%c%c));\n",0x0022,iptr->name,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
+			fprintf(h,"\t\tif (!( xptr ))\n\t\t{\n");
+			fprintf(h,"\t\t\tif (!( wptr = allocate( strlen(separator) + strlen(buffer) + 8 ) )) { return(27); }\n");
+			fprintf(h,"\t\t\telse\n\t\t\t{\n");
+			fprintf(h,"\t\t\t\tsprintf(wptr,\"%cs \%cs\",separator,buffer);\n",0x0025,0x0025);
+			fprintf(h,"\t\t\t\tliberate( xptr ); xptr = wptr; separator = \" AND \";\n");
+			fprintf(h,"\t\t\t}\n\t\t}\n");
+			fprintf(h,"\t\telse if (!( wptr = allocate( strlen( xptr ) + strlen( buffer ) + 8 ) )) return( 27 );\n");
+			fprintf(h,"\t\telse { sprintf(wptr,%c%cs%cs%cs%c,xptr,separator,buffer); liberate( xptr ); xptr = wptr; separator = \" AND \"; }\n",0x0022,0x0025,0x0025,0x0025,0x0022);
+			fprintf(h,"\t}\n");
+			items++;
+		}
+	}
+	fprintf(h,"\tif (!( expression.value = xptr )) return( 27 );\n");
+	fprintf(h,"\treturn(delete_occi_sql_record(%c%s%c,&expression));\n",0x0022,C.name,0x0022);
 	fprintf(h,"}\n");
 	return;
 }
@@ -651,6 +706,7 @@ private	void	generate_occi_sql_on_update( FILE * h, char * nptr, char * fullname
 	fprintf(h,"}\n");
 	return;
 }
+
 private	void	generate_occi_sql_on_delete( FILE * h, char * nptr, char * fullname )
 {
 	struct	item * iptr;
@@ -864,6 +920,7 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	generate_occi_sql_on_collect(h, nptr, fullname );
 	generate_occi_sql_on_update(h, nptr, fullname );
 	generate_occi_sql_on_delete(h, nptr, fullname );
+	generate_occi_sql_on_delete_list(h, nptr, fullname );
 	generate_occi_sql_on_first(h, nptr, fullname );
 	generate_occi_sql_on_last(h, nptr, fullname );
 	generate_occi_sql_on_previous(h, nptr, fullname );
@@ -1335,10 +1392,25 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"private struct rest_response * %s_delete_all(",C.name);
 	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr)\n");
 	fprintf(h,"{\n");
-	fprintf(h,"\tstruct %s * pptr=(struct %s *) 0;\n",C.name,C.name);
-	fprintf(h,"\tif (!(pptr = %s_collector(optr,cptr,rptr,aptr,pptr)))\n",C.name);
-	fprintf(h,"\t\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
-	fprintf(h,"\treturn( rest_html_response( aptr, 400, %cBad Request%c) );\n",0x0022,0x0022);
+	fprintf(h,"\tint\tstatus=0;\n");
+	fprintf(h,"\tstruct %s_occi_filter filter;\n",C.name);
+
+	/* collect the selection criteria filter */
+	fprintf(h,"\tif (!( filter_%s_info(&filter, optr, rptr, aptr ) ))\n",C.name);
+	fprintf(h,"\t\treturn( rest_html_response( aptr, 400, %cBad Request%c ) );\n",
+		0x0022,0x0022);
+
+	/* delete records from the table */
+	fprintf(h,"\tstatus = %s_sql_on_delete_list(&filter);\n",fullname);
+	fprintf(h,"\tliberate_%s(filter.attributes);\n", C.name);
+	fprintf(h,"\tif ( status != 0 )\n");
+	fprintf(h,"\t\treturn( rest_html_response( aptr, 404, %cNOT FOUND%c) );\n",0x0022,0x0022);
+
+	/* check for success and return */
+	fprintf(h,"\telse if (!( occi_success( aptr ) ))\n");
+	fprintf(h,"\t\treturn( rest_response_status( aptr, 500, %cServer OCCI Failure%c ) );\n",0x0022,0x0022);
+	fprintf(h,"\telse\treturn( rest_response_status( aptr, 200, %cOK%c ) );\n",0x0022,0x0022);
+
 	fprintf(h,"}\n");
 
 	/* -------------------- */
