@@ -1101,7 +1101,7 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\tif (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,&node,rptr);\n");
 
 	/* prepare the response header */
-	fprintf(h,"\telse\treturn(%s_occi_response(optr, cptr, rptr, aptr, pptr) );\n",C.name);
+	fprintf(h,"\treturn(%s_occi_response(optr, cptr, rptr, aptr, pptr) );\n",C.name);
 
 	fprintf(h,"}\n");
 
@@ -1370,7 +1370,7 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\tif (( iptr ) && (iptr->update)) (*iptr->update)(optr,&node,rptr);\n");
 
 	/* prepare the response header */
-	fprintf(h,"\telse if (( status = prepare_%s_response(aptr,id,pptr)) != 0)\n",C.name);
+	fprintf(h,"\tif (( status = prepare_%s_response(aptr,id,pptr)) != 0)\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500+status, %cServer Response Failure%c ) );\n",0x0022,0x0022);
 
 	/* check for success and return */
