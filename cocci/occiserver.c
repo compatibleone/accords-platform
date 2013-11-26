@@ -326,7 +326,7 @@ public struct  occi_link_node * occi_first_category_link(
 		char * category, 
 		char * id )
 {
-	return( occi_next_category_link( occi_first_link_node(), category, id ) );
+	return( occi_next_category_link( occi_first_link_node("source",id,2), category, id ) );
 }
 
 /*	---------------------------------------------------------	*/
@@ -395,7 +395,7 @@ public	int	occi_render_links( struct rest_response * aptr, char * id )
 		return(0);
 	else if (!( id ))
 		return(0);
-	for (	nptr=occi_first_link_node();
+	for (	nptr=occi_first_link_node("source",id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{

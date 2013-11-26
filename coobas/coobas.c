@@ -920,7 +920,7 @@ private	int	close_invoice_transactions( struct cords_invoice * pptr )
     /* ----------------------------------------------------- */
     /* for all defined contract nodes of the current service */
     /* ----------------------------------------------------- */
-    for (	nptr=occi_first_link_node();
+    for (	nptr=occi_first_link_node("source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
     {

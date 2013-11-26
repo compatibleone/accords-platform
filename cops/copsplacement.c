@@ -328,7 +328,7 @@ private	int	invoke_placement_action( struct cords_placement * pptr, char * actio
 	else if (!( rest_valid_string( pptr->id ) ))
 		return( 0 );
 
-	for (	nptr=occi_first_link_node();
+	for (	nptr=occi_first_link_node("source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{
@@ -521,7 +521,7 @@ private	int	delete_placement_quantities( struct cords_placement * pptr )
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	buffer[0] = 0;
-	for (	nptr=occi_first_link_node();
+	for (	nptr=occi_first_link_node("source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{

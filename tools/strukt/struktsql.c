@@ -666,6 +666,13 @@ private	void	generate_occi_sql_on_delete( FILE * h, char * nptr, char * fullname
 	return;
 }
 
+private	void	generate_build_filter( FILE * h )
+{
+	fprintf(h,"\tif ( nptr->filter ) nptr->filter = liberate( nptr->filter );\n");
+	fprintf(h,"\tnptr->filter = build_sql_filter( tptr, vptr, type );\n");
+	return;
+}
+
 private	void	generate_occi_sql_on_first( FILE * h, char * nptr, char * fullname )
 {
 	char *	nature;
@@ -679,7 +686,7 @@ private	void	generate_occi_sql_on_first( FILE * h, char * nptr, char * fullname 
 		nature = "kind";
 		break;
 	}
-	fprintf(h,"\nprivate struct occi_%s_node * %s_sql_on_first(struct occi_%s_node * nptr)\n{\n",nature,fullname,nature);
+	fprintf(h,"\nprivate struct occi_%s_node * %s_sql_on_first(struct occi_%s_node * nptr, char * tptr, char * vptr, int type)\n{\n",nature,fullname,nature);
 	fprintf(h,"\tint status=0;\n");
 	fprintf(h,"\tstruct %s *pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
@@ -687,6 +694,7 @@ private	void	generate_occi_sql_on_first( FILE * h, char * nptr, char * fullname 
 	fprintf(h,"\telse if (!( pptr = (struct %s *) nptr->contents ))\n\t{\n",C.name);
 	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_%s_node *) 0 );\n",C.name,C.name,nature);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
+	generate_build_filter(h);
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tif ((status = first_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
@@ -788,7 +796,7 @@ private	void	generate_occi_sql_on_last( FILE * h, char * nptr, char * fullname )
 		nature = "kind";
 		break;
 	}
-	fprintf(h,"\nprivate struct occi_%s_node * %s_sql_on_last(struct occi_%s_node * nptr)\n{\n",nature,fullname,nature);
+	fprintf(h,"\nprivate struct occi_%s_node * %s_sql_on_last(struct occi_%s_node * nptr, char * tptr, char * vptr, int type)\n{\n",nature,fullname,nature);
 	fprintf(h,"\tint status=0;\n");
 	fprintf(h,"\tstruct %s *pptr=(struct %s*) 0;\n",C.name,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, %s_sql_on_field, (void *) 0 };\n",fullname);
@@ -797,6 +805,7 @@ private	void	generate_occi_sql_on_last( FILE * h, char * nptr, char * fullname )
 	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_%s_node *) 0 );\n",C.name,C.name,nature);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\texpression.context = pptr;\n");
+	generate_build_filter(h);
 	fprintf(h,"\tif ((status = last_occi_sql_record(%c%s%c,&expression)) != 0)\n",0x0022,C.name,0x0022);
  	fprintf(h,"\t\treturn((struct occi_%s_node *) 0);\n",nature);
 	fprintf(h,"\tif (!( pptr->id ))\n");
@@ -853,12 +862,12 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	{
 	case	_OCCI_LINK :
 		title(h,"occi first link node" );
-		fprintf(h,"public struct  occi_link_node * occi_first_link_node()\n{\n");
+		fprintf(h,"public struct  occi_link_node * occi_first_link_node(char * tptr, char * vptr, int type)\n{\n");
 		fprintf(h,"\tstruct occi_link_node * nptr=(struct occi_link_node *) 0;\n");
 		fprintf(h,"\tstruct occi_link_node * xptr=(struct occi_link_node *) 0;\n");
 		fprintf(h,"\tif (!( nptr = allocate( sizeof( struct occi_link_node )) ))\n");
 		fprintf(h,"\t\treturn( nptr );\n");
-		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_first( nptr ) ))\n",fullname);
+		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_first( nptr,tptr,vptr,type ) ))\n",fullname);
 		fprintf(h,"\t\treturn( liberate( nptr ) );\n");
 		fprintf(h,"\telse\treturn( xptr );\n}\n");
 
@@ -881,24 +890,24 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 		fprintf(h,"\telse\treturn( xptr );\n}\n");
 
 		title(h,"occi last link node" );
-		fprintf(h,"public struct  occi_link_node * occi_last_link_node()\n{\n");
+		fprintf(h,"public struct  occi_link_node * occi_last_link_node(char * tptr, char * vptr, int type)\n{\n");
 		fprintf(h,"\tstruct occi_link_node * nptr=(struct occi_link_node *) 0;\n");
 		fprintf(h,"\tstruct occi_link_node * xptr=(struct occi_link_node *) 0;\n");
 		fprintf(h,"\tif (!( nptr = allocate( sizeof( struct occi_link_node )) ))\n");
 		fprintf(h,"\t\treturn( nptr );\n");
-		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_last( nptr ) ))\n",fullname);
+		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_last( nptr,tptr, vptr, type ) ))\n",fullname);
 		fprintf(h,"\t\treturn( liberate( nptr ) );\n");
 		fprintf(h,"\telse\treturn( xptr );\n}\n");
 		break;
 
 	case	_OCCI_KIND :
 		title(h,"occi first kind node" );
-		fprintf(h,"public struct  occi_kind_node * occi_first_%s_node()\n{\n",C.name);
+		fprintf(h,"public struct  occi_kind_node * occi_first_%s_node(char * tptr, char * vptr, int type)\n{\n",C.name);
 		fprintf(h,"\tstruct occi_kind_node * nptr=(struct occi_kind_node *) 0;\n");
 		fprintf(h,"\tstruct occi_kind_node * xptr=(struct occi_kind_node *) 0;\n");
 		fprintf(h,"\tif (!( nptr = allocate( sizeof( struct occi_kind_node )) ))\n");
 		fprintf(h,"\t\treturn( nptr );\n");
-		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_first( nptr ) ))\n",fullname);
+		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_first( nptr,tptr, vptr, type  ) ))\n",fullname);
 		fprintf(h,"\t\treturn( liberate( nptr ) );\n");
 		fprintf(h,"\telse\treturn( xptr );\n}\n");
 
@@ -921,12 +930,12 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 		fprintf(h,"\telse\treturn( xptr );\n}\n");
 
 		title(h,"occi last kind node" );
-		fprintf(h,"public struct  occi_kind_node * occi_last_%s_node()\n{\n",C.name);
+		fprintf(h,"public struct  occi_kind_node * occi_last_%s_node(char * tptr, char * vptr, int type)\n{\n",C.name);
 		fprintf(h,"\tstruct occi_kind_node * nptr=(struct occi_kind_node *) 0;\n");
 		fprintf(h,"\tstruct occi_kind_node * xptr=(struct occi_kind_node *) 0;\n");
 		fprintf(h,"\tif (!( nptr = allocate( sizeof( struct occi_kind_node )) ))\n");
 		fprintf(h,"\t\treturn( nptr );\n");
-		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_last( nptr ) ))\n",fullname);
+		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_last( nptr,tptr, vptr, type  ) ))\n",fullname);
 		fprintf(h,"\t\treturn( liberate( nptr ) );\n");
 		fprintf(h,"\telse\treturn( xptr );\n}\n");
 		break;

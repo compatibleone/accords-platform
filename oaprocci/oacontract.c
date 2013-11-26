@@ -1321,10 +1321,10 @@ struct oa_config * resolve_oa_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
 	struct	oa_config * pptr=(struct oa_config *) 0;
-	struct	occi_kind_node  * occi_first_oa_config_node();
-	struct	occi_kind_node  * occi_next_oa_config_node();
+	struct	occi_kind_node  * occi_first_oa_config_node(char *, char *, int);
+	struct	occi_kind_node  * occi_next_oa_config_node(struct occi_kind_node  * );
 
-	for (	nptr = occi_first_oa_config_node();
+	for (	nptr = occi_first_oa_config_node("name",sptr,0);
 		nptr != (struct occi_kind_node *) 0;
 		nptr = occi_next_oa_config_node(nptr) )
 	{
@@ -1464,11 +1464,12 @@ struct cords_onapp_extras_handle resolve_cords_onapp_extras_handle( char * sptr,
 #else // !_USE_OCCI_ONAPPEXTRAS
 	struct	occi_kind_node * nptr;
 	struct	cords_onapp_extras * pptr=(struct cords_onapp_extras *) 0;
-	struct	occi_kind_node  * occi_first_cords_onapp_extras_node();
+	struct	occi_kind_node  * occi_first_cords_onapp_extras_node(char *, char *, int);
+	struct	occi_kind_node  * occi_next_cords_onapp_extras_node(struct occi_kind_node  *);
 
-	for (nptr = occi_first_cords_onapp_extras_node();
+	for (nptr = occi_first_cords_onapp_extras_node("name",sptr,0);
 		nptr != (struct occi_kind_node *) 0;
-		nptr = nptr->next )
+		nptr = occi_next_cords_onapp_extras_node(nptr))
 	{
 		if (!( pptr = nptr->contents ))
 		{

@@ -29,6 +29,8 @@ public struct occi_link_node * liberate_occi_link_node(struct occi_link_node * s
 	{
 		if ( sptr->source )
 			 sptr->source = liberate(sptr->source);
+		if ( sptr->filter )
+			 sptr->filter = liberate(sptr->filter);
 		if ( sptr->target )
 			 sptr->target = liberate(sptr->target);
 		sptr = liberate( sptr );
@@ -47,6 +49,7 @@ public struct occi_link_node * reset_occi_link_node(struct occi_link_node * sptr
 		sptr->previous = (struct occi_link_node*) 0;
 		sptr->next = (struct occi_link_node*) 0;
 		sptr->contents = (void**) 0;
+		sptr->filter = (char*) 0;
 		sptr->source = (char*) 0;
 		sptr->target = (char*) 0;
 	}

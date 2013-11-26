@@ -183,7 +183,7 @@ private	struct rest_response * instance_agreement(
 	/* ----------------------------- */
 	/* retrieve manifest description */
 	/* ----------------------------- */
-	for (	nptr=occi_first_link_node();
+	for (	nptr=occi_first_link_node("source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{

@@ -962,6 +962,50 @@ public	char *	sql_escaped_filter( char * sptr )
 	}
 }
 
+/*	-------------------------------		*/
+/*	b u i l d _ s q l _ f i l t e r		*/
+/*	-------------------------------		*/
+public	char *	build_sql_filter(char * nptr, char * vptr, int type )
+{
+	char	buffer[2048];
+	char *	rptr;
+	if ((!( nptr )) || (!( vptr )))
+		return( (char *) 0 );
+	else	
+	{
+		switch ( type )
+		{
+		case	0 :
+			sprintf(buffer,"_%s = '%s'",nptr,sql_escaped_filter(vptr));
+			break;
+		case	1 :
+			sprintf(buffer,"_%s LIKE '%s\%'",nptr,sql_escaped_filter(vptr));
+			break;
+		case	2 :
+			sprintf(buffer,"_%s LIKE '\%%s'",nptr,sql_escaped_filter(vptr));
+			break;
+		case	3 :
+			sprintf(buffer,"_%s LIKE '\%%s\%'",nptr,sql_escaped_filter(vptr));
+			break;
+		case	4 :
+			sprintf(buffer,"_%s > '%s'",nptr,sql_escaped_filter(vptr));
+			break;
+		case	5 :
+			sprintf(buffer,"_%s >= '%s'",nptr,sql_escaped_filter(vptr));
+			break;
+		case	6 :
+			sprintf(buffer,"_%s < '%s'",nptr,sql_escaped_filter(vptr));
+			break;
+		case	7 :
+			sprintf(buffer,"_%s <= '%s'",nptr,sql_escaped_filter(vptr));
+			break;
+		default	:
+			return((char *) 0);
+		}
+		return( allocate_string( buffer ) );
+	}
+}
+
 	/* ----------- */
 #endif	/* _occi_sql_c */
 	/* ----------- */

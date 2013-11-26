@@ -7,6 +7,7 @@ struct occi_kind_node
 	struct occi_kind_node  	* previous;
 	struct occi_kind_node  	* next;
 	void			* contents;
+	char			* filter;
 	struct occi_mixin 	* firstmixin;
 	struct occi_mixin 	* lastmixin;
 	struct occi_link  	* firstlink;

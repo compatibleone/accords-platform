@@ -332,12 +332,14 @@ private	int	fileserver_operation( char * nptr )
 		fileserver_put,
 		fileserver_delete,
 		fileserver_head,
+		(void *) 0,
 		fileserver_extension,
 		(void *) 0,
 		(void *) 0,
 		(void *) 0,
+		(void *) 0,
+		(void *) 0,
 		(void *) 0
-
 	};
 
 	if (!( Fs.authorise ))

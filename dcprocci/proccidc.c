@@ -11,9 +11,9 @@ private	struct	dc_config * resolve_deltacloud_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
 	struct	dc_config * pptr=(struct dc_config *) 0;
-	struct	occi_kind_node  * occi_first_dc_config_node();
-	struct	occi_kind_node  * occi_next_dc_config_node();
-	for (	nptr = occi_first_dc_config_node();
+	struct	occi_kind_node  * occi_first_dc_config_node(char *, char *, int);
+	struct	occi_kind_node  * occi_next_dc_config_node(struct occi_kind_node  * );
+	for (	nptr = occi_first_dc_config_node("name",sptr,0);
 		nptr != (struct occi_kind_node *) 0;
 		nptr = occi_next_dc_config_node(nptr) )
 	{

@@ -78,9 +78,9 @@ private	struct	os_config * resolve_os_occi_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
 	struct	os_config * pptr=(struct os_config *) 0;
-	struct	occi_kind_node  * occi_first_os_config_node();
-	struct	occi_kind_node  * occi_next_os_config_node();
-	for (	nptr = occi_first_os_config_node();
+	struct	occi_kind_node  * occi_first_os_config_node(char *, char *, int);
+	struct	occi_kind_node  * occi_next_os_config_node(struct occi_kind_node  * );
+	for (	nptr = occi_first_os_config_node("name",sptr,0);
 		nptr != (struct occi_kind_node *) 0;
 		nptr = occi_next_os_config_node(nptr) )
 	{

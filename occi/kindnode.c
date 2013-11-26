@@ -31,6 +31,8 @@ public struct occi_kind_node * liberate_occi_kind_node(struct occi_kind_node * s
 			 sptr->firstmixin = liberate_occi_mixin(sptr->firstmixin);
 		if ( sptr->lastmixin )
 			 sptr->lastmixin = liberate_occi_mixin(sptr->lastmixin);
+		if ( sptr->filter )
+			 sptr->filter = liberate(sptr->filter);
 		if ( sptr->firstlink )
 			 sptr->firstlink = liberate_occi_link(sptr->firstlink);
 		if ( sptr->lastlink )
@@ -51,6 +53,7 @@ public struct occi_kind_node * reset_occi_kind_node(struct occi_kind_node * sptr
 		sptr->previous = (struct occi_kind_node*) 0;
 		sptr->next = (struct occi_kind_node*) 0;
 		sptr->contents = (void*) 0;
+		sptr->filter = (char*) 0;
 		sptr->firstmixin = (struct occi_mixin*) 0;
 		sptr->lastmixin = (struct occi_mixin*) 0;
 		sptr->firstlink = (struct occi_link*) 0;

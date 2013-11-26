@@ -53,23 +53,23 @@ public	void	generate_occi_rest_builder( FILE * h, char * nptr )
 	switch ( C.genrest )
 	{
 	case	_OCCI_LINK :
-		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return( %s_first ); }\n",
+		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node(char * tptr, char * vptr, int type) { return( %s_first ); }\n",
 			C.klass,C.klass,C.name);
 		fprintf(h,"public struct  occi_%s_node * occi_next_%s_node(struct occi_%s_node * nptr ) { if (!( nptr )) return( nptr ); else return( nptr->next ); }\n",
 			C.klass,C.klass,C.klass);
 		fprintf(h,"public struct  occi_%s_node * occi_previous_%s_node(struct occi_%s_node * nptr ) { if (!( nptr )) return( nptr ); else return( nptr->previous ); }\n",
 			C.klass,C.klass,C.klass);
-		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return( %s_last ); }\n",
+		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node(char * tptr, char * vptr, int type) { return( %s_last ); }\n",
 			C.klass,C.klass,C.name);
 		break;
 	case	_OCCI_KIND :
-		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node() { return( %s_first ); }\n",
+		fprintf(h,"public struct  occi_%s_node * occi_first_%s_node(char * tptr, char * vptr, int type) { return( %s_first ); }\n",
 			C.klass,C.name,C.name);
 		fprintf(h,"public struct  occi_%s_node * occi_next_%s_node(struct occi_%s_node * nptr ) { if (!( nptr )) return( nptr ); else return( nptr->next ); }\n",
 			C.klass,C.name,C.klass);
 		fprintf(h,"public struct  occi_%s_node * occi_previous_%s_node(struct occi_%s_node * nptr ) { if (!( nptr )) return( nptr ); else return( nptr->previous ); }\n",
 			C.klass,C.name,C.klass);
-		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node() { return( %s_last ); }\n",
+		fprintf(h,"public struct  occi_%s_node * occi_last_%s_node(char * tptr, char * vptr, int type) { return( %s_last ); }\n",
 			C.klass,C.name,C.name);
 		break;
 

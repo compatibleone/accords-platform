@@ -26,7 +26,7 @@ private	struct rest_response * start_session(
 	else
 	{
 		for (	pptr->connections=0,
-			nptr=occi_first_link_node();
+			nptr=occi_first_link_node("source",pptr->id,2);
 			nptr != (struct occi_link_node *) 0;
 			nptr = occi_next_link_node(nptr) )
 		{
