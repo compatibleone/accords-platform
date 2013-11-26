@@ -309,9 +309,9 @@ private	int	stop_connection_probes( struct cords_connection * pptr )
 
 	buffer[0] = 0;
 	for (	pptr->probes=0,
-		nptr=occi_last_link_node();
+		nptr=occi_last_link_node("source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->previous )
+		nptr = occi_previous_link_node(nptr) )
 	{
 		if (!( lptr = nptr->contents ))
 			continue;

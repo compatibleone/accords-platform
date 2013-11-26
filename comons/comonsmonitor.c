@@ -72,9 +72,9 @@ private	int	stop_monitor_controls( struct cords_monitor * pptr )
 	char *	wptr;
 	char	buffer[2048];
 	buffer[0] = 0;
-	for (	nptr=occi_last_link_node();
+	for (	nptr=occi_last_link_node("source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->previous )
+		nptr = occi_previous_link_node(nptr) )
 	{
 		if (!( lptr = nptr->contents ))
 			continue;

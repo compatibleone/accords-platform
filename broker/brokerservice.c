@@ -376,9 +376,9 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		nptr=occi_last_link_node();
+		nptr=occi_last_link_node("source",id,2);
 		nptr != (struct occi_link_node *) 0;
-		nptr = nptr->previous )
+		nptr = occi_previous_link_node(nptr) )
 	{
 		if (!( lptr = nptr->contents ))
 			continue;
