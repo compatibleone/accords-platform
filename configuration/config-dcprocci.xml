@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="deltacloud_configuration" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<deltacloud_configuration name="accords" description="no configuration" />
+
+</import>
+
+
+

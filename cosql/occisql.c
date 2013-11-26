@@ -915,7 +915,6 @@ public	char *	sql_escaped_filter( char * sptr )
 		case	'\r'	:
 		case	'\n'	:
 		case	'"'	:
-		case	'_'	:
 		case	0x0025	:
 		case	0x0027	:
 		case	0x005C	:
@@ -951,7 +950,6 @@ public	char *	sql_escaped_filter( char * sptr )
 			case	'"'	:
 			case	0x0027	:	/* ' */
 			case	0x0025	:	/* % */
-			case	'_'	:
 			case	0x005C	:	/* \ */
 				*(wptr++) = 0x005C;
 				*(wptr++) = c;

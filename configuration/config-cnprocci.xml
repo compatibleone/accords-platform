@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="computenext_configuration" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<computenext_configuration
+
+	name="accords" 
+
+	apisec="specify the api secret of your user account here"
+	apikey="specify the api key of your user account here" 
+	description="specify the description of your user account here"
+
+	host="http://services.computenext.com/api" 
+	agent="CNPROCCI/1.0a"
+	version="v1.0" 
+
+
+</import>
+

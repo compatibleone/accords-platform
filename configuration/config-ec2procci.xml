@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="amazonec2_configuration" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<ec2config
+	name="accords" 
+
+	authenticate="specify the full pathname to the private key"
+	accesskey="specify the access key of the user account here"
+	secretkey="specify the secret key of your user account here"
+	user="specify the user account name here" 
+	password="specify the user account password here"
+	description="specify the user account description here" 
+
+	host="http://www.amazonaws.com" 
+	location="us-west-2" 
+	version="v1.1" 
+
+	namespace="accords" 
+	agent="EC2PROCCI/1.0a"
+
+	/>
+
+</import>
+
+
+
+
+
+
+
+
+
+
+
+

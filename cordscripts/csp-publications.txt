@@ -1,0 +1,17 @@
+	"<html><head><title>publications</title></head>".display();
+
+	"<body><div align=center><h1>Publications</h1><table><tr><th>Category<th>EndPoint</tr>".display();
+	$l = publication.list();
+
+	foreach ( $l as $i )
+	{
+		$r = $i.get();
+		$what = $r["occi.publication.what"];
+		$why  = $r["occi.publication.why"];
+		$m = "<tr><th>"#$what#"<th><a href='"#$why#"/"#$what#"/'>"#$why#"</a></tr>";
+		$m.display();
+	}
+
+	"</table></div></body></html>".display();
+
+

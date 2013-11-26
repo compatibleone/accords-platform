@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="paas_configuration" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<paas_configuration
+	name="accords" 
+	description="description"
+	host="coaps host"
+	user="username" 
+	password="password" 
+	port="portnumber" 
+	tenant="tenent" 
+	subscription="subscription information"
+	/>
+
+</import>
+

@@ -6,6 +6,7 @@ mkdir $1/images
 cd $1
 cp ../accords-platform/scripts/accords-config .
 cp ../accords-platform/dashboard/* .
+cp ../accords-platform/configuration/*.xml .
 chmod uog+x *.sh
 cp ../accords-platform/dashboard/images/* ./images
 cp ../accords-platform/cordscripts/csp*.txt .

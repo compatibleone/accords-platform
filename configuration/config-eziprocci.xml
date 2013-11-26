@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="easiclouds_configuration" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<easiclouds_configuration
+	name="accords" 
+	namespace="namespace" 
+	agent="EZIPROCCI/1.0a" 
+	host="hostname"
+	version="v1.1" 
+	user="username" 
+	iaas="iaas host"
+	password="password" 
+	description="account description"
+	/>
+
+</import>
+
+

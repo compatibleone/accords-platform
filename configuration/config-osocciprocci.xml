@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="occi_openstack_configuration" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<occi_openstack_configuration
+	name="accords" 
+	description="specify your user account description here"
+	user="specify your user account login name here" 
+	password="specify your user account login password here" 
+	namespace="specify your user account namespace or tenant identifier here" 
+	host="specify the full access url for the provider platform here"
+	version="specify the paltform version here"
+	agent="OSPROCCI/1.0a" 
+	 />
+
+</import>
+
+

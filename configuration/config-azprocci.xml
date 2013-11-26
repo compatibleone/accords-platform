@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<import name="windowsazure_configuration" xmlns="http://www.compatibleone.fr/schemes/cords.xsd">
+
+<windowsazure_configuration
+
+	name="accords" 
+	group="accords" 
+	storageaccount="accords" 
+	hostedservice="accords" 
+
+	tls="specify your security configuration file here"
+	user="specify your user name here"
+	password="specify your password here"
+	subscription="specify your subscription identifier here"
+
+	namespace="http://schemas.microsoft.com/windowsazure" 
+	version="2012-03-01" 
+	location="West Europe" 
+	host="https://management.core.windows.net/" 
+	base="" 
+	services="0" 
+	agent="AZPROCCI/1.0a" 
+	description="POC X-Wiki" />
+
+</import>
+
+

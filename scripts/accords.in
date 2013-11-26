@@ -208,6 +208,7 @@ _co_run_prov () {
     co-parser sla-$procci
     run-$procci &
     sleep $tempo
+    co-parser config-$procci --xsd
 }
 
 _co_provision()
