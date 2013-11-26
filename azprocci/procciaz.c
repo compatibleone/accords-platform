@@ -142,7 +142,7 @@ private	int	connect_windowsazure_image( struct az_subscription * subscription, s
 			reset_windowsazure_server( pptr );
 			return( 27 );
 		}
-		autosave_windowsazure_nodes();
+		autosave_windowsazure_node(pptr);
 		/* ----------------------------------------------------- */
 		/* we must now await ACTIVE status to be able to collect */
 		/* the final identification information to complete the  */
@@ -408,7 +408,7 @@ private	int	connect_windowsazure_server(
 		zptr = liberate_az_response( zptr );
 		pptr->stamp = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
-		autosave_windowsazure_nodes();
+		autosave_windowsazure_node(pptr);
 		return(0);
 	}
 }
@@ -1017,7 +1017,7 @@ private	struct	rest_response * stop_windowsazure(
 		stop_windowsazure_provisioning( pptr );
 		reset_windowsazure_server( pptr );
 		pptr->stamp = time((long *) 0);
-		autosave_windowsazure_nodes();
+		autosave_windowsazure_node(pptr);
 		sprintf(reference,"%s/%s/%s",WazProcci.identity,_CORDS_WINDOWSAZURE,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );

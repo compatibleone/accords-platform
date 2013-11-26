@@ -309,7 +309,7 @@ private	int	connect_openstack_image(
 			reset_openstack_server( pptr );
 			return( 27 );
 		}
-		autosave_openstack_nodes();
+		autosave_openstack_node(pptr);
 		/* ----------------------------------------------------- */
 		/* we must now await ACTIVE status to be able to collect */
 		/* the final identification information to complete the  */
@@ -555,7 +555,7 @@ private	int	connect_openstack_server(
 			rest_log_message( pptr->rootpass );
 		}
 
-		autosave_openstack_nodes();
+		autosave_openstack_node(pptr);
 
 		/* ----------------------------------------------------- */
 		/* we must now await ACTIVE status to be able to collect */
@@ -668,7 +668,7 @@ private	int	connect_openstack_server(
 		{
 			rest_log_message("*** OS PROCCI Instance is UP and RUNNING ***");
 		}
-		autosave_openstack_nodes();
+		autosave_openstack_node(pptr);
 		if ( check_debug() )
 		{
 			rest_log_message("*** OS PROCCI connect_openstack_server( exit ) ***");

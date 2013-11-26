@@ -225,7 +225,7 @@ private	int	connect_opennebula_server( struct on_subscription * subptr, struct o
 			rest_log_message( pptr->number );
 		}
 
-		autosave_opennebula_nodes();
+		autosave_opennebula_node(pptr);
 
 		/* ----------------------------------------------------- */
 		/* we must now await ACTIVE status to be able to collect */
@@ -305,7 +305,7 @@ private	int	connect_opennebula_server( struct on_subscription * subptr, struct o
 		/* ------------------------------------------------- */
 		pptr->stamp = time((long *) 0);
 		pptr->state = _OCCI_RUNNING;
-		autosave_opennebula_nodes();
+		autosave_opennebula_node(pptr);
 		return(0);
 	}
 }
