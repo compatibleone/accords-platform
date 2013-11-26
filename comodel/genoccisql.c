@@ -1084,15 +1084,21 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\tstruct occi_interface * iptr;\n");
 	fprintf(h,"\tstruct %s * pptr;\n",C.name);
 	fprintf(h,"\tint    status=0;\n");
+	fprintf(h,"\tstruct occi_%s_node node;\n",C.klass);
+	fprintf(h,"\tmemset(&node,0,sizeof(struct occi_%s_node));\n",C.klass);
 	fprintf(h,"\tiptr = optr->callback;\n");
 
 	/* retrieve occi fields */
 	fprintf(h,"\tif (!( pptr = allocate_%s()))\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500, %cAllocation Failure%c) );\n",0x0022,0x0022);
+	fprintf(h,"\telse\tnode.contents = pptr;\n");
 
 	/* locate the sql record in the table */
-	fprintf(h,"\telse if ((status = %s_sql_on_search(id, pptr)) != 0)\n",fullname);
+	fprintf(h,"\tif ((status = %s_sql_on_search(id, pptr)) != 0)\n",fullname);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 404, %cNOT FOUND%c) );\n",0x0022,0x0022);
+
+	/* invoke overloaded method */
+	fprintf(h,"\tif (( iptr ) && (iptr->retrieve)) (*iptr->retrieve)(optr,&node,rptr);\n");
 
 	/* prepare the response header */
 	fprintf(h,"\telse\treturn(%s_occi_response(optr, cptr, rptr, aptr, pptr) );\n",C.name);
@@ -1182,6 +1188,8 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\tint    reqport=0;\n");
 	fprintf(h,"\tchar * id=(char *) 0;\n");
 	fprintf(h,"\tint    status=0;\n");
+	fprintf(h,"\tstruct occi_%s_node node;\n",C.klass);
+	fprintf(h,"\tmemset(&node,0,sizeof(struct occi_%s_node));\n",C.klass);
 	fprintf(h,"\tiptr = optr->callback;\n");
 
 	/* prepare for response */
@@ -1192,14 +1200,18 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	/* retrieve occi fields */
 	fprintf(h,"\tif (!(pptr = %s_collector(optr,cptr,rptr,aptr,pptr)))\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 400, %cBad Request Header%c) );\n",0x0022,0x0022);
+	fprintf(h,"\telse\tnode.contents = pptr;\n");
 
 	/* allocate a new uuid */
-	fprintf(h,"\telse if (!( id = rest_allocate_uuid() ))\n");
+	fprintf(h,"\tif (!( id = rest_allocate_uuid() ))\n");
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500, %cCannot Allocate UUID%c) );\n",0x0022,0x0022);
 
 	/* insert a new sql record into the table */
 	fprintf(h,"\telse if ((status = %s_sql_on_insert(id, pptr)) != 0)\n",fullname);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500+status, %cSQL Insert Failure %c) );\n",0x0022,0x0022);
+
+	/* invoke overloaded method */
+	fprintf(h,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,&node,rptr);\n");
 
 	/* prepare the result location */
 	fprintf(h,"\tprepare_%s_location(cptr->buffer,reqhost,reqport,optr->location, id);\n",C.name);
@@ -1224,14 +1236,17 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\tstruct occi_interface * iptr;\n");
 	fprintf(h,"\tstruct %s * pptr;\n",C.name);
 	fprintf(h,"\tint    status=0;\n");
+	fprintf(h,"\tstruct occi_%s_node node;\n",C.klass);
+	fprintf(h,"\tmemset(&node,0,sizeof(struct occi_%s_node));\n",C.klass);
 	fprintf(h,"\tiptr = optr->callback;\n");
 
-	/* retrieve occi fields */
+	/* retrieve create occi fields */
 	fprintf(h,"\tif (!( pptr = allocate_%s()))\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500, %cAllocation Failure%c) );\n",0x0022,0x0022);
+	fprintf(h,"\telse\tnode.contents = pptr;\n");
 
 	/* locate the sql record in the table */
-	fprintf(h,"\telse if ((status = %s_sql_on_search(id, pptr)) != 0)\n",fullname);
+	fprintf(h,"\tif ((status = %s_sql_on_search(id, pptr)) != 0)\n",fullname);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500+status, %cSQL Insert Failure %c) );\n",0x0022,0x0022);
 
 	/* step over parameters to action name */
@@ -1330,11 +1345,14 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\tstruct occi_interface * iptr;\n");
 	fprintf(h,"\tstruct %s * pptr;\n",C.name);
 	fprintf(h,"\tint    status=0;\n");
+	fprintf(h,"\tstruct occi_%s_node node;\n",C.klass);
+	fprintf(h,"\tmemset(&node,0,sizeof(struct occi_%s_node));\n",C.klass);
 	fprintf(h,"\tiptr = optr->callback;\n");
 
 	/* retrieve occi fields */
 	fprintf(h,"\tif (!( pptr = allocate_%s()))\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500, %cAllocation Failure%c) );\n",0x0022,0x0022);
+	fprintf(h,"\telse\tnode.contents = pptr;\n");
 
 	/* locate the sql record in the table */
 	fprintf(h,"\tif ((status = %s_sql_on_search(id, pptr)) != 0)\n",fullname);
@@ -1348,7 +1366,9 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\telse if ((status = %s_sql_on_update(id, pptr)) != 0)\n",fullname);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500+status, %cSQL Insert Failure %c) );\n",0x0022,0x0022);
 
-	/* prepare the response header */
+	/* invoke the interface method */
+	fprintf(h,"\tif (( iptr ) && (iptr->update)) (*iptr->update)(optr,&node,rptr);\n");
+
 	/* prepare the response header */
 	fprintf(h,"\telse if (( status = prepare_%s_response(aptr,id,pptr)) != 0)\n",C.name);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500+status, %cServer Response Failure%c ) );\n",0x0022,0x0022);
@@ -1420,9 +1440,24 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"private struct rest_response * %s_delete_item(",C.name);
 	fprintf(h,"struct occi_category * optr, struct rest_client * cptr, struct rest_request * rptr,struct rest_response * aptr, char * id)\n");
 	fprintf(h,"{\n");
+	fprintf(h,"\tstruct %s * pptr;\n",C.name);
 	fprintf(h,"\tstruct occi_interface * iptr;\n");
 	fprintf(h,"\tint    status=0;\n");
+	fprintf(h,"\tstruct occi_%s_node node;\n",C.klass);
+	fprintf(h,"\tmemset(&node,0,sizeof(struct occi_%s_node));\n",C.klass);
 	fprintf(h,"\tiptr = optr->callback;\n");
+
+	/* retrieve occi fields */
+	fprintf(h,"\tif (!( pptr = allocate_%s()))\n",C.name);
+	fprintf(h,"\t\treturn( rest_html_response( aptr, 500, %cAllocation Failure%c) );\n",0x0022,0x0022);
+	fprintf(h,"\telse\tnode.contents = pptr;\n");
+
+	/* locate the sql record in the table */
+	fprintf(h,"\tif ((status = %s_sql_on_search(id, pptr)) != 0)\n",fullname);
+	fprintf(h,"\t\treturn( rest_html_response( aptr, 404, %cNOT FOUND%c) );\n",0x0022,0x0022);
+
+	/* invoke the interface method */
+	fprintf(h,"\tif (( iptr ) && (iptr->delete)) (*iptr->delete)(optr,&node,rptr);\n");
 
 	/* delete the sql record from table */
 	fprintf(h,"\tif ((status = %s_sql_on_delete(id)) != 0)\n",fullname);
