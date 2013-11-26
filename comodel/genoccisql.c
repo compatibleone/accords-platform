@@ -1209,6 +1209,7 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	/* insert a new sql record into the table */
 	fprintf(h,"\telse if ((status = %s_sql_on_insert(id, pptr)) != 0)\n",fullname);
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500+status, %cSQL Insert Failure %c) );\n",0x0022,0x0022);
+	fprintf(h,"\telse\tpptr->id = id;\n");
 
 	/* invoke overloaded method */
 	fprintf(h,"\tif (( iptr ) && (iptr->create)) (*iptr->create)(optr,&node,rptr);\n");
