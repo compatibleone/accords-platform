@@ -960,6 +960,18 @@ public	char *	sql_escaped_filter( char * sptr )
 	}
 }
 
+/*	-------------------------------------	*/
+/*	o r d e r _ s q l _ t i m e s t a m p	*/
+/*	------------------------------------- 	*/
+public	void	order_sql_timestamp( char * buffer )
+{
+	struct timeval  TV = { 0, 0 };
+	struct timezone TZ = { 0, 0 };
+	gettimeofday(&TV,&TZ);
+	sprintf(buffer,"%08.8X%08.8X",TV.tv_sec,TV.tv_usec);
+	return;
+}
+
 /*	-------------------------------		*/
 /*	b u i l d _ s q l _ f i l t e r		*/
 /*	-------------------------------		*/

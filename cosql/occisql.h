@@ -110,6 +110,7 @@ public	char *	build_sql_filter(char * nptr, char * vptr, int type );
 public	char *	sql_escaped_value( char * sptr );
 public	char *	sql_unescaped_value( char * sptr );
 public	char *	sql_escaped_filter( char * sptr );
+public	void	order_sql_timestamp( char * buffer );
 
 	/* ----------- */
 #endif	/* _occi_sql_h */

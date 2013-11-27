@@ -374,7 +374,7 @@ private	void	generate_file_description( FILE * h )
 	char *	wptr=(char *) 0;
 	struct	item * iptr;
 
-	if (!( 	xptr = allocate_string( "(id CHAR(80) PRIMARY KEY, orderid INTEGER") ))
+	if (!( 	xptr = allocate_string( "(id CHAR(80) PRIMARY KEY, orderid CHAR(16)") ))
 		return;
 
 	for ( 	iptr= C.first;
@@ -454,22 +454,15 @@ private	void	generate_occi_sql_on_insert( FILE * h, char * nptr, char * fullname
 	char *	xptr=(char *) 0;
 	char *	wptr=(char *) 0;
 
-	title(h,"sql order id management");
-	fprintf(h,"private int %s_sqlorderid=0;\n",fullname);
-	fprintf(h,"private int %s_get_sql_order_id()\n{\n",fullname);
-	fprintf(h,"\tif (!( %s_sqlorderid )) %s_sqlorderid = time((long *) 0);\n",fullname,fullname);
-	fprintf(h,"\treturn( ++%s_sqlorderid );\n",fullname);
-	fprintf(h,"}\n");
-
 	title(h,"sql on insert record");
 	fprintf(h,"\nprivate int %s_sql_on_insert(char * id, struct %s *pptr)\n{\n",fullname,C.name);
 	fprintf(h,"\tstruct occi_expression expression={(char *) 0, (void *) 0, (void *) 0};\n");
 	fprintf(h,"\tchar * xptr=(char *) 0;\n");
 	fprintf(h,"\tchar * wptr=(char *) 0;\n");
-	fprintf(h,"\tint    orderid=0;\n");
+	fprintf(h,"\tchar   orderid[32];\n");
 	fprintf(h,"\tchar buffer[1024];\n");
 	fprintf(h,"\tint separator='(';\n");
-	fprintf(h,"\rorderid = %s_get_sql_order_id();\n",fullname);
+	fprintf(h,"\rorder_sql_timestamp(buffer);\n");
 	if (!( xptr = allocate_string("(id,orderid")))
 		return;
 
@@ -529,7 +522,7 @@ private	void	generate_occi_sql_on_insert( FILE * h, char * nptr, char * fullname
 			if (!( strcmp( iptr->name, "id" ) ))
 				fprintf(h,"\tsprintf(buffer,%c'%cs'%c,id);\n",0x0022,0x0025,0x0022);
 			else if (!( strcmp( iptr->name, "orderid" ) ))
-				fprintf(h,"\tsprintf(buffer,%c'%cu'%c,orderid);\n",0x0022,0x0025,0x0022);
+				fprintf(h,"\tsprintf(buffer,%c'%cs'%c,orderid);\n",0x0022,0x0025,0x0022);
 			else if (!( strcmp( iptr->basic, "int" ) ))
 			 	fprintf(h,"\tsprintf(buffer,%c'%cu'%c,pptr->%s);\n",0x0022,0x0025,0x0022,iptr->name);
 			else 	fprintf(h,"\tsprintf(buffer,%c'%cs'%c,(rest_valid_string(pptr->%s)?sql_escaped_value(pptr->%s):%c%c));\n",0x0022,0x0025,0x0022,iptr->name,iptr->name,0x0022,0x0022);
@@ -829,6 +822,7 @@ private	void	generate_occi_sql_on_previous( FILE * h, char * nptr, char * fullna
 	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_%s_node *) 0 );\n",C.name,C.name,nature);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\tif (!( pptr->id )) { return((struct occi_%s_node *) 0); }\n",nature);
+	fprintf(h,"\telse if (!( pptr->orderid )) { return((struct occi_%s_node *) 0); }\n",nature);
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE orderid < '%cs'%c,pptr->orderid);\n",0x0022,0x0025,0x0022);
 	fprintf(h,"\tpptr->id = liberate( pptr->id );\n");
@@ -868,6 +862,7 @@ private	void	generate_occi_sql_on_next( FILE * h, char * nptr, char * fullname )
 	fprintf(h,"\t\tif (!( pptr = (struct %s *) allocate_%s() ))\n\t\t\t return((struct occi_%s_node *) 0 );\n",C.name,C.name,nature);
 	fprintf(h,"\t\telse\tnptr->contents = pptr;\n\t}\n");
 	fprintf(h,"\tif (!( pptr->id )) { return((struct occi_%s_node *) 0); }\n",nature);
+	fprintf(h,"\telse if (!( pptr->orderid )) { return((struct occi_%s_node *) 0); }\n",nature);
 	fprintf(h,"\texpression.context = pptr;\n");
 	fprintf(h,"\tsprintf(buffer,%cWHERE orderid > '%cs'%c,pptr->orderid);\n",0x0022,0x0025,0x0022);
 	generate_use_filter(h);
