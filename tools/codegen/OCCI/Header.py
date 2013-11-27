@@ -38,6 +38,7 @@ class Header(OCCI.Output.Output):
         self._write_header_preamble(struct_name, header_file)
                 
         header_file.write("\tchar *\tid;\n")
+        header_file.write("\tint\torderid;\n")
         filter_names = ['id']
     # TODO - get all attributes (using Category.allAttrs)
     # TODO - Use templating for header generation

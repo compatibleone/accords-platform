@@ -506,9 +506,9 @@ public	int	first_occi_sql_record( char * category,  struct occi_expression *expr
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if (!( xptr = allocate( strlen( tptr->name ) + strlen( _SELECT_ID_FROM ) + strlen( _ORDER_BY_ID_FIRST ) + 16 ) ))
+	else if (!( xptr = allocate( strlen( tptr->name ) + strlen( _SELECT_ID_FROM ) + strlen( _ORDER_BY_FIRST ) + 16 ) ))
 		return( 27 );
-	else	sprintf(xptr,"%s %s %s",_SELECT_ID_FROM,tptr->name,_ORDER_BY_ID_FIRST);
+	else	sprintf(xptr,"%s %s %s",_SELECT_ALL_FROM,tptr->name,_ORDER_BY_FIRST);
 
 	occi_sql_lock();
 	debug_sql_query( tptr, xptr );
@@ -545,9 +545,9 @@ public	int	previous_occi_sql_record( char * category,  struct occi_expression *e
 				strlen( ( expression->value ? expression->value : "" ) ) + 
 				strlen( tptr->name ) + 
 				strlen( _SELECT_ID_FROM ) + 
-				strlen( _SINGLE_ROW ) + 16 ) ))
+				strlen( _ORDER_BY_LAST ) + 16 ) ))
 		return( 27 );
-	else	sprintf( xptr,"%s %s %s %s",_SELECT_ID_FROM,tptr->name,( expression->value ? expression->value : "" ),_SINGLE_ROW);
+	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,( expression->value ? expression->value : "" ),_ORDER_BY_LAST);
 
 	occi_sql_lock();
 	debug_sql_query( tptr, xptr );
@@ -739,9 +739,9 @@ public	int	next_occi_sql_record( char * category,  struct occi_expression *expre
 				strlen( ( expression->value ? expression->value : "" ) ) + 
 				strlen( tptr->name ) + 
 				strlen( _SELECT_ID_FROM ) + 
-				strlen( _SINGLE_ROW ) + 16 ) ))
+				strlen( _ORDER_BY_FIRST ) + 16 ) ))
 		return( 27 );
-	else	sprintf( xptr,"%s %s %s %s",_SELECT_ID_FROM,tptr->name,( expression->value ? expression->value : "" ),_SINGLE_ROW);
+	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,( expression->value ? expression->value : "" ),_ORDER_BY_FIRST);
 
 	occi_sql_lock();
 	debug_sql_query( tptr, xptr );
@@ -772,9 +772,9 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if (!( xptr = allocate( strlen( tptr->name ) + strlen( _SELECT_ID_FROM ) + strlen( _ORDER_BY_ID_LAST ) + 16 ) ))
+	else if (!( xptr = allocate( strlen( tptr->name ) + strlen( _SELECT_ID_FROM ) + strlen( _ORDER_BY_LAST ) + 16 ) ))
 		return( 27 );
-	else	sprintf( xptr,"%s %s %s",_SELECT_ID_FROM,tptr->name,_ORDER_BY_ID_LAST);
+	else	sprintf( xptr,"%s %s %s",_SELECT_ALL_FROM,tptr->name,_ORDER_BY_LAST);
 
 	occi_sql_lock();
 	debug_sql_query( tptr, xptr );

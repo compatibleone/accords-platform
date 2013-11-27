@@ -41,8 +41,8 @@
 #define	_UPDATE_WHERE		"UPDATE"
 #define	_SELECT_ALL_FROM	"SELECT * FROM"
 #define	_SELECT_ID_FROM		"SELECT id FROM"
-#define	_ORDER_BY_ID_FIRST	"ORDER BY id ASC LIMIT 1"
-#define	_ORDER_BY_ID_LAST	"ORDER BY id DESC LIMIT 1"
+#define	_ORDER_BY_FIRST		"ORDER BY orderid ASC LIMIT 1"
+#define	_ORDER_BY_LAST		"ORDER BY orderid DESC LIMIT 1"
 #define	_DELETE_FROM		"DELETE FROM"
 #define	_SINGLE_ROW		"LIMIT 1"
 
@@ -78,6 +78,7 @@ struct	occi_expression
 	char *	value;
 	int	(*handler)(void *, char *, char *, int);
 	void *	context;
+	char *	orderby;
 };
 
 struct	response_context

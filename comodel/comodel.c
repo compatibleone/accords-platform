@@ -137,7 +137,7 @@ public int	comodel_category_filter( struct occi_category * cptr )
 private	int	comodel_banner()
 {
 	printf("\n   CompatibleOne Model Generator : Version %s ",_COMODEL_VERSION);
-	printf("\n   Beta Version : 23/11/2013");
+	printf("\n   Beta Version : 27/11/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue");
 	printf("\n\n");
 	return(0);
@@ -270,6 +270,8 @@ private	int	comodel_generate_h( struct occi_category * optr )
 		fprintf(h,"/* ----------------------------------------------- */\n");
 		fprintf(h,"struct cords_%s\n{\n",optr->id);
 		fprintf(h,"\tchar * \t%s;\n","id");
+		if ( production.backend )
+			fprintf(h,"\tint\t%s;\n","orderid");
 		for (	aptr=optr->first;
 			aptr != (struct occi_attribute *) 0;
 			aptr = aptr->next )
@@ -322,6 +324,7 @@ private	int	comodel_generate_filter_h( struct occi_category * optr )
 		fprintf(h,"struct cords_%s_occi_filter\n{\n",optr->id);
 		fprintf(h,"\tstruct cords_%s * attributes;\n",optr->id);
 		fprintf(h,"\tint\t%s;\n","id");
+		fprintf(h,"\tint\t%s;\n","orderid");
 		for (	aptr=optr->first;
 			aptr != (struct occi_attribute *) 0;
 			aptr = aptr->next )
