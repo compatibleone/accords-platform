@@ -226,6 +226,8 @@ private	void	generate_set_occi_field( FILE * h )
 			continue;
 		else if (!( strcmp( iptr->name, "next" ) ))
 			continue;
+		else if (!( strcmp( iptr->name, "orderid" ) ))
+			continue;
 		else if (!( strcmp( iptr->name, "parent" ) ))
 			continue;
 		else if (!( strncmp( iptr->name, "first", strlen("first") ) ))

@@ -324,7 +324,6 @@ private	int	comodel_generate_filter_h( struct occi_category * optr )
 		fprintf(h,"struct cords_%s_occi_filter\n{\n",optr->id);
 		fprintf(h,"\tstruct cords_%s * attributes;\n",optr->id);
 		fprintf(h,"\tint\t%s;\n","id");
-		fprintf(h,"\tint\t%s;\n","orderid");
 		for (	aptr=optr->first;
 			aptr != (struct occi_attribute *) 0;
 			aptr = aptr->next )
