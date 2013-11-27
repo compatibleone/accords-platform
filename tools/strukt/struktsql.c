@@ -460,9 +460,9 @@ private	void	generate_occi_sql_on_insert( FILE * h, char * nptr, char * fullname
 	fprintf(h,"\tchar * xptr=(char *) 0;\n");
 	fprintf(h,"\tchar * wptr=(char *) 0;\n");
 	fprintf(h,"\tchar   orderid[32];\n");
-	fprintf(h,"\tchar buffer[1024];\n");
-	fprintf(h,"\tint separator='(';\n");
-	fprintf(h,"\rorder_sql_timestamp(buffer);\n");
+	fprintf(h,"\tchar   buffer[1024];\n");
+	fprintf(h,"\tint    separator='(';\n");
+	fprintf(h,"\torder_sql_timestamp(orderid);\n");
 	if (!( xptr = allocate_string("(id,orderid")))
 		return;
 
