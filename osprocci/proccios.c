@@ -1671,6 +1671,7 @@ private	struct	rest_response * save_openstack(
 
 			}
 			sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+			autosave_openstack_node(pptr);
 			if (!( rest_valid_string( pptr->price ) ))
 				return( rest_html_response( aptr, 200, "OK" ) );
 			else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=save", pptr->account, reference ) )
@@ -1786,6 +1787,7 @@ private	struct	rest_response * stop_openstack(
 		reset_openstack_server( pptr );
 		pptr->stamp = time((long *) 0);
 		sprintf(reference,"%s/%s/%s",OsProcci.identity,_CORDS_OPENSTACK,pptr->id);
+		autosave_openstack_node(pptr);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENSTACK, pptr->price, "action=stop", pptr->account, reference ) )
@@ -1817,6 +1819,7 @@ private	struct	rest_response * restart_openstack(
 		{
 			pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_RUNNING;
+			autosave_openstack_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -1844,6 +1847,7 @@ private	struct	rest_response * suspend_openstack(
 		{
 			pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_SUSPENDED;
+			autosave_openstack_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}

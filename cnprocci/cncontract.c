@@ -230,7 +230,7 @@ public	struct	rest_response * start_computenext(
 	cnptr = cn_liberate_response( cnptr );
 	
 	pptr->state = _OCCI_RUNNING;
-		
+	autosave_computenext_node(pptr);	
 	return( rest_html_response( aptr, 200, "OK" ) );	
 }
 
@@ -244,7 +244,7 @@ public	struct	rest_response * save_computenext(
 		struct rest_response * aptr, 
 		void * vptr )
 {
-	struct	cords_contract * pptr;
+	struct	computenext * pptr;
 	if (!( pptr = vptr ))
 	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
 	else
@@ -252,6 +252,7 @@ public	struct	rest_response * save_computenext(
 		/* ----------------------------------- */
 		/* add code here to allocate resources */	
 		/* ----------------------------------- */
+		autosave_computenext_node(pptr);	
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
 }
@@ -283,6 +284,7 @@ public	struct	rest_response * stop_computenext(
 		cnptr = cn_liberate_response( cnptr );
 
 		sprintf(reference,"%s/%s/%s",Configuration.identity,_CORDS_COMPUTENEXT,pptr->id);
+		autosave_computenext_node(pptr);	
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_COMPUTENEXT, pptr->price, "action=stop", pptr->apikey, reference ) )

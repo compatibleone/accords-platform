@@ -655,6 +655,7 @@ private	struct	rest_response * save_opennebula(
 		}
 		onptr = liberate_on_response( onptr );
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
+		autosave_opennebula_node(pptr);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
 		else if ( occi_send_transaction( _CORDS_OPENNEBULA, pptr->price, "action=save", pptr->account, reference ) )
@@ -704,6 +705,7 @@ private	struct	rest_response * snapshot_opennebula(
 	 	return( rest_html_response( aptr, 1400+status, "snapshot shutdown failure" ) );
 	{
 		onptr = liberate_on_response( onptr );
+		autosave_opennebula_node(pptr);
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -769,6 +771,7 @@ private	struct	rest_response * stop_opennebula(
 		reset_opennebula_server( pptr );
 		pptr->stamp = time((long *) 0);
 		onptr = liberate_on_response( onptr );
+		autosave_opennebula_node(pptr);
 		sprintf(reference,"%s/%s/%s",OnProcci.identity,_CORDS_OPENNEBULA,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );

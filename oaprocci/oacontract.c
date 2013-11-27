@@ -1532,8 +1532,7 @@ private	struct oa_response * stop_onapp_provisioning( struct onapp * pptr )
 		}
 		if ( pptr->hostname )
 			pptr->hostname = liberate(pptr->hostname);
-//		if ( pptr->ipaddress )
-//			pptr->ipaddress = liberate(pptr->ipaddress);
+		autosave_onapp_node(pptr);
 		return( oaptr );
 	}
 }
@@ -1559,7 +1558,7 @@ private	struct oa_response * start_onapp_provisioning( struct onapp * pptr )
 			pptr->state = _OCCI_ACTIVE;
 		}
 	}
-
+	autosave_onapp_node(pptr);
 	return( oaptr );
 }
 
@@ -1597,7 +1596,7 @@ private	struct oa_response * shutdown_onapp_provisioning( struct onapp * pptr )
 		oaptr = oa_shutdown_server(config, pptr);
 
 		pptr->state = _OCCI_IDLE;
-
+		autosave_onapp_node(pptr);
 		return( oaptr );
 	}
 }
@@ -1620,7 +1619,7 @@ private	struct oa_response * restart_onapp_provisioning( struct onapp * pptr )
 
 		pptr->state = _OCCI_ACTIVE;
 	}
-
+	autosave_onapp_node(pptr);
 	return( oaptr );
 }
 
