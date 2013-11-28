@@ -1,4 +1,3 @@
-
 include "csp-customermenu.txt";
 include "csp-vendormenu.txt";
 include "csp-providermenu.txt";
@@ -59,3 +58,14 @@ function	HtmlFooter()
 	"</table></div></td></tr></table></div></body></html>".display();
 	return;
 }
+
+function	HtmlTimer($timeout)
+{
+	'<script language="javascript" type="text/javascript">'.display();
+	'function reloadPage(newpage)'.display();
+	'{ window.location = newpage; return(false); }'.display();
+	$m = "var prTimer = setTimeout('reloadPage(window.location)',"#$timeout#");";
+	$m.display();
+	'</script>'.display();
+}
+

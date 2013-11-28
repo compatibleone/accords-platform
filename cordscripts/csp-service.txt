@@ -58,6 +58,7 @@
 	HtmlHeader("Accords Platform Service Report",$1);
 
 	$service = $2;
+	$working = 0;
 
 	if ($service.length() > 0 )
 	{
@@ -86,6 +87,7 @@
 			break;
 		default		:
 			"<span class=action>working</span></form></tr>".display();
+			$working = $working + 1;
 		}
 		}
 		else
@@ -144,6 +146,7 @@
 			break;
 		default		:
 			$m = "<td colspan=2><b>working Since</b><td>"#$value;
+			$working = $working + 1;
 		}
 		$m.display();
 
@@ -236,10 +239,13 @@
 					break;
 				default		:
 					"<span class=action>working</span></form></tr>".display();
+					$working = $working + 1;
 				}
 			}
 		}
 	}
+
+	if ( $working > 0 ) { HtmlTimer( 30000 ); }
 
 	HtmlFooter();
 
