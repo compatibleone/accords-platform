@@ -1,0 +1,32 @@
+	"Service Recovery Operation".display();
+
+	$l = service.list();
+
+	foreach ( $l as $i )
+	{
+		$s = $i.get();
+		$state = $s["occi.service.state"];
+		$i.display();
+		$m = "state = ";
+		switch ( $state )
+		{
+		case	0	:
+			$m = $m#"idle";
+			break;
+		case	1	:
+			$m = $m#"active";
+			break;
+		default		:
+			$m = $m#"working";
+			break;
+		}
+		$m.display();
+		if ( $state > 1 )
+		{
+			"recovery of service".display();
+			$i.recover();
+		}	
+	}
+
+	"End of Operation".display();
+
