@@ -8,6 +8,7 @@ include "csp-header.txt";
 
 	$jobs = [];
 	$max  = 0;
+	$working = 0;
 
 	$maximum = 0;
 	$minimum = 0;
@@ -28,6 +29,7 @@ include "csp-header.txt";
 		$start    = $start.date();
 		$duration = $schedule["occi.schedule.duration"];
 		$status   = $schedule["occi.schedule.response"];
+		if ( $status == 0 ) { $status = "<span class=action>working</span>"; $start = ""; $working = $working + 1; }
 		$message  = $schedule["occi.schedule.message"];
 		$a = $url / "/";
 
@@ -117,5 +119,5 @@ include "csp-header.txt";
 	$m.display();
 
 	"<tr><th colspan=5><a href='dashboard.php?action=compile&output=HTML&script=csp-operations.txt'>Platform Operations</a></th></tr>".display();
-
+	if ( $working > 0 ) { HtmlTimer( 30000 ); }
 	HtmlFooter();
