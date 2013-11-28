@@ -701,6 +701,7 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#scaleup'/>
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#scaledown'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#recover'/>
 	    </actions>
 	</category>
 	<!--  no doc or live instances -->

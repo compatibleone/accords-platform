@@ -182,7 +182,7 @@
 	        <attribute name="name" type='string' required='false' immutable='false'/>
 	        <attribute name="description" type='string' required='false' immutable='false'/>
 	        <attribute name="node" type='string' required='false' immutable='false'/>
-	        <attribute name="filename" type='string' required='false' immutable='false'/>
+	        <attribute name="request" type='string' required='false' immutable='false'/>
 	        <attribute name="account" type='string' required='false' immutable='false'/>
 	        <attribute name="profile" type='string' required='false' immutable='false'/>
 	        <attribute name="hostname" type='string' required='false' immutable='false'/>

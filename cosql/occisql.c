@@ -58,8 +58,10 @@ private	void	occi_sql_unlock()
 /*	-------------------------------------------	*/
 private	int	occi_database_failure()
 {
-	printf("*** mysql database failure: error: %s ***\n",
+	char 	buffer[4096];
+	sprintf(buffer,"MYSQL: DATABASE FAILURE: ERROR: %s ***\n",
 	       	mysql_error(Database.handle));
+	rest_log_message( buffer );
 	return(0);
 }
 
@@ -68,8 +70,10 @@ private	int	occi_database_failure()
 /*	-------------------------------------------	*/
 private	int	occi_sql_failure( struct occi_table * tptr, int result )
 {
-	printf("*** mysql table failure: error: %s ***\n",
-	       	mysql_error(tptr->handle));
+	char 	buffer[4096];
+	sprintf(buffer,"MYSQL: TABLE(%s) FAILURE: %s \n",
+	       	tptr->name,mysql_error(tptr->handle));
+	rest_log_message( buffer );
 	return( result );
 }
 
@@ -817,6 +821,7 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 /*	-------------------------------------------	*/
 public	int	start_sql_transaction(char * tablename)
 {
+	int	status;
 	struct	occi_table * tptr;
 	if (!( tptr = locate_occi_sql_table( tablename ) ))
 		return( 40 );
@@ -825,7 +830,9 @@ public	int	start_sql_transaction(char * tablename)
 	else
 	{
 		debug_sql_query( tptr, _START_TRANSACTION );
-		return( mysql_query( tptr->handle, _START_TRANSACTION ) );
+		if (!(status = mysql_query( tptr->handle, _START_TRANSACTION ) ))
+			return( status );
+		else	return( occi_sql_failure( tptr, status ) );
 	}
 }
 
@@ -834,6 +841,7 @@ public	int	start_sql_transaction(char * tablename)
 /*	-------------------------------------------	*/
 public	int	commit_sql_transaction(char * tablename)
 {
+	int	status;
 	struct	occi_table * tptr;
 	if (!( tptr = locate_occi_sql_table( tablename ) ))
 		return( 40 );
@@ -842,7 +850,9 @@ public	int	commit_sql_transaction(char * tablename)
 	else
 	{
 		debug_sql_query( tptr, _COMMIT_TRANSACTION );
-		return( mysql_query( tptr->handle, _COMMIT_TRANSACTION ) );
+		if (!(status = mysql_query( tptr->handle, _COMMIT_TRANSACTION ) ))
+			return( status );
+		else	return( occi_sql_failure( tptr, status ) );
 	}
 }
 
@@ -851,6 +861,7 @@ public	int	commit_sql_transaction(char * tablename)
 /*	-------------------------------------------------	*/
 public	int	rollback_sql_transaction(char * tablename)
 {
+	int	status;
 	struct	occi_table * tptr;
 	if (!( tptr = locate_occi_sql_table( tablename ) ))
 		return( 40 );
@@ -859,7 +870,9 @@ public	int	rollback_sql_transaction(char * tablename)
 	else
 	{
 		debug_sql_query( tptr, _ROLLBACK_TRANSACTION );
-		return( mysql_query( tptr->handle, _ROLLBACK_TRANSACTION ) );
+		if (!( status = mysql_query( tptr->handle, _ROLLBACK_TRANSACTION ) ))
+			return( status );
+		else	return( occi_sql_failure( tptr, status ) );
 	}
 }
 

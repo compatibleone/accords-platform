@@ -145,9 +145,9 @@ public	struct	rest_response * start_easiclouds(
 	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
 	else if (!( subptr = use_easiclouds_configuration( pptr->profile ) ))
 	 	return( rest_html_response( aptr, 403, "Forbidden" ) );
-	else if (!( pptr->filename ))
+	else if (!( pptr->request))
 	 	return( rest_html_response( aptr, 500, "Application Message Failure" ) );
-	else if (!( zptr = ezi_create_server( subptr, allocate_string( pptr->filename ) ) ))
+	else if (!( zptr = ezi_create_server( subptr, allocate_string( pptr->request) ) ))
 	 	return( rest_html_response( aptr, 500, "Application Creation Failure" ) );
 	else if (( status = ezi_creation_status( zptr, pptr )) > 299)
 	{
@@ -692,7 +692,7 @@ public	int	create_easiclouds_contract(
 	/* ------------------------------------------------------------------------------ */
 	/* arrival here the manifest element contains the application description message */
 	/* ------------------------------------------------------------------------------ */
-	if (!( pptr->filename = create_easiclouds_request( &contract, pptr ) ))
+	if (!( pptr->request = create_easiclouds_request( &contract, pptr ) ))
 		return( terminate_ezi_contract( 1406, &contract ) );
 
 	else

@@ -564,6 +564,35 @@ private	struct	rest_response * suspend_service(
 }
 
 /*	-------------------------------------------	*/
+/* 	   r e c o v e r _ s e r v i c e
+/*	-------------------------------------------	*/
+private	struct	rest_response * recover_service(
+		struct occi_category * optr, 
+		struct rest_client * cptr, 
+		struct rest_request * rptr, 
+		struct rest_response * aptr, 
+		void * vptr )
+{
+	struct	occi_link_node  * nptr;
+	struct	cords_xlink	* lptr;
+	char			* mptr;
+	char 			* wptr;
+	struct	cords_service * pptr;
+	if (!( pptr = vptr ))
+	 	return( rest_html_response( aptr, 404, "Invalid Action" ) );
+	else
+	{
+		if ( pptr->state == _OCCI_WORKING )
+		{
+			pptr->state = _OCCI_ACTIVE;
+			pptr->stamp  = time((long*) 0);
+			autosave_cords_service_node(pptr);
+		}
+		return( rest_html_response( aptr, 200, "OK" ) );
+	}
+}
+
+/*	-------------------------------------------	*/
 /* 	   r e s t a r t _ s e r v i c e
 /*	-------------------------------------------	*/
 private	struct	rest_response * restart_service(
@@ -1112,6 +1141,8 @@ private	struct	occi_category *	broker_service_builder( char * domain, char * cat
 		else if (!( optr = occi_add_action( optr,"scaleup","",scaleup_service)))
 			return( optr );
 		else if (!( optr = occi_add_action( optr,"scaledown","",scaledown_service)))
+			return( optr );
+		else if (!( optr = occi_add_action( optr,"recover","",recover_service)))
 			return( optr );
 		else	return( optr );
 	}
