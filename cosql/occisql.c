@@ -849,6 +849,7 @@ public	char *	sql_escaped_value( char * sptr )
 			case	0x0027	:	/* ' */
 			case	0x005C	:	/* \ */
 				*(wptr++) = 0x005C;
+			default		:
 				*(wptr++) = c;
 			}
 		}
@@ -952,7 +953,9 @@ public	char *	sql_escaped_filter( char * sptr )
 			case	0x0025	:	/* % */
 			case	0x005C	:	/* \ */
 				*(wptr++) = 0x005C;
+			default		:
 				*(wptr++) = c;
+			
 			}
 		}
 		*(wptr++) = 0;
