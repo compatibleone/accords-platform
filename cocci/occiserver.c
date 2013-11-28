@@ -1064,7 +1064,7 @@ private	struct rest_response * occi_invoke_get(
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);
 		if ( iptr->get )	aptr = (*iptr->get)(optr,cptr,rptr);
 		else			aptr = occi_failure(cptr,  405, "Bad Request : No Category Method" );
-		if ( iptr->after )	(*iptr->after)(optr,cptr,rptr);
+		if ( iptr->after )	(*iptr->after)(optr,cptr,aptr);
 		return( occi_content_type( optr, rptr, aptr ) );
 	}
 }

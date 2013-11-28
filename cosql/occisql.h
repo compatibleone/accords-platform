@@ -46,6 +46,9 @@
 #define	_ORDER_BY_LAST		"ORDER BY orderid DESC LIMIT 1"
 #define	_DELETE_FROM		"DELETE FROM"
 #define	_SINGLE_ROW		"LIMIT 1"
+#define	_START_TRANSACTION	"START TRANSACTION"
+#define	_COMMIT_TRANSACTION	"COMMIT TRANSACTION"
+#define	_ROLLBACK_TRANSACTION	"ROLLBACK TRANSACTION"
 
 struct	occi_table
 {
@@ -97,8 +100,10 @@ public	char *	allocate_string(char *);
 
 public	int	initialise_occi_sql( char * hostname, char * databasename, char * username, char * password );
 public	void	terminate_occi_sql();
+
 public	struct	occi_table * initialise_occi_sql_table( char * tablename, char * description );
 public	int	drop_occi_sql_table( char * tablename );
+
 public	int	first_occi_sql_record( char * category, struct occi_expression *expression );
 public	int	previous_occi_sql_record( char * category, struct occi_expression *expression );
 public	int	insert_occi_sql_record( char * category, struct occi_expression *expression );
@@ -107,11 +112,17 @@ public	int	update_occi_sql_record( char * category, struct occi_expression *expr
 public	int	delete_occi_sql_record( char * category, struct occi_expression *expression );
 public	int	next_occi_sql_record( char * category, struct occi_expression *expression );
 public	int	last_occi_sql_record( char * category, struct occi_expression *expression );
+
 public	char *	build_sql_filter(char * nptr, char * vptr, int type );
 public	char *	sql_escaped_value( char * sptr );
 public	char *	sql_unescaped_value( char * sptr );
 public	char *	sql_escaped_filter( char * sptr );
+
 public	void	order_sql_timestamp( char * buffer );
+
+public	int	start_sql_transaction(char * tablename);
+public	int	commit_sql_transaction(char * tablename);
+public	int	rollback_sql_transaction(char * tablename);
 
 	/* ----------- */
 #endif	/* _occi_sql_h */

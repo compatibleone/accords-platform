@@ -935,7 +935,7 @@ public	int	publish_occi_category(
 private	int 	occi_auto_publish( 
 		void * vptr,
 		struct rest_client * cptr, 
-		struct rest_request * rptr )
+		struct rest_response * rptr )
 {
 	char 	*	contract=(char *) 0;
 	struct	occi_category * optr;

@@ -105,7 +105,7 @@ struct	rest_interface
 	struct rest_response  * (*options)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	struct rest_extension * (*extension)(void * i,struct rest_server * sptr,struct rest_extension * xptr);
 	int 			(*before)(void * i,struct rest_client * cptr, struct rest_request * rptr);
-	int 			(*after)(void * i,struct rest_client * cptr, struct rest_request * rptr);
+	int 			(*after)(void * i,struct rest_client * cptr, struct rest_response * rptr);
 	int 			(*security)(void * i,struct rest_client * cptr, struct rest_request * rptr);
 	struct rest_response * 	(*transaction)(void * i,struct rest_client * cptr, struct rest_request * rptr, struct rest_response * aptr);
 	struct rest_response *  (*alert)(void * i, 

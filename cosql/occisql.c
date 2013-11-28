@@ -813,6 +813,57 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 }
 
 /*	-------------------------------------------	*/
+/*	 s t a r t _ s q l _ t r a n s a c t i o n	*/
+/*	-------------------------------------------	*/
+public	int	start_sql_transaction(char * tablename)
+{
+	struct	occi_table * tptr;
+	if (!( tptr = locate_occi_sql_table( tablename ) ))
+		return( 40 );
+	else if (!( tptr->handle ))
+		return( 50 );
+	else
+	{
+		debug_sql_query( tptr, _START_TRANSACTION );
+		return( mysql_query( tptr->handle, _START_TRANSACTION ) );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	c o m m i t _ s q l _ t r a n s a c t i o n	*/
+/*	-------------------------------------------	*/
+public	int	commit_sql_transaction(char * tablename)
+{
+	struct	occi_table * tptr;
+	if (!( tptr = locate_occi_sql_table( tablename ) ))
+		return( 40 );
+	else if (!( tptr->handle ))
+		return( 50 );
+	else
+	{
+		debug_sql_query( tptr, _COMMIT_TRANSACTION );
+		return( mysql_query( tptr->handle, _COMMIT_TRANSACTION ) );
+	}
+}
+
+/*	-------------------------------------------------	*/
+/*	 r o l l b a c k _ s q l _ t r a n s a c t i o n	*/
+/*	-------------------------------------------------	*/
+public	int	rollback_sql_transaction(char * tablename)
+{
+	struct	occi_table * tptr;
+	if (!( tptr = locate_occi_sql_table( tablename ) ))
+		return( 40 );
+	else if (!( tptr->handle ))
+		return( 50 );
+	else
+	{
+		debug_sql_query( tptr, _ROLLBACK_TRANSACTION );
+		return( mysql_query( tptr->handle, _ROLLBACK_TRANSACTION ) );
+	}
+}
+
+/*	-------------------------------------------	*/
 /*	     s q l _ e s c a p e d _ v a l u e 		*/
 /*	-------------------------------------------	*/
 private	char	sql_escape_buffer[4096];
