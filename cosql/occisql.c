@@ -502,13 +502,21 @@ public	int	first_occi_sql_record( char * category,  struct occi_expression *expr
 	char *	xptr;
 	struct	occi_table * tptr;
 	int	status;
+	char	buffer[2048];
+	if ( expression->value )
+		sprintf(buffer,"WHERE %s",expression->value);
+	else	buffer[0] = 0;
 	if (!( tptr = locate_occi_sql_table( category ) ))
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if (!( xptr = allocate( strlen( tptr->name ) + strlen( _SELECT_ID_FROM ) + strlen( _ORDER_BY_FIRST ) + 16 ) ))
+	else if (!( xptr = allocate( 
+			strlen( _SELECT_ALL_FROM ) + 
+			strlen( tptr->name ) + 
+			strlen( buffer ) + 
+			strlen( _ORDER_BY_FIRST ) + 16 ) ))
 		return( 27 );
-	else	sprintf(xptr,"%s %s %s",_SELECT_ALL_FROM,tptr->name,_ORDER_BY_FIRST);
+	else	sprintf(xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,buffer,_ORDER_BY_FIRST);
 
 	occi_sql_lock();
 	debug_sql_query( tptr, xptr );
@@ -544,7 +552,7 @@ public	int	previous_occi_sql_record( char * category,  struct occi_expression *e
 	else if (!( xptr = allocate( 
 				strlen( ( expression->value ? expression->value : "" ) ) + 
 				strlen( tptr->name ) + 
-				strlen( _SELECT_ID_FROM ) + 
+				strlen( _SELECT_ALL_FROM ) + 
 				strlen( _ORDER_BY_LAST ) + 16 ) ))
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,( expression->value ? expression->value : "" ),_ORDER_BY_LAST);
@@ -645,9 +653,12 @@ public	int	collect_occi_sql_records( char * category,  struct occi_expression *e
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if (!( xptr = allocate( strlen( ( expression->value ? expression->value : "" ) ) + strlen( tptr->name ) + strlen( _SELECT_ALL_FROM ) + 16 ) ))
+	else if (!( xptr = allocate( strlen( ( expression->value ? expression->value : "" ) ) + strlen( tptr->name ) + strlen( _SELECT_ALL_FROM ) + strlen( _ORDER_BY_ORDERID ) + 16 ) ))
 		return( 27 );
-	else	sprintf( xptr,"%s %s %s",_SELECT_ID_FROM,tptr->name,( expression->value ? expression->value : "" ));
+	else	sprintf( xptr,"%s %s %s %s",
+			_SELECT_ID_FROM,tptr->name,
+			( expression->value ? expression->value : "" ),
+			_ORDER_BY_ORDERID);
 	occi_sql_lock();
 	debug_sql_query( tptr, xptr );
 	status = mysql_query( tptr->handle, xptr );
@@ -738,7 +749,7 @@ public	int	next_occi_sql_record( char * category,  struct occi_expression *expre
 	else if (!( xptr = allocate( 
 				strlen( ( expression->value ? expression->value : "" ) ) + 
 				strlen( tptr->name ) + 
-				strlen( _SELECT_ID_FROM ) + 
+				strlen( _SELECT_ALL_FROM ) + 
 				strlen( _ORDER_BY_FIRST ) + 16 ) ))
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,( expression->value ? expression->value : "" ),_ORDER_BY_FIRST);
@@ -768,13 +779,21 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 	int	status;
 	char *	xptr;
 	struct	occi_table * tptr;
+	char	buffer[2048];
+	if ( expression->value )
+		sprintf(buffer,"WHERE %s",expression->value);
+	else	buffer[0] = 0;
 	if (!( tptr = locate_occi_sql_table( category ) ))
 		return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
-	else if (!( xptr = allocate( strlen( tptr->name ) + strlen( _SELECT_ID_FROM ) + strlen( _ORDER_BY_LAST ) + 16 ) ))
+	else if (!( xptr = allocate( 
+			strlen( _SELECT_ALL_FROM ) + 
+			strlen( tptr->name ) +  
+			strlen( buffer ) +			
+			strlen( _ORDER_BY_LAST ) + 16 ) ))
 		return( 27 );
-	else	sprintf( xptr,"%s %s %s",_SELECT_ALL_FROM,tptr->name,_ORDER_BY_LAST);
+	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,buffer,_ORDER_BY_LAST);
 
 	occi_sql_lock();
 	debug_sql_query( tptr, xptr );

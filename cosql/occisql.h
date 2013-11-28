@@ -41,6 +41,7 @@
 #define	_UPDATE_WHERE		"UPDATE"
 #define	_SELECT_ALL_FROM	"SELECT * FROM"
 #define	_SELECT_ID_FROM		"SELECT id FROM"
+#define	_ORDER_BY_ORDERID	"ORDER BY orderid ASC "
 #define	_ORDER_BY_FIRST		"ORDER BY orderid ASC LIMIT 1"
 #define	_ORDER_BY_LAST		"ORDER BY orderid DESC LIMIT 1"
 #define	_DELETE_FROM		"DELETE FROM"
