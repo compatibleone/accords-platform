@@ -86,7 +86,8 @@
 			"<input type=submit class=greenaction name=action value='start service'></form></tr>".display();
 			break;
 		default		:
-			"<span class=action>working</span></form></tr>".display();
+			"<br><input type=submit class=redaction name=action value='recover service'>".display();
+			"<br>&nbsp;<br><center><span class=action>working</span></center></form></tr>".display();
 			$working = $working + 1;
 		}
 		}
