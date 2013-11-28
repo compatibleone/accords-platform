@@ -268,6 +268,7 @@ private	struct	rest_response * start_contract(
 			/* ---------------------------------------- */
 			if ( is_common_contract( pptr ) )
 			{
+				autosave_cords_contract_node( pptr );
 				if (!(zptr = cords_invoke_action( pptr->common, _CORDS_START,
 					_CORDS_CONTRACT_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
@@ -277,6 +278,7 @@ private	struct	rest_response * start_contract(
 					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
 				}
 				else	zptr = occi_remove_response ( zptr );
+				autoload_cords_contract_node( pptr );
 			}
 			/* ---------------------------------------- */
 			/* basic type infrastructure and image node */
@@ -286,6 +288,7 @@ private	struct	rest_response * start_contract(
 			{
 				sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
 				contract_instructions( pptr, fullid, pptr->provider );
+				autosave_cords_contract_node( pptr );
 				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_START, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
@@ -295,6 +298,7 @@ private	struct	rest_response * start_contract(
 					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
 				}
 				else	zptr = occi_remove_response ( zptr );
+				autoload_cords_contract_node( pptr );
 				retrieve_provider_information( pptr );
 			}
 			/* ---------------------------------------- */
@@ -305,6 +309,7 @@ private	struct	rest_response * start_contract(
 			{
 				sprintf(fullid,"%s/%s/%s",Procci.identity,_CORDS_CONTRACT,pptr->id);
 				contract_instructions( pptr, fullid, pptr->provider );
+				autosave_cords_contract_node( pptr );
 				if (!(zptr = cords_invoke_action( pptr->provider, _CORDS_START, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
@@ -314,6 +319,7 @@ private	struct	rest_response * start_contract(
 					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
 				}
 				else	zptr = occi_remove_response ( zptr );
+				autoload_cords_contract_node( pptr );
 				retrieve_provider_information( pptr );
 			}
 			/* ---------------------------------------- */
@@ -321,6 +327,7 @@ private	struct	rest_response * start_contract(
 			/* ---------------------------------------- */
 			else if ( rest_valid_string( pptr->service ) != 0 )
 			{
+				autosave_cords_contract_node( pptr );
 				if (!(zptr = cords_invoke_action( pptr->service, _CORDS_START, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
@@ -330,6 +337,7 @@ private	struct	rest_response * start_contract(
 					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
 				}
 				else	zptr = occi_remove_response ( zptr );
+				autoload_cords_contract_node( pptr );
 			}
 
 			/* ------------------------ */
@@ -359,6 +367,7 @@ private	struct	rest_response * start_contract(
 			/* ------------------------ */
 			if ( rest_valid_string( pptr->session ) != 0)
 			{
+				autosave_cords_contract_node( pptr );
 				if (!(zptr = cords_invoke_action( pptr->session, _CORDS_START, 
 					_CORDS_CONTRACT_AGENT, default_tls() )))
 					return( rest_html_response( aptr, 900, "Action Invocation Failure" ) );
@@ -368,6 +377,7 @@ private	struct	rest_response * start_contract(
 					return( rest_html_response( aptr, status, "Action Invocation Error" ) );
 				}
 				else	zptr = occi_remove_response ( zptr );
+				autoload_cords_contract_node( pptr );
 			}
 			pptr->startduration = (time((long*)0) - pptr->stamp);
 			pptr->stamp  = time((long*)0); 

@@ -231,6 +231,7 @@ public	void	generate_occi_rest_builder( FILE * h, char * nptr )
 	/* ----------------- */
 	title(h,"occi category rest interface method auto load");
 	fprintf(h,"private char*autosave_%s_name=%c%s.xml%c;\n",C.name,0x0022,C.name,0x0022);
+	fprintf(h,"public int autoload_%s_node(struct %s * pptr) { return(0); }\n",C.name,C.name);
 	fprintf(h,"private void autoload_%s_nodes() {\n",C.name,C.name);
 	fprintf(h,"\tchar * fn=autosave_%s_name;",C.name);
 	fprintf(h,"\tstruct occi_%s_node * nptr;\n",C.klass);
@@ -375,6 +376,8 @@ public	void	generate_occi_rest_builder( FILE * h, char * nptr )
 			continue;
 		else if (!( strcmp( iptr->name, "id" ) ))
 			continue;
+		else if (!( strcmp( iptr->name, "orderid" ) ))
+			continue;
 		else if (!( strcmp( iptr->name, "parent" ) ))
 			continue;
 		else if (!( strncmp( iptr->name, "first", strlen("first") ) ))
@@ -410,6 +413,8 @@ public	void	generate_occi_rest_builder( FILE * h, char * nptr )
 		else if (!( strcmp( iptr->name, "next" ) ))
 			continue;
 		else if (!( strcmp( iptr->name, "id" ) ))
+			continue;
+		else if (!( strcmp( iptr->name, "orderid" ) ))
 			continue;
 		else if (!( strcmp( iptr->name, "parent" ) ))
 			continue;
@@ -471,6 +476,8 @@ public	void	generate_occi_rest_builder( FILE * h, char * nptr )
 		if (!( strcmp( iptr->name, "previous" ) ))
 			continue;
 		else if (!( strcmp( iptr->name, "next" ) ))
+			continue;
+		else if (!( strcmp( iptr->name, "orderid" ) ))
 			continue;
 		else if (!( strcmp( iptr->name, "parent" ) ))
 			continue;
