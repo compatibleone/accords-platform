@@ -1094,6 +1094,12 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	fprintf(h,"\telse return(%s_sql_on_update(pptr->id, pptr));\n",fullname);
 	fprintf(h,"}\n");
 
+	fprintf(h,"public  int	autoload_%s_node(struct %s * pptr)\n{\n",C.name,C.name);
+	fprintf(h,"\tif (!( pptr )) return(118);\n");
+	fprintf(h,"\telse if (!( pptr->id )) return(118);\n");
+	fprintf(h,"\telse return(%s_sql_on_search(pptr->id, pptr));\n",fullname);
+	fprintf(h,"}\n");
+
 	/* ----------------------- */
 	/* generate occi collector */
 	/* ----------------------- */
