@@ -355,7 +355,7 @@ public	struct	occi_table * initialise_occi_sql_table( char * tablename, char * d
 			occi_database_failure("initialisation");
 			return( tptr );
 		}
-		else if (!( mysql_options( Database.handle, MYSQL_OPT_RECONNECT, (const void *)&option )))
+		else if ( mysql_options( Database.handle, MYSQL_OPT_RECONNECT, (const void *)&option ) != 0)
 		{
 			occi_database_failure("options");
 			return( tptr );
