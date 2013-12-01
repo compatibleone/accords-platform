@@ -66,13 +66,24 @@ private	int	occi_database_failure(char * msg)
 }
 
 /*	-------------------------------------------	*/
-/*	o c c i _ s q l _ f a i l u r e 		*/
+/*	o c c i _ d a t a b a s e _ l o g w r i t E	*/
 /*	-------------------------------------------	*/
-private	int	occi_sql_failure( struct occi_table * tptr, int result )
+private	int	occi_database_logwrite(char * msg)
 {
 	char 	buffer[4096];
-	sprintf(buffer,"MYSQL: TABLE(%s) FAILURE: %s \n",
-	       	tptr->name,mysql_error(tptr->handle));
+	sprintf(buffer,"MYSQL-QUERY: %s", msg);
+	rest_log_message( buffer );
+	return(0);
+}
+
+/*	-------------------------------------------	*/
+/*	o c c i _ s q l _ f a i l u r e 		*/
+/*	-------------------------------------------	*/
+private	int	occi_sql_failure( struct occi_table * tptr, int result, char * msg,int id )
+{
+	char 	buffer[4096];
+	sprintf(buffer,"MYSQL(%u,%s): TABLE(%s) FAILURE: %s \n",
+	       	id,msg,tptr->name,mysql_error(tptr->handle));
 	rest_log_message( buffer );
 	return( result );
 }
@@ -92,14 +103,15 @@ private	void	debug_sql_query(struct occi_table * tptr, char * xptr )
 /*	-------------------------------		*/
 /*	o c c i _ m y s q l _ q u e r y 	*/
 /*	-------------------------------		*/
-private	int occi_mysql_query(struct occi_table * tptr, char * xptr )
+private	int occi_mysql_query(int id, struct occi_table * tptr, char * xptr )
 {
 	int	status;
 	debug_sql_query( tptr, xptr );
+	occi_database_logwrite( xptr );
 	if ((status = mysql_ping(tptr->handle)) != 0)
-		return( occi_sql_failure( tptr, status ) );
+		return( occi_sql_failure( tptr, status, "ping", id ) );
 	if ((status = mysql_query(tptr->handle, xptr)) != 0)
-		return( occi_sql_failure( tptr, status ) );
+		return( occi_sql_failure( tptr, status, "query", id ) );
 	else	return( status );
 }
 
@@ -250,7 +262,7 @@ private	int	create_occi_sql_table( struct occi_table * tptr )
 	else 
 	{
 		sprintf(xptr,"%s %s %s", _CREATE_TABLE, tptr->name, tptr->description );
-		tptr->status = occi_mysql_query( tptr, xptr );
+		tptr->status = occi_mysql_query( 1,tptr, xptr );
 		liberate( xptr );
 		return( ( tptr->status ? 46 : 0 ) );
 	}
@@ -268,7 +280,7 @@ private	int	create_occi_sql_database( struct occi_table * tptr )
 	else 
 	{
 		sprintf(xptr,"%s %s ", _CREATE_DATABASE, tptr->base );
-		if ((tptr->status = occi_mysql_query( tptr, xptr )) != 0)
+		if ((tptr->status = occi_mysql_query( 2,tptr, xptr )) != 0)
 		{
 			liberate( xptr );
 			return(46);
@@ -552,7 +564,7 @@ public	int	first_occi_sql_record( char * category,  struct occi_expression *expr
 	else	sprintf(xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,buffer,_ORDER_BY_FIRST);
 
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 3,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0)
 	{
@@ -590,7 +602,7 @@ public	int	previous_occi_sql_record( char * category,  struct occi_expression *e
 	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,( expression->value ? expression->value : "" ),_ORDER_BY_LAST);
 
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 4,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0)
 	{
@@ -625,7 +637,7 @@ public	int	insert_occi_sql_record( char * category,  struct occi_expression *exp
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s",_INSERT_INTO,tptr->name,expression->value);
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 5,tptr, xptr );
 	liberate( xptr );
 	occi_sql_unlock();
 	if ( status )
@@ -653,7 +665,7 @@ public	int	search_occi_sql_record( char * category,  struct occi_expression *exp
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s",_SELECT_ALL_FROM,tptr->name,expression->value);
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 6,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0 )
 	{
@@ -689,7 +701,7 @@ public	int	collect_occi_sql_records( char * category,  struct occi_expression *e
 			( expression->value ? expression->value : "" ),
 			_ORDER_BY_ORDERID);
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 7,tptr, xptr );
 	liberate( xptr );
 	if ( status )
 	{
@@ -724,7 +736,7 @@ public	int	update_occi_sql_record( char * category,  struct occi_expression *exp
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s",_UPDATE_WHERE,tptr->name,expression->value);
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 8,tptr, xptr );
 	liberate( xptr );
 	occi_sql_unlock();
 	if ( status )
@@ -752,7 +764,7 @@ public	int	delete_occi_sql_record( char * category,  struct occi_expression *exp
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s",_DELETE_FROM,tptr->name,expression->value);
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 9,tptr, xptr );
 	liberate( xptr );
 	occi_sql_unlock();
 	if ( status )
@@ -781,7 +793,7 @@ public	int	next_occi_sql_record( char * category,  struct occi_expression *expre
 	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,( expression->value ? expression->value : "" ),_ORDER_BY_FIRST);
 
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 10,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0)
 	{
@@ -821,7 +833,7 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,buffer,_ORDER_BY_LAST);
 
 	occi_sql_lock();
-	status = occi_mysql_query( tptr, xptr );
+	status = occi_mysql_query( 11,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0)
 	{
@@ -849,7 +861,7 @@ public	int	start_sql_transaction(char * tablename)
 		return( 50 );
 	else
 	{
-		if (!(status = occi_mysql_query( tptr, _START_TRANSACTION ) ))
+		if (!(status = occi_mysql_query( 12,tptr, _START_TRANSACTION ) ))
 			return( status );
 		else	return( status );
 	}
@@ -868,7 +880,7 @@ public	int	commit_sql_transaction(char * tablename)
 		return( 50 );
 	else
 	{
-		if (!(status = occi_mysql_query( tptr, _COMMIT_TRANSACTION ) ))
+		if (!(status = occi_mysql_query( 13,tptr, _COMMIT_TRANSACTION ) ))
 			return( status );
 		else	return( status );
 	}
@@ -887,7 +899,7 @@ public	int	rollback_sql_transaction(char * tablename)
 		return( 50 );
 	else
 	{
-		if (!( status = occi_mysql_query( tptr, _ROLLBACK_TRANSACTION ) ))
+		if (!( status = occi_mysql_query( 14,tptr, _ROLLBACK_TRANSACTION ) ))
 			return( status );
 		else	return( status );
 	}

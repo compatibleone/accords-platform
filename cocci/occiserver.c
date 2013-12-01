@@ -1330,7 +1330,7 @@ private	struct rest_response * occi_invoke_post(
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);
 		if ( iptr->post )	aptr = (*iptr->post)(optr,cptr,rptr);
 		else			aptr = occi_failure(cptr,  405, "Bad Request : No Category Method" );
-		if ( iptr->after )	(*iptr->after)(optr,cptr,rptr);
+		if ( iptr->after )	(*iptr->after)(optr,cptr,aptr);
 		return( occi_content_type( optr,rptr, aptr ) );
 	}
 }
@@ -1356,7 +1356,7 @@ private	struct rest_response * occi_invoke_put(
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);
 		if ( iptr->put )	aptr = (*iptr->put)(optr,cptr,rptr);
 		else			aptr = occi_failure(cptr,  405, "Bad Request : No Category Method" );
-		if ( iptr->after )	(*iptr->after)(optr,cptr,rptr);
+		if ( iptr->after )	(*iptr->after)(optr,cptr,aptr);
 		return( occi_content_type( optr, rptr, aptr ) );
 	}
 }
@@ -1436,7 +1436,7 @@ private	struct rest_response * occi_invoke_delete(
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);
 		if ( iptr->delete )	aptr = (*iptr->delete)(optr,cptr,rptr);
 		else			aptr = occi_failure(cptr,  405, "Bad Request : No Category Method" );
-		if ( iptr->after )	(*iptr->after)(optr,cptr,rptr);
+		if ( iptr->after )	(*iptr->after)(optr,cptr,aptr);
 		occi_untrack_double_delete( eptr );
 		return( occi_content_type( optr, rptr, aptr ) );
 	}
@@ -1461,7 +1461,7 @@ private	struct rest_response * occi_invoke_head(
 		if ( iptr->before ) 	(*iptr->before)(optr,cptr,rptr);
 		if ( iptr->head )	aptr = (*iptr->head)(optr,cptr,rptr);
 		else			aptr = occi_failure(cptr,  405, "Bad Request : No Category Method" );
-		if ( iptr->after )	(*iptr->after)(optr,cptr,rptr);
+		if ( iptr->after )	(*iptr->after)(optr,cptr,aptr);
 		return( occi_content_type( optr, rptr, aptr ) );
 	}
 }
