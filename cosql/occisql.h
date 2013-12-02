@@ -21,7 +21,8 @@
 
 #include "standard.h"
 
-#define	OCCI_MYSQL 
+#define	_OCCI_MYSQL		1
+// #define	_OCCI_POSTGRE 	2
 
 #ifndef	public
 #define	public
@@ -31,8 +32,12 @@
 #define	private	static
 #endif
 
-#ifdef	OCCI_MYSQL
+#ifdef	_OCCI_MYSQL
 #include <mysql/mysql.h>
+#endif
+
+#ifdef	_OCCI_POSTGRE
+#include <libpq-fe.h>
 #endif
 
 #define	_CREATE_DATABASE	"CREATE DATABASE IF NOT EXISTS "
@@ -50,6 +55,12 @@
 #define	_COMMIT_TRANSACTION	"COMMIT"
 #define	_ROLLBACK_TRANSACTION	"ROLLBACK"
 
+struct	occi_database_thread
+{
+	struct	occi_database_thread *	next;
+	pthread_t			tid;
+};
+
 struct	occi_table
 {
 	struct	occi_table * previous;
@@ -62,13 +73,15 @@ struct	occi_table
 	int	port;
 	char *	user;
 	char * 	pass;
-	MYSQL *	handle;
+	void *	handle;
+	void *	result;
 };
 
 struct	occi_database 
 {
 	int	status;
-	MYSQL*	handle;
+	char * 	nature;
+	void *	handle;
 	char *	hostname;
 	char *	basename;
 	char *	username;

@@ -24,6 +24,7 @@
 private	struct	occi_database Database = 
 	{
 	0,
+	"UNKNOWN",
 	(MYSQL*) 0,
 	(char *) 0,
 	(char *) 0, 
@@ -34,12 +35,14 @@ private	struct	occi_database Database =
 	};
 
 private pthread_mutex_t database_lock=PTHREAD_MUTEX_INITIALIZER;
+private	struct	occi_database_thread * threadheap=(struct occi_database_thread*) 0;
 
 /*	-------------------------------------------	*/
 /*		o c c i _ s q l _ l o c k		*/
 /*	-------------------------------------------	*/
 private	void	occi_sql_lock()
 {
+	rest_log_message("OCCI-SQL LOCK DATABASE");
 	pthread_mutex_lock( &database_lock );
 	return;
 }
@@ -49,8 +52,38 @@ private	void	occi_sql_lock()
 /*	-------------------------------------------	*/
 private	void	occi_sql_unlock()
 {
+	rest_log_message("OCCI-SQL UNLOCK DATABASE");
 	pthread_mutex_unlock( &database_lock );
 	return;
+}
+
+/*	---------------------------		*/
+/*	o c c i _ s q l _ e r r o r 	*/
+/*	---------------------------		*/
+private	char * occi_sql_error( void * h )
+{
+	switch ( Database.status )
+	{
+
+#ifdef	_OCCI_MYSQL
+	case	_OCCI_MYSQL		:
+		return( (char *) mysql_error( (MYSQL *) h ) );
+#endif
+
+#ifdef	_OCCI_POSTGRE
+	case	_OCCI_POSTGRE	:
+			PGconn * pqptr;
+			if (!(pqptr = (PGconn *) h))
+				return( "incorrect handle" );
+			else if (!( pqptr->result ))
+				return( "incorrect result handle" );
+			else
+				return( PQresultErrorMessage( pqptr->result ) );
+#endif
+
+	default					:
+		return( "unknown database type" );
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -59,8 +92,8 @@ private	void	occi_sql_unlock()
 private	int	occi_database_failure(char * msg)
 {
 	char 	buffer[4096];
-	sprintf(buffer,"MYSQL: DATABASE FAILURE(%s): ERROR: %s ***\n",
-		msg, mysql_error(Database.handle));
+	sprintf(buffer,"%s: DATABASE FAILURE(%s): ERROR: %s ***\n",
+		Database.nature,msg, occi_sql_error(Database.handle));
 	rest_log_message( buffer );
 	return(0);
 }
@@ -71,7 +104,7 @@ private	int	occi_database_failure(char * msg)
 private	int	occi_database_logwrite(char * msg)
 {
 	char 	buffer[4096];
-	sprintf(buffer,"MYSQL-QUERY: %s", msg);
+	sprintf(buffer,"%s-QUERY: %s",Database.nature, msg);
 	rest_log_message( buffer );
 	return(0);
 }
@@ -82,8 +115,8 @@ private	int	occi_database_logwrite(char * msg)
 private	int	occi_sql_failure( struct occi_table * tptr, int result, char * msg,int id )
 {
 	char 	buffer[4096];
-	sprintf(buffer,"MYSQL(%u,%s): TABLE(%s) FAILURE: %s \n",
-	       	id,msg,tptr->name,mysql_error(tptr->handle));
+	sprintf(buffer,"%s(%u,%s): TABLE(%s) FAILURE: %s \n",
+	       	Database.nature,id,msg,tptr->name,occi_sql_error(tptr->handle));
 	rest_log_message( buffer );
 	return( result );
 }
@@ -95,24 +128,78 @@ private	void	debug_sql_query(struct occi_table * tptr, char * xptr )
 {
 	if ( check_verbose() )
 	{
-		printf("Occi MySQL Query: %s: %s\n",tptr->name, xptr);
+		printf("Occi %s Query: %s: %s\n",Database.nature,tptr->name, xptr);
 	}
 	return;
+}
+
+/*	-------------------------------------------------	*/
+/*	o c c i _ d a t a b a s e _ t h r e a d _ i n i t	*/
+/*	-------------------------------------------------	*/
+/*	this is pure MYSQL stuff.							*/
+/*	-------------------------------------------------	*/
+private	void	occi_database_thread_init()
+{
+	char	buffer[1024];
+	struct	occi_database_thread * tptr;
+	pthread_t	tid;
+	tid = pthread_self();
+	for ( 	tptr=threadheap;
+		tptr != (struct occi_database_thread *) 0;
+		tptr = tptr->next )
+		if ( tptr->tid == tid )
+			return;
+	sprintf(buffer,"%s THREAD INIT: %u\n",Database.nature,tid);	
+	rest_log_message( buffer );
+	if (!( tptr = allocate( sizeof( struct occi_database_thread ) ) ))
+		return;
+	else
+	{
+		tptr->tid = tid;
+		mysql_thread_init();
+		tptr->next = threadheap;
+		threadheap = tptr;
+		return;
+	}
 }
 
 /*	-------------------------------		*/
 /*	o c c i _ m y s q l _ q u e r y 	*/
 /*	-------------------------------		*/
-private	int occi_mysql_query(int id, struct occi_table * tptr, char * xptr )
+private	int occi_sql_query(int id, struct occi_table * tptr, char * xptr )
 {
 	int	status;
+
 	debug_sql_query( tptr, xptr );
 	occi_database_logwrite( xptr );
-	if ((status = mysql_ping(tptr->handle)) != 0)
-		return( occi_sql_failure( tptr, status, "ping", id ) );
-	if ((status = mysql_query(tptr->handle, xptr)) != 0)
-		return( occi_sql_failure( tptr, status, "query", id ) );
-	else	return( status );
+
+	switch ( Database.status )
+	{
+
+#ifdef	_OCCI_MYSQL
+	/* ----------- */
+	/* MYSQL Query */
+	/* ----------- */
+	case	_OCCI_MYSQL		:
+		occi_database_thread_init();
+		if ((status = mysql_ping(tptr->handle)) != 0)
+			return( occi_sql_failure( tptr, status, "mysql_ping", id ) );
+		if ((status = mysql_query(tptr->handle, xptr)) != 0)
+			return( occi_sql_failure( tptr, status, "mysql_query", id ) );
+		else	return( status );
+#endif
+
+#ifdef	_OCCI_POSTGRE
+	/* ----------------- */
+	/* POSTGRE SQL Query */
+	/* ----------------- */
+	case	_DATABASE_POSTGRE	:
+		tptr->result = PQexec( tptr->handle, xptr );
+		return( 0 );
+#endif	
+	default						:
+		return( occi_sql_failure( tptr, 40, "undefined database", id ) );
+	}
 }
 
 /*	-------------------------------------------	*/
@@ -127,8 +214,23 @@ private	struct	occi_table *	liberate_occi_table( struct occi_table * tptr )
 
 		if ( tptr->handle )
 		{
-			mysql_close( tptr->handle );
-			tptr->handle = (MYSQL *) 0;
+			switch ( Database.status )
+			{
+
+#ifdef	_OCCI_MYSQL
+			case	_OCCI_MYSQL		:	
+				mysql_close( tptr->handle );
+				tptr->handle = (void *) 0;
+				break;
+#endif
+
+#ifdef	_OCCI_POSTGRE
+			case	_OCCI_POSTGRE		:
+				tptr->handle = (void *) 0;
+				break;
+#endif	
+			}
+
 		}
 		tptr = liberate( tptr );
 	}
@@ -197,8 +299,12 @@ private	struct occi_table * new_occi_sql_table( char * tablename, char * descrip
 public	int	initialise_occi_sql( char * hostname, char * basename, char * username, char * password )
 {
 	char * eptr;
+	char * nature;
 	if (!( Database.status ))
 	{
+		if (!( nature = getenv("OCCISQLTYPE" ) ))
+			nature = "MYSQL";
+
 		if (( eptr = getenv("OCCISQLHOST")) != (char *) 0)
 			hostname = eptr;
 
@@ -219,11 +325,25 @@ public	int	initialise_occi_sql( char * hostname, char * basename, char * usernam
 			return( 27 );
 		else if (!( Database.basename = allocate_string( basename ) ))
 			return( 27 );
+		else if (!( Database.nature = allocate_string( nature ) ))
+			return( 27 );
 		else if (!( Database.username = allocate_string( username ) ))
 			return( 27 );
 		else if (!( Database.password = allocate_string( password ) ))
 			return( 27 );
-		Database.status = 1;
+
+		/* ------------------------------------------- */
+		/* determine the database type behind the host */
+		/* ------------------------------------------- */
+#ifdef	_OCCI_MYSQL
+		if (!( strcasecmp( Database.nature, "MYSQL" ) ))
+			Database.status = _OCCI_MYSQL;
+#endif
+#ifdef	_OCCI_POSTGRES
+		if (!( strcasecmp( Database.nature, "POSTGRESQL" ) ))
+			Database.status = _POSTGRES_POSTGRE;
+#endif
+
 	}
 	return( 0 );
 }
@@ -262,7 +382,7 @@ private	int	create_occi_sql_table( struct occi_table * tptr )
 	else 
 	{
 		sprintf(xptr,"%s %s %s", _CREATE_TABLE, tptr->name, tptr->description );
-		tptr->status = occi_mysql_query( 1,tptr, xptr );
+		tptr->status = occi_sql_query( 1,tptr, xptr );
 		liberate( xptr );
 		return( ( tptr->status ? 46 : 0 ) );
 	}
@@ -280,21 +400,25 @@ private	int	create_occi_sql_database( struct occi_table * tptr )
 	else 
 	{
 		sprintf(xptr,"%s %s ", _CREATE_DATABASE, tptr->base );
-		if ((tptr->status = occi_mysql_query( 2,tptr, xptr )) != 0)
+		if ((tptr->status = occi_sql_query( 2,tptr, xptr )) != 0)
 		{
 			liberate( xptr );
 			return(46);
 		}
-		else if ((tptr->status = mysql_select_db( tptr->handle, tptr->base )) != 0)
+		switch ( Database.status )
 		{
-			liberate( xptr );
-			return(40);
+#ifdef	_OCCI_MYSQL
+		case	_OCCI_MYSQL		:
+			if ((tptr->status = mysql_select_db( tptr->handle, tptr->base )) != 0)
+			{
+				liberate( xptr );
+				return(40);
+			}
+			break;
+#endif
 		}
-		else
-		{
-			liberate( xptr );
-			return(0);
-		}
+		liberate( xptr );
+		return(0);
 	}
 }
 
@@ -362,22 +486,43 @@ public	struct	occi_table * initialise_occi_sql_table( char * tablename, char * d
 	/* -------------------------------- */
 	while (!( tptr->handle = Database.handle ))
 	{
-		if (!( Database.handle = mysql_init((MYSQL *) 0) ))
+		switch ( Database.status )
 		{
-			occi_database_failure("initialisation");
-			return( tptr );
+#ifdef	_OCCI_MYSQL
+		case	_OCCI_MYSQL		:
+			if (!( Database.handle = mysql_init((MYSQL *) 0) ))
+			{
+				occi_database_failure("initialisation");
+				return( tptr );
+			}
+			else	occi_database_thread_init();
+
+			if ( mysql_options( Database.handle, MYSQL_OPT_RECONNECT, (const void *)&option ) != 0)
+			{
+				occi_database_failure("options");
+				return( tptr );
+			}
+			else if (!( tptr->handle = mysql_real_connect( Database.handle, tptr->host, tptr->user, tptr->pass, (char *) 0, 0, 0, CLIENT_REMEMBER_OPTIONS) ))
+			{
+				occi_database_failure("connect");
+				return( tptr );
+			}
+			else	break;
+#endif
+#ifdef	_OCCI_POSTGRE
+		case	_OCCI_POSTGRE	:
+			char buffer[1024];
+			sprintf(buffer,"dbname = %s",Database.basename);
+			if (!( Database.handle = PQconnectdb(sptr) ))
+			{
+				occi_database_failure("connect");
+				return( tptr );
+			}
+			else	break;
+
+#endif
 		}
-		else if ( mysql_options( Database.handle, MYSQL_OPT_RECONNECT, (const void *)&option ) != 0)
-		{
-			occi_database_failure("options");
-			return( tptr );
-		}
-		else if (!( tptr->handle = mysql_real_connect( Database.handle, tptr->host, tptr->user, tptr->pass, (char *) 0, 0, 0, CLIENT_REMEMBER_OPTIONS) ))
-		{
-			occi_database_failure("connect");
-			return( tptr );
-		}
-		else if ( create_occi_sql_database( tptr ) != 0 )
+		if ( create_occi_sql_database( tptr ) != 0 )
 		{
 			occi_database_failure("create");
 			return( tptr );
@@ -449,12 +594,11 @@ private	int	occi_sql_list_item( struct occi_expression *expression, char * nptr,
 	else	return( (*expression->handler)(expression->context, nptr, vptr, length ) );
 }
 
+#ifdef	_OCCI_MYSQL
 /*	-------------------------------------------	*/
-/*	       o c c i _ s q l _ r e c o r d 		*/
+/*	     o c c i _ m y s q l _ r e c o r d 		*/
 /*	-------------------------------------------	*/
-/*	parses a result set and delivers field data	*/
-/*	-------------------------------------------	*/
-private	int	occi_sql_record( struct	occi_table * tptr,  struct occi_expression *expression )
+private	int	occi_mysql_record( struct	occi_table * tptr,  struct occi_expression *expression )
 {
 	MYSQL_RES *	result;
 	MYSQL_ROW 	row;
@@ -495,11 +639,11 @@ private	int	occi_sql_record( struct	occi_table * tptr,  struct occi_expression *
 }
 
 /*	-------------------------------------------	*/
-/*	       o c c i _ s q l _ r e c o r d s 		*/
+/*	    o c c i _ m y s q l _ r e c o r d s 	*/
 /*	-------------------------------------------	*/
 /*	parses a result set and delivers record set	*/
 /*	-------------------------------------------	*/
-private	int	occi_sql_records( struct occi_table * tptr,  struct occi_expression *expression )
+private	int	occi_mysql_records( struct occi_table * tptr,  struct occi_expression *expression )
 {
 	MYSQL_RES *	result;
 	MYSQL_ROW 	row;
@@ -538,6 +682,178 @@ private	int	occi_sql_records( struct occi_table * tptr,  struct occi_expression 
 		return(0);
 	}
 }
+#endif	/* MYSQL */
+
+#ifdef	_OCCI_POSTGRE
+/*	-------------------------------------------	*/
+/*	  o c c i _ p o s t g r e  _ r e c o r d 	*/
+/*	-------------------------------------------	*/
+private	int	occi_postgre_record( struct	occi_table * tptr,  struct occi_expression *expression )
+{
+	unsigned int	nf=0;
+	unsigned int 	nr=0;
+	unsigned int	r;
+	unsigned int 	f;
+	unsigned int	fs=0;
+	char *			fn=(char*) 0;
+	char *			vptr=(char *) 0;
+	int				vlen=0;
+
+	if (!( tptr->result ))
+		return(118);
+
+	else if (!( nf = PQnfields(tptr->result) ))
+	{
+		PQfreeResult( tptr->result );
+		return(119);
+	}
+	else
+	{
+		/* ------------- */
+		/* for row count */
+		/* ------------- */
+		for (	r=0, 
+				nr = PQntuples( tptr->result );
+				r < nr;
+				r++ )
+		{
+				/* ---------------- */
+				/* for column count */
+				/* ---------------- */
+				for (	f=0;
+						f < nf;
+						f++ )
+				{
+					/* -------------------------- */
+					/* retrieve field information */
+					/* -------------------------- */
+					if (!( fn = PQfname( tptr->result, f ) ))
+						continue;
+					else if (!( fs = PQfsize( tptr->result, f ) ))
+						continue;
+					else if (!( vlen = PQgetLength( tptr->result, r, f ) ))
+						continue;
+					else if (!( vptr = PQgetValue( tptr->result, r, f ) ))
+						continue;
+					/* ----------------------------------- */
+					/* use field as required by expression */
+					/* ----------------------------------- */
+					else occi_sql_field( expression, fn, vptr, vlen );
+				}
+		}
+		PQfreeResult( tptr->result );
+		return(0);
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	  o c c i _ p o s t g r e _ r e c o r d s 	*/
+/*	-------------------------------------------	*/
+/*	parses a result set and delivers record set	*/
+/*	-------------------------------------------	*/
+private	int	occi_postgre_records( struct occi_table * tptr,  struct occi_expression *expression )
+{
+	unsigned int	nf=0;
+	unsigned int 	nr=0;
+	unsigned int	r;
+	unsigned int 	f;
+	unsigned int	fs=0;
+	char *			fn=(char*) 0;
+	char *			vptr=(char *) 0;
+	int				vlen=0;
+
+	if (!( tptr->result ))
+		return(118);
+
+	else if (!( nf = PQnfields(tptr->result) ))
+	{
+		PQfreeResult( tptr->result );
+		return(119);
+	}
+	else
+	{
+		/* ------------- */
+		/* for row count */
+		/* ------------- */
+		for (	r=0, 
+				nr = PQntuples( tptr->result );
+				r < nr;
+				r++ )
+		{
+				/* ---------------- */
+				/* for column count */
+				/* ---------------- */
+				for (	f=0;
+						f < nf;
+						f++ )
+				{
+					/* -------------------------- */
+					/* retrieve field information */
+					/* -------------------------- */
+					if (!( fn = PQfname( tptr->result, f ) ))
+						continue;
+					else if (!( fs = PQfsize( tptr->result, f ) ))
+						continue;
+					else if (!( vlen = PQgetLength( tptr->result, r, f ) ))
+						continue;
+					else if (!( vptr = PQgetValue( tptr->result, r, f ) ))
+						continue;
+					/* ----------------------------------- */
+					/* use field as required by expression */
+					/* ----------------------------------- */
+					else occi_sql_list_item( expression, fn, vptr, vlen );
+				}
+		}
+		PQfreeResult( tptr->result );
+		return(0);
+	}
+}
+
+#endif	/* POSTGRE */
+
+/*	-------------------------------------------	*/
+/*	       o c c i _ s q l _ r e c o r d 		*/
+/*	-------------------------------------------	*/
+/*	parses a result set and delivers field data	*/
+/*	-------------------------------------------	*/
+private	int	occi_sql_record( struct	occi_table * tptr,  struct occi_expression *expression )
+{
+	switch ( Database.status )
+	{
+#ifdef	_OCCI_MYSQL
+	case	_OCCI_MYSQL		:
+		return( occi_mysql_record(tptr, expression) );
+#endif
+#ifdef	_OCCI_POSTGRE
+	case	_OCCI_POSTGRE	:
+		return( occi_postgre_record( tptr, expression ) );
+#endif
+	default					:
+		return( 55 );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	       o c c i _ s q l _ r e c o r d 		*/
+/*	-------------------------------------------	*/
+/*	parses a result set and delivers field data	*/
+/*	-------------------------------------------	*/
+private	int	occi_sql_records( struct	occi_table * tptr,  struct occi_expression *expression )
+{
+	switch ( Database.status )
+	{
+#ifdef	_OCCI_MYSQL
+	case	_OCCI_MYSQL		:
+		return( occi_mysql_records(tptr, expression) );
+#endif
+#ifdef	_OCCI_POSTGRE
+	case	_OCCI_POSTGRE	:
+		return( occi_postgre_records( tptr, expression ) );
+#endif
+	default					:
+		return( 55 );
+	}
+}
 
 /*	-------------------------------------------	*/
 /*	 f i r s t _ o c c i _ s q l _ r e c o r d 	*/
@@ -564,7 +880,7 @@ public	int	first_occi_sql_record( char * category,  struct occi_expression *expr
 	else	sprintf(xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,buffer,_ORDER_BY_FIRST);
 
 	occi_sql_lock();
-	status = occi_mysql_query( 3,tptr, xptr );
+	status = occi_sql_query( 3,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0)
 	{
@@ -602,7 +918,7 @@ public	int	previous_occi_sql_record( char * category,  struct occi_expression *e
 	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,( expression->value ? expression->value : "" ),_ORDER_BY_LAST);
 
 	occi_sql_lock();
-	status = occi_mysql_query( 4,tptr, xptr );
+	status = occi_sql_query( 4,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0)
 	{
@@ -637,7 +953,7 @@ public	int	insert_occi_sql_record( char * category,  struct occi_expression *exp
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s",_INSERT_INTO,tptr->name,expression->value);
 	occi_sql_lock();
-	status = occi_mysql_query( 5,tptr, xptr );
+	status = occi_sql_query( 5,tptr, xptr );
 	liberate( xptr );
 	occi_sql_unlock();
 	if ( status )
@@ -665,7 +981,7 @@ public	int	search_occi_sql_record( char * category,  struct occi_expression *exp
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s",_SELECT_ALL_FROM,tptr->name,expression->value);
 	occi_sql_lock();
-	status = occi_mysql_query( 6,tptr, xptr );
+	status = occi_sql_query( 6,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0 )
 	{
@@ -701,7 +1017,7 @@ public	int	collect_occi_sql_records( char * category,  struct occi_expression *e
 			( expression->value ? expression->value : "" ),
 			_ORDER_BY_ORDERID);
 	occi_sql_lock();
-	status = occi_mysql_query( 7,tptr, xptr );
+	status = occi_sql_query( 7,tptr, xptr );
 	liberate( xptr );
 	if ( status )
 	{
@@ -736,7 +1052,7 @@ public	int	update_occi_sql_record( char * category,  struct occi_expression *exp
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s",_UPDATE_WHERE,tptr->name,expression->value);
 	occi_sql_lock();
-	status = occi_mysql_query( 8,tptr, xptr );
+	status = occi_sql_query( 8,tptr, xptr );
 	liberate( xptr );
 	occi_sql_unlock();
 	if ( status )
@@ -764,7 +1080,7 @@ public	int	delete_occi_sql_record( char * category,  struct occi_expression *exp
 		return( 27 );
 	else	sprintf( xptr,"%s %s %s",_DELETE_FROM,tptr->name,expression->value);
 	occi_sql_lock();
-	status = occi_mysql_query( 9,tptr, xptr );
+	status = occi_sql_query( 9,tptr, xptr );
 	liberate( xptr );
 	occi_sql_unlock();
 	if ( status )
@@ -793,7 +1109,7 @@ public	int	next_occi_sql_record( char * category,  struct occi_expression *expre
 	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,( expression->value ? expression->value : "" ),_ORDER_BY_FIRST);
 
 	occi_sql_lock();
-	status = occi_mysql_query( 10,tptr, xptr );
+	status = occi_sql_query( 10,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0)
 	{
@@ -833,7 +1149,7 @@ public	int	last_occi_sql_record( char * category,  struct occi_expression *expre
 	else	sprintf( xptr,"%s %s %s %s",_SELECT_ALL_FROM,tptr->name,buffer,_ORDER_BY_LAST);
 
 	occi_sql_lock();
-	status = occi_mysql_query( 11,tptr, xptr );
+	status = occi_sql_query( 11,tptr, xptr );
 	liberate( xptr );
 	if ( status != 0)
 	{
@@ -861,7 +1177,10 @@ public	int	start_sql_transaction(char * tablename)
 		return( 50 );
 	else
 	{
-		if (!(status = occi_mysql_query( 12,tptr, _START_TRANSACTION ) ))
+		occi_sql_lock();
+		status = occi_sql_query( 12,tptr, _START_TRANSACTION );
+		occi_sql_unlock();
+		if (!(status))
 			return( status );
 		else	return( status );
 	}
@@ -880,7 +1199,10 @@ public	int	commit_sql_transaction(char * tablename)
 		return( 50 );
 	else
 	{
-		if (!(status = occi_mysql_query( 13,tptr, _COMMIT_TRANSACTION ) ))
+		occi_sql_lock();
+		status = occi_sql_query( 13,tptr, _COMMIT_TRANSACTION );
+		occi_sql_unlock();
+		if (!(status))
 			return( status );
 		else	return( status );
 	}
@@ -899,7 +1221,10 @@ public	int	rollback_sql_transaction(char * tablename)
 		return( 50 );
 	else
 	{
-		if (!( status = occi_mysql_query( 14,tptr, _ROLLBACK_TRANSACTION ) ))
+		occi_sql_lock();
+		status = occi_sql_query( 14,tptr, _ROLLBACK_TRANSACTION );
+		occi_sql_unlock();
+		if (!( status ))
 			return( status );
 		else	return( status );
 	}

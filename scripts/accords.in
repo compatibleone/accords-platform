@@ -42,6 +42,7 @@ runcops=1
 nethsm=
 # -------------------------------------
 resthost=127.0.0.1
+export OCCISQLTYPE=MYSQL
 export OCCISQLHOST=127.0.0.1
 export OCCISQLUSER=root
 export OCCISQLPASSWD=root
