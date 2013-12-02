@@ -14,5 +14,5 @@ AM_CPPFLAGS = -DUNIX -Dunix
 libcosql_la_SOURCES = occisql.c 
 
 libcosql_la_CFLAGS = $(CFLAGS_COXML)
-libcosql_la_LDFLAGS = $(LDFLAGS_MYSQL)
+libcosql_la_LDFLAGS = $(LDFLAGS_MYSQL) $(LDFLAGS_POSTGRE)
 

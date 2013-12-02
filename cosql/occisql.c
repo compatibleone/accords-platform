@@ -62,6 +62,9 @@ private	void	occi_sql_unlock()
 /*	---------------------------		*/
 private	char * occi_sql_error( void * h )
 {
+#ifdef	_OCCI_POSTGRE
+	PGconn * pqptr;
+#endif
 	switch ( Database.status )
 	{
 
@@ -72,13 +75,9 @@ private	char * occi_sql_error( void * h )
 
 #ifdef	_OCCI_POSTGRE
 	case	_OCCI_POSTGRE	:
-			PGconn * pqptr;
 			if (!(pqptr = (PGconn *) h))
 				return( "incorrect handle" );
-			else if (!( pqptr->result ))
-				return( "incorrect result handle" );
-			else
-				return( PQresultErrorMessage( pqptr->result ) );
+			else	return( "unknown error" );
 #endif
 
 	default					:
@@ -193,7 +192,7 @@ private	int occi_sql_query(int id, struct occi_table * tptr, char * xptr )
 	/* ----------------- */
 	/* POSTGRE SQL Query */
 	/* ----------------- */
-	case	_DATABASE_POSTGRE	:
+	case	_OCCI_POSTGRE	:
 		tptr->result = PQexec( tptr->handle, xptr );
 		return( 0 );
 #endif	
@@ -451,7 +450,13 @@ private	int	default_occi_sql_host( struct occi_table * tptr )
 private	int	sql_initialised=0;
 public	struct	occi_table * initialise_occi_sql_table( char * tablename, char * description )
 {
+#ifdef	_OCCI_MYSQL
 	MYSQL		   * rptr;
+#endif
+#ifdef	_OCCI_POSTGRE
+	char buffer[1024];
+#endif
+
 	struct	occi_table * tptr;
 	int		option=1;
 
@@ -511,9 +516,8 @@ public	struct	occi_table * initialise_occi_sql_table( char * tablename, char * d
 #endif
 #ifdef	_OCCI_POSTGRE
 		case	_OCCI_POSTGRE	:
-			char buffer[1024];
 			sprintf(buffer,"dbname = %s",Database.basename);
-			if (!( Database.handle = PQconnectdb(sptr) ))
+			if (!( Database.handle = PQconnectdb(buffer) ))
 			{
 				occi_database_failure("connect");
 				return( tptr );
@@ -704,7 +708,7 @@ private	int	occi_postgre_record( struct	occi_table * tptr,  struct occi_expressi
 
 	else if (!( nf = PQnfields(tptr->result) ))
 	{
-		PQfreeResult( tptr->result );
+		PQclear( tptr->result );
 		return(119);
 	}
 	else
@@ -731,9 +735,9 @@ private	int	occi_postgre_record( struct	occi_table * tptr,  struct occi_expressi
 						continue;
 					else if (!( fs = PQfsize( tptr->result, f ) ))
 						continue;
-					else if (!( vlen = PQgetLength( tptr->result, r, f ) ))
+					else if (!( vlen = PQgetlength( tptr->result, r, f ) ))
 						continue;
-					else if (!( vptr = PQgetValue( tptr->result, r, f ) ))
+					else if (!( vptr = PQgetvalue( tptr->result, r, f ) ))
 						continue;
 					/* ----------------------------------- */
 					/* use field as required by expression */
@@ -741,7 +745,7 @@ private	int	occi_postgre_record( struct	occi_table * tptr,  struct occi_expressi
 					else occi_sql_field( expression, fn, vptr, vlen );
 				}
 		}
-		PQfreeResult( tptr->result );
+		PQclear( tptr->result );
 		return(0);
 	}
 }
@@ -767,7 +771,7 @@ private	int	occi_postgre_records( struct occi_table * tptr,  struct occi_express
 
 	else if (!( nf = PQnfields(tptr->result) ))
 	{
-		PQfreeResult( tptr->result );
+		PQclear( tptr->result );
 		return(119);
 	}
 	else
@@ -794,9 +798,9 @@ private	int	occi_postgre_records( struct occi_table * tptr,  struct occi_express
 						continue;
 					else if (!( fs = PQfsize( tptr->result, f ) ))
 						continue;
-					else if (!( vlen = PQgetLength( tptr->result, r, f ) ))
+					else if (!( vlen = PQgetlength( tptr->result, r, f ) ))
 						continue;
-					else if (!( vptr = PQgetValue( tptr->result, r, f ) ))
+					else if (!( vptr = PQgetvalue( tptr->result, r, f ) ))
 						continue;
 					/* ----------------------------------- */
 					/* use field as required by expression */
@@ -804,7 +808,7 @@ private	int	occi_postgre_records( struct occi_table * tptr,  struct occi_express
 					else occi_sql_list_item( expression, fn, vptr, vlen );
 				}
 		}
-		PQfreeResult( tptr->result );
+		PQclear( tptr->result );
 		return(0);
 	}
 }

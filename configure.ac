@@ -56,8 +56,16 @@ AC_CHECK_HEADERS([mysql/mysql.h],
                 [break],
 		[AC_MSG_ERROR([You are missing mysql development files])])
 
+AC_CHECK_HEADERS([postgresql/libpq-fe.h],
+                [break],
+		[AC_MSG_ERROR([You are missing postgresql development files])])
+
 if test "$(uname -s)" = 'Linux' ; then
 	AC_SUBST([LDFLAGS_MYSQL], ["-lmysqlclient_r"])
+fi
+
+if test "$(uname -s)" = 'Linux' ; then
+	AC_SUBST([LDFLAGS_POSTGRE], ["/usr/lib/libpq.so"])
 fi
 
 AC_CHECK_HEADERS([uuid/uuid.h uuid.h],

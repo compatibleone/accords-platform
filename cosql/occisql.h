@@ -22,7 +22,7 @@
 #include "standard.h"
 
 #define	_OCCI_MYSQL		1
-// #define	_OCCI_POSTGRE 	2
+#define	_OCCI_POSTGRE 	2
 
 #ifndef	public
 #define	public
@@ -37,7 +37,7 @@
 #endif
 
 #ifdef	_OCCI_POSTGRE
-#include <libpq-fe.h>
+#include <postgresql/libpq-fe.h>
 #endif
 
 #define	_CREATE_DATABASE	"CREATE DATABASE IF NOT EXISTS "
