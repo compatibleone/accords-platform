@@ -50,7 +50,7 @@ from amazonEc2Class import *
 		- zone 
 		- hostname 
 		- workload 
-		- when 
+		- stamp 
 		- state
 		- keyfile
 		- agentstatus 

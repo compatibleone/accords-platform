@@ -58,7 +58,7 @@ from amazonEc2Class import *
 		- hostname 
 		- workload 
 		- agent
-		- when 
+		- stamp 
 		- state 
 		- keyfile
 		- agentstatus
