@@ -508,7 +508,7 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 	}
 	else strConcat(sendstr,pptr->agent,',');
 
-	sprintf(strtmp,"%d",pptr->when);
+	sprintf(strtmp,"%d",pptr->stamp);
 	strcmptr = allocate_string(strtmp);
 	if(strValid(strcmptr)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
@@ -702,7 +702,7 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->when = atoi(pelem->value);
+		pptr->stamp = atoi(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -909,7 +909,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	}
 	else strConcat(sendstr,pptr->agent,',');
 
-	sprintf(strtmp,"%d",pptr->when);
+	sprintf(strtmp,"%d",pptr->stamp);
 	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
@@ -1102,7 +1102,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->when = atoi(pelem->value);
+		pptr->stamp = atoi(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -1319,7 +1319,7 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	}
 	else strConcat(sendstr,pptr->agent,',');
 
-	sprintf(strtmp,"%d",pptr->when);
+	sprintf(strtmp,"%d",pptr->stamp);
 	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
@@ -1480,7 +1480,7 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->when = atoi(pelem->value);
+		pptr->stamp = atoi(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -1671,7 +1671,7 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	}
 	else strConcat(sendstr,pptr->agent,',');
 
-	sprintf(strtmp,"%d",pptr->when);
+	sprintf(strtmp,"%d",pptr->stamp);
 	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 	else strConcat(sendstr," ",',');
 	
@@ -1832,7 +1832,7 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->when = atoi(pelem->value);
+		pptr->stamp = atoi(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -2030,7 +2030,7 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		}
 		else strConcat(sendstr,pptr->agent,',');
 		
-		sprintf(strtmp,"%d",pptr->when);
+		sprintf(strtmp,"%d",pptr->stamp);
 	 	if(strValid(strtmp)) strConcat(sendstr,strtmp,',');
 		else strConcat(sendstr," ",',');
 	
@@ -2191,7 +2191,7 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->when = atoi(pelem->value);
+			pptr->stamp = atoi(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){

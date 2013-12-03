@@ -220,7 +220,7 @@ struct rest_response * stop_amazonEc2(
 	else
 	{
 		reset_ec2_server( pptr );
-		pptr->when = time((long *) 0);
+		pptr->stamp = time((long *) 0);
 		autosave_amazonEc2_nodes();
 		sprintf(reference,"%s/%s/%s",get_identity(),_CORDS_EC2,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
@@ -252,7 +252,7 @@ struct rest_response * restart_amazonEc2(
 	{
 		if ( pptr->state == _OCCI_SUSPENDED )
 		{
-			pptr->when = time((long *) 0);
+			pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_RUNNING;
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
@@ -279,7 +279,7 @@ struct rest_response * suspend_amazonEc2(
 			return (rest_html_response(aptr, status, "Ec2 instance failure"));
 		else 
 		{
-		   	pptr->when = time((long *) 0);
+		   	pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_SUSPENDED;
 			return (rest_html_response(aptr, 200, "OK"));
 		}
