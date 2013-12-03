@@ -1179,6 +1179,10 @@ public	int	ssh_launch_using_keypair( char * username, char * keyfile, char * hos
 {
 	int	status=0;
 	char *	syntax=(char *) 0;
+
+	if (!( try_open_socket(hostname, 22, _COSACS_START_TIMEOUT, _COSACS_START_RETRY )))
+                return(40);
+ 
 	if ((!( username))
 	||  (!( keyfile ))
 	||  (!( hostname))

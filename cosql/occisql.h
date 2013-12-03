@@ -40,8 +40,10 @@
 #include <postgresql/libpq-fe.h>
 #endif
 
-#define	_CREATE_DATABASE	"CREATE DATABASE IF NOT EXISTS "
-#define	_CREATE_TABLE		"CREATE TABLE IF NOT EXISTS "
+#define	_CREATE_DATABASE_INE	"CREATE DATABASE IF NOT EXISTS "
+#define	_CREATE_DATABASE	"CREATE DATABASE "
+#define	_CREATE_TABLE_INE	"CREATE TABLE IF NOT EXISTS "
+#define	_CREATE_TABLE		"CREATE TABLE "
 #define	_INSERT_INTO		"INSERT INTO"
 #define	_UPDATE_WHERE		"UPDATE"
 #define	_SELECT_ALL_FROM	"SELECT * FROM"
@@ -82,6 +84,7 @@ struct	occi_database
 	int	status;
 	char * 	nature;
 	void *	handle;
+	int	version;
 	char *	hostname;
 	char *	basename;
 	char *	username;

@@ -437,6 +437,45 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 	}
 }
 
+/*	-----------------------------		*/
+/*	t r y _ o p e n _ s o c k e t 		*/
+/*	-----------------------------		*/
+public	int	try_open_socket( char * host, int port, int timeout, int retry )
+{
+	int	socket;
+	int	status;
+	if ((socket = socket_create(get_socket_type(), SOCK_STREAM, 0  )) < 0)
+	{
+		if ( check_debug() )
+			failure(errno,"socket_create","errno");
+		return( 0 );
+	}
+	while ( retry )
+	{
+		if (( status = socket_try_connect( socket, host, port, ( timeout > 1 ? timeout / 2 : 1 ) )) == 1)
+		{
+			/* ------- */
+			/* success */
+			/* ------- */
+			break;
+		}
+		else if ( status == 0 )
+		{
+			retry--;
+			/* ------- */
+			/* failure */
+			/* ------- */
+			if ( retry )
+				sleep(( timeout > 1 ? timeout / 2 : 1 ));
+			continue;
+		}
+		else	return( 0 );
+	}
+	if (!( retry ))
+		return( 0 );
+	else	return( 1 );
+}
+
 /*	------------------------------------------------	*/
 /*	    r e s t _ t r y _ o p e n _ c l i e n t		*/
 /*	------------------------------------------------	*/
