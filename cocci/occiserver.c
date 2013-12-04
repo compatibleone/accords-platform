@@ -326,7 +326,7 @@ public struct  occi_link_node * occi_first_category_link(
 		char * category, 
 		char * id )
 {
-	return( occi_next_category_link( occi_first_link_node("source",id,2), category, id ) );
+	return( occi_next_category_link( occi_first_link_node(category,"source",id,2), category, id ) );
 }
 
 /*	---------------------------------------------------------	*/
@@ -384,7 +384,7 @@ struct rest_extension * xptr)
 /*	response to allow any links from the instance to be	*/
 /*	appended to the response.				*/
 /*	---------------------------------------------------	*/
-public	int	occi_render_links( struct rest_response * aptr, char * id )
+public	int	occi_render_links( struct occi_category * optr, struct rest_response * aptr, char * id )
 {
 	struct	occi_link_node  * nptr;
 	struct	cords_xlink	* lptr;
@@ -395,7 +395,7 @@ public	int	occi_render_links( struct rest_response * aptr, char * id )
 		return(0);
 	else if (!( id ))
 		return(0);
-	for (	nptr=occi_first_link_node("source",id,2);
+	for (	nptr=occi_first_link_node(optr->id,"source",id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{

@@ -615,7 +615,7 @@ public	char *	occi_html_body(
 			/* generate the list of links if available */
 			/* --------------------------------------- */
 			fprintf(h,"<tr><th>Links</th><td><div align=center><table>\n");
-			for (	nptr=occi_first_link_node("source",id,2);
+			for (	nptr=occi_first_link_node(cptr->id,"source",id,2);
 				nptr != (struct occi_link_node *) 0;
 				nptr = occi_next_link_node(nptr) )
 			{

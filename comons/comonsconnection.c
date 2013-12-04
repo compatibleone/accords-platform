@@ -101,7 +101,7 @@ private	int	connection_worker( struct cords_connection * pptr )
 	sprintf(packets,"%s/%s/",get_identity(),_CORDS_PACKET);
 	while (!( rest_server_signal()))
 	{
-		for (	nptr=occi_first_link_node("source",pptr->id,2);
+		for (	nptr=occi_first_link_node("connection","source",pptr->id,2);
 			nptr != (struct occi_link_node *) 0;
 			nptr = occi_next_link_node(nptr) )
 		{
@@ -235,7 +235,7 @@ private	struct rest_response * start_connection(
 	else
 	{
 		for (	pptr->probes=0,
-			nptr=occi_first_link_node("source",pptr->id,2);
+			nptr=occi_first_link_node("connection","source",pptr->id,2);
 			nptr != (struct occi_link_node *) 0;
 			nptr = occi_next_link_node(nptr) )
 		{
@@ -309,7 +309,7 @@ private	int	stop_connection_probes( struct cords_connection * pptr )
 
 	buffer[0] = 0;
 	for (	pptr->probes=0,
-		nptr=occi_last_link_node("source",pptr->id,2);
+		nptr=occi_last_link_node("connection","source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_previous_link_node(nptr) )
 	{

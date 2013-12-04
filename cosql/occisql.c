@@ -1585,7 +1585,7 @@ public	void	order_sql_timestamp( char * buffer )
 /*	-------------------------------		*/
 /*	b u i l d _ s q l _ f i l t e r		*/
 /*	-------------------------------		*/
-public	char *	build_sql_filter( char * nptr, char * vptr, int type )
+public	char *	build_sql_filter( char * category, char * nptr, char * vptr, int type )
 {
 	char	buffer[2048];
 	char *	rptr;
@@ -1602,7 +1602,7 @@ public	char *	build_sql_filter( char * nptr, char * vptr, int type )
 			sprintf(buffer,"_%s LIKE '%s%c'",nptr,sql_escaped_filter(vptr),0x0025);
 			break;
 		case	2 :
-			sprintf(buffer,"_%s LIKE '%c%s'",nptr,0x0025,sql_escaped_filter(vptr));
+			sprintf(buffer,"_%s LIKE '%s/%s/%s'",nptr,get_identity(),category,sql_escaped_filter(vptr));
 			break;
 		case	3 :
 			sprintf(buffer,"_%s LIKE '%c%s%c'",nptr,0x0025,sql_escaped_filter(vptr),0x0025);

@@ -1099,7 +1099,7 @@ private	int	delete_generic_contract( struct occi_category * optr, struct cords_c
 	/* ----------------------------------------------------- */
 	/* for all defined instructions of the current contract  */
 	/* ----------------------------------------------------- */
-	for (	nptr=occi_first_link_node("source",pptr->id,2); 
+	for (	nptr=occi_first_link_node("contract","source",pptr->id,2); 
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{

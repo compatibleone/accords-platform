@@ -23,7 +23,7 @@ private	struct rest_response * start_monitor(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
-		for (	nptr=occi_first_link_node("source",pptr->id,2);
+		for (	nptr=occi_first_link_node("monitor","source",pptr->id,2);
 			nptr != (struct occi_link_node *) 0;
 			nptr = occi_next_link_node(nptr) )
 		{
@@ -72,7 +72,7 @@ private	int	stop_monitor_controls( struct cords_monitor * pptr )
 	char *	wptr;
 	char	buffer[2048];
 	buffer[0] = 0;
-	for (	nptr=occi_last_link_node("source",pptr->id,2);
+	for (	nptr=occi_last_link_node("monitor","source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_previous_link_node(nptr) )
 	{

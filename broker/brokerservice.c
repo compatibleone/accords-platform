@@ -213,7 +213,7 @@ private	int	service_action( struct cords_service * pptr, char * id, char * actio
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		nptr=occi_first_link_node("source",id,2);
+		nptr=occi_first_link_node("service","source",id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{
@@ -376,7 +376,7 @@ private	int	reverse_service_action( struct cords_service * pptr, char * id, char
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	for (	pptr->contracts=0,
-		nptr=occi_last_link_node("source",id,2);
+		nptr=occi_last_link_node("service","source",id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_previous_link_node(nptr) )
 	{
@@ -802,7 +802,7 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	buffer[0] = 0;
-	for (	nptr=occi_first_link_node("source",pptr->id,2);
+	for (	nptr=occi_first_link_node(_CORDS_SERVICE,"source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{

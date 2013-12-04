@@ -26,7 +26,7 @@ private	struct rest_response * start_session(
 	else
 	{
 		for (	pptr->connections=0,
-			nptr=occi_first_link_node("source",pptr->id,2);
+			nptr=occi_first_link_node("session","source",pptr->id,2);
 			nptr != (struct occi_link_node *) 0;
 			nptr = occi_next_link_node(nptr) )
 		{
@@ -89,7 +89,7 @@ private	struct rest_response * stop_session(
 	else
 	{
 		for (	pptr->connections=0,
-			nptr=occi_last_link_node("source",pptr->id,2);
+			nptr=occi_last_link_node("session","source",pptr->id,2);
 			nptr != (struct occi_link_node *) 0;
 			nptr = occi_previous_link_node(nptr) )
 		{
@@ -184,7 +184,7 @@ private	int	delete_monitoring_session(struct occi_category * optr,struct cords_s
 	char *	wptr;
 	buffer[0] = 0;
 	for (	pptr->connections=0,
-		nptr=occi_last_link_node("source",pptr->id,2);
+		nptr=occi_last_link_node("session","source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_previous_link_node(nptr) )
 	{

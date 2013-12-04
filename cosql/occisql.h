@@ -22,7 +22,9 @@
 #include "standard.h"
 
 #define	_OCCI_MYSQL		1
-#define	_OCCI_POSTGRE 	2
+//#undef	_OCCI_MYSQL
+#define	_OCCI_POSTGRE 		2
+//#undef	_OCCI_POSTGRE
 
 #ifndef	public
 #define	public
@@ -129,7 +131,7 @@ public	int	delete_occi_sql_record( char * category, struct occi_expression *expr
 public	int	next_occi_sql_record( char * category, struct occi_expression *expression );
 public	int	last_occi_sql_record( char * category, struct occi_expression *expression );
 
-public	char *	build_sql_filter(char * nptr, char * vptr, int type );
+public	char *	build_sql_filter(char * category, char * nptr, char * vptr, int type );
 public	char *	sql_escaped_value( char * sptr );
 public	char *	sql_unescaped_value( char * sptr );
 public	char *	sql_escaped_filter( char * sptr );

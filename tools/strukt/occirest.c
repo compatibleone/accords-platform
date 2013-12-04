@@ -552,7 +552,7 @@ public	void	generate_occi_rest_builder( FILE * h, char * nptr )
 		}
 	}
 
-	fprintf(h,"\tif ( occi_render_links( aptr, pptr->id ) != 0)\n");
+	fprintf(h,"\tif ( occi_render_links( optr, aptr, pptr->id ) != 0)\n");
 	fprintf(h,"\t\treturn( rest_html_response( aptr, 500, %cServer Link Failure%c ) );\n",
 			0x0022,0x0022);
 	fprintf(h,"\telse\tif (!( occi_success( aptr ) ))\n");
