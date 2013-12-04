@@ -60,6 +60,12 @@ public	int	check_testflag()	{	return( testflag);	}
 private	int	webflag=0;
 public	int	check_webflag()		{	return( webflag);	}
 
+/*	-----------------	*/
+/*	g e t _ d e p o t 	*/
+/*	-----------------	*/
+private	char *	depot="http://www.compatibleone.fr/accords-platform";
+private	char * get_depot() {	return( depot );	}
+
 /*	------------------------------------------------------------------	*/
 /*	c o m o d e l _ o c c i _ p r o d u c i o n _ p a r a m e t e r s	*/
 /*	------------------------------------------------------------------	*/
@@ -137,7 +143,7 @@ public int	comodel_category_filter( struct occi_category * cptr )
 private	int	comodel_banner()
 {
 	printf("\n   CompatibleOne Model Generator : Version %s ",_COMODEL_VERSION);
-	printf("\n   Beta Version : 27/11/2013");
+	printf("\n   Beta Version : 04/12/2013");
 	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue");
 	printf("\n\n");
 	return(0);
@@ -747,6 +753,200 @@ private	int	comodel_by_schema( struct xml_element * eptr)
 }
 
 /*	------------------------------------------------------------------	*/
+/*		c o m o d e l _ a c t i o n _ c o n f i g u r a t i o n		*/
+/*	------------------------------------------------------------------	*/
+private	int	comodel_action_configuration( FILE * h, struct xml_element * eptr, char * nptr )
+{
+	char *	aptr;
+	struct	xml_element * fptr;
+	int	item=0;
+	if ( eptr )
+	{
+		for (	fptr = eptr->first;
+			fptr != (struct xml_element *) 0;
+			fptr = fptr->next )
+		{
+			if (!( fptr->name ))
+				continue;
+			else if ( strcmp( fptr->name, "component" ) != 0 )
+				continue;
+			else if (!( aptr = comodel_attribute( fptr, "name")))
+				continue;
+			else if (!( strcmp( aptr, nptr ) ))
+				break;
+			{
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",nptr,++item);
+				fprintf(h," expression=\"%s.configure(%s.contract);\"/>\n",nptr, aptr);
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",nptr,++item);
+				fprintf(h," expression=\"%s.configure(%s.hostname);\"/>\n",nptr, aptr);
+				liberate( aptr );
+			}
+		}
+	}
+	return( item );
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m o d e l _ p l a t f o r m _ m a n i f e s t		*/
+/*	------------------------------------------------------------------	*/
+private	int	comodel_platform_manifest( struct xml_element * eptr )
+{
+	struct	xml_element * fptr;
+	char *	aptr;
+	char *	mptr;
+	char	filename[1024];
+	FILE *	h;
+	int	item=0;
+	if (!( mptr = comodel_attribute( eptr, "name")))
+		return( 78 );
+	else
+	{
+		sprintf(filename,"%s.xml",mptr);
+		if (!(h = fopen(filename,"w") ))
+			return( 46 );
+		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+		fprintf(h,"<manifest name=\"%s\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">\n",mptr);
+		for (	fptr = eptr->first;
+			fptr != (struct xml_element *) 0;
+			fptr = fptr->next )
+		{
+			if (!( fptr->name ))
+				continue;
+			else if ( strcmp( fptr->name, "component" ) != 0 )
+				continue;
+			else if (!( aptr = comodel_attribute( fptr, "name")))
+				continue;
+			else
+			{
+				fprintf(h,"\t<node name=\"%s\" access=\"public\" type=\"simple\" provider=\"any\">\n",aptr);
+				fprintf(h,"\t\t<infrastructure name=\"%s\">\n",aptr);
+				fprintf(h,"\t\t\t<compute name=\"%s\"/>\n",aptr);
+				fprintf(h,"\t\t\t<storage name=\"%s\"/>\n",aptr);
+				fprintf(h,"\t\t\t<network name=\"%s\" label=\"account\">\n",aptr);
+				fprintf(h,"\t\t\t\t<port name=\"publisher\" protocol =\"tcp\" from=\"8086\" to=\"8086\" range=\"0.0.0.0/24\"/>\n",aptr);
+				fprintf(h,"\t\t\t\t<port name=\"cosacs\" protocol =\"tcp\" from=\"8286\" to=\"8286\" range=\"0.0.0.0/24\"/>\n",aptr);
+				fprintf(h,"\t\t\t\t<port name=\"ssh\" protocol =\"tcp\" from=\"22\" to=\"22\" range=\"0.0.0.0/24\"/>\n",aptr);
+				fprintf(h,"\t\t\t\t<port name=\"http\" protocol =\"tcp\" from=\"80\" to=\"80\" range=\"0.0.0.0/24\"/>\n",aptr);
+				fprintf(h,"\t\t\t</network>\n",aptr);
+				fprintf(h,"\t\t</infrastructure>\n");
+				fprintf(h,"\t\t<image name=\"%s\" agent=\"install:cosacs:root:debian:run-cosacs\">\n",aptr);
+				fprintf(h,"\t\t\t<system name=\"debian_with_cosacs\"/>\n",aptr);
+				fprintf(h,"\t\t</image>\n");
+				fprintf(h,"\t</node>\n");
+			}						
+		}
+		fprintf(h,"\t<configuration name=\"%s\">\n",mptr);
+		for (	fptr = eptr->first;
+			fptr != (struct xml_element *) 0;
+			fptr = fptr->next )
+		{
+			if (!( fptr->name ))
+				continue;
+			else if ( strcmp( fptr->name, "component" ) != 0 )
+				continue;
+			else if (!( aptr = comodel_attribute( fptr, "name")))
+				continue;
+			else
+			{	
+				item = comodel_action_configuration( h, eptr, aptr );
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"%s.system('wget %s/install-%s');\"/>\n",
+					aptr,get_depot(),aptr);
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"%s.fork('bash ./install-%s');\"/>\n",aptr,aptr);
+				liberate( aptr );
+			}
+		}
+		fprintf(h,"\t</configuration>\n");
+		fprintf(h,"\t<release name=\"%s\">\n",mptr);
+		for (	fptr = eptr->first;
+			fptr != (struct xml_element *) 0;
+			fptr = fptr->next )
+		{
+			if (!( fptr->name ))
+				continue;
+			else if ( strcmp( fptr->name, "component" ) != 0 )
+				continue;
+			else if (!( aptr = comodel_attribute( fptr, "name")))
+				continue;
+			else
+			{
+				fprintf(h,"\t\t<action name=\":d_%s\"",aptr);
+				fprintf(h," expression=\"%s.kill();\"/>\n",aptr);
+				liberate( aptr );
+			}
+		}
+		fprintf(h,"\t</release>\n");
+		fprintf(h,"\t<interface name=\"%s\">\n",mptr);
+		for (	fptr = eptr->first;
+			fptr != (struct xml_element *) 0;
+			fptr = fptr->next )
+		{
+			if (!( fptr->name ))
+				continue;
+			else if ( strcmp( fptr->name, "component" ) != 0 )
+				continue;
+			else if (!( aptr = comodel_attribute( fptr, "name")))
+				continue;
+			else
+			{
+				fprintf(h,"\t\t<action name=\":%s\"/>\n",aptr);
+				liberate( aptr );
+			}
+		}
+		fprintf(h,"\t</interface>\n");
+		fprintf(h,"\t<account name=\"accords\"/>\n");
+		fprintf(h,"\t<security type=\"public\"/>\n");
+		fprintf(h,"</manifest>\n");
+		liberate( mptr );
+		fclose(h);
+		return( 0 );
+	}
+}
+
+/*	------------------------------------------------------------------	*/
+/*			c o m o d e l _ b y _ p l a t f o r m 			*/
+/*	------------------------------------------------------------------	*/
+private	int	comodel_by_platform( struct xml_element * eptr)
+{
+	int	status;
+	struct	xml_element * fptr;
+	if ((eptr = document_element( eptr, "platform" )) != (struct xml_element *) 0)
+	{
+		for (	fptr = eptr->first;
+			fptr != (struct xml_element *) 0;
+			fptr = fptr->next )
+		{
+			if (!( fptr->name ))
+				continue;
+			else if (!( strcmp( fptr->name, "component" ) ))
+				if ((status = comodel_by_component( fptr )) != 0)
+					return( status );
+		}
+		return( comodel_platform_manifest( eptr ) );
+	}
+	else	return( 78 );
+}
+
+/*	------------------------------------------------------------------	*/
+/*			c o m o d e l _ b y _ p r o d u c t			*/
+/*	------------------------------------------------------------------	*/
+private	int	comodel_by_product( struct xml_element * eptr)
+{
+	int	status;
+	struct	xml_element * fptr;
+	if ((eptr = document_element( eptr, "product" )) != (struct xml_element *) 0)
+	{
+		if ((fptr = document_element( eptr, "platform" )) != (struct xml_element *) 0)
+			if ((status = comodel_by_platform( fptr )) != 0)
+				return( status );
+
+		return( 0 );
+	}
+	else	return( 78 );
+}
+
+/*	------------------------------------------------------------------	*/
 /*		c o m o d e l _ p r e p a r e _ s t r u k t			*/
 /*	------------------------------------------------------------------	*/
 private	int	comodel_prepare_strukt(int mode)
@@ -929,6 +1129,10 @@ private	int	comodel_operation( char * sptr )
 		return( comodel_by_schema( eptr ) );
 	else if ((eptr = document_element( document, "model" )) != (struct xml_element *) 0)
 		return( comodel_by_model( eptr ) );
+	else if ((eptr = document_element( document, "product" )) != (struct xml_element *) 0)
+		return( comodel_by_product( eptr ) );
+	else if ((eptr = document_element( document, "platform" )) != (struct xml_element *) 0)
+		return( comodel_by_platform( eptr ) );
 	else if ((eptr = document_element( document, "component" )) != (struct xml_element *) 0)
 		return( comodel_by_component( eptr ) );
 	else if ((eptr = document_element( document, "category" )) != (struct xml_element *) 0)
