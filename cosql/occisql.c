@@ -43,7 +43,7 @@ private	struct	occi_database_thread * threadheap=(struct occi_database_thread*) 
 /*	-------------------------------------------	*/
 private	void	occi_sql_lock()
 {
-	rest_log_message("OCCI-SQL LOCK DATABASE");
+	if ( check_debug() ) { rest_log_message("OCCI-SQL LOCK DATABASE"); }
 	pthread_mutex_lock( &database_lock );
 	return;
 }
@@ -53,7 +53,7 @@ private	void	occi_sql_lock()
 /*	-------------------------------------------	*/
 private	void	occi_sql_unlock()
 {
-	rest_log_message("OCCI-SQL UNLOCK DATABASE");
+	if ( check_debug() ) { rest_log_message("OCCI-SQL UNLOCK DATABASE"); }
 	pthread_mutex_unlock( &database_lock );
 	return;
 }
@@ -149,8 +149,11 @@ private	void	occi_database_thread_init()
 		tptr = tptr->next )
 		if ( tptr->tid == tid )
 			return;
-	sprintf(buffer,"%s THREAD INIT: %u\n",Database.nature,tid);	
-	rest_log_message( buffer );
+	if ( check_debug() )
+	{
+		sprintf(buffer,"%s THREAD INIT: %u\n",Database.nature,tid);	
+		rest_log_message( buffer );
+	}
 	if (!( tptr = allocate( sizeof( struct occi_database_thread ) ) ))
 		return;
 	else
