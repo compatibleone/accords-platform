@@ -1379,7 +1379,7 @@ public	int	rollback_sql_transaction(char * tablename)
 /*	-------------------------------------------	*/
 /*	     s q l _ e s c a p e d _ v a l u e 		*/
 /*	-------------------------------------------	*/
-private	char	sql_escape_buffer[4096];
+private	char	sql_escape_buffer[8192];
 public	char *	sql_escaped_value( char * sptr )
 {
 	char *	rptr;
@@ -1405,12 +1405,14 @@ public	char *	sql_escaped_value( char * sptr )
 	}
 	if (!( extra ))
 		return( sptr );
-	else if ((extra + total) > 4096 )
+	else if ((extra + total) > 8192 )
 		return( sptr );
 	else if (!( rptr = sql_escape_buffer ))
 		return( sptr );
-	else
+	switch ( Database.status )
 	{
+#ifdef	_OCCI_MYSQL
+	case	_OCCI_MYSQL	:
 		wptr = rptr;
 		while ((c = *(sptr++)) != 0)
 		{
@@ -1438,7 +1440,21 @@ public	char *	sql_escaped_value( char * sptr )
 		}
 		*(wptr++) = 0;
 		return( rptr );
+#endif
+#ifdef	_OCCI_POSTGRE
+	case	_OCCI_POSTGRE	:
+		if (((total*2)+1) > 8192 )
+			return( sptr );
+		else
+		{
+			PQescapeStringConn(Database.handle,rptr, sptr,total, (int *) 0);
+			return( rptr );
+		}
+#endif
+	default			:
+		return( sptr );
 	}
+
 }
 
 /*	-------------------------------------------	*/
@@ -1451,6 +1467,10 @@ public	char *	sql_unescaped_value( char * sptr )
 	char * wptr;
 	if (!( sptr ))
 		return( sptr );
+#ifdef	_OCCI_POSTGRE
+	else if ( Database.status  == _OCCI_POSTGRE )
+		return( allocate_string( sptr ) );
+#endif
 	else if (!( rptr = allocate_string( sptr ) ))
 		return( rptr );
 	else
@@ -1489,6 +1509,10 @@ public	char *	sql_escaped_filter( char * sptr )
 	int	c;
 	int	extra=0;
 	int	total=0;
+#ifdef	_OCCI_POSTGRE
+	if ( Database.status  == _OCCI_POSTGRE )
+		return( sql_escaped_value( sptr ) );
+#endif
 	for (	wptr=sptr;
 		*wptr != 0;
 		wptr++ )
