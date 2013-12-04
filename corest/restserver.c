@@ -1259,7 +1259,7 @@ private	struct rest_response * rest_process_request(
 	aptr = rest_ll_process_request( cptr, rptr );
 	aptr = rest_process_cors( cptr, rptr, aptr );
 	if ( cptr->server->method.after )
-		(*cptr->server->method.after)(cptr->server->method.instance,cptr,rptr);
+		(*cptr->server->method.after)(cptr->server->method.instance,cptr,aptr);
 	return( aptr );
 }
 

@@ -1004,12 +1004,12 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	{
 	case	_OCCI_LINK :
 		title(h,"occi first link node" );
-		fprintf(h,"public struct  occi_link_node * occi_first_link_node(category,char * category, char * tptr, char * vptr, int type)\n{\n");
+		fprintf(h,"public struct  occi_link_node * occi_first_link_node(char * category, char * tptr, char * vptr, int type)\n{\n");
 		fprintf(h,"\tstruct occi_link_node * nptr=(struct occi_link_node *) 0;\n");
 		fprintf(h,"\tstruct occi_link_node * xptr=(struct occi_link_node *) 0;\n");
 		fprintf(h,"\tif (!( nptr = allocate( sizeof( struct occi_link_node )) ))\n");
 		fprintf(h,"\t\treturn( nptr );\n");
-		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_first( nptr,tptr,vptr,type ) ))\n",fullname);
+		fprintf(h,"\telse\tif (!( xptr = %s_sql_on_first( category, nptr,tptr,vptr,type ) ))\n",fullname);
 		fprintf(h,"\t\treturn( liberate( nptr ) );\n");
 		fprintf(h,"\telse\treturn( xptr );\n}\n");
 
