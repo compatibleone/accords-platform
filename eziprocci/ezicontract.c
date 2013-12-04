@@ -49,11 +49,11 @@ private	struct	ezi_config * resolve_ezi_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
 	struct	ezi_config * pptr=(struct ezi_config *) 0;
-	struct	occi_kind_node  * occi_first_ezi_config_node(char *, char *, int);
+	struct	occi_kind_node  * occi_first_ezi_config_node(char *,char *, char *, int);
 	struct	occi_kind_node  * occi_next_ezi_config_node(struct occi_kind_node  * );
 	rest_log_message("resolve_ezi_configuration");
 	rest_log_message( sptr );
-	for (	nptr = occi_first_ezi_config_node("name",sptr,0);
+	for (	nptr = occi_first_ezi_config_node("easiclouds_configuration","name",sptr,0);
 		nptr != (struct occi_kind_node *) 0;
 		nptr = occi_next_ezi_config_node(nptr) )
 	{

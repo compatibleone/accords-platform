@@ -24,7 +24,7 @@
 #define	_OCCI_MYSQL		1
 //#undef	_OCCI_MYSQL
 #define	_OCCI_POSTGRE 		2
-//#undef	_OCCI_POSTGRE
+#undef	_OCCI_POSTGRE
 
 #ifndef	public
 #define	public

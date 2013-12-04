@@ -462,8 +462,8 @@ private	struct rest_response * stop_probe(
 /*	-------------------------------------------	*/
 /* 	      c o s a c s _ l a u n c h			*/
 /*	-------------------------------------------	*/
-public	struct	occi_kind_node * occi_first_cords_metadata_node(char *, char *,int);
-public	struct	occi_kind_node * occi_first_cords_script_node(char *, char *,int);
+public	struct	occi_kind_node * occi_first_cords_metadata_node(char *,char *, char *,int);
+public	struct	occi_kind_node * occi_first_cords_script_node(char *,char *, char *,int);
 public	struct	occi_kind_node * occi_next_cords_metadata_node(struct occi_kind_node * );
 public	struct	occi_kind_node * occi_next_cords_script_node(struct occi_kind_node * );
 
@@ -486,7 +486,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	/* ------------------------------------ */
 	/* generate the list of meta data items */
 	/* ------------------------------------ */
-	for ( 	kptr=occi_first_cords_metadata_node("state","0",0);
+	for ( 	kptr=occi_first_cords_metadata_node("metadata","state","0",0);
 		kptr != (struct occi_kind_node *) 0;
 		kptr = occi_next_cords_metadata_node(kptr) )
 	{
@@ -534,7 +534,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	/* --------------------------------- */
 	/* generate the list of script items */
 	/* --------------------------------- */
-	for ( 	kptr=occi_first_cords_script_node("state","0",0);
+	for ( 	kptr=occi_first_cords_script_node("script","state","0",0);
 		kptr != (struct occi_kind_node *) 0;
 		kptr = occi_next_cords_script_node(kptr) )
 	{

@@ -802,7 +802,7 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 	/* for all defined contract nodes of the current service */
 	/* ----------------------------------------------------- */
 	buffer[0] = 0;
-	for (	nptr=occi_first_link_node(_CORDS_SERVICE,"source",pptr->id,2);
+	for (	nptr=occi_first_link_node("service","source",pptr->id,2);
 		nptr != (struct occi_link_node *) 0;
 		nptr = occi_next_link_node(nptr) )
 	{
