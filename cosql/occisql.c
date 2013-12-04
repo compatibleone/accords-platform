@@ -1585,7 +1585,7 @@ public	void	order_sql_timestamp( char * buffer )
 /*	-------------------------------		*/
 /*	b u i l d _ s q l _ f i l t e r		*/
 /*	-------------------------------		*/
-public	char *	build_sql_filter(char * nptr, char * vptr, int type )
+public	char *	build_sql_filter( char * nptr, char * vptr, int type )
 {
 	char	buffer[2048];
 	char *	rptr;
