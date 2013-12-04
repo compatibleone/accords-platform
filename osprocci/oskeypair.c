@@ -136,6 +136,7 @@ private	int	generate_private_keyfile( char * pathname, char * kptr )
 				}
 				break;
 			}
+			break;
 		}
 		fclose(h);
 		if (!( status )) unlink( pathname );
