@@ -793,7 +793,7 @@ public	int	generate_service_interface( char * name, struct occi_category * cptr,
 	FILE * h;
 	struct	occi_attribute * iptr;
 	char buffer[1024];
-	sprintf(buffer,"%s.php");
+	sprintf(buffer,"%s.php",name);
 	if (!( h = fopen( buffer, "w" ) ))
 		return( 46 );
 	else
