@@ -133,6 +133,7 @@ private	void	debug_sql_query(struct occi_table * tptr, char * xptr )
 	return;
 }
 
+#ifdef	_OCCI_MYSQL
 /*	-------------------------------------------------	*/
 /*	o c c i _ d a t a b a s e _ t h r e a d _ i n i t	*/
 /*	-------------------------------------------------	*/
@@ -165,6 +166,7 @@ private	void	occi_database_thread_init()
 		return;
 	}
 }
+#endif	/* _OCCI_MYSQL */
 
 /*	-------------------------------		*/
 /*	o c c i _ m y s q l _ q u e r y 	*/

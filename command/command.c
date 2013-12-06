@@ -1268,6 +1268,22 @@ private	void	cords_copy_file( FILE * h, char * filename )
 	}
 }
 
+private	char *	corcs_copy_file( char * filename )
+{
+	char *	tempname;
+	FILE *	h;
+	if (!( tempname = rest_temporary_filename( "tmp" ) ))
+		return( tempname );
+	else if (!( h = fopen( tempname, "w" ) ))
+		return( liberate( tempname ) );
+	else
+	{
+		cords_copy_file( h, filename );
+		fclose(h);
+		return( tempname );
+	}
+}
+
 /*	------------------------------------------------------------	*/
 /*	  		c o r d s _ r c s _ s t y l e 			*/
 /*	------------------------------------------------------------	*/
@@ -1743,7 +1759,11 @@ private	char *	command_get_filename( char * command )
 		return( corcs_soap_get_wsdl() );
 	else if (!( strcasecmp( command, "wsrpc" ) ))
 		return( corcs_soap_get_wsrpc() );
-	else	return((char *) 0);
+	else if (!( strcasecmp( command, "manifest.xsd" ) ))
+		return( corcs_copy_file( command ) );
+	else if (!( strcasecmp( command, "slam.xsd" ) ))
+		return( corcs_copy_file( command ) );
+	else	return( corcs_copy_file( command ) );
 }
 
 

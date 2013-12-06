@@ -256,7 +256,8 @@ public	struct xml_element * document_load_xsd( struct xml_element * document )
 	struct	xml_element 	* xsd=(struct xml_element *) 0;
 	struct	xml_atribut 	* aptr=(struct xml_atribut *) 0;
 	char 			* sptr=(char *) 0;
-	if (!( aptr = document_atribut( document,"xmlns" ) ))
+	if ((!( aptr = document_atribut( document,"schemaLocation" ) ))
+	&&  (!( aptr = document_atribut( document,"xmlns" ) )))
 	{
 		if (!( sptr = allocate_string( _CORDS_NS ) ))
 		{
