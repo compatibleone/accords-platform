@@ -1763,6 +1763,8 @@ private	char *	command_get_filename( char * command )
 		return( corcs_copy_file( command ) );
 	else if (!( strcasecmp( command, "slam.xsd" ) ))
 		return( corcs_copy_file( command ) );
+	else if (!( strlen( command ) ))
+		return( (char *) 0 );
 	else	return( corcs_copy_file( command ) );
 }
 
