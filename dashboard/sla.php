@@ -1,70 +1,6 @@
 <?php
 
-function AccountSelector( $selectorname )
-{
-	print "<select style='width: 50mm;' name=".$selectorname.">\n";
-	$a = array();
-	exec("grep name cords_account.xml | cut -f 9 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select>\n";
-}
-
-function ManifestSelector( $selectorname )
-{
-	print "<select style='width: 50mm;' name=".$selectorname.">\n";
-	$a = array();
-	exec("grep name cords_manifest.xml | cut -f 4 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select>";
-}
-
-function ProviderSelector( $selectorname )
-{
-	print "<select style='width: 50mm;' name=".$selectorname.">\n";
-	print "<option value=any>any</option>\n";
-	$a = array();
-	exec("grep name cords_provider.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select>\n";
-}
-
-function PropertySelector( $selectorname )
-{
-	print "<select style='width: 50mm;' name=".$selectorname.">\n";
-	print "<option value=none>none</option>\n";
-	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select>\n";
-}
-
-	/* ------------------------------------- */
-	/* service level agreement creation form */
-	/* ------------------------------------- */
+	require "selector.php";
 
 	print "<form method=\"POST\" action=\"dashboard.php\">\n";
 
@@ -79,12 +15,11 @@ function PropertySelector( $selectorname )
 		print "<td><input type=text name=sladesc size=64></td>\n";
 		print "</tr>\n";
 
-	print "<tr><td>Account</td>";
-	print "<td>";
-	AccountSelector( "slaaccount" );
+	print "<tr><td>Account</td><td>";
+	AccountSelector("slaaccount");
 	print "</td>\n";
 
-	print "<tr><td>Manifest</td><td>\n";
+	print "<tr><td>Manifest</td><td>";
 	ManifestSelector("slaservice");
 	print "</td>\n";
 
@@ -101,8 +36,19 @@ function PropertySelector( $selectorname )
 
 	print "<tr><td>Scripted</td><td><input type=text name=slascript value='fairpack'>\n";
 	print "<tr><td>Provider</td><td>\n";
-	ProviderSelector( "slaprovider" );
-	print "</td></tr>\n";
+	print "<select style='width: 50mm;' name=slaprovider>\n";
+	print "<option value=any>any</option>\n";
+	print "<option selected value='openstack'>openstack</option>\n";
+	$a = array();
+	exec("grep name cords_provider.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
+	foreach ($a as $l )
+	{
+		if ( $l != "" )
+		{
+			print "<option value='$l'>$l</option>\n";
+		}
+	}
+	print "</select></td></tr>\n";
 
 	print "<tr><td>Zone<td><select style='width: 50mm;' name=slazone>\n";
 	print "<option value=any>any</option>\n";
@@ -153,8 +99,19 @@ function PropertySelector( $selectorname )
 	print "<tr><td colspan=4><div align=left><b>Service Guarantees</b></div></th></tr>\n";
 	
 	print "<tr><td>Property</td><td >\n";
-	PropertySelector("gp1");
-	print "</td></tr>\n";
+	print "<select style='width: 50mm;' name=gp1>\n";
+	print "<option value=none>none</option>\n";
+	print "<option value='user:count'>user:count</option>\n";
+	$a = array();
+	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
+	foreach ($a as $l )
+	{
+		if ( $l != "" )
+		{
+			print "<option value='$l'>$l</option>\n";
+		}
+	}
+	print "</select></td></tr>\n";
 
 	print "<tr><td>Compare</td><td >\n";
 	print "<select style='width: 50mm;' name=gc1>\n";
@@ -179,8 +136,18 @@ function PropertySelector( $selectorname )
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
 	print "<tr><td>Property</td><td >\n";
-	PropertySelector("gp2");
-	print "</td></tr>\n";
+	print "<select style='width: 50mm;' name=gp2>\n";
+	print "<option value=none>none</option>\n";
+	$a = array();
+	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
+	foreach ($a as $l )
+	{
+		if ( $l != "" )
+		{
+			print "<option value='$l'>$l</option>\n";
+		}
+	}
+	print "</select></td></tr>\n";
 
 	print "<tr><td>Compare</td><td >\n";
 	print "<select style='width: 50mm;' name=gc2>\n";
@@ -205,8 +172,18 @@ function PropertySelector( $selectorname )
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
 	print "<tr><td>Property</td><td >\n";
-	PropertySelector("gp3");
-	print "</td></tr>\n";
+	print "<select style='width: 50mm;' name=gp3>\n";
+	print "<option value=none>none</option>\n";
+	$a = array();
+	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
+	foreach ($a as $l )
+	{
+		if ( $l != "" )
+		{
+			print "<option value='$l'>$l</option>\n";
+		}
+	}
+	print "</select></td></tr>\n";
 
 	print "<tr><td>Compare</td><td >\n";
 	print "<select style='width: 50mm;' name=gc3>\n";
@@ -231,8 +208,18 @@ function PropertySelector( $selectorname )
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
 	print "<tr><td>Property</td><td >\n";
-	PropertySelector("gp4");
-	print "</td></tr>\n";
+	print "<select style='width: 50mm;' name=gp4>\n";
+	print "<option value=none>none</option>\n";
+	$a = array();
+	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
+	foreach ($a as $l )
+	{
+		if ( $l != "" )
+		{
+			print "<option value='$l'>$l</option>\n";
+		}
+	}
+	print "</select></td></tr>\n";
 
 	print "<tr><td>Compare</td><td >\n";
 	print "<select style='width: 50mm;' name=gc4>\n";
