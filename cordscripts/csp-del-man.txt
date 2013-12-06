@@ -1,4 +1,5 @@
 	include "csp-header.txt";
+	include "csp-nodeusers.txt";
 
 	$what = $2;
 
@@ -19,7 +20,12 @@
 					switch ( $n )
 					{
 					case	"link"	:
- 						$v.delete();
+						$nu = NodeUsers( $mid, $v )
+						if ( $n == 1 )
+						{
+ 							$v.delete();
+						}
+
 						break;
 					case	"occi.manifest.configuration" :
 						$v.delete();

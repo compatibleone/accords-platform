@@ -4,6 +4,8 @@
 	/* This script restitutes an XML representation of a parsed manifest from the distributed OCCI knowladge base    */
 	/* ------------------------------------------------------------------------------------------------------------- */
 
+	include "csp-nodeusers.txt";
+
 	function PortList( $r )
 	{
 		/* ----------------------------------------------------------------- */
@@ -289,7 +291,7 @@
 		return;
 	}
 
-	function NodeList( $manifest )
+	function NodeList( $manid, $manifest )
 	{
 		/* ------------------------------------------------- */
 		/* this function generates the list of node elements */
@@ -304,7 +306,8 @@
 				{
 					$simple=1;
 					$node = $v.get();
-					$m = "&lt;node";
+					$dependance = NodeUsers( $manid, $v );
+					$m = "&lt;("#$dependance#")node";
 					$n = $node["occi.node.name"];
 					if ( $n.length() > 0 )
 					{
@@ -463,7 +466,7 @@
 		/* --------------------------------- */
 		/* restitute the collection of nodes */
 		/* --------------------------------- */
-		NodeList( $manifest );
+		NodeList( $manid, $manifest );
 
 		/* ----------------------------------- */
 		/* restitute the configuration actions */

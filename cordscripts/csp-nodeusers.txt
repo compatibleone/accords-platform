@@ -1,0 +1,11 @@
+        function NodeUsers( $manid, $nodid )
+        {
+                $parts = $manid / "/";
+                $nus = $parts[0];
+                $nuh = $parts[1];
+                $murl = $nus#"/"#$nuh#"/link/";
+                $nuq = "occi.link.target='"#$nodid#"'";
+                $nuc = $murl.count($nuq);
+                return( $nuc );
+        }
+
