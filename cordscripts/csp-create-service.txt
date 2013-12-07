@@ -1,0 +1,42 @@
+/*	------------------------------------------------	*/
+/*		csp-create-service.txt				*/
+/*	------------------------------------------------	*/
+/*	creation of a service instance from an agreement	*/
+/*	------------------------------------------------	*/
+/*	$1 is the operator account				*/
+/*	$2 is the agreement name				*/
+/*	------------------------------------------------	*/
+
+	include "csp-service-manifest.txt";
+
+	$s = {};
+
+	$f = "occi.agreement.name='"#$2#"'";
+	$l = agreement.list($f);
+	$slid = $l[0];
+	$sla = $slid.get();
+	$acid = $sla["occi.agreement.initiator"];
+	$vend = $sla["occi.agreement.responder"];
+
+	$man  = ServiceManifest( $sla );
+
+	$o = "'occi.service.name':'"#$2#"'";
+	$s = $s + $o;
+	$o = "'occi.service.sla':'"#$slid#"'";
+	$s = $s + $o;
+	$o = "'occi.service.account':'"#$acid#"'";
+	$s = $s + $o;
+	$o = "'occi.service.vendor':'"#$vend#"'";
+	$s = $s + $o;
+	$o = "'occi.service.manifest':'"#$man#"'";
+	$s = $s + $o;
+	$o = "'occi.service.plan':'"#$man#"'";
+	$s = $s + $o;
+
+	$sid = service.post( $s );
+
+	$2 = $sid;
+
+	include "csp-service.txt";
+
+

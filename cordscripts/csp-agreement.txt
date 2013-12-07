@@ -128,10 +128,12 @@
 					{
 						$smm = $smi.get();
 						$sm = "&lt;manifest";
+						$sm = $sm#' name="';
 						$smn = $smm["occi.manifest.name"];
 						if ( $smn.length() > 0 )
 						{
-							$sm = $sm#' name="'#$smn#'"';
+							$sm = $sm#"<a href='dashboard.php?action=compile&script=csp-manifest.txt&output=HTML&option="#$smn#"'>";
+							$sm = $sm#$smn#'</a>"';
 						}
 						$sm = $sm#"/&gt;";
 						$sm.display();

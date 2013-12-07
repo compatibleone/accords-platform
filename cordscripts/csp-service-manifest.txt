@@ -1,0 +1,37 @@
+/*	------------------------------------------	*/
+/*		csp-service-manifest-txt		*/
+/*	------------------------------------------	*/
+/*	resolves the manifest ID from an agreement	*/
+/*	------------------------------------------	*/
+
+function ServiceManifest( $psla )
+{
+	foreach ( $psla as $tuple )
+	{
+		forboth ( $tuple as $name and $value )
+		{
+			if ( $name == "link" )
+			{
+				$ts = $value.get();
+				$ss = $ts["occi.terms.type"];
+				if ( $ss == "services" )
+				{
+					foreach ( $ts as $ti )
+					{
+						forboth ( $ti as $tn and $tv )
+						{
+							if ( $tn == "link" )
+							{
+								$t = $tv.get();
+								$result=$t["occi.term.manifest"];
+								return( $result );
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return("");
+}
+

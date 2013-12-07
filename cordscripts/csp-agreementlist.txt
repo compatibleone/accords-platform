@@ -38,7 +38,8 @@ function AgreementList( $selector )
 		
 		$m = "<td>"#$expires#"<td>"#$termss#"</td>";
 		$m.display();
-		$m = "<td><a href='"#$baseurl#"?action=createservice&upload=plan_sla-"#$name#".xml'>Create Service Instance<br><img width=64 height=64 src='images/service.png'></a>";
+		$m = "<td><a href='"#$baseurl#"?action=compile&script=csp-create-service.txt&output=HTML&option="#$name#"'>Create Service Instance<br><img width=64 height=64 src='images/service.png'></a>";
+
 		$m.display();
 	}
 	"</table>".display();
