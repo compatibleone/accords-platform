@@ -36,7 +36,7 @@
 								$stv.delete();
 							}
 						}
-					}			
+					}
 					$ttv.delete();
 				}
 			}
@@ -73,7 +73,7 @@
 								$gtv.delete();
 							}
 						}
-					}			
+					}
 					$ttv.delete();
 				}
 			}
@@ -87,7 +87,6 @@
 
 		$agreements = agreement.list('occi.agreement.name="'#$what#'"');
 
-	
 		foreach ( $agreements as $aid )
 		{
 			$agreement = $aid.get();
@@ -112,7 +111,7 @@
 							DeleteGuarantees($terms);
 							break;
 						}
-						$v.delete();						
+						$v.delete();					
 					}	
 				}
 			}
@@ -120,6 +119,7 @@
 		}
 	}
 
+	$2 = $1;
 
 	include "csp-agreements.txt";
 

@@ -1,11 +1,11 @@
 
-	/* ------------------------------------------------------------------------------------------------------------- */
-	/* 						csp-documentmenu.txt						 */
-	/* ------------------------------------------------------------------------------------------------------------- */
-	/* This script displays the platform operator document management menu for all manifest document types documents */
-	/* ------------------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------- */
+/* 			csp-documentmenu.txt						 */
+/* ------------------------------------------------------------------------------------- */
+/* This script displays the platform operator document management menu for all manifest  */
+/* document types 									 */
+/* ------------------------------------------------------------------------------------- */
 
-	include "csp-header.txt";
 
 function	DocumentMenu()
 {
@@ -16,9 +16,3 @@ function	DocumentMenu()
 	return;
 }
 
-
-	HtmlHeader("Platform Operator Document Management",$1);
-
-	DocumentMenu();
-
-	HtmlFooter();

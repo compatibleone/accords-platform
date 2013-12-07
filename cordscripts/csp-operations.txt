@@ -1,30 +1,38 @@
-	/* ------------------------------------------------------------------------------------------------------------- */
-	/* 						csp-operations.txt						 */
-	/* ------------------------------------------------------------------------------------------------------------- */
-	/* This script displays the platform operator platform management operations menu for scheduling and penalty     */
-	/* ------------------------------------------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------- */
+/* 				csp-operations.txt				 */
+/* ----------------------------------------------------------------------------- */
+/* This script displays the platform operator platform management operation menu */
+/* for scheduling and penalty and other maintenance operations			 */
+/* ----------------------------------------------------------------------------- */
 
 	include "csp-header.txt";
+	include "csp-documentmenu.txt";
 
 function	OperationMenu()
 {
+	"<tr><td colspan=3>&nbsp;".display();
 	"<tr>".display();
-	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-documentmenu.txt&ouput=HTML'>Documents</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-scheduling.txt&ouput=HTML'>Scheduling</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-jobs.txt&ouput=HTML'>Jobs</a>".display();
-	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-federations.txt&ouput=HTML'>Federation</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-timers.txt&ouput=HTML'>Timers</a>".display();
+	"<tr><td colspan=3>&nbsp;".display();
+	"<tr>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-penalties.txt&ouput=HTML'>Penalties</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-events.txt&ouput=HTML'>Events</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-alerts.txt&ouput=HTML'>Alerts</a>".display();
+	"<tr><td colspan=3>&nbsp;".display();
 	"<tr>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-federations.txt&ouput=HTML'>Federation</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-resolver.txt&ouput=HTML'>Publications</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-online.txt&ouput=HTML'>Authorizations</a>".display();
-	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-alerts.txt&ouput=HTML'>Alerts</a>".display();
+	"<tr><td colspan=3>&nbsp;".display();
 	return;
 }
-
 
 	HtmlHeader("Platform Operator Management Operations",$1);
 
 	OperationMenu();
+	DocumentMenu();
 
 	HtmlFooter();
+
