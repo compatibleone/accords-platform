@@ -1,4 +1,5 @@
 <?php
+	$metrics = "";
 
 	require "selector.php";
 
@@ -36,19 +37,8 @@
 
 	print "<tr><td>Scripted</td><td><input type=text name=slascript value='fairpack'>\n";
 	print "<tr><td>Provider</td><td>\n";
-	print "<select style='width: 50mm;' name=slaprovider>\n";
-	print "<option value=any>any</option>\n";
-	print "<option selected value='openstack'>openstack</option>\n";
-	$a = array();
-	exec("grep name cords_provider.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select></td></tr>\n";
+	ProviderSelector("slaprovider");
+	print "</td></tr>\n";
 
 	print "<tr><td>Zone<td><select style='width: 50mm;' name=slazone>\n";
 	print "<option value=any>any</option>\n";
@@ -99,19 +89,8 @@
 	print "<tr><td colspan=4><div align=left><b>Service Guarantees</b></div></th></tr>\n";
 	
 	print "<tr><td>Property</td><td >\n";
-	print "<select style='width: 50mm;' name=gp1>\n";
-	print "<option value=none>none</option>\n";
-	print "<option value='user:count'>user:count</option>\n";
-	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select></td></tr>\n";
+	$metrics = MetricSelector("gp1",$metrics);
+	print "</td></tr>\n";
 
 	print "<tr><td>Compare</td><td >\n";
 	print "<select style='width: 50mm;' name=gc1>\n";
@@ -136,18 +115,8 @@
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
 	print "<tr><td>Property</td><td >\n";
-	print "<select style='width: 50mm;' name=gp2>\n";
-	print "<option value=none>none</option>\n";
-	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select></td></tr>\n";
+	$metrics = MetricSelector("gp2",$metrics);
+	print "</td></tr>\n";
 
 	print "<tr><td>Compare</td><td >\n";
 	print "<select style='width: 50mm;' name=gc2>\n";
@@ -172,18 +141,8 @@
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
 	print "<tr><td>Property</td><td >\n";
-	print "<select style='width: 50mm;' name=gp3>\n";
-	print "<option value=none>none</option>\n";
-	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select></td></tr>\n";
+	$metrics = MetricSelector("gp3",$metrics);
+	print "</td></tr>\n";
 
 	print "<tr><td>Compare</td><td >\n";
 	print "<select style='width: 50mm;' name=gc3>\n";
@@ -208,18 +167,8 @@
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
 	print "<tr><td>Property</td><td >\n";
-	print "<select style='width: 50mm;' name=gp4>\n";
-	print "<option value=none>none</option>\n";
-	$a = array();
-	exec("grep name cords_metric.xml | cut -f 3 -d = | cut -f 2 -d '\"' ",$a);
-	foreach ($a as $l )
-	{
-		if ( $l != "" )
-		{
-			print "<option value='$l'>$l</option>\n";
-		}
-	}
-	print "</select></td></tr>\n";
+	$metrics = MetricSelector("gp4",$metrics);
+	print "</></td></tr>\n";
 
 	print "<tr><td>Compare</td><td >\n";
 	print "<select style='width: 50mm;' name=gc4>\n";

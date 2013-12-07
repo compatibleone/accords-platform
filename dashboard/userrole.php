@@ -299,6 +299,7 @@ class user_role extends role
 			case	"upload and parse" :
 				$this->display_tabs("0");
 				$result = upload_manifest($this->page);
+				$this->main_menu();
 				break;
 			/* ------------------ */
 			/* parsing operations */
@@ -318,6 +319,7 @@ class user_role extends role
 			case	"generate sla then parse" :
 				$this->display_tabs("0");
 				$result = generate_sla($this->page);
+				$this->main_menu();
 				break;
 
 			/* ------------------ */
