@@ -600,19 +600,16 @@ private	int	service_operation( char * command, char * service, char * syntax )
 {
 	char *	id;
 	char *	filename=service;
-	FILE *	h;
 	if (!( command ))
 		return( 31 );
 	else if (!( strcasecmp( command, "INVOICE"  ) ))
 		return( cords_invoice_action( filename, syntax ) );
 	else if (!( service ))
 		return( 32 );
-	else if (!( h = fopen( service, "r" ) ))
-		return( 40 );
 	else if (!( _DEFAULT_PUBLISHER ))
 		return( failure( 0, "publisher", "undefined" ) );
+	else
 	{
-		fclose(h);
 		for (	id=service;
 			*service != 0;
 			service++ )
@@ -620,32 +617,33 @@ private	int	service_operation( char * command, char * service, char * syntax )
 			if ( *service == '/' )
 				id = (service+1);
 		}
+	}
 
-		if ( check_verbose() )
-			printf("\n Service %s { %s } \n",command,id);
+	if ( check_verbose() )
+		printf("\n Service %s { %s } \n",command,id);
 
-		if (!( strcasecmp( command, "START" ) ))
-			return( cords_service_action( id, "start" ) );
-		else if (!( strcasecmp( command, "RESTART" ) ))
-			return( cords_service_action( id, "restart" ) );
-		else if (!( strcasecmp( command, "STOP" ) ))
-			return( cords_service_action( id, "stop" ) );
-		else if (!( strcasecmp( command, "SCALEUP" ) ))
-			return( cords_service_action( id, "scaleup" ) );
-		else if (!( strcasecmp( command, "SCALEDOWN" ) ))
-			return( cords_service_action( id, "scaledown" ) );
-		else if (!( strcasecmp( command, "SAVE" ) ))
-			return( cords_service_action( id, "save" ) );
-		else if (!( strcasecmp( command, "SNAPSHOT" ) ))
-			return( cords_service_action( id, "snapshot" ) );
-		else if (!( strcasecmp( command, "DELETE" ) ))
-			return( cords_service_delete( id ) );
-		else if (!( strcasecmp( command, "COSACS" ) ))
-			return( cosacs_service_operation( filename, syntax ) );
-		else if (!( strcasecmp( command, "OCCI"  ) ))
-			return( occi_service_operation( filename, syntax ) );
-		else	return( failure( 30,"incorrect command", command ) );
-	}	
+	if (!( strcasecmp( command, "START" ) ))
+		return( cords_service_action( id, "start" ) );
+	else if (!( strcasecmp( command, "RESTART" ) ))
+		return( cords_service_action( id, "restart" ) );
+	else if (!( strcasecmp( command, "STOP" ) ))
+		return( cords_service_action( id, "stop" ) );
+	else if (!( strcasecmp( command, "SCALEUP" ) ))
+		return( cords_service_action( id, "scaleup" ) );
+	else if (!( strcasecmp( command, "SCALEDOWN" ) ))
+		return( cords_service_action( id, "scaledown" ) );
+	else if (!( strcasecmp( command, "SAVE" ) ))
+		return( cords_service_action( id, "save" ) );
+	else if (!( strcasecmp( command, "SNAPSHOT" ) ))
+		return( cords_service_action( id, "snapshot" ) );
+	else if (!( strcasecmp( command, "DELETE" ) ))
+		return( cords_service_delete( id ) );
+	else if (!( strcasecmp( command, "COSACS" ) ))
+		return( cosacs_service_operation( filename, syntax ) );
+	else if (!( strcasecmp( command, "OCCI"  ) ))
+		return( occi_service_operation( filename, syntax ) );
+	else	return( failure( 30,"incorrect command", command ) );
+		
 }
 
 /*	---------------------------------------------------	*/
@@ -2538,8 +2536,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.08");
-	printf("\n   Beta Version : 25/10/2013 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.09");
+	printf("\n   Beta Version : 07/12/2013 ");
 	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
