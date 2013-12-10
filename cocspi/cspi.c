@@ -1849,7 +1849,8 @@ private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 	{	"send",		_SEND_FUNCTION,		-1 },
 	{	"system",	_SYSTEM_FUNCTION,	-1 },
 	{	"fork",		_FORK_FUNCTION,		-1 },
-	{	"read",		_READ_FUNCTION,		-1 }
+	{	"read",		_READ_FUNCTION,		-1 },
+	{	"write",	_WRITE_FUNCTION,	-1 }
 };
 
 int	prepare_hashcodes=3;
@@ -2032,6 +2033,35 @@ private	void	csp_category_attributes( struct cordscript_instruction * iptr, char
 		occi_remove_client( kptr );
 	}
 	return;
+}
+
+/*	-----------------------------	*/
+/*	w r i t e _ o p e r a t i o n	*/
+/*	-----------------------------	*/
+private	void	write_operation( struct cordscript_instruction * iptr, struct cordscript_value * uptr, struct cordscript_value * bptr )
+{
+
+	char *	message;
+	char *	filename;
+	FILE * h;
+	if (!( uptr ))
+		push_value( iptr->context, string_value("expected filename") );
+	else if (!( filename = uptr->value ))
+		push_value( iptr->context, string_value("expected filename") );
+	else if (!( bptr ))
+		push_value( iptr->context, string_value("expected message") );
+	else if (!( message = bptr->value ))
+		push_value( iptr->context, string_value("expected message") );
+	else if (!( h = fopen( filename, "w" ) ))
+		push_value( iptr->context, string_value("expected file") );
+	else
+	{
+		fprintf(h,"%s\n",message);
+		fclose(h);
+		push_value( iptr->context, string_value("OK") );
+		return;
+	}
+
 }
 
 /*	---------------------------	*/
@@ -2271,6 +2301,9 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 			return( eval_next( iptr,argv ) );
 		case	_READ_FUNCTION		:
 			read_operation( iptr, vptr, argv[0] );
+			return( eval_next( iptr,argv ) );
+		case	_WRITE_FUNCTION		:
+			write_operation( iptr, vptr, argv[0] );
 			return( eval_next( iptr,argv ) );
 		case	_OPEN_FUNCTION		:
 			OpenScriptOutput( vptr->value );
