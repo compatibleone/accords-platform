@@ -10,7 +10,7 @@
 
 	<xsd:complexType name="cordsAgreement">
 		<xsd:sequence>
-			<xsd:element name="terms" type="cordsTerms" minOccurs="3" maxOccurs="3"/>
+			<xsd:element name="terms" type="cordsTerms" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="name" type="xsd:string"/>
