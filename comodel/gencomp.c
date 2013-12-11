@@ -22,6 +22,7 @@
 #include "standard.h"
 #include "occi.h"
 
+public	char *	underscore(char *);
 private	void	date_string( char * result )
 {
 	int 	tt;
@@ -49,11 +50,12 @@ private	void	generate_file_exclusion(FILE * h, char * sptr, int mode )
 {
 	if ( mode == 1 )
 	{
-		fprintf(h,"#ifndef %s\n#define %s\n",sptr,sptr);
+		fprintf(h,"#ifndef %s\n",underscore(sptr));
+		fprintf(h,"#define %s\n",underscore(sptr));
 	}
 	else
 	{
-		fprintf(h,"#endif /* %s */\n",sptr);
+		fprintf(h,"#endif /* %s */\n",underscore(sptr));
 
 	}
 }
@@ -110,13 +112,13 @@ private	void	generate_accords_config( FILE * h, char * nptr, char * prefix )
 	fprintf(h,"\t\tif ( m2 ) printf(\" : %cs\",m2);\n",0x0025);	
 	fprintf(h,"\t\tprintf(\" **\\n\");\n");
 	fprintf(h,"\t}\n\treturn( e );\n}\n");
-	fprintf(h,"private void	%s_configuration()\n{\n",nptr);
-	fprintf(h,"\tload_accords_configuration( &Configuration, \"%s\");\n",nptr);
+	fprintf(h,"private void	%s_configuration()\n{\n",underscore(nptr));
+	fprintf(h,"\tload_accords_configuration( &Configuration, \"%s\");\n",underscore(nptr));
 	fprintf(h,"\treturn;\n}\n");
 
 	title(h,"banner");
-	fprintf(h,"private int %s_banner()\n{\n",nptr);
-	fprintf(h,"\tprintf(\"\\n   CompatibleOne Generated Service %s: Version 1.0a.0.01\");\n",nptr);
+	fprintf(h,"private int %s_banner()\n{\n",underscore(nptr));
+	fprintf(h,"\tprintf(\"\\n   CompatibleOne Generated Service %s: Version 1.0a.0.01\");\n",underscore(nptr));
 	date_string( datebuffer);
 	fprintf(h,"\tprintf(\"\\n   Beta Version : %s \");\n",datebuffer);
 	if ( prefix )
@@ -125,11 +127,11 @@ private	void	generate_accords_config( FILE * h, char * nptr, char * prefix )
 			fprintf(h,"\tprintf(\"\\n   Back End : SQL%s \\n\");\n",(check_testflag() ? "(test)" : "") );
 		else	fprintf(h,"\tprintf(\"\\n   Back End : XML%s \\n\");\n",(check_testflag() ? "(test)" : "") );
 	}
-	fprintf(h,"\tprintf(\"\\n   Copyright (c) 2013 Iain James Marshall\");\n",nptr);
-	fprintf(h,"\tprintf(\"\\n\");\n",nptr);
-	fprintf(h,"\taccords_configuration_options();\n",nptr);
+	fprintf(h,"\tprintf(\"\\n   Copyright (c) 2013 Iain James Marshall\");\n");
+	fprintf(h,"\tprintf(\"\\n\");\n");
+	fprintf(h,"\taccords_configuration_options();\n");
 	fprintf(h,"\tprintf(\"\\n\\n\");\n");
-	fprintf(h,"\treturn(0);\n}\n",nptr);
+	fprintf(h,"\treturn(0);\n}\n");
 
 	return;
 }
@@ -267,16 +269,16 @@ private	void	generate_category_actions( FILE * h, struct occi_category * cptr, c
 			else if (!( mh = category_action_file( cptr->id, nptr, "c" ) ))
 			{
 				title( h, nptr );
-				fprintf(h,"private struct rest_response * _%s_%s(\n",nptr,cptr->id);
+				fprintf(h,"private struct rest_response * _%s_%s(\n",nptr,underscore(cptr->id));
 				fprintf(h,"\tstruct occi_category * optr,\n");
 				fprintf(h,"\tstruct rest_client * cptr,\n");
 				fprintf(h,"\tstruct rest_request * rptr,\n");
 				fprintf(h,"\tstruct rest_response * aptr,\n");
 				fprintf(h,"\tvoid * vptr )\n{\n");
-				fprintf(h,"\tstruct cords_%s * pptr;\n",cptr->id);
-				fprintf(h,"\tif (!( pptr = (struct cords_%s *) vptr ))\n",cptr->id);
+				fprintf(h,"\tstruct cords_%s * pptr;\n",underscore(cptr->id));
+				fprintf(h,"\tif (!( pptr = (struct cords_%s *) vptr ))\n",underscore(cptr->id));
 				fprintf(h,"\t\treturn( rest_html_response( aptr, 400, \"Incorrect Request\" ) );\n");
-				fprintf(h,"\telse\treturn( category_action_script( aptr, \"%s\", \"%s\", pptr->id ) );\n",cptr->id, nptr);
+				fprintf(h,"\telse\treturn( category_action_script( aptr, \"%s\", \"%s\", pptr->id ) );\n",underscore(cptr->id), nptr);
 				fprintf(h,"}\n");
 				generate_category_action_script( cptr, nptr );
 			}
@@ -299,9 +301,11 @@ private	void	generate_add_category( FILE * h, struct occi_category * cptr )
 {
 	struct	occi_action * aptr;
 	char *	nptr;
+	char *	sptr;
 	if (!( comodel_category_filter( cptr ) ))
 		return;
-	fprintf(h,"\tif (!( optr = occi_cords_%s_builder( Configuration.domain, %c%s%c ) ))\n",cptr->id,0x0022,cptr->id,0x0022);
+	sptr = underscore(cptr->id);
+	fprintf(h,"\tif (!( optr = occi_cords_%s_builder( Configuration.domain, %c%s%c ) ))\n",sptr,0x0022,sptr,0x0022);
 	fprintf(h,"\t\treturn( 27 );\n");
 	fprintf(h,"\tif (!( optr->previous = last ))\n");
 	fprintf(h,"\t\tfirst = optr;\n");
@@ -326,7 +330,7 @@ private	void	generate_add_category( FILE * h, struct occi_category * cptr )
 			else	nptr++;
 			if (!( strcmp( nptr, "DELETE" )))
 				continue;
-			fprintf(h,"\tif (!( optr = occi_add_action( optr, %c%s%c, \"\", _%s_%s ) ))\n",0x0022,nptr,0x0022,nptr,cptr->id);
+			fprintf(h,"\tif (!( optr = occi_add_action( optr, %c%s%c, \"\", _%s_%s ) ))\n",0x0022,nptr,0x0022,nptr,sptr);
 			fprintf(h,"\t\treturn( 27 );\n");
 		}
 	}
@@ -351,7 +355,7 @@ private	void	generate_file_actions( FILE * h, struct occi_category * cptr, char 
 private	void	generate_file_operation( FILE * h, char * nptr, struct occi_category * cptr, char * prefix )
 {
 	title(h,"operation");
-	fprintf(h,"\nprivate int %s_operation( char * sptr )\n{\n",nptr);
+	fprintf(h,"\nprivate int %s_operation( char * sptr )\n{\n",underscore(nptr));
 	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tstruct occi_category * first=(struct occi_category *) 0;\n");
 	fprintf(h,"\tstruct occi_category * last=(struct occi_category *) 0;\n");
@@ -389,13 +393,13 @@ private	void	generate_file_operation( FILE * h, char * nptr, struct occi_categor
 private	void	generate_file_start( FILE * h, char * nptr )
 {
 	title(h,"start");
-	fprintf(h,"\nprivate int %s( int argc, char * argv[] )\n{\n",nptr);
+	fprintf(h,"\nprivate int %s( int argc, char * argv[] )\n{\n",underscore(nptr));
 	fprintf(h,"\tint argi=0;\n");
 	fprintf(h,"\tchar * aptr;\n");
-	fprintf(h,"\t%s_configuration();\n",nptr);
+	fprintf(h,"\t%s_configuration();\n",underscore(nptr));
 	fprintf(h,"\twhile ( argi < argc ) {\n");
 	fprintf(h,"\t\tif (!( aptr = argv[++argi] )) break;\n");
-	fprintf(h,"\t\telse if ( *aptr != '-' ) return( %s_operation( aptr ) );\n",nptr);
+	fprintf(h,"\t\telse if ( *aptr != '-' ) return( %s_operation( aptr ) );\n",underscore(nptr));
 	fprintf(h,"\t\telse if ( *(++aptr) != '-' ) return( failure( 30, aptr, \"\" ) );\n");
 	fprintf(h,"\t\telse if (!( argi = accords_configuration_option((aptr+1), argi, argv) )) break;\n");
 	fprintf(h,"\t\telse continue;\n"); 
@@ -412,8 +416,8 @@ private	void	generate_file_main( FILE * h, char * nptr )
 {
 	title(h,"main");
 	fprintf(h,"\npublic int main( int argc, char * argv[] )\n{\n");
-	fprintf(h,"\tif ( argc == 1 ) return( %s_banner() );\n",nptr);
-	fprintf(h,"\telse return( %s(argc,argv) );\n",nptr);
+	fprintf(h,"\tif ( argc == 1 ) return( %s_banner() );\n",underscore(nptr));
+	fprintf(h,"\telse return( %s(argc,argv) );\n",underscore(nptr));
 	fprintf(h,"}\n");
 	return;
 }
@@ -459,13 +463,23 @@ public	int	generate_service_component( char * name, struct occi_category * cptr,
 }
 
 /*	---------------------------------------------------	*/
+/*	 g e n e r a t e _ s e r v i c e _ b u i l d e r   	*/
+/*	---------------------------------------------------	*/
+public	int	generate_service_builder(FILE * h, char * name, struct occi_category * cptr, char * prefix )
+{
+	fprintf(h,"gcc $(CFLAGS) $(INCLUDE) -o %s.o %s.c\n",name);
+	return(0);
+}
+
+/*	---------------------------------------------------	*/
 /*	 g e n e r a t e _ s e r v i c e _ m a k e f i l e 	*/
 /*	---------------------------------------------------	*/
 public	int	generate_service_makefile( char * name, struct occi_category * cptr, char * prefix )
 {
 	FILE * h;
 	char buffer[1024];
-	sprintf(buffer,"Makefile.am");
+
+	sprintf(buffer,"%s-Makefile.am",name);
 	if (!( h =fopen( buffer, "w" ) ))
 		return( 46 );
 	else

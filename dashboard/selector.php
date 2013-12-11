@@ -28,7 +28,7 @@ function ProviderSelector( $sname )
 {
 	print "<select style='width: 50mm;' name=".$sname.">\n";
 	$a = array();
-	$r = exec("bash ./dashboard-command run csp-option-list.txt provider",$a);
+	$r = exec("bash ./dashboard-command run csp-category-list.txt provider",$a);
 	foreach ($a as $l )
 	{
 		print $l."\n";
