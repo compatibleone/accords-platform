@@ -793,7 +793,9 @@ private	int	comodel_platform_manifest( struct xml_element * eptr )
 {
 	struct	xml_element * fptr;
 	char *	aptr;
+	char *	nptr;
 	char *	mptr;
+        char *  nature;
 	char	filename[1024];
 	FILE *	h;
 	int	item=0;
@@ -801,11 +803,93 @@ private	int	comodel_platform_manifest( struct xml_element * eptr )
 		return( 78 );
 	else
 	{
+                if (!( nature = comodel_attribute( eptr, "nature" ) ))
+                        nature = "machine";
+		if (!( strcmp( nature, "cluster" ) ))
+		{
+			for (	fptr = eptr->first;
+				fptr != (struct xml_element *) 0;
+				fptr = fptr->next )
+			{
+				if (!( fptr->name ))
+					continue;
+				else if ( strcmp( fptr->name, "component" ) != 0 )
+					continue;
+				else if (!( aptr = comodel_attribute( fptr, "name")))
+					continue;
+				sprintf(filename,"%s.xml",aptr);
+				if (!(h = fopen(filename,"w") ))
+					continue;	
+				else	item=0;
+				fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+				fprintf(h,"<manifest name=\"%s\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">\n",aptr);
+                		fprintf(h,"\t<node name=\"%s\" access=\"public\" type=\"simple\" provider=\"any\">\n",aptr);
+                		fprintf(h,"\t\t<infrastructure name=\"%s\">\n",aptr);
+               			fprintf(h,"\t\t\t<compute name=\"%s\"/>\n",aptr);
+                		fprintf(h,"\t\t\t<storage name=\"%s\"/>\n",aptr);
+                		fprintf(h,"\t\t\t<network name=\"%s\" label=\"account\">\n",aptr);
+                		fprintf(h,"\t\t\t\t<port name=\"publisher\" protocol =\"tcp\" from=\"8086\" to=\"8086\" range=\"0.0.0.0/24\"/>\n");
+                		fprintf(h,"\t\t\t\t<port name=\"cosacs\" protocol =\"tcp\" from=\"8286\" to=\"8286\" range=\"0.0.0.0/24\"/>\n");
+               			fprintf(h,"\t\t\t\t<port name=\"ssh\" protocol =\"tcp\" from=\"22\" to=\"22\" range=\"0.0.0.0/24\"/>\n");
+		                fprintf(h,"\t\t\t\t<port name=\"http\" protocol =\"tcp\" from=\"80\" to=\"80\" range=\"0.0.0.0/24\"/>\n");
+                		fprintf(h,"\t\t\t</network>\n");
+                		fprintf(h,"\t\t</infrastructure>\n");
+                		fprintf(h,"\t\t<image name=\"%s\" agent=\"install:cosacs:root:debian:run-cosacs\">\n",aptr);
+                		fprintf(h,"\t\t\t<system name=\"debian_with_cosacs\"/>\n",aptr);
+                		fprintf(h,"\t\t</image>\n");
+                		fprintf(h,"\t</node>\n");
+                		fprintf(h,"\t<node name=\"cool\" access=\"public\" type=\"simple\" provider=\"any\"/>\n");
+				fprintf(h,"\t<configuration name=\"%s\">\n",aptr);
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"%s.system('wget %s/install-%s');\"/>\n",
+					aptr,get_depot(),aptr);
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"%s.fork('bash ./install-%s');\"/>\n",aptr,aptr);
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"cool.configure(%s.contract);\"/>\n",aptr);
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"cool.system('export _elastic_contract=$_%s_contract');\"/>\n",aptr);
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"cool.system('wget %s/install-cool');\"/>\n",get_depot());
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"cool.fork('bash ./install-cool');\"/>\n");
+				fprintf(h,"\t</configuration>\n");
+				fprintf(h,"\t<release name=\"%s\">\n",aptr);
+				item=0;
+				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
+				fprintf(h," expression=\"%s.kill();\"/>\n",aptr);
+				fprintf(h,"\t</release>\n");
+				fprintf(h,"\t<account name=\"accords\"/>\n");
+				fprintf(h,"\t<security type=\"public\"/>\n");
+				fprintf(h,"</manifest>\n");
+				fclose(h);
+			}
+		}
+
 		sprintf(filename,"%s.xml",mptr);
 		if (!(h = fopen(filename,"w") ))
 			return( 46 );
 		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
 		fprintf(h,"<manifest name=\"%s\" xmlns=\"http://www.compatibleone.fr/schemes/manifest.xsd\">\n",mptr);
+                if (!( strcmp( nature, "process" ) ))
+                {
+                fprintf(h,"\t<node name=\"%s\" access=\"public\" type=\"simple\" provider=\"any\">\n",mptr);
+                fprintf(h,"\t\t<infrastructure name=\"%s\">\n",mptr);
+                fprintf(h,"\t\t\t<compute name=\"%s\"/>\n",mptr);
+                fprintf(h,"\t\t\t<storage name=\"%s\"/>\n",mptr);
+                fprintf(h,"\t\t\t<network name=\"%s\" label=\"account\">\n",mptr);
+                fprintf(h,"\t\t\t\t<port name=\"publisher\" protocol =\"tcp\" from=\"8086\" to=\"8086\" range=\"0.0.0.0/24\"/>\n");
+                fprintf(h,"\t\t\t\t<port name=\"cosacs\" protocol =\"tcp\" from=\"8286\" to=\"8286\" range=\"0.0.0.0/24\"/>\n");
+                fprintf(h,"\t\t\t\t<port name=\"ssh\" protocol =\"tcp\" from=\"22\" to=\"22\" range=\"0.0.0.0/24\"/>\n");
+                fprintf(h,"\t\t\t\t<port name=\"http\" protocol =\"tcp\" from=\"80\" to=\"80\" range=\"0.0.0.0/24\"/>\n");
+                fprintf(h,"\t\t\t</network>\n");
+                fprintf(h,"\t\t</infrastructure>\n");
+                fprintf(h,"\t\t<image name=\"%s\" agent=\"install:cosacs:root:debian:run-cosacs\">\n",mptr);
+                fprintf(h,"\t\t\t<system name=\"debian_with_cosacs\"/>\n",mptr);
+                fprintf(h,"\t\t</image>\n");
+                fprintf(h,"\t</node>\n");
+                }
+
 		for (	fptr = eptr->first;
 			fptr != (struct xml_element *) 0;
 			fptr = fptr->next )
@@ -818,6 +902,8 @@ private	int	comodel_platform_manifest( struct xml_element * eptr )
 				continue;
 			else
 			{
+				if (!( strcmp( nature, "machine" ) ))
+				{
 				fprintf(h,"\t<node name=\"%s\" access=\"public\" type=\"simple\" provider=\"any\">\n",aptr);
 				fprintf(h,"\t\t<infrastructure name=\"%s\">\n",aptr);
 				fprintf(h,"\t\t\t<compute name=\"%s\"/>\n",aptr);
@@ -833,6 +919,11 @@ private	int	comodel_platform_manifest( struct xml_element * eptr )
 				fprintf(h,"\t\t\t<system name=\"debian_with_cosacs\"/>\n",aptr);
 				fprintf(h,"\t\t</image>\n");
 				fprintf(h,"\t</node>\n");
+				}
+				else if (!( strcmp( nature, "cluster" ) ))
+				{
+					fprintf(h,"\t<node name=\"%s\" access=\"public\" type=\"%s\" provider=\"any\"/>\n",aptr,aptr);
+				}
 			}						
 		}
 		fprintf(h,"\t<configuration name=\"%s\">\n",mptr);
@@ -846,14 +937,24 @@ private	int	comodel_platform_manifest( struct xml_element * eptr )
 				continue;
 			else if (!( aptr = comodel_attribute( fptr, "name")))
 				continue;
-			else
-			{	
-				item = comodel_action_configuration( h, eptr, aptr );
+			else if (!( strcmp( nature, "cluster" ) ))
+				continue;
+			{
+				if (!( strcmp( nature, "process" )))
+				{
+					nptr = mptr;
+					item = 0;
+				}
+				else
+				{
+					nptr = aptr;
+					item = comodel_action_configuration( h, eptr, aptr );
+				}
 				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
 				fprintf(h," expression=\"%s.system('wget %s/install-%s');\"/>\n",
-					aptr,get_depot(),aptr);
+					nptr,get_depot(),aptr);
 				fprintf(h,"\t\t<action name=\":c_%s%u\"",aptr,++item);
-				fprintf(h," expression=\"%s.fork('bash ./install-%s');\"/>\n",aptr,aptr);
+				fprintf(h," expression=\"%s.fork('bash ./install-%s');\"/>\n",nptr,aptr);
 				liberate( aptr );
 			}
 		}
@@ -869,10 +970,15 @@ private	int	comodel_platform_manifest( struct xml_element * eptr )
 				continue;
 			else if (!( aptr = comodel_attribute( fptr, "name")))
 				continue;
+			else if (!( strcmp( nature, "cluster" ) ))
+				continue;
 			else
 			{
+				if (!( strcmp( nature, "process" )))
+					nptr = mptr;
+				else	nptr = aptr;
 				fprintf(h,"\t\t<action name=\":d_%s\"",aptr);
-				fprintf(h," expression=\"%s.kill();\"/>\n",aptr);
+				fprintf(h," expression=\"%s.kill();\"/>\n",nptr);
 				liberate( aptr );
 			}
 		}
@@ -888,9 +994,14 @@ private	int	comodel_platform_manifest( struct xml_element * eptr )
 				continue;
 			else if (!( aptr = comodel_attribute( fptr, "name")))
 				continue;
+			else if (!( strcmp( nature, "cluster" ) ))
+				continue;
 			else
 			{
-				fprintf(h,"\t\t<action name=\":%s\"/>\n",aptr);
+				if (!( strcmp( nature, "process" )))
+					nptr = mptr;
+				else	nptr = aptr;
+				fprintf(h,"\t\t<action name=\":%s\"/>\n",nptr);
 				liberate( aptr );
 			}
 		}
@@ -913,6 +1024,9 @@ private	int	comodel_by_platform( struct xml_element * eptr)
 	struct	xml_element * fptr;
 	if ((eptr = document_element( eptr, "platform" )) != (struct xml_element *) 0)
 	{
+	char *	nature;
+		if (!( nature = comodel_attribute( eptr, "nature" ) ))
+			nature = "machine";
 		for (	fptr = eptr->first;
 			fptr != (struct xml_element *) 0;
 			fptr = fptr->next )
