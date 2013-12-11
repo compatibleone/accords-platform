@@ -1,0 +1,10 @@
+	$l = $1.list();
+	$x = "occi."#$1#".name";
+	foreach ( $l as $i )
+	{
+		$r = $i.get();
+		$n = $r[$x];
+		$m = "<option value="#$n#">"#$n#"</option>";
+		$m.display();
+	}
+
