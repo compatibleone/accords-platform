@@ -33,10 +33,12 @@
 /*	------------------------------------------	*/
 private	struct	rest_client_behaviour
 {
+	char *	proxy;
+	int	test;
 	int	retry;
 	int 	retries;
 	int	seconds;
-} RcB = { 1, 60, 1 };
+} RcB = { (char *) 0, 0, 1, 60, 1 };
 
 /*	-------------------------------------------------	*/
 /*		s e r v i c e _ p r e f i x _ u r l		*/
@@ -155,6 +157,31 @@ public	struct	url *	analyse_url( char * target )
 	if (!( uptr->object = allocate_string( wptr ) ))
 		return( uptr );
 	else	return( uptr );
+}
+
+/*	-------------------------------------------------	*/
+/*		a n a l y s e _ p r o x y _ u r l		*/
+/*	-------------------------------------------------	*/
+public	struct	url *	analyse_proxy_url( char * target )
+{
+	struct	url *	uptr;
+	if (!( RcB.test ))
+	{
+		RcB.test = 1;
+		RcB.proxy = getenv("_HTTP_PROXY");
+	}
+	if (!( RcB.proxy ))
+		return( analyse_url( target ) );
+	else if (!( uptr = analyse_url( RcB.proxy ) ))
+		return( uptr );
+	else
+	{
+		if ( uptr->object )
+			uptr->object = liberate( uptr->object );
+		if (!( uptr->object = allocate_string( target ) ))
+			return( liberate_url( uptr ) );
+		else	return( uptr );
+	}
 }
 
 /*	-------------------------------------------------	*/
@@ -1022,7 +1049,7 @@ public	struct	rest_response * rest_client_get_request(
 		if (!( rest_valid_string( target ) ))
 			return( rest_client_response( 599, "NULL URL", agent ) );
 
-		if (!( uptr = analyse_url( target ) ))
+		else if (!( uptr = analyse_proxy_url( target ) ))
 			return( rest_client_response( 600, "Url Anaysis", agent ) );
 
 		else if (!( uptr = validate_url( uptr )))
@@ -1091,7 +1118,7 @@ public	struct	rest_response * rest_client_get_request_body(
 	if (!( rest_valid_string( target ) ))
 		return( rest_client_response( 599, "NULL URL", agent ) );
 
-	if (!( uptr = analyse_url( target ) ))
+	else if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Url Anaysis", agent ) );
 
 	else if (!( uptr = validate_url( uptr )))
@@ -1226,7 +1253,7 @@ public	struct	rest_response * rest_client_delete_request(
 	if ( check_debug() )
 		printf("REST Client Request : DELETE %s \n",target );
 
-	if (!( uptr = analyse_url( target ) ))
+	else if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
@@ -1286,7 +1313,7 @@ public	struct	rest_response * rest_client_delete_request_body(
 	if ( check_debug() )
 		printf("REST Client Request : DELETE %s \n",target );
 
-	if (!( uptr = analyse_url( target ) ))
+	else if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
@@ -1348,7 +1375,7 @@ public	struct	rest_response * rest_client_head_request(
 	if ( check_debug() )
 		printf("REST Client Request : HEAD %s \n",target );
 
-	if (!( uptr = analyse_url( target ) ))
+	else if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
@@ -1408,7 +1435,7 @@ public	struct	rest_response * rest_client_post_request(
 	if ( check_debug() )
 		printf("REST Client Request : POST %s \n",target );
 
-	if (!( uptr = analyse_url( target ) ))
+	else if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
@@ -1471,7 +1498,7 @@ public	struct	rest_response * rest_client_put_request(
 	if ( check_debug() )
 		printf("REST Client Request : PUT %s \n",target );
 
-	if (!( uptr = analyse_url( target ) ))
+	else if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
