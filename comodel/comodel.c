@@ -75,6 +75,7 @@ struct	occi_production
 	int	nature;
 	int	backend;
 	char *	prefix;
+	char *	platform;
 	struct	occi_component * first;
 	struct	occi_component * last;
 } production = 
@@ -82,6 +83,7 @@ struct	occi_production
 	"",
 	0, 0,
 	"occi",
+	"small-platform",
 	(struct occi_component *) 0,
 	(struct occi_component *) 0
 };
@@ -859,6 +861,7 @@ private	int	comodel_platform_builder ( struct xml_element * eptr )
 		fprintf(h,"wget %s/%s.tgz\n",get_depot(),mptr);
 		fprintf(h,"tar -xzf %s.tgz\n",mptr);
 		fprintf(h,"cp *.so /usr/local/lib \n",mptr);
+		fprintf(h,"cp %s /usr/local/bin \n",mptr);
 		fprintf(h,"ldconfig\n",mptr);
 		fprintf(h,"bash ./run-%s.sh\n",mptr);
 		fprintf(h,"# ----------- \n");
@@ -874,9 +877,52 @@ private	int	comodel_platform_builder ( struct xml_element * eptr )
 		fprintf(h,"#!/bin/sh\n");
 		fprintf(h,"# -------\n");
 		fprintf(h,"# run-%s.sh \n",mptr);
+		fprintf(h,"/usr/local/bin/%s --config config-%s.xml %s/1.0a &\n",
+				mptr, mptr, mptr);
 		fprintf(h,"# ----------- \n");
 		fprintf(h,"# end of file \n");
 		fprintf(h,"# ----------- \n");
+		fclose(h);
+
+		/* -------------------------------- */
+		/* generate component configuration */
+		/* -------------------------------- */
+		sprintf(filename,"config-%s.xml",mptr);
+
+		if (!( h = fopen( filename, "w" ) ))
+			continue;
+		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+		fprintf(h,"<accords>\n");
+		fprintf(h,"\t<%s\n",underscore(mptr));
+
+		if (!( strcmp( mptr, "standard-publisher" ) ))
+		{
+			fprintf(h,"\t\tpublisher=\"%s\"\n","http://standard-publisher.compatibleone.fr");
+			fprintf(h,"\t\tidentity=\"%s%s%s\"\n","http://",mptr,".compatibleone.fr");
+		}
+		else
+		{
+			fprintf(h,"\t\tpublisher=\"%s\"\n","");
+			fprintf(h,"\t\tidentity=\"%s\"\n","");
+		}
+
+		fprintf(h,"\t\tverbose=\"0\"\n");
+		fprintf(h,"\t\tdebug=\"0\"\n");
+		fprintf(h,"\t\tthreads=\"1\">\n");
+
+		fprintf(h,"\t\t<rest\n");
+		fprintf(h,"\t\t\thost=\"%s%s\"\n",mptr,".compatibleone.fr");
+		fprintf(h,"\t\t\tport=\"%u\"/>\n",80);
+		fprintf(h,"\t\t<security\n");
+		fprintf(h,"\t\t\tuser=\"%s\"\n",mptr);
+		fprintf(h,"\t\t\tpassword=\"%s\"\n",mptr);
+		fprintf(h,"\t\t\tmonitor=\"%u\"\n",1);
+		fprintf(h,"\t\t\ttls=\"security/%sTls.xml\"/>\n",mptr);
+		fprintf(h,"\t\t<domain\n");
+		fprintf(h,"\t\t\tname=\"%s\"\n","occi");
+		fprintf(h,"\t\t\tzone=\"%s\"/>\n","europe");
+		fprintf(h,"\t</%s>\n",underscore(mptr));
+		fprintf(h,"</accords>\n");
 		fclose(h);
 	}
 
@@ -902,6 +948,8 @@ private	int	comodel_platform_builder ( struct xml_element * eptr )
 			fprintf(h,"export LIBRARY=\n");
 		if (!( comodel_include( h, "/etc/comodel-depot.sh" ) ))
 			fprintf(h,"export DEPOT=%c$PATHROOT/comodel-depot%c\n",0x0022,0x0022);
+
+		fprintf(h,"cp $LIBRARY .\n");
                 if (!( nature = comodel_attribute( eptr, "nature" ) ))
                         nature = "machine";
 		for (	fptr = eptr->first;
@@ -916,8 +964,8 @@ private	int	comodel_platform_builder ( struct xml_element * eptr )
 				fprintf(h,"# component: %s\n",nptr);
 				fprintf(h,"# ----------------------------------------------------- \n");
 				fprintf(h,"gcc -g -ggdb $INCLUDE -c %s.c\n",nptr);
-				fprintf(h,"gcc -g -ggdb -o %s %s.o $LIBRARY\n",nptr,nptr);
-				fprintf(h,"tar -czf $DEPOT/%s.tgz %s $PACKAGE run-%s.sh\n",nptr, nptr, nptr);
+				fprintf(h,"gcc -g -ggdb -o %s %s.o $LINKAGE\n",nptr,nptr);
+				fprintf(h,"tar -czf $DEPOT/%s.tgz %s $PACKAGE run-%s.sh config-%s.xml\n",nptr, nptr, nptr, nptr);
 				fprintf(h,"cp install-%s.sh $DEPOT\n",nptr, nptr);
 			}
 		}
@@ -1358,6 +1406,94 @@ private	int	comodel_x_production()
 }
 
 /*	------------------------------------------------------------------	*/
+/*			s e t _ p l a t f o r m 				*/
+/*	------------------------------------------------------------------	*/
+private	void	set_platform( char * sptr )
+{
+	char * rptr;
+	if (!( rptr = allocate_string( sptr ) ))
+		return;
+	else	production.platform = rptr;
+	for (	;
+		*rptr != 0;
+		rptr++	)
+	{
+		if ( *rptr == '.' )
+		{
+			*rptr =  0;
+			break;
+		}
+	}
+	return;
+}
+
+/*	------------------------------------------------------------------	*/
+/*			a c t i o n _ n a m e					*/
+/*	------------------------------------------------------------------	*/
+private	char *	action_name( char * sptr )
+{
+	while ( *sptr != '#' )
+		sptr++;
+	if ( *sptr == '#' )
+		return( (sptr + 1) );
+	else	return((char *) 0);
+}
+
+/*	------------------------------------------------------------------	*/
+/*		c o m o d e l _ p r o d u c t i o n 				*/
+/*	------------------------------------------------------------------	*/
+private	int	comodel_p_production()
+{
+	struct	occi_component 	* cptr;
+	struct	occi_category 	* optr;
+	struct	occi_attribute * aptr;
+	struct	occi_action * mptr;
+	char *	sptr;
+	FILE * h;
+	char *	platform;
+	char 	filename[1024];
+	if (!( platform = production.platform ))
+		platform = "small-accords";
+	sprintf(filename,"cords-%s.xml",platform);
+	if (!( h = fopen( filename, "w" ) ))
+		return( 46);
+	else
+	{
+		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		fprintf(h,"<comodel_platform name=\"%s\" xmlns=\"http://www.compatibleone.fr/schemes/comodeltypes.xsd\" nature=\"process\">\n",platform);
+		for (	cptr=production.first;
+			cptr != (struct occi_component *) 0;
+			cptr = cptr->next )
+		{
+			fprintf(h,"<comodel_component name=\"%s\">\n",cptr->name);
+			for (	optr=cptr->first;
+				optr != (struct occi_category *) 0;
+				optr = optr->next )
+			{
+				fprintf(h,"<comodel_category name=\"%s\">\n",optr->id);
+				for (	aptr=optr->first;
+					aptr != (struct occi_attribute *) 0;
+					aptr = aptr->next )
+					fprintf(h,"<comodel_member name=\"%s\" type=\"string\"/>\n",aptr->name);
+				for (	mptr=optr->firstact;
+					mptr != (struct occi_action *) 0;
+					mptr = mptr->next )
+					if (!( sptr = mptr->name ))
+						continue;
+					else if (!( sptr = action_name( sptr ) ))
+						continue;
+					else	fprintf(h,"<comodel_action name=\"%s\"/>\n",sptr);
+				fprintf(h,"</comodel_category>\n");
+			}
+			fprintf(h,"</comodel_component>\n");
+		}
+		fprintf(h,"</comodel_platform>\n");
+		fclose(h);
+	}
+	return( 0 );
+}
+
+/*	------------------------------------------------------------------	*/
 /*		c o m o d e l _ p r o d u c t i o n 				*/
 /*	------------------------------------------------------------------	*/
 private	int	comodel_production()
@@ -1369,6 +1505,8 @@ private	int	comodel_production()
 	{
 	case	1	:
 		return( comodel_x_production() );
+	case	2	:
+		return( comodel_p_production() );
 	case	0	:
 		return( comodel_c_production() );
 	default		:
@@ -1395,7 +1533,8 @@ private	int	comodel_operation( char * sptr )
 			return( failure( 404, "unable to fetch", sptr ) );
 		else	sptr = nptr;
 	}
-
+	if ( production.nature == 2 )
+		set_platform( sptr );
 	if ( check_verbose() )
 		printf("parsing model description : %s\n",sptr);
 	if (!( document = document_parse_file( sptr )))
@@ -1453,6 +1592,9 @@ private	int	co_model(int argc, char * argv[] )
 				continue;
 			case	'x'	:
 				production.nature = 1;
+				continue;
+			case	'p'	:
+				production.nature = 2;
 				continue;
 			case	'c'	:
 				production.nature = 0;

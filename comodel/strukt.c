@@ -396,8 +396,8 @@ public	int	generate()
 		{
 			fprintf(C.target,"\t<xsd:attribute name=%c%s%c",0x0022,iptr->name,0x0022);
 			if (!( strcmp( iptr->basic , "int" ) ))
-				fprintf(C.target," type=%c%s%c",0x0022,"xsd:integer");
-			else	fprintf(C.target," type=%c%s%c",0x0022,"xsd:string");
+				fprintf(C.target," type=%c%s%c",0x0022,"xsd:integer",0x0022);
+			else	fprintf(C.target," type=%c%s%c",0x0022,"xsd:string",0x0022);
 			fprintf(C.target,"/>\n");
 		}
 		fprintf(C.target,"</xsd:complexType>\n");
@@ -829,13 +829,13 @@ private	void	prepend_license( FILE * target, char * filename )
 
 private	void	schema_header( FILE * h, char * nptr, char * iptr)
 {
-	fprintf(h,"\n<xsd:sxhema xmlns:xsd=%chttp://www.w3c.org/2001/XMLSchema%c>\n",0x0022,0x0022);
+	fprintf(h,"\n<xsd:schema xmlns:xsd=%chttp://www.w3c.org/2001/XMLSchema%c>\n",0x0022,0x0022);
 	return;
 }
 
 private	void	schema_footer( FILE * h, char * nptr )
 {
-	fprintf(h,"\n</xsd:sxhema>\n");
+	fprintf(h,"\n</xsd:schema>\n");
 	return;
 }
 
