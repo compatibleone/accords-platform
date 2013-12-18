@@ -436,7 +436,7 @@ class user_role extends role
 				else
 				{
 					$b = array();
-					exec("grep ".$this->page->account." ".$l,&$b);
+					exec("grep ".$this->page->account." ".$l,$b);
 					foreach ($b as $m )
 					{
 						print "<option value='".$l."'>".$l."</option>\n";
