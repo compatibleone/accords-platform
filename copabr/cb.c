@@ -1576,6 +1576,7 @@ private	char *	cords_cops_operation(
 			else if ((!(dptr=occi_request_element(qptr,"occi.placement.provider" , selector->provider ) ))
 			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.name"     , "" 		  ) ))
 			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.solution" , "" 		  ) ))
+			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.operator" , selector->operator ) ))
 			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.account"  , account		  ) ))
 			     ||  (!(dptr=occi_request_element(qptr,"occi.placement.node"     , selector->node     ) )))
 			{
@@ -1781,10 +1782,11 @@ private	void	reset_placement_criteria( struct cords_placement_criteria * selecto
 /*	--------------------------------------------------------	*/
 /*	      s e t _ p l a c e m e n t _ c r i t e r i a		*/
 /*	--------------------------------------------------------	*/
-private	void	set_placement_criteria( struct cords_placement_criteria * selector, char * provider, char * node )
+private	void	set_placement_criteria( struct cords_placement_criteria * selector, char * provider, char * node, char * operator )
 {
 	selector->node		= node;
 	selector->provider	= provider;
+	selector->operator	= operator;
 	return;
 }
 
@@ -1833,7 +1835,7 @@ private	char * 	cords_contract_provider(
 	/* ----------------------------------- */
 	else 
 	{
-		set_placement_criteria( &App->selector, cptr->value, id );
+		set_placement_criteria( &App->selector, cptr->value, id, App->operator );
 		if (!( zptr = cords_select_provider( &App->selector, App->account, agent, tls ) ))
 			return( zptr );
 	}
@@ -1925,6 +1927,7 @@ private	void 	cords_terminate_instance_node( struct cords_node_descriptor * dptr
 	if ( dptr->accessApp )	dptr->accessApp = liberate( dptr->accessApp );
 	if ( dptr->scopeApp )	dptr->scopeApp = liberate( dptr->scopeApp );
 	if ( dptr->category )	dptr->category = liberate( dptr->category );
+	if ( dptr->operator )	dptr->operator = liberate( dptr->operator );
 	if ( dptr->hid )	dptr->hid = liberate( dptr->hid );
 	if ( dptr->sid )	dptr->sid = liberate( dptr->sid );
 	if ( dptr->provider )	dptr->provider = liberate( dptr->provider );
@@ -3198,6 +3201,12 @@ public	struct	xml_element * cords_instance_node(
 	/* ------------------------------ */
 	if (!(App.category = occi_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_CATEGORY)))
 		App.category = allocate_string( _CORDS_MANIFEST );
+
+	/* ------------------------- */
+	/* collect the node operator */
+	/* ------------------------- */
+	if (!(App.operator = occi_extract_atribut(App.node,Operator.domain,_CORDS_NODE,_CORDS_OPERATOR)))
+		App.operator = allocate_string( "any" );
 
 	/* ---------------------------------------------------- */
 	/* instance or share the service contract for this node */

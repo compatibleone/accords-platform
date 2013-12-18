@@ -118,6 +118,7 @@
 /*	------------------------	*/
 #define	_CORDS_NODE		"node"
 #define	_CORDS_PROVIDER		"provider"
+#define	_CORDS_OPERATOR		"operator"
 #define	_CORDS_PROVISION	"provision"
 #define	_CORDS_PROFILE 		"profile"
 #define	_CORDS_INFRASTRUCTURE	"infrastructure"

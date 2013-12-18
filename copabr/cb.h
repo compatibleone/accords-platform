@@ -109,6 +109,7 @@ struct	cords_node_descriptor
 	char			* service;	/* the parent service identifier for the contract	*/
 	char			* scopeApp;	/* the node scope : normal/common 			*/
 	char			* category;	/* the node category : manifest/other			*/
+	char			* operator;	/* the node operator : accords /other			*/
 	char			* accessApp;	/* the node access: public/private 			*/
 	char			* hid;
 	char			* sid;

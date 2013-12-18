@@ -919,6 +919,7 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 	char *	ihost;
 	char *	result=(char *) 0;
 	struct	occi_element 	* eptr;
+	struct	occi_element 	* dptr;
 	struct	occi_response	* zptr;
 	struct	occi_response	* yptr;
 	struct	cops_solution 	* sptr;
@@ -956,7 +957,19 @@ private	char *	resolve_cops_solution( struct cords_placement * pptr )
 		return((char *) 0);
 	else if (!( eptr = occi_create_element( "occi.provider.category", pptr->provider ) ))
 		return((char *) 0);
-	else if (!( zptr = occi_simple_list( buffer, eptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
+	else if (( rest_valid_string( pptr->operator ) != 0 )
+	     &&  ( strcmp( pptr->operator, "any" ) != 0))
+	{
+		if (!( dptr = occi_create_element( "occi.provider.operator", pptr->operator ) ))
+			return((char *) 0);
+		else
+		{
+			eptr->next = dptr;
+			dptr->previous = eptr;
+		}
+	}
+
+	if (!( zptr = occi_simple_list( buffer, eptr, _CORDS_CONTRACT_AGENT, default_tls() ) ))
 		return((char *) 0);
 	else 
 	{
