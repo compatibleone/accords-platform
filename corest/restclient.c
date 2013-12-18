@@ -1253,7 +1253,7 @@ public	struct	rest_response * rest_client_delete_request(
 	if ( check_debug() )
 		printf("REST Client Request : DELETE %s \n",target );
 
-	else if (!( uptr = analyse_proxy_url( target ) ))
+	if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
@@ -1313,7 +1313,7 @@ public	struct	rest_response * rest_client_delete_request_body(
 	if ( check_debug() )
 		printf("REST Client Request : DELETE %s \n",target );
 
-	else if (!( uptr = analyse_proxy_url( target ) ))
+	if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
@@ -1375,7 +1375,7 @@ public	struct	rest_response * rest_client_head_request(
 	if ( check_debug() )
 		printf("REST Client Request : HEAD %s \n",target );
 
-	else if (!( uptr = analyse_proxy_url( target ) ))
+	if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
@@ -1435,7 +1435,7 @@ public	struct	rest_response * rest_client_post_request(
 	if ( check_debug() )
 		printf("REST Client Request : POST %s \n",target );
 
-	else if (!( uptr = analyse_proxy_url( target ) ))
+	if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
@@ -1498,7 +1498,7 @@ public	struct	rest_response * rest_client_put_request(
 	if ( check_debug() )
 		printf("REST Client Request : PUT %s \n",target );
 
-	else if (!( uptr = analyse_proxy_url( target ) ))
+	if (!( uptr = analyse_proxy_url( target ) ))
 		return( rest_client_response( 600, "Incorrect Url", agent ) );
 
 	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
