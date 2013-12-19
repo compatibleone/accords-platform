@@ -124,8 +124,8 @@ private	void	cool_configuration()
 /*	---------------------------------------------------------------	*/  
 private	int	cool_banner()
 {
-	printf("\n   CompatibleOne Elasticity Manager : Version 1.1a.0.02");
-	printf("\n   Beta Version : 20/10/2013 ");
+	printf("\n   CompatibleOne Elasticity Manager : Version 1.1a.0.03");
+	printf("\n   Beta Version : 18/12/2013 ");
 	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -172,9 +172,17 @@ private	struct rest_extension * cool_extension( void * v,struct rest_server * sp
 	return( xptr );
 }
 
+#ifdef	_COOL_CONNECTION
 #include "comonsconnection.c"
+#endif
+
+#include "xlink.h"
+#include "xlink.c"
+#include "occixlink.c"
+#include "job.h"
 #include "job.c"
 #include "occijob.c"
+#include "workload.h"
 #include "workload.c"
 #include "occiworkload.c"
 
@@ -1997,7 +2005,7 @@ private	int	cool_occi_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-
+#ifdef	_COOL_CONNECTION
 	/* -------------------------------------- */
 	/* add the monitoring connection category */
 	/* -------------------------------------- */
@@ -2007,7 +2015,8 @@ private	int	cool_occi_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-
+#endif
+#ifdef	_COOL_CONNECTION
 	/* ---------------------------------- */
 	/* add the monitoring packet category */
 	/* ---------------------------------- */
@@ -2017,7 +2026,7 @@ private	int	cool_occi_operation( char * nptr )
 		first = optr;
 	else	optr->previous->next = optr;
 	last = optr;
-
+#endif
 	rest_initialise_log(Cool.monitor);
 
 	if (!( Cool.identity ))

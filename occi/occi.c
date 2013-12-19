@@ -99,17 +99,21 @@ public	struct	occi_category * occi_create_category( char * domain, char * name, 
 	}
 }
 
+/*	---------------------------------------------------	*/
+/*	   o c c i _ c r e a t e _ o s _ t e m p la t e		*/
+/*	---------------------------------------------------	*/
 public	struct	occi_category * occi_create_os_template( char * domain, char * name, char * schema, char * title )
 {
 	return( occi_create_category( domain, name, schema, "mixin", _OCCI_OS_TEMPLATE , title ) );
 }
 
- 
+/*	---------------------------------------------------------	*/
+/*	o c c i _ c r e a t e _ r e s o u r c e _ t e m p l a t e 	*/
+/*	---------------------------------------------------------	*/
 public	struct	occi_category * occi_create_resource_template( char * domain, char * name, char * schema, char * title )
 {
 	return( occi_create_category( domain, name, schema, "mixin", _OCCI_RESOURCE_TEMPLATE, title ) );
 }
-
  
 /*	---------------------------------------------------	*/
 /*		o c c i _ a d d _ a c t i o n           	*/

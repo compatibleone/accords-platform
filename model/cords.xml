@@ -1194,64 +1194,6 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
 	    </actions>
 	</category>
-	<!-- categories from service at port 8286 -->
-	<category term='metadata' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/metadata/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='value' type='string' required='false' immutable='false'/>
-	        <attribute name='target' type='string' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	    </actions>
-	</category>
-	<!--  No docs or live instances -->
-	<category term='file' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/file/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	        <attribute name='length' type='int' required='false' immutable='false'/>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='type' type='string' required='false' immutable='false'/>
-	        <attribute name='permissions' type='string' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	    </actions>
-	</category>
-	<category term='script' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/script/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <attribute name='syntax' type='string' required='false' immutable='false'/>
-	        <attribute name='nature' type='string' required='false' immutable='false'/>
-	        <attribute name='target' type='string' required='false' immutable='false'/>
-	        <attribute name='timestamp' type='int' required='false' immutable='false'/>
-	        <attribute name='result' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	    </actions>
-	</category>
-	<category term='probe' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/probe/' rel='http://schemas.ogf.org/occi/core#resource'>
-	    <attributes>
-	        <attribute name='name' type='string' required='false' immutable='false'/>
-	        <instance name='metric' category='http://scheme.compatibleone.fr/scheme/compatible#metric' multiplicity='[0..1]'/>
-	        <instance name='connection' category='http://scheme.compatibleone.fr/scheme/compatible#connection' multiplicity='[0..1]'/>
-	        <attribute name='expression' type='string' required='false' immutable='false'/>
-	        <instance name='timer' category='http://scheme.compatibleone.fr/scheme/compatible#timer' multiplicity='[0..1]'/>
-	        <attribute name='samples' type='int' required='false' immutable='false'/>
-	        <attribute name='period' type='int' required='false' immutable='false'/>
-	        <attribute name='pid' type='int' required='false' immutable='false'/>
-	        <collection name='packets' category='http://scheme.compatibleone.fr/scheme/compatible#packet' multiplicity='[0..*]'/>
-	        <attribute name='state' type='int' required='false' immutable='false'/>
-	    </attributes>
-	    <actions>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
-	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
-	    </actions>
-	</category>
 
 	<!-- Start of "missing" categories. -->
 	<category term='appliance' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/appliance/' rel='http://schemas.ogf.org/occi/core#resource'>

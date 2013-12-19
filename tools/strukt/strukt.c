@@ -31,6 +31,7 @@
 #include "strukt.h"
 
 struct	strukt_context C = 	{ 
+		0,		/* nosql */
 		0,		/* schema */
 		(char *) 0,	/* license */
 		(char *) 0,	/* scheme */
@@ -777,12 +778,27 @@ void	file_footer( FILE * h, char * nptr)
 	return;
 }
 
+
+int	check_cool_cosacs( char * struct_name )
+{
+	int	holder=C.gensql;
+	if ((!( strcmp( struct_name,"metadata" ) ))
+	||  (!( strcmp( struct_name,"script" ) ))
+	||  (!( strcmp( struct_name,"file" ) ))
+	||  (!( strcmp( struct_name,"probe" ) ))
+	||  (!( strcmp( struct_name,"workload" ) ))
+	||  (!( strcmp( struct_name,"job" ) )))
+		C.gensql = 0;
+	return( holder );
+}
+
 int	process( char * struct_name )
 {
 	int	status;
 	int	c;
 	int	l;
 	char	occi_header_filename[512];
+	int	holder;
 	char	filter_filename[512];
 	char	tn[512];
 	char 	token[512];
@@ -799,6 +815,7 @@ int	process( char * struct_name )
 	}
 	else
 	{
+		holder = check_cool_cosacs( struct_name );
 		file_header( C.target, tn, occi_header_filename, filter_filename);
 		while ((c = remove_white_space( sh )))
 		{
@@ -818,6 +835,7 @@ int	process( char * struct_name )
 		file_footer( C.target, tn );
 		fclose(C.target);
 		fclose(sh);
+		C.gensql = holder;
 	}		
 	return( 0 );
 }
@@ -867,8 +885,8 @@ int	schema( char * nptr )
 
 private	int	banner()
 {
-	printf("\n Structure Constructor : Version 3.1a.0.0.4");
-	printf("\n Provisoire du 24/11/2013");
+	printf("\n Structure Constructor : Version 3.1a.0.0.5");
+	printf("\n Provisoire du 18/12/2013");
 	printf("\n Copyright (c) 2013 Iain James Marshall\n");
 	printf("\n Options : \n");
 	printf("\n --verbose                 activate verbose messages ");
@@ -933,6 +951,8 @@ int	main(int argc, char * argv[])
 						C.verbose = 1;
 					else if (!( strcmp( aptr, "xml" ) ))
 						C.genxml = 1;
+					else if (!( strcmp( aptr, "nosql" ) ))
+						C.gensql = 0;
 					else if (!( strcmp( aptr, "mysql" ) ))
 						C.gensql = 1;
 					else if (!( strcmp( aptr, "occi" ) ))

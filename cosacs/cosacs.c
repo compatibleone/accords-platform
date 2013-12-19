@@ -25,7 +25,6 @@
 #include "document.h"
 #include "cordspublic.h"
 #include "occipublisher.h"
-#include "occibuilder.h"
 #include "cordslang.h"
 
 #include <sys/types.h>
@@ -105,8 +104,8 @@ private	void	cosacs_load()
 /*	---------------------------------------------	*/  
 private	int	cosacs_banner()
 {
-	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.09");
-	printf("\n   Beta Version : 19/10/2013");
+	printf("\n   CompatibleOne Software Appliance Configuration Services : Version 1.0a.0.10");
+	printf("\n   Beta Version : 18/12/2013");
 	printf("\n   Copyright (c) 2013 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
@@ -152,6 +151,22 @@ private	struct rest_extension * cosacs_extension( void * v,struct rest_server * 
 {
 	return( xptr );
 }
+
+#include "metadata.h"
+#include "metadata.c"
+#include "occimetadata.c"
+#include "file.h"
+#include "file.c"
+#include "occifile.c"
+#include "script.h"
+#include "script.c"
+#include "occiscript.c"
+#include "probe.h"
+#include "probe.c"
+#include "occiprobe.c"
+#include "xlink.h"
+#include "xlink.c"
+#include "occixlink.c"
 
 /*	------------------------------------------------------------------	*/
 /*			c o s a c s _ f i l e _ e n c o d e			*/
@@ -527,7 +542,7 @@ private	int	cosacs_launch(struct occi_category * optr, struct cords_script * ppt
 	/* -------------------------------------------- */
 	if ( metadatas )
 	{
-		autosave_cords_metadata_node(pptr);
+		autosave_cords_metadata_node(mptr);
 		sync();
 	}
 

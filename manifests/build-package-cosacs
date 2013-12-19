@@ -1,3 +1,4 @@
+cp /usr/local/lib/libcosql.so.0 .
 cp /usr/local/lib/libcocci.so.0 .
 cp /usr/local/lib/libocci.so.0 .
 cp /usr/local/lib/libcords.so.0 .
