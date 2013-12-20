@@ -122,7 +122,11 @@ private	char *	occi_json_body(
 					else if ( *(vptr++) == '.' )
 						nptr = vptr;
 				}
-				fprintf(h,"\t%c%s%c : %c%s%c",0x0022,nptr,0x0022,0x0022,vptr,0x0022);
+				if (( vptr = occi_unquoted_value( vptr )) != (char *) 0)
+				{
+					fprintf(h,"\t%c%s%c : %c%s%c",0x0022,nptr,0x0022,0x0022,vptr,0x0022);
+					liberate( vptr );
+				}
 				hptr = occi_consume_header( hptr );
 			}
 			else	hptr = hptr->next;
