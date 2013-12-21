@@ -19,6 +19,7 @@
 #define	_testhdfs_c
 
 #include "hdfsclient.h"
+#include "xxlink.c"
 
 private	int	debug=0;
 private	int	verbose=1;

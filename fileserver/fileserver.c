@@ -24,6 +24,7 @@
 #include "occi.h"
 #include "document.h"
 #include "cordspublic.h"
+#include "xxlink.c"
 
 struct	fileserver_configuration Fs = {
 	0,

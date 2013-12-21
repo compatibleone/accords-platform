@@ -19,6 +19,8 @@
 #define	_testaz_c
 
 #include "azclient.h"
+#include "xxlink.c"
+
 private	int	debug=0;
 private	int	verbose=0;
 private	char *	tls=(char *) 0;

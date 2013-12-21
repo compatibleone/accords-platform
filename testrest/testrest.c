@@ -2,22 +2,13 @@
  * testrest.c
  *
  *  Created on: 9 Jul 2013
- *      Author: me
+ *      Author: me ( someone from OnApp or Green Custard )
  */
 #include <stdio.h>
 #include "standard.h"
-//#include "broker.h"
 #include "restresponse.h"
 #include "rest.h"
-//#include "occi.h"
-//#include "document.h"
-//#include "cordspublic.h"
-//#include "occipublisher.h"
-//#include "occiresolver.h"
-
-//#include "oaconfig.h"
-//#include "oaclient.h"
-//#include "cb.h"
+#include "xxlink.c"
 
 // Required by CompatibleOne
 public  int check_debug()   { return(0);   }

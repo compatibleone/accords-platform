@@ -19,6 +19,7 @@
 #define	_teston_c
 
 #include "onclient.h"
+#include "xxlink.c"
 
 private	int	debug=0;
 private	int	verbose=1;

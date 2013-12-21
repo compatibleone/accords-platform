@@ -1,5 +1,5 @@
 #
-# OSOCCI Makefile.am
+# SLAM Makefile.am
 #
 # Copyright 2011, Mandriva, All rights reserved
 # Copyright 2012, Prologue, All rights reserved

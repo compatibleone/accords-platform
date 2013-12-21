@@ -31,6 +31,7 @@
 #define	_OCCI_MIXIN	4
 
 struct	strukt_context	{
+	int	nosql;
 	int	schema;
 	char *	license;
 	char *	scheme;

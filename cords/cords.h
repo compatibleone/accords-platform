@@ -51,9 +51,6 @@
 #include "authorise.h"
 #include "manifest.h"
 #include "price.h"
-#include "metadata.h"
-#include "file.h"
-#include "script.h"
 
 #include "monitor.h"
 #include "control.h"
@@ -65,7 +62,6 @@
 #include "consumer.h"
 #include "connection.h"
 #include "stream.h"
-#include "probe.h"
 #include "metric.h"
 #include "alert.h"
 

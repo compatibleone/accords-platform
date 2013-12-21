@@ -18,7 +18,17 @@
 #ifndef	_testos_c
 #define	_testos_c
 
+#include "standard.h"
+#include "broker.h"
+#include "rest.h"
+#include "occi.h"
+#include "document.h"
+#include "cordspublic.h"
+#include "occipublisher.h"
+#include "occiresolver.h"
+#include "cordslang.h"
 #include "osclient.h"
+#include "xxlink.c"
 
 private char *	group=(char *) 0;
 private	int	detail=0;
