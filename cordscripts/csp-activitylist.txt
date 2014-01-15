@@ -1,0 +1,34 @@
+
+function ActivityList( $selection )
+{
+	$baseurl ="dashboard.php";
+	"<table width='100%'><tr><td class=section colspan=5><b>activities</b></td></tr>".display();
+	"<tr><td class=title>Date<td class=title>Contract<td class=title>Probe<td class=title>Data</tr>".display();
+	$activitys = activity.list($selection);
+	foreach ( $activitys as $sid )
+	{
+		$activity = $sid.get();
+		$when     = $activity["occi.activity.start"];
+
+		if ( $when > 0 )
+		{
+			$data     = $activity["occi.activity.data"];
+			$data     = "%"#$data;
+			$d        = $data / "%";
+			$data     = $d[0]
+
+			$probe    = $activity["occi.activity.probe"];
+			$contract = $conid.get();
+			$conname  = $contract["occi.contract.name"];
+
+			$when     = $when.date();
+
+			$m = "<tr><td>"#$when#"<td>"#$conname#"<td>"#$probe#"<td>"#$data#"</tr>";
+			$m.display();
+		}
+	}
+	"</table>".display();
+	return;
+}
+
+

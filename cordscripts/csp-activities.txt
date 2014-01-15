@@ -1,0 +1,24 @@
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* 						csp-activities.txt						 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+	/* This displays the list of activities occurred by customer and operator accounts     				 */
+	/* ------------------------------------------------------------------------------------------------------------- */
+
+	include "csp-header.txt";
+	include "csp-activitylist.txt";
+
+	HtmlHeader("Accords Platform Activity",$1);
+
+	$what = $2;
+
+	
+	"<tr><td colspan=6>".display();
+	ActivityList( " " );
+	"</td></tr>".display();
+
+	$m = "<tr><th colspan=6><a href='dashboard.php?action=compile&output=HTML&script=csp-services.txt&option="#$what#"'>Deployed Services</a></th></tr>";
+	$m.display();
+	
+	HtmlFooter();
+
+
