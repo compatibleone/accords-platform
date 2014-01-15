@@ -1,0 +1,51 @@
+	/* -------------------------------------------------------------- */
+	/* csp-activity.txt						  */
+	/* -------------------------------------------------------------- */
+	/* this script is intended to be called from a control expression */
+	/* for the creation of an activity instance from a control packet */
+	/* -------------------------------------------------------------- */
+	if ( $1 == "slam.control" )
+	{
+		/* ---------------------- */
+		/* create activity record */
+		/* ---------------------- */
+		$s ={};
+
+		$a = '"occi.activity.name":"csp-activity"';
+		$s = $s + $a;
+
+		$controlid = $2;
+		$control = $controlid.get();
+		$probe = $control["occi.control.probe"];
+		$a = '"occi.activity.probe":"'#$probe#'"';
+		$s = $s + $a;
+		$v = $control["occi.control.contract"];
+		$a = '"occi.activity.contract":"'#$v#'"';
+		$s = $s + $a;
+		$v = $control["occi.control.session"];
+		$a = '"occi.activity.session":"'#$v#'"';
+		$s = $s + $a;
+
+		$packid = $4;
+		$packet = $packid.get();
+		$v = $packet["occi.packet.data"];
+		$a = '"occi.activity.data":"'#$v#'"';
+		$s = $s + $a;
+		$v = $packet["occi.packet.start"];
+		$a = '"occi.activity.start":"'#$v#'"';
+		$s = $s + $a;
+		$v = $packet["occi.packet.finish"];
+		$a = '"occi.activity.finish":"'#$v#'"';
+		$s = $s + $a;
+		$v = $packet["occi.packet.metric"];
+		$a = '"occi.activity.metric":"'#$v#'"';
+		$s = $s + $a;
+
+		$id = activity.post( $s );
+
+		/* ---------------------------- */
+		/* delete and unlink the packet */
+		/* ---------------------------- */
+		$probe.unlink( $packid );
+		$packid.delete();          
+	}
