@@ -24,6 +24,7 @@
 private	struct	occi_database Database = 
 	{
 	0,
+	0,
 	"UNKNOWN",
 	(void *) 0,
 	0,
@@ -104,8 +105,11 @@ private	int	occi_database_failure(char * msg)
 private	int	occi_database_logwrite(char * msg)
 {
 	char 	buffer[4096];
-	sprintf(buffer,"%s-QUERY: %s",Database.nature, msg);
-	rest_log_message( buffer );
+	if ( Database.log )
+	{
+		sprintf(buffer,"%s-QUERY: %s",Database.nature, msg);
+		rest_log_message( buffer );
+	}
 	return(0);
 }
 
@@ -323,6 +327,9 @@ public	int	initialise_occi_sql( char * hostname, char * basename, char * usernam
 
 		if (( eptr = getenv("OCCISQLPASSWD")) != (char *) 0)
 			password = eptr;
+
+		if (( eptr = getenv("OCCISQLLOG")) != (char *) 0)
+			Database.log = atoi(eptr);
 
 		if ( hostname )
 			if (!( strcmp( hostname , "storage" ) ))

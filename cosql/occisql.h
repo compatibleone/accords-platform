@@ -84,6 +84,7 @@ struct	occi_table
 struct	occi_database 
 {
 	int	status;
+	int	log;
 	char * 	nature;
 	void *	handle;
 	int	version;
