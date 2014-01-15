@@ -102,6 +102,7 @@ public	int	failure( int e, char * m1, char * m2 )
 private	void	command_load()
 {
 	load_accords_configuration( &Command, "command" );
+	rest_initialise_log( Command.monitor );
 	return;
 }
 
@@ -2520,6 +2521,8 @@ private	int	operation( int argc, char * argv[] )
 					soap = argv[++argi];
 				else if (!( strcmp( aptr, "echo") ))
 					csp_set_echo(1);
+				else if (!( strcmp( aptr, "log" ) ))
+					rest_initialise_log( atoi( argv[++argi] ) );
 				else if (!( strcmp( aptr, "agent" ) ))
 					set_default_agent( argv[++argi] );
 				else if (!( argi = accords_configuration_option( aptr, argi, argv )))
