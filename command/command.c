@@ -2539,9 +2539,9 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.09");
-	printf("\n   Beta Version : 07/12/2013 ");
-	printf("\n   Copyright (c) 2011,2013 Iain James Marshall ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.10");
+	printf("\n   Beta Version : 15/01/2014 ");
+	printf("\n   Copyright (c) 2011,2014 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
 	printf("\n         command <options> BROKER      <xml_file> ");
@@ -2581,11 +2581,12 @@ private	int	banner()
 	printf("\n         --callback                   specify callback operations");
 	printf("\n         --noauth                     inhibit authentication for test purposes");
 	printf("\n         --echo                       activate source echo ");
-	printf("\n         --port <number>              set online port number \n");
-	printf("\n         --user <name>                set online user name \n");
-	printf("\n         --password <value>           set online password \n");
-	printf("\n         --wsdl <url>                 set wsdl document   \n");
-	printf("\n         --soap <url>                 set soap host       \n");
+	printf("\n         --log  <value>               set log configuration ");
+	printf("\n         --port <number>              set online port number ");
+	printf("\n         --user <name>                set online user name ");
+	printf("\n         --password <value>           set online password ");
+	printf("\n         --wsdl <url>                 set wsdl document   ");
+	printf("\n         --soap <url>                 set soap host       ");
 	printf("\n         --debug                      activate debug messages \n");
 	return( 0 );
 }
