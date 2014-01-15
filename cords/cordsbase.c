@@ -42,6 +42,7 @@
 
 #include "interface.c"
 #include "session.c"
+#include "activity.c"
 #include "consumer.c"
 #include "connection.c"
 #include "stream.c"

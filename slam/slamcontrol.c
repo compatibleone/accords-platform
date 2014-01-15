@@ -27,7 +27,8 @@ private	void	purge_control_packets(struct cords_control * pptr, char * packets, 
 		kptr = occi_remove_client( kptr );
 		return;
 	}
-	else if (!(dptr=occi_request_element(qptr,"occi.packet.probe", probe ) ))
+	else if ((!(dptr=occi_request_element(qptr,"occi.packet.probe", probe ) ))
+	     &&  (!(dptr=occi_request_element(qptr,"occi.packet.state", "0"   ) )))
 	{
 		kptr = occi_remove_client ( kptr );
 		qptr = occi_remove_request( qptr );

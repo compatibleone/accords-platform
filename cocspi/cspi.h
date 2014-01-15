@@ -61,7 +61,8 @@
 #define	_FORK_FUNCTION		15
 #define	_READ_FUNCTION		16
 #define	_WRITE_FUNCTION		17
-#define	_MAX_FUNCTIONS		18
+#define	_LOG_FUNCTION		18
+#define	_MAX_FUNCTIONS		19
 
 #define	_MAX_KEYWORDS	20
 #define	_KEYWORD_HASH	57

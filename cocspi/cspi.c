@@ -1850,7 +1850,8 @@ private	struct cordscript_language_function Functions[_MAX_FUNCTIONS] =
 	{	"system",	_SYSTEM_FUNCTION,	-1 },
 	{	"fork",		_FORK_FUNCTION,		-1 },
 	{	"read",		_READ_FUNCTION,		-1 },
-	{	"write",	_WRITE_FUNCTION,	-1 }
+	{	"write",	_WRITE_FUNCTION,	-1 },
+	{	"log",		_LOG_FUNCTION,		-1 }
 };
 
 int	prepare_hashcodes=3;
@@ -2314,6 +2315,12 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				if ( ScriptOutput )
 					fprintf(ScriptOutput,"%s\n",vptr->value);
 				else	printf("%s\n",vptr->value);
+			}
+			return( eval_next( iptr, argv ) );
+		case	_LOG_FUNCTION	:
+			if ( vptr->value )
+			{
+				rest_log_message( vptr->value );
 			}
 			return( eval_next( iptr, argv ) );
 		case	_WAIT_FUNCTION		:

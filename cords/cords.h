@@ -59,6 +59,7 @@
 
 #include "interface.h"
 #include "session.h"
+#include "activity.h"
 #include "consumer.h"
 #include "connection.h"
 #include "stream.h"
