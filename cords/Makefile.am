@@ -14,7 +14,7 @@ libcords_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COXML) $(CFLAGS_COSQL) $(CFLAGS_CORES
 libcords_la_LDFLAGS = $(LD_COXML) $(LD_COSQL)
 
 # Build the model files
-model_h_files = azconfig.h paconfig.h publication.h placement.h account.h instruction.h		\
+model_h_files = azconfig.h activity.h paconfig.h publication.h placement.h account.h instruction.h		\
 		node.h package.h tarif.h carrier.h report.h action.h invoice.h onconfig.h 			\
 		parameter.h transaction.h compute.h domain.h requirement.h agency.h ipaddress.h		\
 		opennebula.h plan.h user.h configuration.h enquiry.h security.h algorithm.h			\
