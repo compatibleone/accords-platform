@@ -86,9 +86,9 @@ private	void	comons_load()
 
 private	int	banner()
 {
-	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.06");
-	printf("\n   Beta Version : 23/08/2012");
-	printf("\n   Copyright (c) 2011, 2012 Iain James Marshall, Prologue");
+	printf("\n   CompatibleOne Monitoring Services : Version 1.0a.0.07");
+	printf("\n   Beta Version : 14/01/2014");
+	printf("\n   Copyright (c) 2011, 2014 Iain James Marshall, Prologue");
 	printf("\n");
 	accords_configuration_options();
 	printf("\n\n");
@@ -207,6 +207,15 @@ private	int	comons_operation( char * nptr )
 	/* monitoring metric category management */
 	/* ------------------------------------- */
 	if (!( optr = occi_cords_metric_builder( Comons.domain, _CORDS_METRIC ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+	optr->callback  = (void *) 0;
+	optr->access |= _OCCI_NO_PRICING;
+
+	if (!( optr = occi_cords_activity_builder( Comons.domain, "activity" ) ))
 		return( 27 );
 	else if (!( optr->previous = last ))
 		first = optr;
