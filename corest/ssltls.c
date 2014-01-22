@@ -148,8 +148,8 @@ public	int	socketreader( int handle, char * buffer, int length )
 {
 	int	status;
 	start_socket_catcher(handle,"socket read");
-	if ((status = read( handle, buffer, length )) >= 0)
-		*(buffer+status) =0;
+	*buffer = 0;
+	status = read( handle, buffer, length );
 	close_socket_catcher(handle,"socket read",errno);
 	return( status );
 }
