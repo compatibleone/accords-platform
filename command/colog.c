@@ -10,10 +10,15 @@
 #define	private	static
 #endif
 
+private void    colog_flush_page( int mode );
 private	int	colog_sent_request(int when,int pid,int tid,char * who,int dir, char * method, char * object);
 private	int	colog_received_request(int when,int pid,int tid,char * who,int dir, char * method, char * object);
 private	int	colog_sent_response(int when,int pid,int tid,char * who,int dir, char * object);
 private	int	colog_received_response(int when,int pid,int tid,char * who,int dir, char * object);
+private	FILE *	colog_handle=(FILE*) 0;
+private	int	colog_page=0;
+private	char *	colog_output="colog";
+private	int	colog_page_size=48;
 
 int	maxcolumns=0;
 
@@ -1087,8 +1092,8 @@ private	void	colog_show_events()
 	struct	colog_event * eptr;
 	struct	colog_module * fptr;
 	struct	colog_module * tptr;
-	printf("<p><table><tr><th class=ath colspan=3>COLOG Event List</th></tr>\n");
-	printf("<tr><th class=ath>Time<th class=ath>From<th class=ath>To</tr>\n");
+	fprintf(colog_handle,"<p><table><tr><th class=ath colspan=3>COLOG Event List</th></tr>\n");
+	fprintf(colog_handle,"<tr><th class=ath>Time<th class=ath>From<th class=ath>To</tr>\n");
 	for (	eptr=Manager.FirstEvent;
 		eptr !=(struct colog_event *) 0;
 		eptr = eptr->next )
@@ -1099,7 +1104,7 @@ private	void	colog_show_events()
 			continue;
 		else if ( eptr->dir > 1 )
 			continue;
-		printf("<tr><th class=ath>%u<td class=atd>%s %s<td class=atd> %s %s</tr>\n",
+		fprintf(colog_handle,"<tr><th class=ath>%u<td class=atd>%s %s<td class=atd> %s %s</tr>\n",
 			eptr->when,
 			( eptr->dir ? ( eptr->dir == 1 ? "Sent by" : "Received by" ) : " "),
 			( (fptr = eptr->from) ? ( fptr->name ? fptr->name : "unknown") : "unknown" ),
@@ -1107,7 +1112,7 @@ private	void	colog_show_events()
 			( (tptr = eptr->to) ? ( tptr->name ? tptr->name : 
 			( tptr->host ? tptr->host : "unknown")) : "unknown" ));
 	}
-	printf("</table><p>\n");
+	fprintf(colog_handle,"</table><p>\n");
 	return;
 }
 
@@ -1117,8 +1122,8 @@ private	void	colog_show_events()
 private	void	colog_show_modules()
 {
 	struct	colog_module * mptr;
-	printf("<p><table width='90%'><tr><th class=ath colspan=4>COLOG Module List</th></tr>\n");
-	printf("<tr><th class=ath>Number<th class=ath>Name<th class=ath>Process<th class=ath>URL</tr>\n");
+	fprintf(colog_handle,"<p><table width='90%'><tr><th class=ath colspan=4>COLOG Module List</th></tr>\n");
+	fprintf(colog_handle,"<tr><th class=ath>Number<th class=ath>Name<th class=ath>Process<th class=ath>URL</tr>\n");
 	maxcolumns=0;
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
@@ -1126,53 +1131,96 @@ private	void	colog_show_modules()
 	{
 		mptr->column = ++maxcolumns;
 
-		printf("<tr><th class=ath>%u<td class=atd>%s", mptr->column, ( mptr->name ? mptr->name : "&nbsp;" ));
+		fprintf(colog_handle,"<tr><th class=ath>%u<td class=atd>%s", mptr->column, ( mptr->name ? mptr->name : "&nbsp;" ));
 
 		if ( mptr->pid )
-			printf("<td class=atd>%u",mptr->pid);
-		else	printf("<td class=atd>&nbsp;");
+			fprintf(colog_handle,"<td class=atd>%u",mptr->pid);
+		else	fprintf(colog_handle,"<td class=atd>&nbsp;");
 
-		printf("<td class=atd>%s", ( mptr->host ? mptr->host : "&nbsp;" ));
+		fprintf(colog_handle,"<td class=atd>%s", ( mptr->host ? mptr->host : "&nbsp;" ));
 
 		if ( mptr->port )
-			printf(":%u",mptr->port);
+			fprintf(colog_handle,":%u",mptr->port);
 
-		printf("</tr>\n");
+		fprintf(colog_handle,"</tr>\n");
 	}
-	printf("</table><p>\n");
+	fprintf(colog_handle,"</table><p>\n");
 	return;
 }
 
 /*	---------------------------------	*/
 /*	c o l o g _ s h o w _ h e a d e r	*/
 /*	---------------------------------	*/
-private	void	colog_show_header()
+private	void	colog_show_header(int top, int mode)
 {
 	struct	colog_module * mptr;
-	printf("<tr><th class=ath>#<th class=ath>&nbsp;<th class=mth>Information\n");
+	fprintf(colog_handle,"<tr><th class=ath>#<th class=ath>");
+	if ( top )
+	{
+		if ( colog_page > 1 )
+		{
+		fprintf(colog_handle,"<div align=center><a href='%s%u.html'>Page %u</a></div>\n",
+		colog_output, colog_page - 1, colog_page - 1);
+		}
+	}
+	else if ( mode )
+	{
+	fprintf(colog_handle,"<div align=center><a href='%s%u.html'>Page %u</a></div>\n",
+	colog_output,colog_page+1, colog_page+1);
+
+	}
+	fprintf(colog_handle,"<th class=mth>Information\n");
 	for (	mptr=Manager.FirstModule;
 		mptr !=(struct colog_module *) 0;
 		mptr = mptr->next )
 	{
 		if ( mptr->column )
 		{
-			printf("<th class=ath>%u",mptr->column);
+			fprintf(colog_handle,"<th class=ath>%u",mptr->column);
 			if ( mptr->name )
-				printf("<br><font size=1>%s</font>",mptr->name);
-			printf("</th>\n");
+				fprintf(colog_handle,"<br><font size=1>%s</font>",mptr->name);
+			fprintf(colog_handle,"</th>\n");
 		}
 		else if ( mptr->name )
-			printf("<th class=ath>%s</th>\n",mptr->name);
-		else	printf("<th class=ath>%s:%u</th>\n",( mptr->host ? mptr->host : "unknown" ),mptr->port);
+			fprintf(colog_handle,"<th class=ath>%s</th>\n",mptr->name);
+		else	fprintf(colog_handle,"<th class=ath>%s:%u</th>\n",( mptr->host ? mptr->host : "unknown" ),mptr->port);
 	}
-	printf("</tr>\n");
+	fprintf(colog_handle,"</tr>\n");
 	return;
+}
+
+private void    colog_start_page( int mode )
+{
+	char	buffer[1024];
+	colog_page++;
+	sprintf(buffer,"%s%u.html",colog_output,colog_page);
+	colog_handle = fopen( buffer, "w" );
+        fprintf(colog_handle,"<html><head><title>Accords Platform LOG Analysis Report</title>\n");
+       	fprintf(colog_handle,"<link href=\"analyse.css\" rel=\"STYLESHEET\" type=\"text/css\" media=\"SCREEN\">\n");
+      	fprintf(colog_handle,"<link href=\"analyse.css\" rel=\"STYLESHEET\" type=\"text/css\" media=\"PRINT\">\n");
+       	fprintf(colog_handle,"</style></head>\n");
+       	fprintf(colog_handle,"<body><div align=center><h1>Accords Platform LOG Analysis Report</h1><p>\n");
+        fprintf(colog_handle,"<p><table border=0>\n");
+        colog_show_header(1,0);
+        return;
+}
+
+private void    colog_flush_page( int mode )
+{
+        colog_show_header(0,mode);
+       	fprintf(colog_handle,"</table>");
+        colog_show_modules();
+	fprintf(colog_handle,"</div><p></body></html>\n");
+	fclose( colog_handle );
+	colog_handle = (FILE *) 0;
+	if ( mode ) { colog_start_page( mode ); }
+        return;
 }
 
 /*	---------------------------------	*/
 /*	c o l o g _ s h o w _ d e t a i l	*/
 /*	---------------------------------	*/
-private	void	colog_show_detail()
+private	void	colog_show_detail(int mode)
 {
 	int	n;
 	int	from=0;
@@ -1205,16 +1253,16 @@ private	void	colog_show_detail()
 		/* handle pagination with title bar */
 		/* -------------------------------- */
 		items++;
-		if ( items > 48 )
+		if ( items > colog_page_size)
 		{
-			colog_show_header();
+			colog_flush_page(1);
 			items=1;
 		}
 
 		switch ( eptr->dir )
 		{
 		case	1	:
-			printf("<tr><th class=ath>%u<th class=ath>%s<td class=msg>%s",++total,
+			fprintf(colog_handle,"<tr><th class=ath>%u<th class=ath>%s<td class=msg>%s",++total,
 				(eptr->method ? eptr->method : ""),
 				(eptr->object ? eptr->object : ""));
 			ifr = "reqfr.png";
@@ -1224,7 +1272,7 @@ private	void	colog_show_detail()
 			ith = "reqth.png";
 			break;
 		case	2	:
-			printf("<tr><th class=ath>%u<th class=ath>%u<th class=msg>%s",++total,eptr->status,(eptr->message ? eptr->message : "&nbsp;"));
+			fprintf(colog_handle,"<tr><th class=ath>%u<th class=ath>%u<th class=msg>%s",++total,eptr->status,(eptr->message ? eptr->message : "&nbsp;"));
 			ifr = "repfr.png";
 			itl = "reptl.png";
 			ifl = "repfl.png";
@@ -1266,7 +1314,7 @@ private	void	colog_show_detail()
 			n = from-1;
 			while ( n )
 			{
-				printf("<td class=nb><img src='vertical.png'></td>\n");
+				fprintf(colog_handle,"<td class=nb><img src='vertical.png'></td>\n");
 				n--;
 			}
 		}
@@ -1274,7 +1322,7 @@ private	void	colog_show_detail()
 		/* -------------------------- */
 		/* left hand image to or from */
 		/* -------------------------- */
-		printf("<td class=nb><img src='%s' alt='%s'></td>\n",ifrom,
+		fprintf(colog_handle,"<td class=nb><img src='%s' alt='%s'></td>\n",ifrom,
 			( left->name ? left->name : "unknown" ));
 		
 		/* -------------- */
@@ -1286,7 +1334,7 @@ private	void	colog_show_detail()
 			n -= 1;
 			while ( n )
 			{
-				printf("<td class=nb><img src='%s'></td>\n",ith);
+				fprintf(colog_handle,"<td class=nb><img src='%s'></td>\n",ith);
 				n--;
 			}
 		}
@@ -1294,7 +1342,7 @@ private	void	colog_show_detail()
 		/* --------------------------- */
 		/* right hand image to or from */
 		/* --------------------------- */
-		printf("<td class=nb><img src='%s' alt='%s'></td>\n",ito,
+		fprintf(colog_handle,"<td class=nb><img src='%s' alt='%s'></td>\n",ito,
 			( right->name ? right->name : "unknown" ));
 
 		/* ------------------------ */
@@ -1303,7 +1351,7 @@ private	void	colog_show_detail()
 		n = maxcolumns - to;
 		while ( n)
 		{
-			printf("<td class=nb><img src='vertical.png'></td>\n");
+			fprintf(colog_handle,"<td class=nb><img src='vertical.png'></td>\n");
 			n--;
 		}
 	}
@@ -1313,28 +1361,23 @@ private	void	colog_show_detail()
 /*	---------------------------------	*/
 /*	c o l o g _ s h o w _ r e s u l t 	*/
 /*	---------------------------------	*/
-private	void	colog_show_result()
+private	void	colog_show_result(int pages)
 {
-	printf("<html><head><title>Accords Platform LOG Analysis Report</title>\n");
-	printf("<link href=\"analyse.css\" rel=\"STYLESHEET\" type=\"text/css\" media=\"SCREEN\">\n");
-	printf("<link href=\"analyse.css\" rel=\"STYLESHEET\" type=\"text/css\" media=\"PRINT\">\n");
-	printf("</style></head>\n");
-	printf("<body><div align=center><h1>Accords Platform LOG Analysis Report</h1><p>\n");
-	colog_show_modules();
-	printf("<p><table border=0>\n");
-	colog_show_header();
-	colog_show_detail();
-	colog_show_header();
-	printf("</table></div><p></body></html>\n");
+	colog_page_size = pages;
+	colog_start_page(pages);
+	colog_show_detail(pages);
+	colog_flush_page(0);
 }
 
 /*	---------------------------------	*/
 /*	  c o l o g _ a n a l y s i s 		*/
 /*	---------------------------------	*/
-public	int	colog_analysis( char * filename )
+public	int	colog_analysis( char * filename, char * output, int pages )
 {
+	if (!( colog_output = output ))
+		colog_output = "colog";
 	colog_operation( filename );
-	colog_show_result();
+	colog_show_result(pages);
 	return( 0 );
 }
 	

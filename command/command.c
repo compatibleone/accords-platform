@@ -27,6 +27,7 @@
 #include "json.h"
 
 private	int	noauth=0;
+private	int	page=48;
 
 struct	accords_configuration Command = {
 	0,0,
@@ -2470,7 +2471,7 @@ private	int	operation( int argc, char * argv[] )
 			else if (!( strcasecmp( command, "SOAP" ) ))
 				return( invoke_soap_api( aptr, argv[argi+1], argv[argi+2], asynch, callback ) );
 			else if (!( strcasecmp( command, "ANALYSE" ) ))
-				return( colog_analysis( aptr ) );
+				return( colog_analysis( aptr, argv[++argi] , page) );
 			else if (!( strcasecmp( command, "RUN" ) ))
 			{
 				argi++;
@@ -2521,6 +2522,8 @@ private	int	operation( int argc, char * argv[] )
 					soap = argv[++argi];
 				else if (!( strcmp( aptr, "echo") ))
 					csp_set_echo(1);
+				else if (!( strcmp( aptr, "page") ))
+					page = atoi(argv[++argi]);
 				else if (!( strcmp( aptr, "log" ) ))
 					rest_initialise_log( atoi( argv[++argi] ) );
 				else if (!( strcmp( aptr, "agent" ) ))
@@ -2582,6 +2585,7 @@ private	int	banner()
 	printf("\n         --noauth                     inhibit authentication for test purposes");
 	printf("\n         --echo                       activate source echo ");
 	printf("\n         --log  <value>               set log configuration ");
+	printf("\n         --page  <value>              set analyse page size ");
 	printf("\n         --port <number>              set online port number ");
 	printf("\n         --user <name>                set online user name ");
 	printf("\n         --password <value>           set online password ");
