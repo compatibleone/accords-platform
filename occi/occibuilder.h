@@ -5,6 +5,7 @@
 #include "cords.h"
 
 public struct occi_category * occi_cords_agreement_builder(char *a,char * b);
+public struct occi_category * occi_cords_activity_builder(char *a,char * b);
 public struct occi_category * occi_cords_terms_builder(char *a,char * b);
 public struct occi_category * occi_cords_term_builder(char *a,char * b);
 public struct occi_category * occi_cords_variable_builder(char *a,char * b);
