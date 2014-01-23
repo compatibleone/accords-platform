@@ -133,7 +133,7 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 			if ((aptr = document_atribut( eptr, "certificate" )) != (struct xml_atribut *) 0)
 				cptr->certificate = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "passphrase" )) != (struct xml_atribut *) 0)
-				cptr->passphrase = document_atribut_string( aptr );
+				cptr->passphrase = document_atribut_password( aptr );
 			if ((aptr = document_atribut( eptr, "authority" )) != (struct xml_atribut *) 0)
 				cptr->authority = document_atribut_string( aptr );
 		}

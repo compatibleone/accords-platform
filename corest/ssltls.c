@@ -264,7 +264,7 @@ public	int	https_use_password(	char *	aptr	)
 		liberate( SslPassWord );
 		SslPassWord = (char *) 0;
 	}
-	SslPassWord = allocate_string( aptr );
+	SslPassWord = allocate_string_secure( aptr );
 
 	if (!( SslPassWord  ))
 		return( 27 );
