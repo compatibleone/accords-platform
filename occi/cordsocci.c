@@ -64,9 +64,6 @@
 #include "occitransaction.c"
 #include "occiuser.c"
 #include "occivm.c"
-#include "occimetadata.c"
-#include "occiscript.c"
-#include "occifile.c"
 #include "occixlink.c"
 
 #include "occireport.c"
@@ -80,7 +77,6 @@
 #include "occiconsumer.c"
 #include "occiconnection.c"
 #include "occistream.c"
-#include "occiprobe.c"
 #include "occimetric.c"
 
 #include "occioptimise.c"
