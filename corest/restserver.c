@@ -1324,7 +1324,7 @@ private	struct rest_response * rest_process_cors(
 /*	------------------------------------------------	*/
 private	int	rest_consume_byte( struct rest_client * cptr )
 {
-	while ( cptr->consumed >= cptr->bytes )
+	while ( cptr->consumed >= cptr->bytes ) // DG FIXME: infloop if 0 = 0
 		if ( rest_client_read( cptr ) == -1 )
 			return( -1 );
 	return( cptr->buffer[cptr->consumed++] );

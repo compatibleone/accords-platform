@@ -286,9 +286,14 @@ public	int	sslsocketreader(
 {
 	int	status;
 	start_socket_catcher(0,"ssl read");
-	if ((status = SSL_read( handle, buffer, length )) >= 0)
-		*(buffer+status) = 0;
-	else if ( status == -1 )
+	if ((status = SSL_read( handle, buffer, length )) == 0) {
+		/* DG: FIXED (?) DOS when underlying socket was not cleanly closed */
+		if(SSL_get_error(handle, status) == SSL_ERROR_SYSCALL) {
+			printf("Socket read 0 (EOF?): %u\n",
+							SSL_get_error(handle, status));
+			status = -1;
+		}
+	} else if ( status < 0 )
 	{
 		if ( check_debug() )
 		{
