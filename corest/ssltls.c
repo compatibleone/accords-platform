@@ -3,6 +3,8 @@
 
 #include <openssl/engine.h>
 #include "allocate.h"
+
+
 /*	-------------------------------------------------	*/
 /*			A B A L    S S L			*/
 /*	-------------------------------------------------	*/
@@ -605,6 +607,7 @@ private	int	tls_client_verify_callback( int preverify, X509_STORE_CTX * certific
 {
 	if ( check_debug() )
 		printf("tls_client_verify_callback(%u)\n",preverify);
+    // DG: FIXME check certificate
 	return(1);	/* never fail : for now */
 }
 
@@ -612,18 +615,107 @@ private	int	tls_server_verify_callback( int preverify, X509_STORE_CTX * certific
 {
 	if ( check_debug() )
 		printf("tls_server_verify_callback(%u)\n",preverify);
+    X509 *err_cert;
+    char buf[256];
+    int err, depth;
+    SSL *ssl;
+    (void)ssl;
+    err_cert = X509_STORE_CTX_get_current_cert(certificate);
+    err = X509_STORE_CTX_get_error(certificate);
+    depth = X509_STORE_CTX_get_error_depth(certificate);
+    ssl = X509_STORE_CTX_get_ex_data(certificate, SSL_get_ex_data_X509_STORE_CTX_idx());
+    X509_NAME_oneline(X509_get_subject_name(err_cert), buf, 256);
+	if ( check_debug() ) {
+        if (!preverify) {
+            printf("verify error:num=%d:%s\ndepth=%d:%s\n", err,
+                     X509_verify_cert_error_string(err), depth, buf);
+        } else {
+            printf("depth=%d:%s\n", depth, buf);
+        }
+        if (!preverify && (err == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT))
+        {
+          X509_NAME_oneline(X509_get_issuer_name(certificate->current_cert), buf, 256);
+          printf("issuer= %s\n", buf);
+        }
+    }
 	return(1);	/* never fail : for now */
 }
 
 /*	-----------------------------------------------------------	*/
 /*		t l s _ c h e c k _ c e r t i f i c a t e		*/
 /*	-----------------------------------------------------------	*/
-private	int	tls_check_certificate( X509_STORE_CTX * certificate, void * arg )
+typedef enum {
+    MatchFound,
+    MatchNotFound,
+    NoSANPresent,
+    MalformedCertificate,
+    Error
+} HostnameValidationResult;
+
+private HostnameValidationResult validate_hostname(const char *hostname, X509 *cert) {
+    return MatchFound; /* never fail : for now */
+}
+
+private	int	tls_check_certificate( X509_STORE_CTX * x509_ctx, void * arg )
 {
 	if ( check_debug() )
 		printf("tls_check_certificate()\n");
 
-	return(1);	/* never fail : for now */
+    char cert_str[256];
+    CONNECTIONPTR	cptr = (CONNECTIONPTR)arg;
+    const char *host = "undefined";
+    const char *res_str = "tls_check_certificate() failed";
+    HostnameValidationResult res = Error;
+
+    /* This is the function that OpenSSL would call if we hadn't called
+     * SSL_CTX_set_cert_verify_callback().  Therefore, we are "wrapping"
+     * the default functionality, rather than replacing it. */
+    int ok_so_far = X509_verify_cert(x509_ctx);
+
+    X509 *server_cert = X509_STORE_CTX_get_current_cert(x509_ctx);
+
+    /* We don't have the hostname, what should we check BTW ?
+     * This will be called for Azure self-signed certs AFAIK
+     * Maybe we could check an attribute of the certificate
+     */
+    if (ok_so_far) {
+        res = validate_hostname(host, server_cert);
+
+        switch (res) {
+            case MatchFound:
+                res_str = "MatchFound";
+                break;
+            case MatchNotFound:
+                res_str = "MatchNotFound";
+                break;
+            case NoSANPresent:
+                res_str = "NoSANPresent";
+                break;
+            case MalformedCertificate:
+                res_str = "MalformedCertificate";
+                break;
+            case Error:
+                res_str = "Error";
+                break;
+            default:
+                res_str = "WTF!";
+                break;
+        }
+    }
+
+    X509_NAME_oneline(X509_get_subject_name (server_cert),
+            cert_str, sizeof (cert_str));
+
+    if (res == MatchFound) {
+        printf("https server '%s' has this certificate, "
+                "which looks good to me:\n%s\n",
+                host, cert_str);
+        return 1;
+    } else {
+        printf("Got '%s' for hostname '%s' and certificate:\n%s\n",
+                res_str, host, cert_str);
+        return 0;
+    }
 }
 
 /*	------------------------------------------------	*/
@@ -850,6 +942,10 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
 		SSL_CTX_set_verify_depth(cptr->context,1);
 #endif
+        if(!SSL_CTX_check_private_key(cptr->context)) {
+            printf("Private key does not match the public certificate\n");
+            return 0;
+        }
 	}
 
 	if (!( cptr->object = SSL_new( cptr->context ) )) 
@@ -881,6 +977,7 @@ private	int	build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 /*	----------------------------------------------------------	*/
 public	int	tls_validate_server( CONNECTIONPTR cptr, int mode )
 {
+    // DG: FIXME this function should do something useful
 	if (!( mode & _REQUEST_PEER ) )
 		return(0);
 	else if (!( mode & _REQUIRE_PEER ) )
@@ -941,13 +1038,27 @@ public	int	tls_client_handshake( CONNECTIONPTR cptr, int mode )
 /*	----------------------------------------------------------	*/
 /*		t l s _ v a l i d a t e _ c l i e n t			*/
 /*	----------------------------------------------------------	*/
-public	int	tls_validate_client( CONNECTIONPTR cptr, int mode )
+public	int	tls_validate_client( SSL *	handle, int mode )
 {
-	if (!( mode & _REQUEST_PEER ) )
-		return(0);
-	else if (!( mode & _REQUIRE_PEER ) )
-		return(0);
-	else	return(0);
+    X509 *cert;
+	//if (!( mode & _REQUEST_PEER ) )
+	//	return(0);
+	//else if (!( mode & _REQUIRE_PEER ) )
+	//	return(0);
+	//else	return(0);
+    cert = SSL_get_peer_certificate(handle);
+    if(mode & _REQUIRE_PEER) {
+        if(!cert) {
+	    	printf("SSL_accept(pid=%u,h=%p) => No peer certificate %d \r\n",getpid(),handle,-1);
+            return -1;
+        }
+        X509_free(cert);
+    }
+    if (SSL_get_verify_result(handle) != X509_V_OK) {
+		printf("SSL_accept(pid=%u,h=%p) => Bad peer certificate %d \r\n",getpid(),handle,-1);
+        return -1;
+    }
+    return 0;
 }
 
 /*	----------------------------------------------------------	*/
@@ -967,6 +1078,9 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 	else
 	{
 		security_lock( 0, "server_set_verify" );
+        //DG FIXME: Server should build and send the CA list
+        //SSL_CTX_set_client_CA_list(tlsctx, SSL_load_client_CA_file(SslCertFile));
+
 		if ( mode & _REQUIRE_PEER )
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,tls_server_verify_callback);
 		else if ( mode & _REQUEST_PEER )
