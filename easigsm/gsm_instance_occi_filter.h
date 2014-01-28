@@ -9,9 +9,11 @@ struct	gsm_instance_occi_filter
 	int	name;
 	int	service;
 	int	stop;
+	int	scaleup;
 	int	agreement;
 	int	start;
 	int	state;
+	int	scaledown;
 };
 
 #endif

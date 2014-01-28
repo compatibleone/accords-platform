@@ -592,7 +592,7 @@ public	int	delete_ec2_contract(
 
 	if ( pptr->reference )
 	{
-		if ((subptr = use_ec2_configuration(pptr->profile )) != (struct az_subscription *) 0)
+		if ((subptr = use_ec2_configuration(pptr->profile )) != (struct ec2_subscription *) 0)
 		{
 
 			/* ------------------------- */

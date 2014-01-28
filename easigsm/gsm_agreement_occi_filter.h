@@ -5,11 +5,16 @@ struct	gsm_agreement_occi_filter
 {
 	struct gsm_agreement	*attributes;
 	int	id;
+	int	negotiation;
 	int	account;
 	int	name;
 	int	verify;
+	int	agreement;
 	int	accept;
+	int	manifest;
+	int	refuse;
 	int	state;
+	int	plan;
 	int	template;
 };
 
