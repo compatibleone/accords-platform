@@ -166,8 +166,10 @@ public	int	socket_create( int a, int b, int c )
 		h = -1;
 	else
 	{
+		optval = 1;
+		(void) setsockopt(h, SOL_SOCKET, SO_REUSEADDR, (int *) & optval, sizeof( optval ));
 		optval = 60;
-		(void) setsockopt(h, SOL_SOCKET, (SO_KEEPALIVE | SO_REUSEADDR), (int *) & optval, sizeof( optval ));
+		(void) setsockopt(h, SOL_SOCKET, SO_KEEPALIVE, (int *) & optval, sizeof( optval ));
 		optval = 1;
 		(void) setsockopt(h, SOL_TCP, TCP_NODELAY, (int *) & optval, sizeof( optval ));
 	}
