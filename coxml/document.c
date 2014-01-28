@@ -396,7 +396,7 @@ public	void	document_show_element( struct xml_element * eptr, int level )
 		{
 			printf("\n");
 			for (i=0; i < (level+1); i++) printf("\t");
-			printf("%s=%c%",aptr->name,0x0022);
+			printf("%s=%c",aptr->name,0x0022);
 			if ( aptr->value )
 			{
 				for ( 	sptr=aptr->value;
@@ -446,7 +446,7 @@ public	void	document_serialise_element( FILE * h, struct xml_element * eptr, int
 		{
 			fprintf(h,"\n");
 			for (i=0; i < (level+1); i++) fprintf(h,"\t");
-			fprintf(h,"%s=%c%",aptr->name,0x0022);
+			fprintf(h,"%s=%c",aptr->name,0x0022);
 			if ( aptr->value )
 			{
 				for ( 	sptr=aptr->value;

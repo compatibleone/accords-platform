@@ -236,7 +236,7 @@ public	struct	hdfs_response *	hdfs_append_file( struct hdfs_subscription * sptr,
 public	struct	hdfs_response *	hdfs_open_file( struct hdfs_subscription * sptr, char * path, int seek, int length )
 {
 	char	buffer[4096];
-	sprintf(buffer,"%s%s?%sop=OPEN&offset=%s&length=%u&buffersize=%u",
+	sprintf(buffer,"%s%s?%sop=OPEN&offset=%u&length=%u&buffersize=%u",
 			sptr->base,path,( sptr->authenticate ? sptr->authenticate : "" ),
 			seek,length,
 			sptr->buffersize);
