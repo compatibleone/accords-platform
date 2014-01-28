@@ -1705,8 +1705,7 @@ public	char *	rest_key_file( char * nptr, char * vptr )
 
 		fclose(h);
 
-		sprintf(buffer,"chmod 0600 %s",pemname);
-		system( buffer );
+		chmod(pemname, 0600);
 
 		return( allocate_string( pemname ) );
 	}

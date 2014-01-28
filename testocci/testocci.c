@@ -929,7 +929,7 @@ int  main( int argc, char * argv[] )
 {
   int result = 0;
   char cwd[1024];
-  getcwd(cwd, 1024);
+  char *dummy = getcwd(cwd, 1024);
   fprintf(stdout, "Current Working Directory: '%s'\n", cwd);
 
   if ( argc == 1 )
