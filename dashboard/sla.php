@@ -42,14 +42,22 @@
 
 	print "<tr><td>Zone<td><select style='width: 50mm;' name=slazone>\n";
 	print "<option value=any>any</option>\n";
-	print "<option value=westeurope>west europe</option>\n";
-	print "<option value=easteurope>east europe</option>\n";
-	print "<option value=northasia>north asia</option>\n";
-	print "<option value=southasia>south asia</option>\n";
-	print "<option value=northamerica>north america</option>\n";
-	print "<option value=southameric>south america</option>\n";
-	print "<option value=southafrica>south africa</option>\n";
-	print "<option value=northafrica>north africa</option>\n";
+	print "<option value='europe'>europe</option>\n";
+	print "<option value='west-europe'>west europe</option>\n";
+	print "<option value='east-europe'>east europe</option>\n";
+	print "<option value='asia'>asia</option>\n";
+	print "<option value='north-asia'>north asia</option>\n";
+	print "<option value='south-asia'>south asia</option>\n";
+	print "<option value='east-asia'>east asia</option>\n";
+	print "<option value='west-asia'>west asia</option>\n";
+	print "<option value='america'>america</option>\n";
+	print "<option value='us-east'>united states east</option>\n";
+	print "<option value='us-west'>united states west</option>\n";
+	print "<option value='north-america'>north america</option>\n";
+	print "<option value='south-america'>south america</option>\n";
+	print "<option value='africa'>africa</option>\n";
+	print "<option value='north-africa'>north africa</option>\n";
+	print "<option value='south-africa'>south africa</option>\n";
 	print "</select></td></tr>\n";
 
 	print "<tr><td>Rating<td><select style='width: 50mm;' name=slarating>\n";
