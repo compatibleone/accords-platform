@@ -1857,6 +1857,8 @@ private	char * 	cords_contract_provider(
 		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "node", id ) ))
 		return((char *) 0);
+	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "zone", App->selector.zone ) ))
+		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "account", App->account ) ))
 		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "profile", pptr->value ) ))
@@ -2127,6 +2129,7 @@ public	struct	xml_element * 	cords_build_contract(
 		char * agreement,
 		char * parentservice,
 		char * provider,
+		char * zone,
 		int	flags )
 {
 	struct	xml_element * eptr;
@@ -2140,6 +2143,8 @@ public	struct	xml_element * 	cords_build_contract(
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NAME, name ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NODE, node ) ))
+		return(document_drop( eptr ));
+	else if (!( aptr = document_add_atribut( eptr, "zone", zone      ) ))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_AGREEMENT, ( agreement ? agreement : "") ) ))
 		return(document_drop( eptr ));
@@ -2236,7 +2241,7 @@ private	struct	xml_element * 	cords_instance_complex_contract(
 	/* --------------------------------------------------- */
 	/* then create the contract document for the node here */
 	/* --------------------------------------------------- */
-	else if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, _CORDS_ANY , App->flags) ))
+	else if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, _CORDS_ANY , App->selector.zone, App->flags) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2276,7 +2281,7 @@ private	struct	xml_element * 	cords_instance_abstract_contract(
 	/* --------------------------------------------------- */
 	/* then create the contract document for the node here */
 	/* --------------------------------------------------- */
-	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags) ))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->selector.zone, App->flags) ))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2416,7 +2421,7 @@ private	struct	xml_element * 	cords_instance_simple_contract(
 	struct	xml_atribut	*	aptr;
 	char 			*	service;
 
-	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->selector.zone, App->flags )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2542,7 +2547,7 @@ private	struct	xml_element * cords_terminate_private_common_contract(
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 
-	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->selector.zone, App->flags )))
 	{
 		cords_terminate_instance_node( App );
 		return((struct xml_element *) 0);
@@ -2682,7 +2687,7 @@ private	struct	xml_element * cords_terminate_public_common_contract(
 	struct	xml_element * document;
 	struct	xml_atribut * aptr;
 
-	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->flags )))
+	if (!( document = cords_build_contract( id, App->nameApp, sla, App->service, App->provider, App->selector.zone, App->flags )))
 	{
 		liberate( common );
 		cords_terminate_instance_node( App );

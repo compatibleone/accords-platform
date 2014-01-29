@@ -142,7 +142,7 @@ public	struct	xml_element  * cords_build_service(
 	char * 	name, char * plan, char * manifest, char * sla, char * account, char * vender, char * tarification );
 
 private	struct	xml_element * 	cords_build_contract( 
-	char * 	node, 	char * name, char * agreement, char * parentservice, char * provider, int flags );
+	char * 	node, 	char * name, char * agreement, char * parentservice, char * provider, char * zone, int flags );
 
 public	char *	cords_create_service( char * plan, char * agent, char * tls );
 

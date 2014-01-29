@@ -770,6 +770,7 @@
 	        <attribute name='rootpass' type='string' required='false' immutable='false'/>
 	        <attribute name='workload' type='string' required='false' immutable='false'/>
 	        <attribute name='blob' type='string' required='false' immutable='false'/>
+	        <attribute name='zone' type='string' required='false' immutable='false'/>
 	        <instance name='price' category='http://scheme.compatibleone.fr/scheme/compatible#price' multiplicity='[0..1]'/>
 	        <attribute name='access' type='string' required='false' immutable='false'/>
 	        <!--  This is a relationship - it needs clearer identification. If it can be a service
