@@ -126,6 +126,9 @@ public struct rest_client * drop_rest_client(struct rest_client * sptr)
 			}
 			else if (!( sptr->next->previous = sptr->previous ))
 				sptr->parent->first = sptr->next;
+			if(sptr == sptr->parent->active) {
+				sptr->parent->active = (struct rest_client *) 0;
+			}
 		}
 		sptr = liberate_rest_client(sptr);
 	}
