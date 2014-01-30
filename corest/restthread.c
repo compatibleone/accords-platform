@@ -197,12 +197,10 @@ public	int	terminate_rest_thread_manager()
 	if ( rootServer )
 	{
 		pthread_mutex_lock( &restThreadLock );
-		while ((tptr = firstThread) != (struct rest_thread *) 0)
-		{
-			firstThread = tptr->next;
+		for (	tptr = firstThread;
+			tptr != (struct rest_thread *) 0;
+			tptr = tptr->next )
 			delete_rest_thread( tptr );
-			tptr = liberate_rest_thread( tptr );
-		}
 		pthread_mutex_unlock( &restThreadLock );
 	}
 	rootServer = (struct rest_server *) 0;
