@@ -133,7 +133,7 @@ th 	{
 	color: #444444;
 	border-style: none;
 	border-color: #333333;
-	border-width: 0px;
+	border-width: 1px;
 	}
 
 .xtd 	{
@@ -197,9 +197,10 @@ a	{
 	bottom-margin: 2mm;
 	background-color: #606060;
 	color: #E0E0E0;
-	border-spacing: 0;
-	border-style: none;
+	border-spacing: 0 2 0 0;
+	border-style: solid;
 	border-radius: 8px;
+	border-color: white;
 	-moz-border-radius: 8px;
 	}
 
