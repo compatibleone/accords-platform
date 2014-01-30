@@ -25,7 +25,7 @@ model_h_files = azconfig.h activity.h paconfig.h publication.h placement.h accou
 		interface.h session.h consumer.h connection.h stream.h	\
 		metric.h alert.h quota.h application.h variable.h business.h zone.h			\
 		guarantee.h term.h deltacloud.h terms.h amazonEc2.h control.h result.h			\
-		ec2config.h gw.h intercloudGW.h linkgw.h packet.h penalty.h release.h volume.h
+		ec2config.h gw.h intercloudGW.h linkgw.h packet.h penalty.h release.h volume.h xthread.h
 
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
