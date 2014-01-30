@@ -96,5 +96,6 @@
 #include "business.h"
 
 #include "xlink.h"
+#include "xthread.h"
 
 #endif

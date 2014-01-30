@@ -65,6 +65,7 @@
 #include "occiuser.c"
 #include "occivm.c"
 #include "occixlink.c"
+#include "occixthread.c"
 
 #include "occireport.c"
 #include "occievent.c"

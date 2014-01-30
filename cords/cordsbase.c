@@ -71,6 +71,7 @@
 #include "manifest.c"
 #include "plan.c"
 #include "xlink.c"
+#include "xthread.c"
 
 #include "agency.c"
 #include "enquiry.c"

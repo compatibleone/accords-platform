@@ -167,6 +167,9 @@ private	struct rest_extension * cosacs_extension( void * v,struct rest_server * 
 #include "xlink.h"
 #include "xlink.c"
 #include "occixlink.c"
+#include "xthread.h"
+#include "xthread.c"
+#include "occixthread.c"
 
 /*	------------------------------------------------------------------	*/
 /*			c o s a c s _ f i l e _ e n c o d e			*/

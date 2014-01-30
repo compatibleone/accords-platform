@@ -69,6 +69,7 @@ public struct occi_category * occi_cords_system_builder(char *a,char * b);
 public struct occi_category * occi_cords_transaction_builder(char *a,char * b);
 public struct occi_category * occi_cords_user_builder(char *a,char * b);
 public struct occi_category * occi_cords_xlink_builder(char *a,char * b);
+public struct occi_category * occi_cords_xthread_builder(char *a,char * b);
 
 public struct occi_category * occi_cords_publication_builder(char *a,char * b);
 public struct occi_category * occi_cords_enquiry_builder(char *a,char * b);

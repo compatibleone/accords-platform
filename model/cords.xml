@@ -1298,7 +1298,6 @@
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
-	      <!-- TODO Actions -->
 	    </actions>
 	</category>
 	<category term='tarif' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/tarif/' rel='http://schemas.ogf.org/occi/core#resource'>
@@ -1312,7 +1311,6 @@
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
-	      <!-- TODO Actions -->
 	    </actions>
 	</category>
 	<category term='zone' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/zone/' rel='http://schemas.ogf.org/occi/core#resource'>
@@ -1323,7 +1321,6 @@
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
-	      <!-- TODO Actions -->
 	    </actions>
 	</category>
 	<category term='xlink' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/xlink/' rel='http://schemas.ogf.org/occi/core#resource'>
@@ -1334,6 +1331,22 @@
 	    </attributes>
 	    <actions>
 	      <!-- TODO Actions -->
+	    </actions>
+	</category>
+	<category term='xthread' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/xthread/' rel='http://schemas.ogf.org/occi/core#resource'>
+	    <attributes>
+	        <attribute name='identity' type='string' required='false' immutable='false'/>
+	        <attribute name='client' type='string' required='false' immutable='false'/>
+	        <attribute name='request' type='string' required='false' immutable='false'/>
+	        <attribute name='pid' type='int' required='false' immutable='false'/>
+	        <attribute name='status' type='int' required='false' immutable='false'/>
+	        <attribute name='started' type='int' required='false' immutable='false'/>
+	        <attribute name='item' type='int' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#start'/>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#stop'/>
 	    </actions>
 	</category>
 	<category term='gw' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/gw/' rel='http://schemas.ogf.org/occi/core#resource' structname='gw'>

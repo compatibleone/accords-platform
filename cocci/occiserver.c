@@ -54,9 +54,11 @@ struct	accords_authorization
 
 private	struct	occi_category * OcciLocalCategory=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerLinkManager=(struct occi_category *) 0;
+private	struct	occi_category * OcciServerThreadManager=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerMixinManager=(struct occi_category *) 0;
 private	struct	accords_authorization * AccordsAuthorization=(struct accords_authorization *) 0;
 public	struct	occi_category * occi_cords_xlink_builder( char * domain, char * name );
+public	struct	occi_category * occi_cords_xthread_builder( char * domain, char * name );
 private	char *	occi_authorization=(char *) 0;
 
 private	struct rest_response * occi_get( 
@@ -639,6 +641,12 @@ private	struct rest_response * occi_get_capacities(
 
 #ifdef	_need_to_add_link_manager
 	if ((optr = OcciServerLinkManager) != (struct occi_category*) 0)
+		if (!( optr->access & _OCCI_SECRET ))
+			if (( mptr = occi_http_capacity( optr )) != (char *) 0)
+				hptr = rest_response_header( aptr, "Category", mptr );
+#endif
+#ifdef	_need_to_add_thread_manager
+	if ((optr = OcciServerThreadManager) != (struct occi_category*) 0)
 		if (!( optr->access & _OCCI_SECRET ))
 			if (( mptr = occi_http_capacity( optr )) != (char *) 0)
 				hptr = rest_response_header( aptr, "Category", mptr );
@@ -1670,6 +1678,9 @@ private	struct rest_response * occi_get(
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_get( optr, cptr, rptr ) );
+	else if (((optr = OcciServerThreadManager) != (struct occi_category *) 0) 
+	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
+		return( occi_invoke_get( optr, cptr, rptr ) );
 	else
 	{
 		for ( 	optr = vptr;
@@ -1710,6 +1721,9 @@ private	struct rest_response * occi_post(
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Creation" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
+	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
+		return( occi_invoke_post( optr, cptr, rptr ) );
+	else if (((optr = OcciServerThreadManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_post( optr, cptr, rptr ) );
 	else
@@ -1768,6 +1782,9 @@ private	struct rest_response * occi_put(
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_put( optr, cptr, rptr ) );
+	else if (((optr = OcciServerThreadManager) != (struct occi_category *) 0) 
+	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
+		return( occi_invoke_put( optr, cptr, rptr ) );
 	{
 		for ( 	optr = vptr;
 			optr != (struct occi_category *) 0;
@@ -1802,6 +1819,9 @@ private	struct rest_response * occi_delete(
 	else if (!( strcmp( rptr->object, "/-/" ) ))
 		return( occi_failure(cptr,  400, "Bad Request : Illegal Mixin Removal" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
+	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
+		return( occi_invoke_delete( optr, cptr, rptr ) );
+	else if (((optr = OcciServerThreadManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_delete( optr, cptr, rptr ) );
 	else
@@ -1841,6 +1861,9 @@ private	struct rest_response * occi_head(
 	else if (!( strcmp( rptr->object, "/" ) ))
 		return( occi_redirect(cptr,  301, "Redirected to Capacities", "/-/" ) );
 	else if (((optr = OcciServerLinkManager) != (struct occi_category *) 0) 
+	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
+		return( occi_invoke_head( optr, cptr, rptr ) );
+	else if (((optr = OcciServerThreadManager) != (struct occi_category *) 0) 
 	     &&  (!( strncmp( rptr->object, optr->location,strlen(optr->location)) )))
 		return( occi_invoke_head( optr, cptr, rptr ) );
 	else
@@ -2287,6 +2310,13 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 	if (!(OcciServerLinkManager = occi_cords_xlink_builder( "occi", "link" ) ))
 		return( 27 );
 	else	OcciServerLinkManager->access |= _OCCI_PRIVATE;
+
+	/* ------------------------------------- */
+	/* and a default external thread handler */
+	/* ------------------------------------- */
+	if (!(OcciServerThreadManager = occi_cords_xthread_builder( "occi", "thread" ) ))
+		return( 27 );
+	else	OcciServerThreadManager->access |= _OCCI_PRIVATE;
 
 	/* ------------------------------------------ */
 	/* this parameter now controls thread workers */
