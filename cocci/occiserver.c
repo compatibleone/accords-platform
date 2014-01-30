@@ -32,6 +32,7 @@
 #include "rest.h"
 #include "occi.h"
 #include "xlink.h"
+#include "xthread.h"
 #include "url.h"
 #include "urlpublic.h"
 #include "occiauth.h"
@@ -42,6 +43,7 @@
 #include "occilogin.h"
 #include "json.h"
 #include "restclient.h"
+#include "restthread.h"
 
 struct	accords_authorization
 {
@@ -52,6 +54,8 @@ struct	accords_authorization
 	char *	authorization;
 };
 
+public	struct	cords_xthread *	allocate_cords_xthread();
+public	struct	cords_xthread *	liberate_cords_xthread(struct	cords_xthread *	tptr);
 private	struct	occi_category * OcciLocalCategory=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerLinkManager=(struct occi_category *) 0;
 private	struct	occi_category * OcciServerThreadManager=(struct occi_category *) 0;
@@ -2290,6 +2294,101 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 }
 
 /*	---------------------------------------------------------	*/
+/*		o c c i _ t h r e a d _ c r e a t e			*/
+/*	---------------------------------------------------------	*/
+private	int	occi_thread_create( void * vptr )
+{
+	struct	cords_xthread * xthread=(struct cords_xthread *) 0;
+	struct	rest_thread   * rthread=(struct rest_thread *) 0;
+	if (!( rthread = (struct rest_thread *) vptr))
+		return( 0 );
+	if (!( xthread = allocate_cords_xthread() ))
+		return(27);
+	else
+	{
+		if ( check_verbose() )
+			printf("occi_thread_create(%u)\n",rthread->pid);
+		xthread = liberate_cords_xthread( xthread );
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ t h r e a d _ r e t r i e v e			*/
+/*	---------------------------------------------------------	*/
+private	int	occi_thread_retrieve( void * vptr )
+{
+	struct	cords_xthread * xthread=(struct cords_xthread *) 0;
+	struct	rest_thread   * rthread=(struct rest_thread *) 0;
+	if (!( rthread = (struct rest_thread *) vptr))
+		return( 0 );
+	else if (!( xthread = allocate_cords_xthread() ))
+		return(27);
+	else
+	{
+		if ( check_verbose() )
+			printf("occi_thread_retrieve(%u)\n",rthread->pid);
+		xthread = liberate_cords_xthread( xthread );
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ t h r e a d _ u p d a t e 			*/
+/*	---------------------------------------------------------	*/
+private	int	occi_thread_update( void * vptr )
+{
+	struct	cords_xthread * xthread=(struct cords_xthread *) 0;
+	struct	rest_thread   * rthread=(struct rest_thread *) 0;
+	if (!( rthread = (struct rest_thread *) vptr))
+		return( 0 );
+	else if (!( xthread = allocate_cords_xthread() ))
+		return(27);
+	else
+	{
+		if ( check_verbose() )
+			printf("occi_thread_update(%u)\n",rthread->pid);
+		xthread = liberate_cords_xthread( xthread );
+		return(0);
+	}
+}
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ t h r e a d _ d e l e t e			*/
+/*	---------------------------------------------------------	*/
+private	int	occi_thread_delete( void * vptr )
+{
+	struct	cords_xthread * xthread=(struct cords_xthread *) 0;
+	struct	rest_thread   * rthread=(struct rest_thread *) 0;
+	if (!( rthread = (struct rest_thread *) vptr))
+		return( 0 );
+	else if (!( xthread = allocate_cords_xthread() ))
+		return(27);
+	else
+	{
+		if ( check_verbose() )
+			printf("occi_thread_delete(%u)\n",rthread->pid);
+		xthread = liberate_cords_xthread( xthread );
+		return(0);
+	}
+}
+
+
+/*	---------------------------------------------------------	*/
+/*		o c c i _ t h r e a d _ o p e r a t i o n 		*/
+/*	---------------------------------------------------------	*/
+private	int	occi_thread_operation( int operation, void * vptr )
+{
+	switch ( operation )
+	{
+	case	1 :	return( occi_thread_create( vptr ) );
+	case	2 :	return( occi_thread_retrieve( vptr ) );
+	case	3 :	return( occi_thread_update( vptr ) );
+	case	4 :	return( occi_thread_delete( vptr ) );
+	}
+}
+
+/*	---------------------------------------------------------	*/
 /*			o c c i _ s e r v e r				*/
 /*	---------------------------------------------------------	*/
 /*	this function is to be called to instance an OCCI server	*/
@@ -2317,7 +2416,8 @@ public	int	occi_server( char * nptr, int port, char * tls, int max,
 		occi_security,
 		(void *) 0,
 		occi_alert_relay,
-		occi_allowed_headers
+		occi_allowed_headers,
+		occi_thread_operation
 	};
 
 	set_default_agent( nptr );

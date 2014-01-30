@@ -20,8 +20,10 @@
 
 #include "restthread.h"
 
+private	pthread_mutex_t restThreadLock=PTHREAD_MUTEX_INITIALIZER;
 private	struct	rest_thread * firstThread=(struct rest_thread *) 0;
 private	struct	rest_thread * lastThread=(struct rest_thread *) 0;
+private	struct	rest_server * rootServer=(struct rest_server *) 0;
 
 /*	-----------------------------------------------------------	*/
 /*		   l o c k _ t h r e a d _ c o n t r o l		*/
@@ -39,6 +41,40 @@ private	void	unlock_rest_thread(struct rest_thread * tptr)
 {
 	pthread_mutex_unlock( &tptr->lock );
 	return;
+}
+
+/*	-----------------------------------------------------------	*/
+/*		   i n s e r t _ r e s t _ t h r e a d			*/
+/*	-----------------------------------------------------------	*/
+private	struct rest_thread * insert_rest_thread( struct rest_thread * tptr )
+{
+	lock_rest_thread(tptr);
+	unlock_rest_thread(tptr);
+	return( tptr );
+}
+
+/*	-----------------------------------------------------------	*/
+/*		   u p d a t e _ r e s t _ t h r e a d			*/
+/*	-----------------------------------------------------------	*/
+private	struct rest_thread * update_rest_thread( struct rest_thread * tptr, int lock )
+{
+	if ( lock )
+		lock_rest_thread(tptr);
+
+	if ( lock )
+		unlock_rest_thread(tptr);
+
+	return( tptr );
+}
+
+/*	-----------------------------------------------------------	*/
+/*		   d e l e t e _ r e s t _ t h r e a d			*/
+/*	-----------------------------------------------------------	*/
+private	struct rest_thread * delete_rest_thread( struct rest_thread * tptr )
+{
+	lock_rest_thread(tptr);
+	unlock_rest_thread(tptr);
+	return( tptr );
 }
 
 /*	-----------------------------------------------------------	*/
@@ -79,6 +115,7 @@ private	void	wait_rest_thread(struct rest_thread * tptr)
 	int	item;
 	lock_rest_thread(tptr);
 	item = tptr->item;
+	tptr->status = _THREAD_IDLE;
 	unlock_rest_thread(tptr);
 	if ( item )
 	{
@@ -90,6 +127,9 @@ private	void	wait_rest_thread(struct rest_thread * tptr)
 		pthread_mutex_lock( &tptr->controlZero );
 		pthread_mutex_unlock( &tptr->controlZero );
 	}
+	lock_rest_thread(tptr);
+	tptr->status = _THREAD_WORKING;
+	unlock_rest_thread(tptr);
 	return;
 }
 
@@ -100,6 +140,8 @@ public struct rest_thread * liberate_rest_thread(struct rest_thread * sptr)
 {
 	if ( sptr )
 	{
+		if ( sptr->reqid )
+			sptr->reqid = liberate( sptr->reqid );
 		sptr = liberate( sptr );
 		pthread_mutex_unlock( &sptr->lock );
 		pthread_mutex_unlock( &sptr->controlOne );
@@ -118,12 +160,15 @@ public struct rest_thread * reset_rest_thread(struct rest_thread * sptr)
 		sptr->previous = (struct rest_thread*) 0;
 		sptr->next = (struct rest_thread*) 0;
 		sptr->id =  (pthread_t) 0;
+		sptr->reqid = (char *) 0;
 		memset(&sptr->lock,0,sizeof( sptr->lock));
 		sptr->client = (struct rest_client *) 0;
 		sptr->request = (struct rest_request *) 0;
 		sptr->item   = 1;
-		sptr->status = 1;
+		sptr->status = _THREAD_IDLE;
 		sptr->started = 0;
+		sptr->pid = getpid();
+		sptr->ppid = getppid();
 		pthread_mutex_lock( &sptr->controlOne );
 	}
 	return(sptr);
@@ -138,7 +183,9 @@ public struct rest_thread * allocate_rest_thread()
 	struct rest_thread * sptr;
 	if (!( sptr = allocate( sizeof( struct rest_thread ) ) ))
 		return( sptr );
-	else	return( reset_rest_thread(sptr) );
+	else if (!( sptr = reset_rest_thread( sptr ) ))
+		return( sptr );
+	else	return( insert_rest_thread(sptr) );
 }
 
 /*	---------------------------------------------------------	*/
@@ -146,15 +193,28 @@ public struct rest_thread * allocate_rest_thread()
 /*	---------------------------------------------------------	*/
 public	int	terminate_rest_thread_manager()
 {
+	struct	rest_thread * tptr;
+	if ( rootServer )
+	{
+		pthread_mutex_lock( &restThreadLock );
+		while ((tptr = firstThread) != (struct rest_thread *) 0)
+		{
+			firstThread = tptr->next;
+			delete_rest_thread( tptr );
+			tptr = liberate_rest_thread( tptr );
+		}
+		pthread_mutex_unlock( &restThreadLock );
+	}
+	rootServer = (struct rest_server *) 0;
 	return(0);
 }
 
 /*	-----------------------------------------------------------	*/
 /*	i n i t i a l i s e _ r e s t _ t h r e a d _ m a n a g e r 	*/
 /*	-----------------------------------------------------------	*/
-public	int	initialise_rest_thread_manager()
+public	int	initialise_rest_thread_manager(struct rest_server * sptr)
 {
-	
+	rootServer = sptr;	
 	firstThread = lastThread = (struct rest_thread *) 0;
 	return( 0 );
 }
@@ -174,6 +234,7 @@ public	struct rest_thread * rest_start_thread
 	/* ------------------------------- */
 	/* attempt to locate a free thread */
 	/* ------------------------------- */
+	pthread_mutex_lock( &restThreadLock );
 	for (	tptr=firstThread; 
 		tptr != (struct rest_thread *) 0;
 		tptr = tptr->next )
@@ -186,18 +247,21 @@ public	struct rest_thread * rest_start_thread
 			break;
 		else	continue;
 	}
+	pthread_mutex_unlock( &restThreadLock );
 
 	/* -------------------------------- */
 	/* allocate and launch a new thread */
 	/* -------------------------------- */
 	if (!( tptr ))
 	{
+		pthread_mutex_lock( &restThreadLock );
+
 		/* --------------------- */
 		/* allocate a new thread */
 		/* --------------------- */
 		if (!( tptr = allocate_rest_thread() ))
 			return( tptr );
-		else	tptr->status = 1;
+		else	tptr->status = _THREAD_IDLE;
 
 		pthread_attr_init( &tptr->attributes);
 
@@ -209,7 +273,10 @@ public	struct rest_thread * rest_start_thread
 				&tptr->attributes,
 				rest_thread_message,
 				(void *) tptr)) > 0 )
+		{
+			pthread_mutex_unlock( &restThreadLock );
 			return( liberate_rest_thread( tptr ) );
+		}
 		else
 		{
 			/* --------------------- */
@@ -219,6 +286,7 @@ public	struct rest_thread * rest_start_thread
 				firstThread = tptr;
 			else 	tptr->previous->next = tptr;
 			lastThread = tptr;
+			pthread_mutex_unlock( &restThreadLock );
 		}
 	}
 
@@ -231,6 +299,7 @@ public	struct rest_thread * rest_start_thread
 
 	tptr->client = cptr;
 	tptr->request = rptr;
+	update_rest_thread( tptr,0 );
 
 	unlock_rest_thread( tptr );
 

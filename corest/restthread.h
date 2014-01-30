@@ -18,15 +18,21 @@
 #ifndef	_rest_thread_h
 #define	_rest_thread_h
 
+#define	_THREAD_IDLE	1
+#define	_THREAD_WORKING	2
+
 struct	rest_thread
 {
 	struct	rest_thread * 	previous;
 	struct	rest_thread * 	next;
 	struct 	rest_client *	client;
 	struct 	rest_request *	request;
+	char *			reqid;
 	int			status;
 	int			started;
 	int			item;
+	int			pid;
+	int			ppid;
 	pthread_mutex_t 	controlOne;
 	pthread_mutex_t 	controlZero;
 	pthread_mutex_t 	lock;

@@ -132,6 +132,8 @@ public int	comodel_category_filter( struct occi_category * cptr )
 		return(0);
 	else if (!( strcmp( cptr->id, "link" ) ))
 		return(0);
+	else if (!( strcmp( cptr->id, "thread" ) ))
+		return(0);
 	else if (!( strcmp( cptr->id, "entity" ) ))
 		return(0);
 	else if (!( strcmp( cptr->id, "resource" ) ))
@@ -636,6 +638,13 @@ private	int	comodel_by_category( struct xml_element * eptr )
 			optr->class    = comodel_attribute(eptr,"class");
 			optr->rel      = comodel_attribute(eptr,"rel");
 			optr->location = comodel_attribute(eptr,"location");
+
+			if ((vptr = comodel_attribute(eptr,"access")) != (char *) 0)
+			{
+				if (!( strcasecmp( vptr, "provider" ) ))
+					optr->access = _OCCI_PROVIDER;
+				liberate( vptr );
+			}
 
 			if (!( optr->version = comodel_attribute(eptr,"version") ))
 				optr->version = allocate_string(_COMODEL_VERSION);

@@ -291,6 +291,9 @@ private	struct rest_server * 	rest_open_server( int port, char * tls, int max, s
 		if ( iptr->alert )
 			sptr->method.alert = iptr->alert;
 		else	sptr->method.alert = 0;
+		if ( iptr->thread )
+			sptr->method.thread = iptr->thread;
+		else	sptr->method.thread = 0;
 		return( sptr );
 		}
 }
@@ -2715,6 +2718,7 @@ public	int	rest_server( char * nptr, int port, char * tls, int max, struct rest_
 	int	status;
 	struct	rest_server * sptr;
 
+
 	if ( tls )
 		if (!( strlen(tls) ))
 			tls = (char *) 0;
@@ -2728,6 +2732,8 @@ public	int	rest_server( char * nptr, int port, char * tls, int max, struct rest_
 	}
 	else
 	{
+		initialise_rest_thread_manager(sptr);
+
 		/* ----------------------------------------------- */
 		/* allow application to see server before starting */
 		/* ----------------------------------------------- */
@@ -2800,6 +2806,7 @@ public	int	rest_server( char * nptr, int port, char * tls, int max, struct rest_
 		if ( check_verbose() )
 			printf("   REST Server %s : shuting down\n",sptr->name);
 		rest_liberate_server( sptr );
+		terminate_rest_thread_manager();
 		return(0);
 	}
 }

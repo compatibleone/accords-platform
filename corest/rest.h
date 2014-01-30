@@ -119,6 +119,7 @@ struct	rest_interface
 						   struct rest_client * cptr, 
 						   struct rest_request * rptr, 
 						   struct rest_response * aptr);
+	int			(*thread)(int operation, void * i);
 };
 
 struct	rest_client

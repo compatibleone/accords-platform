@@ -224,6 +224,124 @@ private	int	generate_category_action_script( struct occi_category * cptr, char *
 	
 
 /*	--------------------------------------------------	*/
+/*	g e n e r a t e _ c a t e g o r y  _ m e t h o d s 	*/
+/*	--------------------------------------------------	*/
+private	void	generate_category_methods( FILE * h, struct occi_category * cptr, char * prefix )
+{
+	FILE *  hh;
+	char *	sptr;
+	sptr = underscore(cptr->id);
+	char	buffer[1024];
+
+	sprintf(buffer,"create_%s.c",sptr);
+	if (!( hh = fopen( buffer,"r" ) ))
+	{
+		if (( hh = fopen( buffer, "w" )) != (FILE *) 0)
+		{
+			fprintf(hh,"#ifndef _create_%s_c\n",sptr);
+			fprintf(hh,"#define _create_%s_c\n",sptr);
+			fprintf(hh,"private int create_%s(struct occi_category * optr, void * vptr, struct rest_request * rptr)\n",sptr);
+			fprintf(hh,"{\n");
+			fprintf(hh,"\tstruct occi_kind_node * nptr;\n");
+			fprintf(hh,"\tstruct os_subscription * subptr=(struct os_subscription *) 0;\n");
+			fprintf(hh,"\tstruct cords_%s * pptr;\n",sptr);
+			fprintf(hh,"\tif (!( nptr = vptr ))\n");
+			fprintf(hh,"\t\treturn(0);\n");
+			fprintf(hh,"\telse if (!( pptr = nptr->contents ))\n");
+			fprintf(hh,"\t\treturn(0);\n");
+			fprintf(hh,"\telse\treturn(0);\n");
+			fprintf(hh,"}\n");
+			fprintf(hh,"#endif /* _create_%s_c */\n",sptr);
+			fclose(hh);
+		}
+	}
+	else	fclose(hh);
+	fprintf(h,"#include \"%s\"\n",buffer);
+
+	sprintf(buffer,"delete_%s.c",sptr);
+	if (!( hh = fopen( buffer,"r" ) ))
+	{
+		if (( hh = fopen( buffer, "w" )) != (FILE *) 0)
+		{
+			fprintf(hh,"#ifndef _delete_%s_c\n",sptr);
+			fprintf(hh,"#define _delete_%s_c\n",sptr);
+			fprintf(hh,"private int delete_%s(struct occi_category * optr, void * vptr, struct rest_request * rptr)\n",sptr);
+			fprintf(hh,"{\n");
+			fprintf(hh,"\tstruct occi_kind_node * nptr;\n");
+			fprintf(hh,"\tstruct os_subscription * subptr=(struct os_subscription *) 0;\n");
+			fprintf(hh,"\tstruct cords_%s * pptr;\n",sptr);
+			fprintf(hh,"\tif (!( nptr = vptr ))\n");
+			fprintf(hh,"\t\treturn(0);\n");
+			fprintf(hh,"\telse if (!( pptr = nptr->contents ))\n");
+			fprintf(hh,"\t\treturn(0);\n");
+			fprintf(hh,"\telse\treturn(0);\n");
+			fprintf(hh,"}\n");
+			fprintf(hh,"#endif /* _delete_%s_c */\n",sptr);
+			fclose(hh);
+		}
+	}
+	else	fclose(hh);
+	fprintf(h,"#include \"%s\"\n",buffer);
+
+	sprintf(buffer,"retrieve_%s.c",sptr);
+	if (!( hh = fopen( buffer,"r" ) ))
+	{
+		if (( hh = fopen( buffer, "w" )) != (FILE *) 0)
+		{
+			fprintf(hh,"#ifndef _retrieve_%s_c\n",sptr);
+			fprintf(hh,"#define _retrieve_%s_c\n",sptr);
+			fprintf(hh,"private int retrieve_%s(struct occi_category * optr, void * vptr, struct rest_request * rptr)\n",sptr);
+			fprintf(hh,"{\n");
+			fprintf(hh,"\tstruct occi_kind_node * nptr;\n");
+			fprintf(hh,"\tstruct os_subscription * subptr=(struct os_subscription *) 0;\n");
+			fprintf(hh,"\tstruct cords_%s * pptr;\n",sptr);
+			fprintf(hh,"\tif (!( nptr = vptr ))\n");
+			fprintf(hh,"\t\treturn(0);\n");
+			fprintf(hh,"\telse if (!( pptr = nptr->contents ))\n");
+			fprintf(hh,"\t\treturn(0);\n");
+			fprintf(hh,"\telse\treturn(0);\n");
+			fprintf(hh,"}\n");
+			fprintf(hh,"#endif /* _retrieve_%s_c */\n",sptr);
+			fclose(hh);
+		}
+	}
+	else	fclose(hh);
+	fprintf(h,"#include \"%s\"\n",buffer);
+
+	sprintf(buffer,"update_%s.c",sptr);
+	if (!( hh = fopen( buffer,"r" ) ))
+	{
+		if (( hh = fopen( buffer, "w" )) != (FILE *) 0)
+		{
+			fprintf(hh,"#ifndef _update_%s_c\n",sptr);
+			fprintf(hh,"#define _update_%s_c\n",sptr);
+			fprintf(hh,"private int update_%s(struct occi_category * optr, void * vptr, struct rest_request * rptr)\n",sptr);
+			fprintf(hh,"{\n");
+			fprintf(hh,"\tstruct occi_kind_node * nptr;\n");
+			fprintf(hh,"\tstruct os_subscription * subptr=(struct os_subscription *) 0;\n");
+			fprintf(hh,"\tstruct cords_%s * pptr;\n",sptr);
+			fprintf(hh,"\tif (!( nptr = vptr ))\n");
+			fprintf(hh,"\t\treturn(0);\n");
+			fprintf(hh,"\telse if (!( pptr = nptr->contents ))\n");
+			fprintf(hh,"\t\treturn(0);\n");
+			fprintf(hh,"\telse\treturn(0);\n");
+			fprintf(hh,"}\n");
+			fprintf(hh,"#endif /* _update_%s_c */\n",sptr);
+			fclose(hh);
+		}
+	}
+	else	fclose(hh);
+	fprintf(h,"#include \"%s\"\n",buffer);
+
+	fprintf(h,"private struct occi_interface %s_interface = {\n",sptr);
+   	fprintf(h,"\tcreate_%s,\n",sptr);
+	fprintf(h,"\tretrieve_%s,\n",sptr);
+	fprintf(h,"\tupdate_%s,\n",sptr);
+	fprintf(h,"\tdelete_%s };\n",sptr);
+	return;
+}
+
+/*	--------------------------------------------------	*/
 /*	g e n e r a t e _ c a t e g o r y  _ a c t i o n s 	*/
 /*	--------------------------------------------------	*/
 private	void	generate_category_actions( FILE * h, struct occi_category * cptr, char * prefix )
@@ -302,6 +420,7 @@ private	void	generate_add_category( FILE * h, struct occi_category * cptr )
 	struct	occi_action * aptr;
 	char *	nptr;
 	char *	sptr;
+	int	isprocci=0;
 	if (!( comodel_category_filter( cptr ) ))
 		return;
 	sptr = underscore(cptr->id);
@@ -311,6 +430,10 @@ private	void	generate_add_category( FILE * h, struct occi_category * cptr )
 	fprintf(h,"\t\tfirst = optr;\n");
 	fprintf(h,"\telse\toptr->previous->next = optr;\n");
 	fprintf(h,"\tlast = optr;\n");
+	fprintf(h,"\toptr->callback = &%s_interface;\n",sptr);
+	if ( cptr->access & _OCCI_PROVIDER )
+		fprintf(h,"\toptr->access  |= _OCCI_PROVIDER;\n");
+
 	for (	aptr=cptr->firstact;
 		aptr != (struct occi_action *) 0;
 		aptr = aptr->next )
@@ -345,7 +468,10 @@ private	void	generate_file_actions( FILE * h, struct occi_category * cptr, char 
 	for (;	
 		cptr != (struct occi_category *) 0; 
 		cptr = cptr->next )
+	{
 		generate_category_actions(h, cptr, prefix );
+		generate_category_methods(h, cptr, prefix );
+	}
 	return;
 }
 
