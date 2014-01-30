@@ -2302,14 +2302,26 @@ private	int	occi_thread_create( void * vptr )
 	struct	rest_request  * rptr=(struct rest_request *) 0;
 	struct	rest_header   * hptr=(struct rest_header *) 0;
 	struct	rest_response * aptr=(struct rest_response *) 0;
+	struct	rest_client   * cptr=(struct rest_client *) 0;
 	char	buffer[1024];
 	if (!( OcciServerThreadManager ))
 		return( 0 );
-	if (!( rthread = (struct rest_thread *) vptr))
+	else if (!( rthread = (struct rest_thread *) vptr))
 		return( 0 );
+	else if (!( vptr = get_identity() ))
+		return(0);
 	else if (!( rptr = allocate_rest_request() ))
 		return( 27 );
-
+	else if (!( cptr = allocate_rest_client() ))
+		return( 27 );
+        else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
+		return( 27 );
+	else if (!( hptr = rest_request_header( rptr, _HTTP_HOST, vptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(27);
+	}
+		
 	sprintf(buffer,"/thread/");
 
 	if ((!( rptr->object = allocate_string( buffer )))
@@ -2319,19 +2331,31 @@ private	int	occi_thread_create( void * vptr )
 		return(27);
 	}
 
-	sprintf(buffer,"occi.xthread.pid=%u",rthread->pid);
+	sprintf(buffer,"occi.thread.pid=%u",rthread->pid);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 	{
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
 	}
 
-	aptr = occi_invoke_post( OcciServerThreadManager, (struct rest_client *) 0, rptr );
-
-	if ( check_verbose() )
-		printf("occi_thread_create(%u)\n",rthread->pid);
-	rptr = liberate_rest_request( rptr );
-	return(0);
+	if (!(aptr = occi_invoke_post( OcciServerThreadManager, cptr, rptr )))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(0);
+	}
+	else if (!( hptr = rest_resolve_header( aptr->first, "X-OCCI-Location") ))
+	{
+		aptr = liberate_rest_response( aptr );
+		rptr = liberate_rest_request( rptr );
+		return(0);
+	}
+	else 
+	{
+		rthread->reqid = allocate_string( hptr->value );
+		aptr = liberate_rest_response( aptr );
+		rptr = liberate_rest_request( rptr );
+		return(0);
+	}
 }
 
 /*	---------------------------------------------------------	*/
@@ -2343,13 +2367,25 @@ private	int	occi_thread_retrieve( void * vptr )
 	struct	rest_request  * rptr=(struct rest_request *) 0;
 	struct	rest_response * aptr=(struct rest_response *) 0;
 	struct	rest_header   * hptr=(struct rest_header *) 0;
+	struct	rest_client   * cptr=(struct rest_client *) 0;
 	char	buffer[1024];
 	if (!( OcciServerThreadManager ))
 		return( 0 );
-	if (!( rthread = (struct rest_thread *) vptr))
+	else if (!( rthread = (struct rest_thread *) vptr))
 		return( 0 );
+	else if (!( vptr = get_identity() ))
+		return(0);
 	else if (!( rptr = allocate_rest_request() ))
 		return( 27 );
+	else if (!( cptr = allocate_rest_client() ))
+		return( 27 );
+        else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
+		return( 27 );
+	else if (!( hptr = rest_request_header( rptr, _HTTP_HOST, vptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(27);
+	}
 
 	sprintf(buffer,"/thread/%s",rthread->reqid);
 
@@ -2367,10 +2403,9 @@ private	int	occi_thread_retrieve( void * vptr )
 		return( 27 );
 	}
 
-	aptr = occi_invoke_get( OcciServerThreadManager, (struct rest_client *) 0, rptr );
+	aptr = occi_invoke_get( OcciServerThreadManager,cptr, rptr );
 
-	if ( check_verbose() )
-		printf("occi_thread_retrieve(%u)\n",rthread->pid);
+	aptr = liberate_rest_response( aptr );
 	rptr = liberate_rest_request( rptr );
 	return(0);
 
@@ -2385,13 +2420,25 @@ private	int	occi_thread_update( void * vptr )
 	struct	rest_request  * rptr=(struct rest_request *) 0;
 	struct	rest_response * aptr=(struct rest_response *) 0;
 	struct	rest_header   * hptr=(struct rest_header *) 0;
+	struct	rest_client   * cptr=(struct rest_client *) 0;
 	char	buffer[1024];
 	if (!( OcciServerThreadManager ))
 		return( 0 );
-	if (!( rthread = (struct rest_thread *) vptr))
+	else if (!( rthread = (struct rest_thread *) vptr))
 		return( 0 );
+	else if (!( vptr = get_identity() ))
+		return(0);
 	else if (!( rptr = allocate_rest_request() ))
 		return( 27 );
+	else if (!( cptr = allocate_rest_client() ))
+		return( 27 );
+        else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
+		return( 27 );
+	else if (!( hptr = rest_request_header( rptr, _HTTP_HOST, vptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(27);
+	}
 
 	sprintf(buffer,"/thread/%s",rthread->reqid);
 
@@ -2409,17 +2456,16 @@ private	int	occi_thread_update( void * vptr )
 		return( 27 );
 	}
 
-	sprintf(buffer,"occi.xthread.pid=%u",rthread->pid);
+	sprintf(buffer,"occi.thread.pid=%u",rthread->pid);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 	{
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
 	}
 
-	aptr = occi_invoke_put( OcciServerThreadManager, (struct rest_client *) 0, rptr );
+	aptr = occi_invoke_put( OcciServerThreadManager, cptr, rptr );
 
-	if ( check_verbose() )
-		printf("occi_thread_update(%u)\n",rthread->pid);
+	aptr = liberate_rest_response( aptr );
 	rptr = liberate_rest_request( rptr );
 	return(0);
 }
@@ -2433,13 +2479,25 @@ private	int	occi_thread_delete( void * vptr )
 	struct	rest_request  * rptr=(struct rest_request *) 0;
 	struct	rest_response * aptr=(struct rest_response *) 0;
 	struct	rest_header   * hptr=(struct rest_header *) 0;
+	struct	rest_client   * cptr=(struct rest_client *) 0;
 	char	buffer[1024];
 	if (!( OcciServerThreadManager ))
 		return( 0 );
-	if (!( rthread = (struct rest_thread *) vptr))
+	else if (!( rthread = (struct rest_thread *) vptr))
 		return( 0 );
+	else if (!( vptr = get_identity() ))
+		return(0);
 	else if (!( rptr = allocate_rest_request() ))
 		return( 27 );
+	else if (!( cptr = allocate_rest_client() ))
+		return( 27 );
+        else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
+		return( 27 );
+	else if (!( hptr = rest_request_header( rptr, _HTTP_HOST, vptr ) ))
+	{
+		rptr = liberate_rest_request( rptr );
+		return(27);
+	}
 
 	sprintf(buffer,"/thread/%s",rthread->reqid);
 
@@ -2457,10 +2515,9 @@ private	int	occi_thread_delete( void * vptr )
 		return( 27 );
 	}
 
-	aptr = occi_invoke_delete( OcciServerThreadManager, (struct rest_client *) 0, rptr );
+	aptr = occi_invoke_delete( OcciServerThreadManager, cptr, rptr );
 
-	if ( check_verbose() )
-		printf("occi_thread_delete(%u)\n",rthread->pid);
+	aptr = liberate_rest_response( aptr );
 	rptr = liberate_rest_request( rptr );
 	return(0);
 

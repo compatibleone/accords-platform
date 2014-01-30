@@ -48,7 +48,14 @@ private	void	unlock_rest_thread(struct rest_thread * tptr)
 /*	-----------------------------------------------------------	*/
 private	struct rest_thread * insert_rest_thread( struct rest_thread * tptr )
 {
+	if (!( rootServer ))
+		return( tptr );
+
+	if (!( rootServer->method.thread ))
+		return( tptr );
+
 	lock_rest_thread(tptr);
+	(void) (*rootServer->method.thread)(1,tptr);
 	unlock_rest_thread(tptr);
 	return( tptr );
 }
@@ -58,8 +65,16 @@ private	struct rest_thread * insert_rest_thread( struct rest_thread * tptr )
 /*	-----------------------------------------------------------	*/
 private	struct rest_thread * update_rest_thread( struct rest_thread * tptr, int lock )
 {
+	if (!( rootServer ))
+		return( tptr );
+
+	if (!( rootServer->method.thread ))
+		return( tptr );
+
 	if ( lock )
 		lock_rest_thread(tptr);
+
+	(void) (*rootServer->method.thread)(3,tptr);
 
 	if ( lock )
 		unlock_rest_thread(tptr);
@@ -72,7 +87,14 @@ private	struct rest_thread * update_rest_thread( struct rest_thread * tptr, int 
 /*	-----------------------------------------------------------	*/
 private	struct rest_thread * delete_rest_thread( struct rest_thread * tptr )
 {
+	if (!( rootServer ))
+		return( tptr );
+
+	if (!( rootServer->method.thread ))
+		return( tptr );
+
 	lock_rest_thread(tptr);
+	(void) (*rootServer->method.thread)(4,tptr);
 	unlock_rest_thread(tptr);
 	return( tptr );
 }
