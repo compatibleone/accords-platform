@@ -16,7 +16,7 @@ cool_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CF
 
 # Create auto-generated model files
 
-model_h_files = job.h workload.h
+model_h_files = job.h workload.h xthread.h
 
 include $(top_srcdir)/tools/Makefile_generate_model.am
 

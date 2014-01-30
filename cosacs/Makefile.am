@@ -16,7 +16,7 @@ cosacs_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(
 
 # Create auto-generated model files
 
-model_h_files = metadata.h file.h script.h probe.h
+model_h_files = metadata.h file.h script.h probe.h xthread.h 
 
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
