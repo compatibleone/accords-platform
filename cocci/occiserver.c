@@ -2079,6 +2079,8 @@ private	struct occi_category * check_occi_conformity( struct occi_category * cat
 			core |= 2;
 		else if (!( strcmp( cptr->id, "link" ) ))
 			core |= 4;
+		else if (!( strcmp( cptr->id, "thread" ) ))
+			core |= 8;
 	}
 	if (!( core & 1 ))
 	{
@@ -2131,6 +2133,36 @@ private	struct occi_category * check_occi_conformity( struct occi_category * cat
 		if (!( optr = occi_add_attribute( optr, "source", 0, 0 ) ))
 			return( category );
 		else if (!( optr = occi_add_attribute( optr, "target", 0, 0 ) ))
+			return( category );
+		else
+		{
+			optr->access = _OCCI_PRIVATE;
+			category = append_category_list( category, optr );
+		}
+	}
+	if (!( core & 8 ))
+	{
+		if (!( optr = occi_create_category(
+			"occi",
+			"thread",
+			"http://schemas.ogf.org/core#",
+			"kind",
+			"http://scheme.ogf.org/occi/thread#",
+			"Accords Platform OCCI Thread" ) )) 
+			return( category );
+		if (!( optr = occi_add_attribute( optr, "identity", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "client", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "request", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "pid", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "started", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "item", 0, 0 ) ))
+			return( category );
+		else if (!( optr = occi_add_attribute( optr, "status", 0, 0 ) ))
 			return( category );
 		else
 		{
