@@ -150,6 +150,8 @@ private	void	wait_rest_thread(struct rest_thread * tptr)
 		pthread_mutex_unlock( &tptr->controlZero );
 	}
 	lock_rest_thread(tptr);
+	tptr->started = time((long *) 0);
+	tptr->activity++;
 	tptr->status = _THREAD_WORKING;
 	unlock_rest_thread(tptr);
 	return;
@@ -189,6 +191,7 @@ public struct rest_thread * reset_rest_thread(struct rest_thread * sptr)
 		sptr->item   = 1;
 		sptr->status = _THREAD_IDLE;
 		sptr->started = 0;
+		sptr->activity= 0;
 		sptr->pid = getpid();
 		sptr->ppid = getppid();
 		pthread_mutex_lock( &sptr->controlOne );

@@ -2306,13 +2306,16 @@ private	int	occi_thread_members( struct rest_request * rptr, struct rest_thread 
 	sprintf(buffer,"occi.thread.started=%u",tptr->started);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 		return( 27 );
+	sprintf(buffer,"occi.thread.activity=%u",tptr->activity);
+	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+		return( 27 );
 	sprintf(buffer,"occi.thread.item=%u",tptr->item);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 		return( 27 );
 	sprintf(buffer,"occi.thread.state=%u",tptr->status);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 		return( 27 );
-	sprintf(buffer,"occi.thread.state=\"%s(T%s)\"",get_identity(),tptr->id);
+	sprintf(buffer,"occi.thread.identity=\"%s(T%u)\"",get_identity(),pthread_self());
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 		return( 27 );
 	if ( tptr->request )
@@ -2330,6 +2333,8 @@ private	int	occi_thread_members( struct rest_request * rptr, struct rest_thread 
 private	int	occi_thread_create( void * vptr )
 {
 	int	status;
+	int	i;
+	int	l;
 	struct	rest_thread   * rthread=(struct rest_thread *) 0;
 	struct	rest_request  * rptr=(struct rest_request *) 0;
 	struct	rest_header   * hptr=(struct rest_header *) 0;
@@ -2382,7 +2387,13 @@ private	int	occi_thread_create( void * vptr )
 	}
 	else 
 	{
-		rthread->reqid = allocate_string( hptr->value );
+		if ( hptr->value )
+		{
+			for (l=0,i=0; *(hptr->value +i) != 0; i++)
+				if (*(hptr->value+i) == '/')
+					l = (i+1);
+			rthread->reqid = allocate_string( (hptr->value+l) );
+		}
 		aptr = liberate_rest_response( aptr );
 		rptr = liberate_rest_request( rptr );
 		return(0);
@@ -2403,6 +2414,8 @@ private	int	occi_thread_retrieve( void * vptr )
 	if (!( OcciServerThreadManager ))
 		return( 0 );
 	else if (!( rthread = (struct rest_thread *) vptr))
+		return( 0 );
+	else if (!( rthread->reqid ))
 		return( 0 );
 	else if (!( vptr = get_identity() ))
 		return(0);
@@ -2457,6 +2470,8 @@ private	int	occi_thread_update( void * vptr )
 	if (!( OcciServerThreadManager ))
 		return( 0 );
 	else if (!( rthread = (struct rest_thread *) vptr))
+		return( 0 );
+	else if (!( rthread->reqid ))
 		return( 0 );
 	else if (!( vptr = get_identity() ))
 		return(0);
@@ -2515,6 +2530,8 @@ private	int	occi_thread_delete( void * vptr )
 	if (!( OcciServerThreadManager ))
 		return( 0 );
 	else if (!( rthread = (struct rest_thread *) vptr))
+		return( 0 );
+	else if (!( rthread->reqid ))
 		return( 0 );
 	else if (!( vptr = get_identity() ))
 		return(0);

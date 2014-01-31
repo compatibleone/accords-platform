@@ -30,6 +30,7 @@ struct	rest_thread
 	char *			reqid;
 	int			status;
 	int			started;
+	int			activity;
 	int			item;
 	int			pid;
 	int			ppid;

@@ -1341,6 +1341,7 @@
 	        <attribute name='pid' type='int' required='false' immutable='false'/>
 	        <attribute name='status' type='int' required='false' immutable='false'/>
 	        <attribute name='started' type='int' required='false' immutable='false'/>
+	        <attribute name='activity' type='int' required='false' immutable='false'/>
 	        <attribute name='item' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
