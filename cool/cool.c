@@ -25,7 +25,6 @@
 #include "rest.h"
 #include "restthread.h"
 #include "occi.h"
-#include "occibuilder.h"
 #include "occiclient.h"
 #include "document.h"
 #include "cool.h"
