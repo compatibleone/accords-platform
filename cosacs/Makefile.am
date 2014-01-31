@@ -16,7 +16,7 @@ cosacs_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(
 
 # Create auto-generated model files
 
-model_h_files = metadata.h file.h script.h probe.h xthread.h 
+model_h_files = metadata.h file.h script.h probe.h 
 
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
@@ -32,5 +32,16 @@ occixlink.c xlink.c: xlink.h
 all_xlink_files = xlink.c xlink.h xlink.xsd occixlink.c
 CLEANFILES += $(all_xlink_files)
 
-cosacs.c: $(model_c_files) xlink.c
+xthread.h : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN)
+	$(MODEL_CODEGEN) -t Header -o . $(top_srcdir)/model -f $@
+
+occixthread.c xthread.c: xthread.h
+	$(MODEL_STRUKT) --license $(srcdir)/../strukt/license.h --nosql --cords kind $(subst .c,,$@)
+	mv $@ occi$@
+	$(MODEL_STRUKT) --license $(srcdir)/../strukt/license.h --nosql --xml --occi $(subst .c,,$@)
+
+all_xthread_files = xthread.c xthread.h xthread.xsd occixthread.c
+CLEANFILES += $(all_xthread_files)
+
+cosacs.c: $(model_c_files) xlink.c xthread.c
 

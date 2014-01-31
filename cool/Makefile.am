@@ -12,11 +12,11 @@ EXTRA_DIST = cool.h
 
 cool_SOURCES = cool.c
 cool_LDFLAGS = $(LDFLAGS_UUID) $(LDFLAGS_SSL) $(LDFLAGS_THREADS) $(LD_COPABR) $(LD_COCCI) $(LD_OCCI) $(LD_COREST) $(LD_COXML) $(LD_PUBOCCI)
-cool_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_CORDS) $(CFLAGS_COCCI) $(CFLAGS_COPABR) $(CFLAGS_PUBOCCI) $(CFLAGS_COMONS)
+cool_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_BROKER) $(CFLAGS_OCCI) $(CFLAGS_COXML) $(CFLAGS_COCCI) $(CFLAGS_COPABR) $(CFLAGS_PUBOCCI) $(CFLAGS_COMONS)
 
 # Create auto-generated model files
 
-model_h_files = job.h workload.h xthread.h
+model_h_files = job.h workload.h 
 
 include $(top_srcdir)/tools/Makefile_generate_model.am
 
@@ -28,9 +28,19 @@ occixlink.c xlink.c: xlink.h
 	$(MODEL_STRUKT) --license $(srcdir)/../strukt/license.h --nosql --cords link $(subst .c,,$@)
 	mv $@ occi$@
 	$(MODEL_STRUKT) --license $(srcdir)/../strukt/license.h --nosql --xml --occi $(subst .c,,$@)
-
 all_xlink_files = xlink.c xlink.h xlink.xsd occixlink.c
 CLEANFILES += $(all_xlink_files)
 
-cool.c: $(model_c_files) xlink.c
+xthread.h : %.h : $(top_srcdir)/model/*.xml $(MODEL_CODEGEN)
+	$(MODEL_CODEGEN) -t Header -o . $(top_srcdir)/model -f $@
+
+occixthread.c xthread.c: xthread.h
+	$(MODEL_STRUKT) --license $(srcdir)/../strukt/license.h --nosql --cords kind $(subst .c,,$@)
+	mv $@ occi$@
+	$(MODEL_STRUKT) --license $(srcdir)/../strukt/license.h --nosql --xml --occi $(subst .c,,$@)
+
+all_xthread_files = xthread.c xthread.h xthread.xsd occixthread.c
+CLEANFILES += $(all_xthread_files)
+
+cool.c: $(model_c_files) xlink.c xthread.c
 
