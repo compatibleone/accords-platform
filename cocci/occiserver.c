@@ -2294,10 +2294,42 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 }
 
 /*	---------------------------------------------------------	*/
+/*		o c c i _ t h r e a d _ m e m b e r s			*/
+/*	---------------------------------------------------------	*/
+private	int	occi_thread_members( struct rest_request * rptr, struct rest_thread * tptr )
+{
+	struct	rest_header   * hptr=(struct rest_header *) 0;
+	char	buffer[1024];
+	sprintf(buffer,"occi.thread.pid=%u",tptr->pid);
+	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+		return( 27 );
+	sprintf(buffer,"occi.thread.started=%u",tptr->started);
+	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+		return( 27 );
+	sprintf(buffer,"occi.thread.item=%u",tptr->item);
+	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+		return( 27 );
+	sprintf(buffer,"occi.thread.state=%u",tptr->status);
+	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+		return( 27 );
+	sprintf(buffer,"occi.thread.state=\"%s(T%s)\"",get_identity(),tptr->id);
+	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+		return( 27 );
+	if ( tptr->request )
+	{
+		sprintf(buffer,"occi.thread.request=\"%s %s\"",tptr->request->method,tptr->request->object);
+		if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+			return( 27 );
+	}
+	return( 0 );
+}
+
+/*	---------------------------------------------------------	*/
 /*		o c c i _ t h r e a d _ c r e a t e			*/
 /*	---------------------------------------------------------	*/
 private	int	occi_thread_create( void * vptr )
 {
+	int	status;
 	struct	rest_thread   * rthread=(struct rest_thread *) 0;
 	struct	rest_request  * rptr=(struct rest_request *) 0;
 	struct	rest_header   * hptr=(struct rest_header *) 0;
@@ -2331,8 +2363,7 @@ private	int	occi_thread_create( void * vptr )
 		return(27);
 	}
 
-	sprintf(buffer,"occi.thread.pid=%u",rthread->pid);
-	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+	if ((status = occi_thread_members( rptr, rthread )) != 0)
 	{
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
@@ -2416,6 +2447,7 @@ private	int	occi_thread_retrieve( void * vptr )
 /*	---------------------------------------------------------	*/
 private	int	occi_thread_update( void * vptr )
 {
+	int	status;
 	struct	rest_thread   * rthread=(struct rest_thread *) 0;
 	struct	rest_request  * rptr=(struct rest_request *) 0;
 	struct	rest_response * aptr=(struct rest_response *) 0;
@@ -2456,8 +2488,7 @@ private	int	occi_thread_update( void * vptr )
 		return( 27 );
 	}
 
-	sprintf(buffer,"occi.thread.pid=%u",rthread->pid);
-	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+	if ((status = occi_thread_members( rptr, rthread )) != 0)
 	{
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
