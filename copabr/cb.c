@@ -1857,7 +1857,8 @@ private	char * 	cords_contract_provider(
 		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "node", id ) ))
 		return((char *) 0);
-	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "zone", App->selector.zone ) ))
+	else if (( App->selector.zone ) 
+	     && (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "zone", App->selector.zone ) )))
 		return((char *) 0);
 	else if (!( qptr = cords_add_provider_attribute( qptr, cptr->value, "account", App->account ) ))
 		return((char *) 0);
@@ -2144,7 +2145,8 @@ public	struct	xml_element * 	cords_build_contract(
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_NODE, node ) ))
 		return(document_drop( eptr ));
-	else if (!( aptr = document_add_atribut( eptr, "zone", zone      ) ))
+	if (( rest_valid_string( zone ) )
+	&& (!( aptr = document_add_atribut( eptr, "zone", zone      ) )))
 		return(document_drop( eptr ));
 	else if (!( aptr = document_add_atribut( eptr, _CORDS_AGREEMENT, ( agreement ? agreement : "") ) ))
 		return(document_drop( eptr ));
