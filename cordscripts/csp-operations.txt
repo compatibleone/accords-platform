@@ -19,6 +19,7 @@ function	OperationMenu()
 	"<tr>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-penalties.txt&ouput=HTML'>Penalties</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-activities.txt&ouput=HTML'>Activities</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-metrics.txt&ouput=HTML'>Metrics</a>".display();
 	"<tr>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-events.txt&ouput=HTML'>Events</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-alerts.txt&ouput=HTML'>Alerts</a>".display();
