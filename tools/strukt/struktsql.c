@@ -420,7 +420,7 @@ private	void	generate_file_description( FILE * h )
 		{
 			if (!( strcmp( iptr->basic, "int" ) ))
 				sprintf(buffer, "%s _%s INTEGER",(xptr ? "," : " ("),iptr->name);
-			else 	sprintf(buffer, "%s _%s CHAR(128)",(xptr ? "," : " ("),iptr->name);
+			else 	sprintf(buffer, "%s _%s CHAR(255)",(xptr ? "," : " ("),iptr->name);
 			if (!( wptr = allocate( strlen( xptr ) + strlen( buffer ) + 3 ) ))
 				break;
 			else	sprintf(wptr,"%s%s",xptr,buffer);
