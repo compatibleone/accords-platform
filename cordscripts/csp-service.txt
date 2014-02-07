@@ -67,7 +67,8 @@
 
 		$m = "<tr><td class=title colspan=7>Service</td></tr>";
 		$m.display();
-		$m = "<tr><td><b>Service Reference</b><td colspan=4>"#$service#"</td>";
+		$m = "<tr><td><b>Service Reference</b><td colspan=4>";
+		$m = $m #"<a href='"#$service#"'>"#$service#"</a></td>";
 		$m.display();
 		$state = $record["occi.service.state"];
 		$m = "<td>&nbsp;<td><form action='dashboard.php' method=POST><input type=hidden name=service value='service/"#$sid#"'>";
