@@ -5973,6 +5973,8 @@ public struct cordscript_context * compile_cordscript_file( char * expression, i
 	char 	*	lptr;
 	int		argi;
 	char	buffer[8192];
+	sprintf(buffer,"cordscript:%s",expression);
+	rest_log_message( buffer );
 	if (!( h = fopen( expression , "r" ) ))
 		return((struct cordscript_context *) 0);
 	else if (!( cptr = allocate_cordscript_context() ))
