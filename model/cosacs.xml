@@ -71,11 +71,14 @@
 	<category term='xthread' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/xthread/' rel='http://schemas.ogf.org/occi/core#resource'>
 	    <attributes>
 	        <attribute name='identity' type='string' required='false' immutable='false'/>
+	        <attribute name='host' type='string' required='false' immutable='false'/>
 	        <attribute name='client' type='string' required='false' immutable='false'/>
 	        <attribute name='request' type='string' required='false' immutable='false'/>
+	        <attribute name='response' type='string' required='false' immutable='false'/>
 	        <attribute name='pid' type='int' required='false' immutable='false'/>
 	        <attribute name='status' type='int' required='false' immutable='false'/>
 	        <attribute name='started' type='int' required='false' immutable='false'/>
+	        <attribute name='completed' type='int' required='false' immutable='false'/>
 	        <attribute name='activity' type='int' required='false' immutable='false'/>
 	        <attribute name='item' type='int' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>

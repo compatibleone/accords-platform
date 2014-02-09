@@ -138,6 +138,7 @@ private	void	wait_rest_thread(struct rest_thread * tptr)
 	lock_rest_thread(tptr);
 	item = tptr->item;
 	tptr->status = _THREAD_IDLE;
+	tptr->completed = time((long *) 0);
 	unlock_rest_thread(tptr);
 	if ( item )
 	{
@@ -185,12 +186,14 @@ public struct rest_thread * reset_rest_thread(struct rest_thread * sptr)
 		sptr->next = (struct rest_thread*) 0;
 		sptr->id =  (pthread_t) 0;
 		sptr->reqid = (char *) 0;
+		sptr->response = (char *) 0;
 		memset(&sptr->lock,0,sizeof( sptr->lock));
 		sptr->client = (struct rest_client *) 0;
 		sptr->request = (struct rest_request *) 0;
 		sptr->item   = 1;
 		sptr->status = _THREAD_IDLE;
 		sptr->started = 0;
+		sptr->completed = 0;
 		sptr->activity= 0;
 		sptr->pid = getpid();
 		sptr->ppid = getppid();

@@ -17,6 +17,8 @@ private	int	colog_sent_response(int when,int pid,int tid,char * who,int dir, cha
 private	int	colog_received_response(int when,int pid,int tid,char * who,int dir, char * object);
 private	FILE *	colog_handle=(FILE*) 0;
 private	int	colog_page=0;
+private	int	colog_lastpage=0;
+private	int	colog_events=0;
 private	char *	colog_output="colog";
 private	int	colog_page_size=48;
 
@@ -49,6 +51,7 @@ struct	colog_event
 	char *	method;
 	char *	object;
 	int	when;
+	int	number;
 	int	dir;
 	int	status;
 	char *	message;
@@ -213,6 +216,7 @@ private	struct colog_event * allocate_event()
 	else
 	{
 		memset(eptr,0,sizeof( struct colog_event ));
+		eptr->number = ++colog_events;
 		return( eptr );
 	}
 }
@@ -1159,15 +1163,25 @@ private	void	colog_show_header(int top, int mode)
 	{
 		if ( colog_page > 1 )
 		{
-		fprintf(colog_handle,"<div align=center><a href='%s%u.html'>Page %u</a></div>\n",
-		colog_output, colog_page - 1, colog_page - 1);
+			fprintf(colog_handle,"<div align=center><a href='%s%u.html'>First</a></div>\n",
+				colog_output, 1);
+			fprintf(colog_handle,"<div align=center><a href='%s%u.html'>Page %u</a></div>\n",
+				colog_output, colog_page - 1, colog_page - 1);
+		}
+		else if ( colog_page_size )
+		{
+			colog_lastpage = ((colog_events / colog_page_size) + 1);
 		}
 	}
 	else if ( mode )
 	{
-	fprintf(colog_handle,"<div align=center><a href='%s%u.html'>Page %u</a></div>\n",
-	colog_output,colog_page+1, colog_page+1);
-
+		fprintf(colog_handle,"<div align=center><a href='%s%u.html'>Page %u</a></div>\n",
+			colog_output,colog_page+1, colog_page+1);
+		if ( colog_lastpage )
+		{
+			fprintf(colog_handle,"<div align=center><a href='%s%u.html'>Last</a></div>\n",
+				colog_output,colog_lastpage);
+		}
 	}
 	fprintf(colog_handle,"<th class=mth>Information\n");
 	for (	mptr=Manager.FirstModule;

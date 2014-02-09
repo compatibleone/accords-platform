@@ -2306,6 +2306,9 @@ private	int	occi_thread_members( struct rest_request * rptr, struct rest_thread 
 	sprintf(buffer,"occi.thread.started=%u",tptr->started);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 		return( 27 );
+	sprintf(buffer,"occi.thread.completed=%u",tptr->completed);
+	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+		return( 27 );
 	sprintf(buffer,"occi.thread.activity=%u",tptr->activity);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 		return( 27 );
@@ -2315,12 +2318,21 @@ private	int	occi_thread_members( struct rest_request * rptr, struct rest_thread 
 	sprintf(buffer,"occi.thread.state=%u",tptr->status);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 		return( 27 );
-	sprintf(buffer,"occi.thread.identity=\"%s(T%u)\"",get_identity(),pthread_self());
+	sprintf(buffer,"occi.thread.identity=\"T%u\"",pthread_self());
+	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+		return( 27 );
+	sprintf(buffer,"occi.thread.host=\"%s\"",get_identity());
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 		return( 27 );
 	if ( tptr->request )
 	{
 		sprintf(buffer,"occi.thread.request=\"%s %s\"",tptr->request->method,tptr->request->object);
+		if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
+			return( 27 );
+	}
+	if ( tptr->response )
+	{
+		sprintf(buffer,"occi.thread.response=\"%s\"",tptr->response);
 		if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 			return( 27 );
 	}

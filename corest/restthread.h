@@ -28,8 +28,10 @@ struct	rest_thread
 	struct 	rest_client *	client;
 	struct 	rest_request *	request;
 	char *			reqid;
+	char *			response;
 	int			status;
 	int			started;
+	int			completed;
 	int			activity;
 	int			item;
 	int			pid;
