@@ -2015,20 +2015,36 @@ public	struct	occi_response *	occi_client_get( struct occi_client * cptr, struct
 		return((struct occi_response *) 0);
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if ((get_thread_occi_headers())
 	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( zptr = rest_client_get_request(uri,cptr->tls,cptr->agent, hptr) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr, "GET" ) ))
-		return( aptr );
-	else if (!( aptr->host = serialise_url_host( cptr->target )))
-		return( aptr );
-	else	return( aptr );
+	}
+	else 
+	{
+		uri = liberate( uri );
+		if (!( aptr = occi_create_response( rptr, zptr, "GET" ) ))
+			return( aptr );
+		else if (!( aptr->host = serialise_url_host( cptr->target )))
+			return( aptr );
+		else	return( aptr );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -2172,22 +2188,41 @@ public	struct	occi_response *	occi_client_put( struct occi_client * cptr, struct
 		return((struct occi_response *) 0);
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if ((get_thread_occi_headers())
 	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( body = occi_client_body( cptr, rptr, hptr, body ) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( zptr = rest_client_put_request(uri,cptr->tls,cptr->agent,body,hptr) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr, "PUT" ) ))
-		return( aptr );
-	else if (!( aptr->host = serialise_url_host( cptr->target )))
-		return( aptr );
-	else	return( aptr );
+	}
+	else
+	{
+		uri = liberate( uri );
+		 if (!( aptr = occi_create_response( rptr, zptr, "PUT" ) ))
+			return( aptr );
+		else if (!( aptr->host = serialise_url_host( cptr->target )))
+			return( aptr );
+		else	return( aptr );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -2203,20 +2238,36 @@ public	struct	occi_response *	occi_client_delete( struct occi_client * cptr, str
 		return((struct occi_response *) 0);
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if ((get_thread_occi_headers())
 	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( zptr = rest_client_delete_request(uri,cptr->tls,cptr->agent,hptr) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr, "DELETE" ) ))
-		return( aptr );
-	else if (!( aptr->host = serialise_url_host( cptr->target )))
-		return( aptr );
-	else	return( aptr );
+	}
+	else 
+	{
+		uri = liberate( uri );
+		if (!( aptr = occi_create_response( rptr, zptr, "DELETE" ) ))
+			return( aptr );
+		else if (!( aptr->host = serialise_url_host( cptr->target )))
+			return( aptr );
+		else	return( aptr );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -2258,22 +2309,41 @@ public	struct	occi_response *	occi_client_post( struct occi_client * cptr, struc
 		return((struct occi_response *) 0);
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if ((get_thread_occi_headers())
 	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( body = occi_client_body( cptr, rptr, hptr, body ) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( zptr = rest_client_post_request(uri,cptr->tls,cptr->agent,body,hptr) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr, "POST" ) ))
-		return( aptr );
-	else if (!( aptr->host = serialise_url_host( cptr->target )))
-		return( aptr );
-	else	return( aptr );
+	}
+	else
+	{
+		uri = liberate( uri );
+		if (!( aptr = occi_create_response( rptr, zptr, "POST" ) ))
+			return( aptr );
+		else if (!( aptr->host = serialise_url_host( cptr->target )))
+			return( aptr );
+		else	return( aptr );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -2297,33 +2367,56 @@ public	struct	occi_response *	occi_action_post( struct occi_client * cptr, struc
 	if (!( uri = occi_client_uri( cptr, (char *) 0 ) ))
 		return((struct occi_response *) 0);
 	else if  (!( hptr = occi_request_headers( cptr, rptr )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if ((get_thread_occi_headers())
 	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 
 	/* -------------------------------------------- */
 	/* append the action invocation parameters here */
 	/* -------------------------------------------- */
 	if ( pptr )
+	{
 		if (!( hptr = occi_append_default( cptr, hptr, pptr ) ))
+		{
+			uri = liberate( uri );
 			return((struct occi_response *) 0);
-
+		}
+	}
 	/* -------------------------------------------- */
 	/* continue with the standard client POST stuff */
 	/* -------------------------------------------- */
 	if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( body = occi_client_body( cptr, rptr, hptr, body ) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( zptr = rest_client_post_request(uri,cptr->tls,cptr->agent,body,hptr) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr,"ACTION" ) ))
-		return( aptr );
-	else if (!( aptr->host = serialise_url_host( cptr->target )))
-		return( aptr );
-	else	return( aptr );
+	}
+	else 
+	{
+		uri = liberate( uri );
+		if (!( aptr = occi_create_response( rptr, zptr,"ACTION" ) ))
+			return( aptr );
+		else if (!( aptr->host = serialise_url_host( cptr->target )))
+			return( aptr );
+		else	return( aptr );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -2339,20 +2432,36 @@ public	struct	occi_response *	occi_client_head( struct occi_client * cptr, struc
 		return((struct occi_response *) 0);
 	else if (( rptr->first ) 
 	     &&  (!( hptr = occi_request_headers( cptr, rptr ))))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if ((get_thread_occi_headers())
 	     &&  (!( hptr = occi_append_default( cptr, hptr, get_thread_occi_headers() ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (( rptr->account )
 	     && (!( hptr = occi_append_account( cptr, hptr, rptr->account ) )))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
+	}
 	else if (!( zptr = rest_client_head_request(uri,cptr->tls,cptr->agent,hptr) ))
+	{
+		uri = liberate( uri );
 		return((struct occi_response *) 0);
-	else if (!( aptr = occi_create_response( rptr, zptr, "HEAD" ) ))
-		return( aptr );
-	else if (!( aptr->host = serialise_url_host( cptr->target )))
-		return( aptr );
-	else	return( aptr );
+	}
+	else 
+	{
+		uri = liberate( uri );
+		if (!( aptr = occi_create_response( rptr, zptr, "HEAD" ) ))
+			return( aptr );
+		else if (!( aptr->host = serialise_url_host( cptr->target )))
+			return( aptr );
+		else	return( aptr );
+	}
 }
 
 
