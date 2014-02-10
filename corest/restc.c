@@ -35,6 +35,8 @@ public struct rest_client * liberate_rest_client(struct rest_client * sptr)
 			 sptr->user = liberate(sptr->user);
 		if ( sptr->pass )
 			 sptr->pass = liberate(sptr->pass);
+		if ( sptr->hostname )
+			 sptr->hostname = liberate(sptr->hostname);
 		if ( sptr->headers )
 			 sptr->headers = liberate_rest_header(sptr->headers);
 		if ( sptr->tlsconf )
