@@ -18,6 +18,8 @@
 #ifndef	_allocate_c
 #define	_allocate_c
 
+//#define mem_debug
+
 #include "allocate.h"
 
 int	indent=0;
@@ -45,6 +47,21 @@ struct mem_header {
 
 #define mem_hdr(v) ((struct mem_header *)(v - sizeof(struct mem_header)))
 
+#ifdef mem_debug
+private int alloc_size = 0;
+private int salloc_size = 0;
+private int alloc_count = 0;
+private int salloc_count = 0;
+
+#define addref(v) { if(v->secure) { alloc_count++; alloc_size += v->size; } else { salloc_count++; salloc_size += v->size; } }
+#define subref(v) { if(v->secure) { alloc_count--; alloc_size -= v->size; } else { salloc_count--; salloc_size -= v->size; } }
+#define printmem(s,v) { printf("MEM_DEBUG: %s %p %p %d %6lu [%3d %6d %3d %6d]\n", s, v, v->data, v->secure, v->size, alloc_count, alloc_size, salloc_count, salloc_size); }
+#else
+#define addref(v)
+#define subref(v)
+#define printmem(s,v)
+#endif
+
 /*	-----------------------------------	*/
 /*		a l l o c a t e	_ s e c u r e	*/
 /*	-----------------------------------	*/
@@ -64,6 +81,8 @@ public	void *	allocate_secure(int n)
         if(res < 0) {
             perror("Warning: Could not lock secure memory");
         }
+		addref(vptr);
+		printmem("allocate", vptr);
     }
 	pthread_mutex_unlock( &allocation_control );
 	return( (void *)vptr->data );		
@@ -79,6 +98,8 @@ public	void *	liberate_secure( void * v)
 	if( v) {
 		struct mem_header	*	vptr = mem_hdr(v);
 		pthread_mutex_lock( &allocation_control );
+		subref(vptr);
+		printmem("liberate", vptr);
     	if(vptr->secure) {
     	    int n = sizeof(struct mem_header) + vptr->size;
     	    /* burn data */
@@ -112,6 +133,8 @@ public	void *	allocate(int n)
 		memset(vptr->data,0,n);
 		if ( areport )
 			printf("%lu allocate %u %lu\n",acounter,n,vptr);
+		addref(vptr);
+		printmem("allocate", vptr);
     }
 	pthread_mutex_unlock( &allocation_control );
 	return( (void *)vptr->data );		
