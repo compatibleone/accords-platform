@@ -1225,6 +1225,9 @@ public	int	publishing_occi_server(
 		if ( tlsconf )
 			tlsconf = release_tls_configuration(tlsconf );
 	}
+
+	occi_flush_clients();
+
 	return( result );
 }
 

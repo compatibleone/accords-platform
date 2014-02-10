@@ -1068,13 +1068,18 @@ public	struct	rest_response * rest_client_get_request(
 			printf("REST Client Request : GET %s \n",target );
 
 		if (!( rest_valid_string( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
 			return( rest_client_response( 599, "NULL URL", agent ) );
-
+		}
 		else if (!( uptr = analyse_proxy_url( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
 			return( rest_client_response( 600, "Url Anaysis", agent ) );
-
+		}
 		else if (!( uptr = validate_url( uptr )))
 		{
+			hptr = liberate_rest_headers( hptr );
 			return( rest_client_response( 601, "Url Validation", agent ) );
 		}
 
@@ -1082,35 +1087,61 @@ public	struct	rest_response * rest_client_get_request(
 		{
 			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
 			rest_log_message( buffer );
-			liberate_url( uptr );
+			uptr= liberate_url( uptr );
+			hptr = liberate_rest_headers( hptr );
 			return( rest_client_response( 602, "Client Failure", agent ) );
 		}
 		else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
 			return( rest_client_response( 603, "Request Creation", agent ) );
+		}
 		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
 
 		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
 			return( rest_client_response( 603, "Request Headers", agent ) );
+		}
 		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
 			return( rest_client_response( 603, "Request Send", agent ) );
+		}
 		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			rptr = liberate_rest_request( rptr );
 			return( rest_client_response( 603, "Response Failure", agent ) );
+		}
 		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
 		{
 			rptr = liberate_rest_request( rptr );
-			if ( retries++ ) { return( aptr ); }
+			uptr= liberate_url( uptr );
+			if ( retries++ )
+			{ 
+				hptr = liberate_rest_headers( hptr );
+				return( aptr ); 
+			}
 			aptr = rest_liberate_response( aptr );
 			continue;
 		}
 		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
 		{
 			rptr = liberate_rest_request( rptr );
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
 			return( aptr );
 		}
 		else
 		{
 			rptr = liberate_rest_request( rptr );
 			aptr = rest_liberate_response( aptr );
+			uptr= liberate_url( uptr );
 		}
 	}
 
@@ -1133,56 +1164,91 @@ public	struct	rest_response * rest_client_get_request_body(
 	
 	while (1)
 	{
-	if ( check_debug() )
-		printf("REST Client Request : GET %s \n",target );
+		if ( check_debug() )
+			printf("REST Client Request : GET %s \n",target );
 
-	if (!( rest_valid_string( target ) ))
-		return( rest_client_response( 599, "NULL URL", agent ) );
-
-	else if (!( uptr = analyse_proxy_url( target ) ))
-		return( rest_client_response( 600, "Url Anaysis", agent ) );
-
-	else if (!( uptr = validate_url( uptr )))
-	{
-		return( rest_client_response( 601, "Url Validation", agent ) );
-	}
-
-	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
-	{
-		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
-		rest_log_message( buffer );
-		liberate_url( uptr );
-		return( rest_client_response( 602, "Client Failure", agent ) );
-	}
-	else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
-		return( rest_client_response( 603, "Request Creation", agent ) );
-	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
-
-	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
-		return( rest_client_response( 603, "Request Headers", agent ) );
-	else if (!( rptr = rest_client_body( rptr, filename ) ))
-		return( rest_client_response( 603, "Request Body", agent ) );
-	else if (!( rptr = rest_send_request( cptr, rptr ) ))
-		return( rest_client_response( 603, "Request Send", agent ) );
-	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
-		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
-	{
-		rptr = liberate_rest_request( rptr );
-		if ( retries++ ) { return( aptr ); }
-		aptr = rest_liberate_response( aptr );
-		continue;
-	}
-	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return( aptr );
-	}
-	else
-	{
-		rptr = liberate_rest_request( rptr );
-		aptr = rest_liberate_response( aptr );
-	}
+		if (!( rest_valid_string( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 599, "NULL URL", agent ) );
+		}
+		else if (!( uptr = analyse_proxy_url( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 600, "Url Anaysis", agent ) );
+		}
+		else if (!( uptr = validate_url( uptr )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 601, "Url Validation", agent ) );
+		}
+	
+		else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+		{
+			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+			rest_log_message( buffer );
+			uptr = liberate_url( uptr );
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 602, "Client Failure", agent ) );
+		}
+		else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Creation", agent ) );
+		}
+		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
+	
+		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Headers", agent ) );
+		}
+		else if (!( rptr = rest_client_body( rptr, filename ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Body", agent ) );
+		}
+		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Send", agent ) );
+		}
+		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			rptr = liberate_rest_request( rptr );
+			return( rest_client_response( 603, "Response Failure", agent ) );
+		}
+		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
+		{
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			if ( retries++ ) 
+			{ 
+				hptr = liberate_rest_headers( hptr );
+				return( aptr ); 
+			}
+			aptr = rest_liberate_response( aptr );
+			continue;
+		}
+		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			return( aptr );
+		}
+		else
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+			uptr= liberate_url( uptr );
+		}
 	}
 
 }
@@ -1204,52 +1270,80 @@ public	struct	rest_response * rest_client_try_get_request(
 	
 	while (1)
 	{
-	if ( check_debug() )
-		printf("REST Client Request : GET %s \n",target );
+		if ( check_debug() )
+			printf("REST Client Request : GET %s \n",target );
 
+		if (!( uptr = analyse_url( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 600, "Url Anaysis", agent ) );
+		}
+		else if (!( uptr = validate_url( uptr )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 601, "Url Validation", agent ) );
+		}
 
-	if (!( uptr = analyse_url( target ) ))
-		return( rest_client_response( 600, "Url Anaysis", agent ) );
+		else if (!( cptr = rest_try_open_client(uptr->host,uptr->port,tls, timeout, retry)))
+		{
+			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+			rest_log_message( buffer );
+			liberate_url( uptr );
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 602, "Client Failure", agent ) );
+		}
+		else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Creation", agent ) );
+		}
+		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
 
-	else if (!( uptr = validate_url( uptr )))
-	{
-		return( rest_client_response( 601, "Url Validation", agent ) );
-	}
-
-	else if (!( cptr = rest_try_open_client(uptr->host,uptr->port,tls, timeout, retry)))
-	{
-		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
-		rest_log_message( buffer );
-		liberate_url( uptr );
-		return( rest_client_response( 602, "Client Failure", agent ) );
-	}
-	else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
-		return( rest_client_response( 603, "Request Creation", agent ) );
-	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
-
-	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
-		return( rest_client_response( 603, "Request Headers", agent ) );
-	else if (!( rptr = rest_send_request( cptr, rptr ) ))
-		return( rest_client_response( 603, "Request Send", agent ) );
-	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
-		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
-	{
-		rptr = liberate_rest_request( rptr );
-		if ( retries++ ) { return( aptr ); }
-		aptr = rest_liberate_response( aptr );
-		continue;
-	}
-	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return( aptr );
-	}
-	else
-	{
-		rptr = liberate_rest_request( rptr );
-		aptr = rest_liberate_response( aptr );
-	}
+		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Headers", agent ) );
+		}
+		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Send", agent ) );
+		}
+		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			rptr = liberate_rest_request( rptr );
+			return( rest_client_response( 603, "Response Failure", agent ) );
+		}
+		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
+		{
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			if ( retries++ ) 
+			{ 
+				hptr = liberate_rest_headers( hptr );
+				return( aptr ); 
+			}
+			aptr = rest_liberate_response( aptr );
+			continue;
+		}
+		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			return( aptr );
+		}
+		else
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+			uptr= liberate_url( uptr );
+		}
 	}
 
 }
@@ -1271,46 +1365,74 @@ public	struct	rest_response * rest_client_delete_request(
 	
 	while(1)
 	{
-	if ( check_debug() )
-		printf("REST Client Request : DELETE %s \n",target );
+		if ( check_debug() )
+			printf("REST Client Request : DELETE %s \n",target );
 
-	if (!( uptr = analyse_proxy_url( target ) ))
-		return( rest_client_response( 600, "Incorrect Url", agent ) );
+		if (!( uptr = analyse_proxy_url( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 600, "Incorrect Url", agent ) );
+		}
+		else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+		{
+			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+			rest_log_message( buffer );
+			liberate_url( uptr );
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 602, "Client Failure", agent ) );
+		}
+		else if (!( rptr = rest_client_request( cptr, "DELETE", uptr, agent )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Creation", agent ) );
+		}
+		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
 
-	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
-	{
-		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
-		rest_log_message( buffer );
-		liberate_url( uptr );
-		return( rest_client_response( 602, "Client Failure", agent ) );
-	}
-	else if (!( rptr = rest_client_request( cptr, "DELETE", uptr, agent )))
-		return( rest_client_response( 603, "Request Creation", agent ) );
-	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
-
-	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
-		return( rest_client_response( 603, "Request Headers", agent ) );
-	else if (!( rptr = rest_send_request( cptr, rptr ) ))
-		return( rest_client_response( 603, "Request Send", agent ) );
-	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
-		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
-	{
-		rptr = liberate_rest_request( rptr );
-		if ( retries++ ) { return( aptr ); }
-		aptr = rest_liberate_response( aptr );
-		continue;
-	}
-	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return( aptr );
-	}
-	else
-	{
-		rptr = liberate_rest_request( rptr );
-		aptr = rest_liberate_response( aptr );
-	}
+		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Headers", agent ) );
+		}
+		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Send", agent ) );
+		}
+		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			rptr = liberate_rest_request( rptr );
+			return( rest_client_response( 603, "Response Failure", agent ) );
+		}
+		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
+		{
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			if ( retries++ ) 
+			{ 
+				hptr = liberate_rest_headers( hptr );
+				return( aptr ); 
+			}
+			aptr = rest_liberate_response( aptr );
+			continue;
+		}
+		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		{
+			rptr = liberate_rest_request( rptr );
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( aptr );
+		}
+		else
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+			uptr= liberate_url( uptr );
+		}
 	}
 }
 
@@ -1331,48 +1453,80 @@ public	struct	rest_response * rest_client_delete_request_body(
 	
 	while(1)
 	{
-	if ( check_debug() )
-		printf("REST Client Request : DELETE %s \n",target );
+		if ( check_debug() )
+			printf("REST Client Request : DELETE %s \n",target );
 
-	if (!( uptr = analyse_proxy_url( target ) ))
-		return( rest_client_response( 600, "Incorrect Url", agent ) );
+		if (!( uptr = analyse_proxy_url( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 600, "Incorrect Url", agent ) );
+		}
+		else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+		{
+			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+			rest_log_message( buffer );
+			liberate_url( uptr );
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 602, "Client Failure", agent ) );
+		}
+		else if (!( rptr = rest_client_request( cptr, "DELETE", uptr, agent )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Creation", agent ) );
+		}
+		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
 
-	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
-	{
-		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
-		rest_log_message( buffer );
-		liberate_url( uptr );
-		return( rest_client_response( 602, "Client Failure", agent ) );
-	}
-	else if (!( rptr = rest_client_request( cptr, "DELETE", uptr, agent )))
-		return( rest_client_response( 603, "Request Creation", agent ) );
-	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
-
-	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
-		return( rest_client_response( 603, "Request Headers", agent ) );
-	else if (!( rptr = rest_client_body( rptr, filename ) ))
-		return( rest_client_response( 603, "Request Body", agent ) );
-	else if (!( rptr = rest_send_request( cptr, rptr ) ))
-		return( rest_client_response( 603, "Request Send", agent ) );
-	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
-		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
-	{
-		rptr = liberate_rest_request( rptr );
-		if ( retries++ ) { return( aptr ); }
-		aptr = rest_liberate_response( aptr );
-		continue;
-	}
-	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return( aptr );
-	}
-	else
-	{
-		rptr = liberate_rest_request( rptr );
-		aptr = rest_liberate_response( aptr );
-	}
+		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Headers", agent ) );
+		}
+		else if (!( rptr = rest_client_body( rptr, filename ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Body", agent ) );
+		}
+		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Send", agent ) );
+		}
+		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			rptr = liberate_rest_request( rptr );
+			return( rest_client_response( 603, "Response Failure", agent ) );
+		}
+		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
+		{
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			if ( retries++ ) 
+			{ 
+				hptr = liberate_rest_headers( hptr );
+				return( aptr ); 
+			}
+			aptr = rest_liberate_response( aptr );
+			continue;
+		}
+		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		{
+			rptr = liberate_rest_request( rptr );
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( aptr );
+		}
+		else
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+			uptr= liberate_url( uptr );
+		}
 	}
 }
 
@@ -1393,46 +1547,74 @@ public	struct	rest_response * rest_client_head_request(
 	
 	while(1)
 	{
-	if ( check_debug() )
-		printf("REST Client Request : HEAD %s \n",target );
+		if ( check_debug() )
+			printf("REST Client Request : HEAD %s \n",target );
 
-	if (!( uptr = analyse_proxy_url( target ) ))
-		return( rest_client_response( 600, "Incorrect Url", agent ) );
+		if (!( uptr = analyse_proxy_url( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 600, "Incorrect Url", agent ) );
+		}
+		else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+		{
+			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+			rest_log_message( buffer );
+			liberate_url( uptr );
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 602, "Client Failure", agent ) );
+		}
+		else if (!( rptr = rest_client_request( cptr, "HEAD", uptr, agent )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Creation", agent ) );
+		}
+		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
 
-	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
-	{
-		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
-		rest_log_message( buffer );
-		liberate_url( uptr );
-		return( rest_client_response( 602, "Client Failure", agent ) );
-	}
-	else if (!( rptr = rest_client_request( cptr, "HEAD", uptr, agent )))
-		return( rest_client_response( 603, "Request Creation", agent ) );
-	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
-
-	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
-		return( rest_client_response( 603, "Request Headers", agent ) );
-	else if (!( rptr = rest_send_request( cptr, rptr ) ))
-		return( rest_client_response( 603, "Request Send", agent ) );
-	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
-		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
-	{
-		rptr = liberate_rest_request( rptr );
-		if ( retries++ ) { return( aptr ); }
-		aptr = rest_liberate_response( aptr );
-		continue;
-	}
-	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return( aptr );
-	}
-	else
-	{
-		rptr = liberate_rest_request( rptr );
-		aptr = rest_liberate_response( aptr );
-	}
+		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Headers", agent ) );
+		}
+		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Send", agent ) );
+		}
+		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			rptr = liberate_rest_request( rptr );
+			return( rest_client_response( 603, "Response Failure", agent ) );
+		}
+		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
+		{
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			if ( retries++ ) 
+			{ 
+				hptr = liberate_rest_headers( hptr );
+				return( aptr ); 
+			}
+			aptr = rest_liberate_response( aptr );
+			continue;
+		}
+		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		{
+			rptr = liberate_rest_request( rptr );
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( aptr );
+		}
+		else
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+			uptr= liberate_url( uptr );
+		}
 	}
 }
 
@@ -1453,50 +1635,81 @@ public	struct	rest_response * rest_client_post_request(
 	
 	while(1)
 	{
-	if ( check_debug() )
-		printf("REST Client Request : POST %s \n",target );
+		if ( check_debug() )
+			printf("REST Client Request : POST %s \n",target );
 
-	if (!( uptr = analyse_proxy_url( target ) ))
-		return( rest_client_response( 600, "Incorrect Url", agent ) );
+		if (!( uptr = analyse_proxy_url( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 600, "Incorrect Url", agent ) );
+		}
+		else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+		{
+			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+			rest_log_message( buffer );
+			liberate_url( uptr );
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 602, "Client Failure", agent ) );
+		}
+		else if (!( rptr = rest_client_request( cptr, "POST", uptr, agent )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Creation", agent ) );
+		}
+		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
 
-	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
-	{
-		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
-		rest_log_message( buffer );
-		liberate_url( uptr );
-		return( rest_client_response( 602, "Client Failure", agent ) );
+		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Headers", agent ) );
+		}
+		else if (!( rptr = rest_client_body( rptr, filename ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Body", agent ) );
+		}
+		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Send", agent ) );
+		}
+		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			rptr = liberate_rest_request( rptr );
+			return( rest_client_response( 603, "Response Failure", agent ) );
+		}
+		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
+		{
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			if ( retries++ ) 
+			{ 
+				hptr = liberate_rest_headers( hptr );
+				return( aptr ); 
+			}
+			aptr = rest_liberate_response( aptr );
+			continue;
+		}
+		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		{
+			rptr = liberate_rest_request( rptr );
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( aptr );
+		}
+		else
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+			uptr= liberate_url( uptr );
+		}
 	}
-	else if (!( rptr = rest_client_request( cptr, "POST", uptr, agent )))
-		return( rest_client_response( 603, "Request Creation", agent ) );
-	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
-
-	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
-		return( rest_client_response( 603, "Request Headers", agent ) );
-	else if (!( rptr = rest_client_body( rptr, filename ) ))
-		return( rest_client_response( 603, "Request Body", agent ) );
-	else if (!( rptr = rest_send_request( cptr, rptr ) ))
-		return( rest_client_response( 603, "Request Send", agent ) );
-	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
-		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
-	{
-		rptr = liberate_rest_request( rptr );
-		if ( retries++ ) { return( aptr ); }
-		aptr = rest_liberate_response( aptr );
-		continue;
-	}
-	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return( aptr );
-	}
-	else
-	{
-		rptr = liberate_rest_request( rptr );
-		aptr = rest_liberate_response( aptr );
-	}
-	}
-
 }
 
 /*	---------------------------------------------------	*/
@@ -1516,48 +1729,80 @@ public	struct	rest_response * rest_client_put_request(
 	
 	while(1)
 	{
-	if ( check_debug() )
-		printf("REST Client Request : PUT %s \n",target );
+		if ( check_debug() )
+			printf("REST Client Request : PUT %s \n",target );
 
-	if (!( uptr = analyse_proxy_url( target ) ))
-		return( rest_client_response( 600, "Incorrect Url", agent ) );
+		if (!( uptr = analyse_proxy_url( target ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 600, "Incorrect Url", agent ) );
+		}
+		else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
+		{
+			sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
+			rest_log_message( buffer );
+			liberate_url( uptr );
+			hptr = liberate_rest_headers( hptr );
+			return( rest_client_response( 602, "Client Failure", agent ) );
+		}
+		else if (!( rptr = rest_client_request( cptr, "PUT", uptr, agent )))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Creation", agent ) );
+		}
+		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
 
-	else if (!( cptr = rest_open_client(uptr->host,uptr->port,tls)))
-	{
-		sprintf(buffer,"Rest Client Failure(%u) to open : %s:%u \n",errno,uptr->host,uptr->port);
-		rest_log_message( buffer );
-		liberate_url( uptr );
-		return( rest_client_response( 602, "Client Failure", agent ) );
-	}
-	else if (!( rptr = rest_client_request( cptr, "PUT", uptr, agent )))
-		return( rest_client_response( 603, "Request Creation", agent ) );
-	else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
-
-	if (!( rptr = rest_client_headers( rptr, hhptr ) ))
-		return( rest_client_response( 603, "Request Headers", agent ) );
-	else if (!( rptr = rest_client_body( rptr, filename ) ))
-		return( rest_client_response( 603, "Request Body", agent ) );
-	else if (!( rptr = rest_send_request( cptr, rptr ) ))
-		return( rest_client_response( 603, "Request Send", agent ) );
-	else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
-		return( rest_client_response( 603, "Response Failure", agent ) );
-	else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
-	{
-		rptr = liberate_rest_request( rptr );
-		if ( retries++ ) { return( aptr ); }
-		aptr = rest_liberate_response( aptr );
-		continue;
-	}
-	else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
-	{
-		rptr = liberate_rest_request( rptr );
-		return( aptr );
-	}
-	else
-	{
-		rptr = liberate_rest_request( rptr );
-		aptr = rest_liberate_response( aptr );
-	}
+		if (!( rptr = rest_client_headers( rptr, hhptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Headers", agent ) );
+		}
+		else if (!( rptr = rest_client_body( rptr, filename ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Body", agent ) );
+		}
+		else if (!( rptr = rest_send_request( cptr, rptr ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( rest_client_response( 603, "Request Send", agent ) );
+		}
+		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))
+		{
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			rptr = liberate_rest_request( rptr );
+			return( rest_client_response( 603, "Response Failure", agent ) );
+		}
+		else if (( credentials = rest_check_authentication( aptr, target, rptr, hptr )) != (struct rest_header *) 0)
+		{
+			rptr = liberate_rest_request( rptr );
+			uptr= liberate_url( uptr );
+			if ( retries++ ) 
+			{ 
+				hptr = liberate_rest_headers( hptr );
+				return( aptr ); 
+			}
+			aptr = rest_liberate_response( aptr );
+			continue;
+		}
+		else if (!( target = rest_check_redirection( aptr, target, rptr ) ))
+		{
+			rptr = liberate_rest_request( rptr );
+			hptr = liberate_rest_headers( hptr );
+			uptr= liberate_url( uptr );
+			return( aptr );
+		}
+		else
+		{
+			rptr = liberate_rest_request( rptr );
+			aptr = rest_liberate_response( aptr );
+			uptr= liberate_url( uptr );
+		}
 	}
 
 }

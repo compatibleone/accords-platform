@@ -61,6 +61,8 @@ public struct occi_category * liberate_occi_category(struct occi_category * sptr
 			 sptr->price = liberate(sptr->price);
 		if ( sptr->rating )
 			 sptr->rating = liberate(sptr->rating);
+		if ( sptr->interface )
+			sptr->interface = liberate( sptr->interface );
 		sptr = liberate( sptr );
 	}
 	return((struct occi_category *) 0);

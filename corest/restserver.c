@@ -1717,6 +1717,7 @@ public	char *	rest_temporary_filename(char * extension)
 		if (!( tptr = allocate_string( tempfilestub ) ))
 			return( tptr );
 	sprintf(namebuffer,"%s%s.%s",tempfilepath,tptr,( extension ? extension : "tmp" ));
+	liberate( tptr );
 	return( allocate_string( namebuffer ) );
 }
 

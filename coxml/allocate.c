@@ -22,6 +22,19 @@
 
 int	indent=0;
 
+private	int		areport=0;
+private	unsigned long	acounter=0;
+private	unsigned long	lcounter=0;
+
+/*	-----------------------------------	*/
+/*	  a l l o c a t i o n _ t r a c e	*/
+/*	-----------------------------------	*/
+public	void	allocation_trace( int mode )
+{
+	areport = mode;
+	return;
+}
+
 /*	-----------------------------------	*/
 /*		a l l o c a t e			*/
 /*	-----------------------------------	*/
@@ -32,9 +45,12 @@ public	void *	allocate(int n)
 {
 	void	*	vptr;
 	pthread_mutex_lock( &allocation_control );
+	acounter++;
 	if (( vptr = malloc(n)) != (void *) 0)
 		memset(vptr,0,n);
 	pthread_mutex_unlock( &allocation_control );
+	if ( areport )
+		printf("%lu allocate %u %lu\n",acounter,n,vptr);
 	return( vptr );		
 }
 
@@ -45,9 +61,15 @@ public	void *	allocate(int n)
 /*	-----------------------------------	*/
 public	void *	liberate( void * v)
 {
-	pthread_mutex_lock( &allocation_control );
-	free(v);
-	pthread_mutex_unlock( &allocation_control );
+	if ( v )
+	{
+		pthread_mutex_lock( &allocation_control );
+		lcounter++;
+		if ( areport )
+			printf("%lu liberate %u %lu\n",lcounter,0,v);
+		free(v);
+		pthread_mutex_unlock( &allocation_control );
+	}
 	return((void *) 0);
 }
 

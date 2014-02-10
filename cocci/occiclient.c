@@ -1391,6 +1391,21 @@ public	struct	occi_client *	occi_flush_client( char * host, int port )
 }
 
 /*	------------------------------------------------------------	*/
+/*			o c c i _ f l u s h _ c l i e n t s		*/
+/*	------------------------------------------------------------	*/
+public	void	occi_flush_clients()
+{
+	struct	occi_client *	cptr;
+
+	while (( cptr=OcciManager.first) != (struct occi_client *) 0)
+	{
+		OcciManager.first = cptr->next;
+		cptr = occi_delete_client( cptr );
+	}
+	flush_tls_configuration();
+}
+
+/*	------------------------------------------------------------	*/
 /*			o c c i _ r e m o v e _ c l i e n t		*/
 /*	------------------------------------------------------------	*/
 public	struct	occi_client *	occi_remove_client( struct occi_client * cptr )

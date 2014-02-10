@@ -309,7 +309,8 @@ private	struct	occi_response * occi_resolver_operation( char * category, char * 
 				break;
 			else if (!(rrptr = occi_create_request( cptr, Resolver.publication, _OCCI_NORMAL)))
 				break;
-			else if (!( aaptr = occi_client_get( cptr, rptr ) ))
+			/* fixed rptr as rrptr ijm 10/02/2014 */
+			else if (!( aaptr = occi_client_get( cptr, rrptr ) ))
 			{
 				rrptr = occi_remove_request( rrptr );
 				break;

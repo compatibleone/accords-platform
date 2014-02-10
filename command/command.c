@@ -28,6 +28,7 @@
 
 private	int	noauth=0;
 private	int	page=48;
+private	int	allocation=0;
 
 struct	accords_configuration Command = {
 	0,0,
@@ -803,6 +804,8 @@ private	int	run_cordscript_interpreter( char * filename, int argc, char * argv[]
 	{
 		(void) logout_occi_user( Command.user,Command.password,agent, auth, default_tls() );	
 	}
+
+	occi_flush_clients();
 
 	return( status );
 
@@ -2514,6 +2517,8 @@ private	int	operation( int argc, char * argv[] )
 					noauth = 1;
 				else if (!( strcmp( aptr, "asynch" ) ))
 					asynch = 1;
+				else if (!( strcmp( aptr, "allocation" ) ))
+					allocation_trace( (allocation = argv[++argi] ));
 				else if (!( strcmp( aptr, "callback" ) ))
 					callback = argv[++argi];
 				else if (!( strcmp( aptr, "wsdl" ) ))
@@ -2543,7 +2548,7 @@ private	int	operation( int argc, char * argv[] )
 private	int	banner()
 {
 	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.10");
-	printf("\n   Beta Version : 15/01/2014 ");
+	printf("\n   Beta Version : 10/02/2014 ");
 	printf("\n   Copyright (c) 2011,2014 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
@@ -2582,6 +2587,7 @@ private	int	banner()
 	printf("\n         --verbose                    activate verbose messages");
 	printf("\n         --asynch                     activate asynchronous operation ");
 	printf("\n         --callback                   specify callback operations");
+	printf("\n         --allocation                 activate allocation trace");
 	printf("\n         --noauth                     inhibit authentication for test purposes");
 	printf("\n         --echo                       activate source echo ");
 	printf("\n         --log  <value>               set log configuration ");
