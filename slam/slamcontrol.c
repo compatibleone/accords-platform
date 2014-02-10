@@ -89,6 +89,7 @@ private	int	scripted_business_processing(
 	int	argc=0;
 	char *	result;
 	char 	buffer[2048];
+	int	iresult=0;
 	if (!( rest_valid_string( expression ) ))
 		return( 0 );
 	else
@@ -107,7 +108,12 @@ private	int	scripted_business_processing(
 		argv[argc] = (char *) 0;
 		if (!( result = evaluate_cordscript( expression, argc, argv )))
 			return( 0 );
-		else	return( atoi( result ) );
+		else
+		{
+			iresult = atoi( result );
+			liberate( result );
+			return( iresult );
+		}
 	}
 }
 
@@ -223,6 +229,7 @@ private	int	invoke_business_values( char * nature, struct cords_control * pptr, 
 				continue;
 			}
 		}
+		zptr = occi_remove_response( zptr );
 		return(items);
 	}
 }

@@ -2362,11 +2362,19 @@ private	int	occi_thread_create( void * vptr )
 	else if (!( rptr = allocate_rest_request() ))
 		return( 27 );
 	else if (!( cptr = allocate_rest_client() ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( 27 );
+	}
         else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
+	{
+		cptr = rest_drop_client( cptr );
+		rptr = liberate_rest_request( rptr );
 		return( 27 );
+	}
 	else if (!( hptr = rest_request_header( rptr, _HTTP_HOST, vptr ) ))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(27);
 	}
@@ -2376,23 +2384,27 @@ private	int	occi_thread_create( void * vptr )
 	if ((!( rptr->object = allocate_string( buffer )))
 	||  (!( rptr->method = allocate_string( "POST" ))))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(27);
 	}
 
 	if ((status = occi_thread_members( rptr, rthread )) != 0)
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
 	}
 
 	if (!(aptr = occi_invoke_post( OcciServerThreadManager, cptr, rptr )))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(0);
 	}
 	else if (!( hptr = rest_resolve_header( aptr->first, "X-OCCI-Location") ))
 	{
+		cptr = rest_drop_client( cptr );
 		aptr = liberate_rest_response( aptr );
 		rptr = liberate_rest_request( rptr );
 		return(0);
@@ -2406,6 +2418,7 @@ private	int	occi_thread_create( void * vptr )
 					l = (i+1);
 			rthread->reqid = allocate_string( (hptr->value+l) );
 		}
+		cptr = rest_drop_client( cptr );
 		aptr = liberate_rest_response( aptr );
 		rptr = liberate_rest_request( rptr );
 		return(0);
@@ -2434,11 +2447,19 @@ private	int	occi_thread_retrieve( void * vptr )
 	else if (!( rptr = allocate_rest_request() ))
 		return( 27 );
 	else if (!( cptr = allocate_rest_client() ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( 27 );
+	}
         else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
+	{
+		cptr = rest_drop_client( cptr );
+		rptr = liberate_rest_request( rptr );
 		return( 27 );
+	}
 	else if (!( hptr = rest_request_header( rptr, _HTTP_HOST, vptr ) ))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(27);
 	}
@@ -2448,6 +2469,7 @@ private	int	occi_thread_retrieve( void * vptr )
 	if ((!( rptr->object = allocate_string( buffer )))
 	||  (!( rptr->method = allocate_string( "GET" ))))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(27);
 	}
@@ -2455,6 +2477,7 @@ private	int	occi_thread_retrieve( void * vptr )
 	sprintf(buffer,"occi.core.id=\"%s\"",rthread->reqid);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
 	}
@@ -2463,6 +2486,7 @@ private	int	occi_thread_retrieve( void * vptr )
 
 	aptr = liberate_rest_response( aptr );
 	rptr = liberate_rest_request( rptr );
+	cptr = rest_drop_client( cptr );
 	return(0);
 
 }
@@ -2490,11 +2514,19 @@ private	int	occi_thread_update( void * vptr )
 	else if (!( rptr = allocate_rest_request() ))
 		return( 27 );
 	else if (!( cptr = allocate_rest_client() ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( 27 );
+	}
         else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
+	{
+		cptr = rest_drop_client( cptr );
+		rptr = liberate_rest_request( rptr );
 		return( 27 );
+	}
 	else if (!( hptr = rest_request_header( rptr, _HTTP_HOST, vptr ) ))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(27);
 	}
@@ -2504,6 +2536,7 @@ private	int	occi_thread_update( void * vptr )
 	if ((!( rptr->object = allocate_string( buffer )))
 	||  (!( rptr->method = allocate_string( "PUT" ))))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(27);
 	}
@@ -2511,12 +2544,14 @@ private	int	occi_thread_update( void * vptr )
 	sprintf(buffer,"occi.core.id=\"%s\"",rthread->reqid);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
 	}
 
 	if ((status = occi_thread_members( rptr, rthread )) != 0)
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
 	}
@@ -2525,6 +2560,7 @@ private	int	occi_thread_update( void * vptr )
 
 	aptr = liberate_rest_response( aptr );
 	rptr = liberate_rest_request( rptr );
+	cptr = rest_drop_client( cptr );
 	return(0);
 }
 
@@ -2550,11 +2586,19 @@ private	int	occi_thread_delete( void * vptr )
 	else if (!( rptr = allocate_rest_request() ))
 		return( 27 );
 	else if (!( cptr = allocate_rest_client() ))
+	{
+		rptr = liberate_rest_request( rptr );
 		return( 27 );
+	}
         else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
+	{
+		cptr = rest_drop_client( cptr );
+		rptr = liberate_rest_request( rptr );
 		return( 27 );
+	}
 	else if (!( hptr = rest_request_header( rptr, _HTTP_HOST, vptr ) ))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(27);
 	}
@@ -2564,6 +2608,7 @@ private	int	occi_thread_delete( void * vptr )
 	if ((!( rptr->object = allocate_string( buffer )))
 	||  (!( rptr->method = allocate_string( "DELETE" ))))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return(27);
 	}
@@ -2571,6 +2616,7 @@ private	int	occi_thread_delete( void * vptr )
 	sprintf(buffer,"occi.core.id=\"%s\"",rthread->reqid);
 	if (!( hptr = rest_request_header( rptr, "X-OCCI-Attribute", buffer) ))
 	{
+		cptr = rest_drop_client( cptr );
 		rptr = liberate_rest_request( rptr );
 		return( 27 );
 	}
@@ -2579,6 +2625,7 @@ private	int	occi_thread_delete( void * vptr )
 
 	aptr = liberate_rest_response( aptr );
 	rptr = liberate_rest_request( rptr );
+	cptr = rest_drop_client( cptr );
 	return(0);
 
 }

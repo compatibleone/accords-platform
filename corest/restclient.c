@@ -91,6 +91,7 @@ public	struct	url *	analyse_url( char * target )
 	int	c;
 	char	*	sptr;
 	char	*	wptr;
+	char	*	mptr;
 	struct	url * uptr;
 
 	if (!( uptr = allocate_url()))
@@ -98,6 +99,7 @@ public	struct	url *	analyse_url( char * target )
 
 	else if (!( wptr = allocate_string(target) ))
 		return( uptr );
+	else	mptr = wptr;
 
 	sptr = wptr;
 
@@ -107,15 +109,18 @@ public	struct	url *	analyse_url( char * target )
 
 	if (!( *sptr ))
 	{
-		if (!( uptr->object = allocate_string( wptr ) ))
-			return( uptr );
-		else	return( uptr );
+		uptr->object = allocate_string( wptr );
+		liberate( mptr );
+		return( uptr );
 	}
 	else if ( *sptr == ':' )
 	{
 		*(sptr++)=0;
 		if (!( uptr->service = allocate_string( wptr ) ))
+		{
+			liberate( mptr );
 			return( uptr );
+		}
 		wptr = sptr;
 	}	
 
@@ -130,9 +135,15 @@ public	struct	url *	analyse_url( char * target )
 		*sptr = 0;
 
 		if (!( uptr->host = allocate_string( wptr ) ))
+		{
+			liberate( mptr );
 			return( uptr );
+		}
 		else if (!( c ))
+		{
+			liberate( mptr );
 			return( uptr );
+		}
 		else if ( c == '/' )
 			*sptr = c;
 		else if ( c == ':' )
@@ -141,7 +152,10 @@ public	struct	url *	analyse_url( char * target )
 			uptr->port = atoi(sptr);
 			while (( *sptr ) && ( *sptr != '/')) sptr++;
 			if (!( *sptr ))
+			{
+				liberate( mptr );
 				return( uptr );
+			}
 		}	
 		if ((!( uptr->port ))
 		&&  ( rest_valid_string( uptr->service ) ))
@@ -155,8 +169,15 @@ public	struct	url *	analyse_url( char * target )
 		wptr = sptr;
 	}
 	if (!( uptr->object = allocate_string( wptr ) ))
+	{
+		liberate( mptr );
 		return( uptr );
-	else	return( uptr );
+	}
+	else
+	{
+		liberate( mptr );
+		return( uptr );
+	}
 }
 
 /*	-------------------------------------------------	*/
