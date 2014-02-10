@@ -1283,8 +1283,6 @@ public	struct	occi_response *	occi_create_response(
 		return( aptr );
 	else if (!( aptr->name = allocate_string( rptr->name ) ))
 		return( occi_remove_response( aptr ) );
-	else if (!( aptr->host = allocate_string( rptr->host ) ))
-		return( occi_remove_response( aptr ) );
 	else
 	{
 		aptr->type = rptr->type;
