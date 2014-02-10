@@ -1461,9 +1461,15 @@ private	struct rest_response *	rest_consume_status(
 		struct rest_client  * cptr, 
 		struct rest_response * rptr)
 {
-	if (!( rptr->status = atoi(rest_consume_token(cptr,' '))))
+	char *	sptr;
+	if (!( sptr = rest_consume_token(cptr,' ') ))
 		return( rptr );
-	else	return( rptr );
+	else
+	{
+		rptr->status = atoi(sptr);
+		liberate( sptr );
+		return( rptr );
+	}
 }
 
 /*	------------------------------------------------	*/
@@ -1717,6 +1723,7 @@ public	char *	rest_temporary_filename(char * extension)
 		if (!( tptr = allocate_string( tempfilestub ) ))
 			return( tptr );
 	sprintf(namebuffer,"%s%s.%s",tempfilepath,tptr,( extension ? extension : "tmp" ));
+	liberate( tptr );
 	return( allocate_string( namebuffer ) );
 }
 
