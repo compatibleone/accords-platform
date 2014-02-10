@@ -63,6 +63,19 @@ public	struct tls_configuration * resolve_tls_configuration(char * filename )
 	return( cptr );
 }	
 
+/*	-------------------------------------------------	*/  
+/*	  f l u s h _ t l s _ c o n f i g u r a t i o n		*/
+/*	-------------------------------------------------	*/
+public	void	flush_tls_configuration()
+{
+	struct	tls_configuration * cptr;
+	while ((cptr=TlsMan.first) != (struct tls_configuration *) 0)
+	{
+		TlsMan.first = cptr->next;
+		cptr = liberate_tls_configuration( cptr );
+	}
+}	
+
 /*	---------------------------------------------	*/  
 /*	 t l s _ c o n f i g u r a t i o n _ l o a d 	*/
 /*	---------------------------------------------	*/

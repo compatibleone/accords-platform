@@ -2189,6 +2189,7 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 	struct 	rest_client * cptr=(struct rest_client *) 0;
 	struct 	rest_request * rptr=(struct rest_request *) 0;
 	struct	rest_response * aptr=(struct rest_response *) 0;
+	struct	rest_header * hhptr=(struct rest_header *) 0;
 	struct	url *	uptr;
 	char 	buffer[2048];
 
@@ -2199,19 +2200,25 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 	rest_log_message( buffer );
 
 	if (!( uptr = analyse_url( target ) ))
+	{
+		hptr = liberate_rest_header( hptr );
 		return(occi_failure(cptr,930,"incorrect url"));
-
+	}
 	else if (!( rptr = allocate_rest_request() ))
+	{
+		hptr = liberate_rest_header( hptr );
 		return(occi_failure(cptr,927,"allocation failure"));
-
+	}
 	else if (!( rptr->object = allocate_string( uptr->object ) ))
 	{
 		rptr = liberate_rest_request( rptr );
+		hptr = liberate_rest_header( hptr );
 		return(occi_failure(cptr,927,"allocation failure"));
 	}
 	else if (!( rptr = rest_parse_object( (struct rest_client *) 0, rptr) ))
 	{
 		rptr = liberate_rest_request( rptr );
+		hptr = liberate_rest_header( hptr );
 		return(occi_failure(cptr,927,"allocation failure"));
 	}
 	else
@@ -2221,21 +2228,25 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 	if (!( cptr = allocate_rest_client() ))
 	{
 		rptr = liberate_rest_request( rptr );
+		hptr = liberate_rest_header( hptr );
 		return(occi_failure(cptr,927,"allocation failure"));
 	}
 	else if (!( cptr->buffer = allocate((cptr->buffersize = _MAX_RESTBUFFER)) ))
 	{
 		rptr = liberate_rest_request( rptr );
+		hptr = liberate_rest_header( hptr );
 		return(occi_failure(cptr,927,"allocation failure"));
 	}
 	else if (!( rptr->method = allocate_string( method ) ))
 	{
 		rptr = liberate_rest_request( rptr );
+		hptr = liberate_rest_header( hptr );
 		return(occi_failure(cptr,927,"allocation failure"));
 	}
-	else if (!( hptr = rest_duplicate_headers( hptr )))
+	else if (!( hhptr = rest_duplicate_headers( hptr )))
 	{
 		rptr = liberate_rest_request( rptr );
+		hptr = liberate_rest_header( hptr );
 		return(occi_failure(cptr,927,"allocation failure"));
 	}
 	else
@@ -2244,24 +2255,36 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 		/* add the request headers */
 		/* ----------------------- */
 
-		if ((rptr->first = hptr) != (struct rest_header *) 0)
+		if ((rptr->first = hhptr) != (struct rest_header *) 0)
 		{
-			while ( hptr->next )
-				hptr = hptr->next;
-			rptr->last = hptr;
+			while ( hhptr->next )
+				hhptr = hhptr->next;
+			rptr->last = hhptr;
 		}
 
 		/* --------------------------------------------- */
 		/* add HOST header for correct Location handling */
 		/* --------------------------------------------- */
-		if (!(hptr = add_rest_header( rptr )))
+		if (!(hhptr = add_rest_header( rptr )))	
+		{
+			hptr = liberate_rest_header( hptr );
 			return(occi_failure(cptr,944,"HOST Header failure"));
-		else if (!( hptr->name = allocate_string( _HTTP_HOST ) ))
+		}
+		else if (!( hhptr->name = allocate_string( _HTTP_HOST ) ))
+		{
+			hptr = liberate_rest_header( hptr );
 			return(occi_failure(cptr,944,"HOST Header failure"));
-		else if (!( hptr->value = allocate_string( uptr->host ) ))
+		}
+		else if (!( hhptr->value = allocate_string( uptr->host ) ))
+		{
+			hptr = liberate_rest_header( hptr );
 			return(occi_failure(cptr,944,"HOST Header failure"));
+		}
 		else if (!( rest_request_host( rptr ) ))
+		{
+			hptr = liberate_rest_header( hptr );
 			return(occi_failure(cptr,944,"HOST Header failure"));
+		}
 
 		/* ---------------- */
 		/* process the body */
@@ -2289,6 +2312,7 @@ public	struct	rest_response * occi_local_server( char * method, char * target, c
 		/* ----------------------- */
 		rptr = liberate_rest_request( rptr );
 		cptr = liberate_rest_client( cptr );
+		hptr = liberate_rest_header( hptr );
 		return( aptr );
 	}
 }

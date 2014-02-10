@@ -486,14 +486,25 @@ private	int	test_cords_broker_banner(char * n)
 	return(0);
 }
 
+/*	-----------------------------------	*/
+/*		o p e r a t i o n		*/
+/*	-----------------------------------	*/
+private	int	operation( int argc, char * argv[] )
+{
+	int	status;
+	status = test_cords_broker_command( argc, argv );
+	occi_flush_clients();
+	return( status );
+}
+
 /*	-----------------------------------------------------	*/
 /*	     t e s t _ c o r d s _ b r o k e r _ m a i n	*/
 /*	-----------------------------------------------------	*/
 public	int	main(int argc, char * argv[])
 {
 	if ( argc == 1 )
-		return( test_cords_broker_banner(argv[0]) );
-	else	return( test_cords_broker_command( argc, argv ) );
+		return( test_cords_broker_banner( argv[0] ) );
+	else	return( operation( argc, argv ) );
 }
 
 

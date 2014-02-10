@@ -234,8 +234,8 @@ private int	test_cords_parser_command( int	argc, char * argv[] )
 private	int	test_cords_parser_banner(char * n)
 {
 	printf("\n   Cords Parser : Version 1.0.c.0.02 ");
-	printf("\n   Beta Version 12/09/2013 \n");
-	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
+	printf("\n   Beta Version 10/02/2014 \n");
+	printf("\n   Copyright (c) 2011, 2014 Iain James Marshall, Prologue ");
 	printf("\n   Usage : \n");
 	printf("\n   --xsd                dis-activate xsd validation ");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
@@ -254,6 +254,17 @@ private	int	test_cords_parser_banner(char * n)
 	return(0);
 }
 
+/*	-----------------------------------	*/
+/*		o p e r a t i o n		*/
+/*	-----------------------------------	*/
+private	int	operation( int argc, char * argv[] )
+{
+	int	status;
+	status = test_cords_parser_command( argc, argv );
+	occi_flush_clients();
+	return( status );
+}
+
 /*	-----------------------------------------------------	*/
 /*	     t e s t _ c o r d s _ p a r s e r _ m a i n	*/
 /*	-----------------------------------------------------	*/
@@ -261,7 +272,7 @@ public	int	main(int argc, char * argv[])
 {
 	if ( argc == 1 )
 		return( test_cords_parser_banner(argv[0]) );
-	else	return( test_cords_parser_command( argc, argv ) );
+	else	return( operation( argc, argv ) );
 }
 
 

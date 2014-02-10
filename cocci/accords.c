@@ -293,6 +293,7 @@ private	int	is_valid_value( char * sptr )
 public	void	load_accords_configuration( struct accords_configuration * cptr, char * sptr )
 {
 	int	security=0;
+	char 	*	wptr;
 	struct	xml_element * document;
 	struct	xml_element * eptr;
 	struct	xml_element * vptr;
@@ -304,6 +305,9 @@ public	void	load_accords_configuration( struct accords_configuration * cptr, cha
 		section	      = sptr;
 
 	set_xml_echo(cptr->debug);
+
+	if ((wptr = getenv( "COALLOC" )) != (char *) 0)
+		allocation_trace( atoi( wptr ) );	
 
 	if (( document = document_parse_file( cptr->config )) != (struct xml_element *) 0)
 	{

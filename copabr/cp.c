@@ -215,10 +215,20 @@ public	struct	occi_response * cords_retrieve_named_instance_list(
 					qptr,
 					namename, 
 					namevalue ) ))
+			{
+				qptr = occi_remove_request( qptr );
 				continue;
+			}
 			else if (!( yptr = occi_client_get( kptr, qptr ) ))
+			{
+				qptr = occi_remove_request( qptr );
 				continue;
-			else 	break;
+			}
+			else
+			{
+				qptr = occi_remove_request( qptr );
+				break;
+			}
 		}
 	}
 	zptr = occi_remove_response ( zptr );
