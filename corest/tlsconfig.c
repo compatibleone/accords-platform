@@ -39,6 +39,8 @@ public struct tls_configuration * liberate_tls_configuration(struct tls_configur
 			 sptr->certificate = liberate(sptr->certificate);
 		if ( sptr->passphrase )
 			 sptr->passphrase = liberate(sptr->passphrase);
+		if ( sptr->authority )
+			 sptr->authority = liberate(sptr->authority);
 		sptr = liberate( sptr );
 	}
 	return((struct tls_configuration *) 0);
