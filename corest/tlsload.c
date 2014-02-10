@@ -61,7 +61,56 @@ public	struct tls_configuration * resolve_tls_configuration(char * filename )
 			break;
 	}
 	return( cptr );
-}	
+}
+
+private struct tls_mode {
+	char *mode_str;
+	int mode_int;
+} tls_modes[] = {
+	{ "debug",				2		},
+	{ "use-ssl",			4		},
+	{ "request-peer",		8		},
+	{ "require-peer",		16		},
+	{ "der-key",			32		},
+	{ "der-cert",			64		},
+	{ "ssl-compat",			128		},
+	{ "internal",			256		},
+	{ "engine",				512		},
+	{ "accept-invalid",		1024	},
+	{ "self-signed",		2048	},
+	{ "valid-cert",			4096	},
+	{ "same-ca",			8192	},
+	{ NULL,					0		}
+};
+
+
+private int tls_mode_parse(const char *str) {
+	int mode = 0;
+	int m;
+	char *bs = allocate_string((char*)str);
+	char *s = bs;
+	char *ss = NULL;
+	printf("TLS_MODE_PARSE(%s)\n", str);
+	while((s = strtok_r(s, " ", &ss)) != NULL) {
+		for(m=0; tls_modes[m].mode_str; m++) {
+			if(!strcmp(s, tls_modes[m].mode_str)) {
+				break;
+			}
+		}
+		if(!tls_modes[m].mode_int) {
+			printf("WARNING: unknown option '%s' (in mode='%s')\n", s, str);
+		} else {
+			mode |= tls_modes[m].mode_int;
+		}
+
+		s = NULL;
+	}
+	liberate(bs);
+	if(mode < 1024) {
+		mode |= 4096; // valid-cert is the default
+	}
+	return mode;
+}
 
 /*	-------------------------------------------------	*/  
 /*	  f l u s h _ t l s _ c o n f i g u r a t i o n		*/
@@ -125,7 +174,7 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 			if ((aptr = document_atribut( eptr, "name" )) != (struct xml_atribut *) 0)
 				cptr->name = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "option" )) != (struct xml_atribut *) 0)
-				cptr->option = document_atribut_value( aptr );
+				cptr->option |= document_atribut_value( aptr );
 			if ((aptr = document_atribut( eptr, "authenticate" )) != (struct xml_atribut *) 0)
 				cptr->authenticate = document_atribut_value( aptr );
 			if ((aptr = document_atribut( eptr, "key" )) != (struct xml_atribut *) 0)
@@ -136,6 +185,8 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 				cptr->passphrase = document_atribut_password( aptr );
 			if ((aptr = document_atribut( eptr, "authority" )) != (struct xml_atribut *) 0)
 				cptr->authority = document_atribut_string( aptr );
+			if ((aptr = document_atribut( eptr, "mode" )) != (struct xml_atribut *) 0)
+				cptr->option |= tls_mode_parse(document_atribut_string( aptr ));
 		}
 		document = document_drop( document );
 	}
