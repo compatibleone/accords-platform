@@ -43,6 +43,8 @@
 #define _SSL_SAME_CA         8192
 #define _SSL_MODES         (_SSL_ACCEPT_INVALID|_SSL_SELF_SIGNED|_SSL_VALID_CERT|_SSL_SAME_CA)
 
+#define _SSL_IS_ISSUER         32768
+
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
 private	int	SSL_READY=0;
@@ -654,77 +656,216 @@ private	int	tls_server_verify_callback( int preverify, X509_STORE_CTX * certific
 /*		t l s _ c h e c k _ c e r t i f i c a t e		*/
 /*	-----------------------------------------------------------	*/
 typedef enum {
-    MatchFound,
-    MatchNotFound,
-    NoSANPresent,
-    MalformedCertificate,
-    Error
+	MatchFound,
+	MatchNotFound,
+	NoSANPresent,
+	MalformedCertificate,
+	Error
 } HostnameValidationResult;
 
+private HostnameValidationResult matches_common_name(const char *hostname, const X509 *server_cert) {
+	int common_name_loc = -1;
+	X509_NAME_ENTRY *common_name_entry = NULL;
+	ASN1_STRING *common_name_asn1 = NULL;
+	char *common_name_str = NULL;
+
+	// Find the position of the CN field in the Subject field of the certificate
+	common_name_loc = X509_NAME_get_index_by_NID(X509_get_subject_name((X509 *) server_cert), NID_commonName, -1);
+	if (common_name_loc < 0) {
+		return Error;
+	}
+
+	// Extract the CN field
+	common_name_entry = X509_NAME_get_entry(X509_get_subject_name((X509 *) server_cert), common_name_loc);
+	if (common_name_entry == NULL) {
+		return Error;
+	}
+
+	// Convert the CN field to a C string
+	common_name_asn1 = X509_NAME_ENTRY_get_data(common_name_entry);
+	if (common_name_asn1 == NULL) {
+		return Error;
+	}
+	common_name_str = (char *) ASN1_STRING_data(common_name_asn1);
+
+	// Make sure there isn't an embedded NUL character in the CN
+	if ((size_t)ASN1_STRING_length(common_name_asn1) != strlen(common_name_str)) {
+		return MalformedCertificate;
+	}
+
+	// Compare expected hostname with the CN
+	//if (Curl_cert_hostcheck(common_name_str, hostname) == CURL_HOST_MATCH)
+	if (!strcmp(common_name_str, hostname)) {
+		return MatchFound;
+	}
+	else {
+		return MatchNotFound;
+	}
+}
+
+private HostnameValidationResult matches_subject_alternative_name(const char *hostname, const X509 *server_cert) {
+	HostnameValidationResult result = MatchNotFound;
+	int i;
+	int san_names_nb = -1;
+	STACK_OF(GENERAL_NAME) *san_names = NULL;
+
+	// Try to extract the names within the SAN extension from the certificate
+	san_names = X509_get_ext_d2i((X509 *) server_cert, NID_subject_alt_name, NULL, NULL);
+	if (san_names == NULL) {
+		return NoSANPresent;
+	}
+	san_names_nb = sk_GENERAL_NAME_num(san_names);
+
+	// Check each name within the extension
+	for (i=0; i<san_names_nb; i++) {
+		const GENERAL_NAME *current_name = sk_GENERAL_NAME_value(san_names, i);
+
+		if (current_name->type == GEN_DNS) {
+			// Current name is a DNS name, let's check it
+			char *dns_name = (char *) ASN1_STRING_data(current_name->d.dNSName);
+
+			// Make sure there isn't an embedded NUL character in the DNS name
+			if ((size_t)ASN1_STRING_length(current_name->d.dNSName) != strlen(dns_name)) {
+				result = MalformedCertificate;
+				break;
+			}
+			else { // Compare expected hostname with the DNS name
+				//if (Curl_cert_hostcheck(dns_name, hostname)
+				//    == CURL_HOST_MATCH)
+				if (!strcmp(dns_name, hostname)) {
+					result = MatchFound;
+					break;
+				}
+			}
+		}
+	}
+	sk_GENERAL_NAME_pop_free(san_names, GENERAL_NAME_free);
+
+	return result;
+}
+
 private HostnameValidationResult validate_hostname(const char *hostname, X509 *cert) {
-    return MatchFound; /* never fail : for now */
+	HostnameValidationResult result;
+
+	if((hostname == NULL) || (cert == NULL))
+		return Error;
+
+	// First try the Subject Alternative Names extension
+	result = matches_subject_alternative_name(hostname, cert);
+	if (result == NoSANPresent) {
+		// Extension was not found: try the Common Name
+		result = matches_common_name(hostname, cert);
+	}
+
+	return result;
 }
 
 private	int	tls_check_certificate( X509_STORE_CTX * x509_ctx, void * arg )
 {
-	if ( check_debug() )
-		printf("tls_check_certificate()\n");
 
-    char cert_str[256];
-    CONNECTIONPTR	cptr = (CONNECTIONPTR)arg;
-    const char *host = "undefined";
-    const char *res_str = "tls_check_certificate() failed";
-    HostnameValidationResult res = Error;
+	char cert_str[256];
+	CONNECTIONPTR	cptr = (CONNECTIONPTR)arg;
+	const char *host = cptr->hostname ? cptr->hostname : "undefined";
+	const char *res_str = "tls_check_certificate() failed";
+	HostnameValidationResult res = Error;
+	SSL *ssl;
+	STACK_OF(X509_NAME) *sk;
+	int is_server = 0;
+	if ( SSL_debug )
+		printf("tls_check_certificate(%s)\n", cptr->hostname);
 
-    /* This is the function that OpenSSL would call if we hadn't called
-     * SSL_CTX_set_cert_verify_callback().  Therefore, we are "wrapping"
-     * the default functionality, rather than replacing it. */
-    int ok_so_far = X509_verify_cert(x509_ctx);
+	if(cptr->newobject != NULL) {
+		ssl = cptr->newobject;
+		is_server = 1;
+		res = MatchFound; // FIXME: check for certificate hash ?
+	} else {
+		ssl = cptr->object;
+	}
 
-    X509 *server_cert = X509_STORE_CTX_get_current_cert(x509_ctx);
+	/* This is the function that OpenSSL would call if we hadn't called
+	 * SSL_CTX_set_cert_verify_callback().  Therefore, we are "wrapping"
+	 * the default functionality, rather than replacing it.
+	 * This is where tls_client_verify_callback() gets called.
+	 * This is where tls_server_verify_callback() gets called. */
+	int ok_so_far = X509_verify_cert(x509_ctx);
 
-    /* We don't have the hostname, what should we check BTW ?
-     * This will be called for Azure self-signed certs AFAIK
-     * Maybe we could check an attribute of the certificate
-     */
-    if (ok_so_far) {
-        res = validate_hostname(host, server_cert);
 
-        switch (res) {
-            case MatchFound:
-                res_str = "MatchFound";
-                break;
-            case MatchNotFound:
-                res_str = "MatchNotFound";
-                break;
-            case NoSANPresent:
-                res_str = "NoSANPresent";
-                break;
-            case MalformedCertificate:
-                res_str = "MalformedCertificate";
-                break;
-            case Error:
-                res_str = "Error";
-                break;
-            default:
-                res_str = "WTF!";
-                break;
-        }
-    }
+	X509 *peer_cert = X509_STORE_CTX_get_current_cert(x509_ctx);
+	//X509 *self_cert = SSL_get_certificate(ssl);;
 
-    X509_NAME_oneline(X509_get_subject_name (server_cert),
-            cert_str, sizeof (cert_str));
+	X509_check_ca(peer_cert);
 
-    if (res == MatchFound) {
-        printf("https server '%s' has this certificate, "
-                "which looks good to me:\n%s\n",
-                host, cert_str);
-        return 1;
-    } else {
-        printf("Got '%s' for hostname '%s' and certificate:\n%s\n",
-                res_str, host, cert_str);
-        return 0;
-    }
+	if(SSL_debug) {
+		if (((sk=SSL_get_client_CA_list(ssl)) != NULL) && (sk_X509_NAME_num(sk) > 0)) {
+			char *buf = NULL;
+			X509_NAME *xn;
+			int i;
+			printf("---\nAcceptable client certificate CA names\n");
+			for (i=0; i<sk_X509_NAME_num(sk); i++) {
+				xn = sk_X509_NAME_value(sk,i);
+				buf = X509_NAME_oneline(xn, buf, 0);
+				if(buf) {
+					printf("%s\n", buf);
+					free(buf);
+				}
+			}
+		}
+		else {
+			printf("---\nNo client certificate CA names sent\n");
+		}
+	}
+
+	/* In Server mode: We don't have the hostname, what should we check BTW ?
+	 * This will be called for Azure self-signed certs AFAIK
+	 * Maybe we could check an attribute of the certificate
+	 */
+	if (ok_so_far) {
+		SSL_CTX *sslctx = SSL_get_SSL_CTX(ssl);
+		int mode = (long)SSL_CTX_get_app_data(sslctx);
+		if(mode & _SSL_SAME_CA) {
+			if(!(mode & _SSL_IS_ISSUER)) {
+				debug("\n\nConnection refused: not same CA\n\n");
+				return 0;
+			}
+		}
+		if(is_server == 0) {
+			res = validate_hostname(host, peer_cert);
+
+			switch (res) {
+				case MatchFound:
+					res_str = "MatchFound";
+					break;
+				case MatchNotFound:
+					res_str = "MatchNotFound";
+					break;
+				case NoSANPresent:
+					res_str = "NoSANPresent";
+					break;
+				case MalformedCertificate:
+					res_str = "MalformedCertificate";
+					break;
+				case Error:
+					res_str = "Error";
+					break;
+				default:
+					res_str = "WTF!";
+					break;
+			}
+		}
+	}
+
+	X509_NAME_oneline(X509_get_subject_name (peer_cert),
+			cert_str, sizeof (cert_str));
+	if (res == MatchFound) {
+		debug("https server '%s' has this certificate, "
+				"which looks good to me:\n%s\n",
+				host, cert_str);
+		return 1;
+	} else {
+		debug("ERROR: Got '%s' for hostname '%s' and certificate:\n%s\n",
+				res_str, host, cert_str);
+		return 0;
+	}
 }
 
 /*	------------------------------------------------	*/
@@ -850,6 +991,8 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 
 	SSL_CTX_set_mode (cptr->context, SSL_MODE_ENABLE_PARTIAL_WRITE);
 	SSL_CTX_set_mode (cptr->context, SSL_MODE_AUTO_RETRY);
+
+	SSL_CTX_set_app_data(cptr->context, (void*)(long)mode);
 
 	if (!( mode & _SSL_INTERNAL ))
 	{
