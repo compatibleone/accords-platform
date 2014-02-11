@@ -680,32 +680,65 @@ private	int	tls_client_verify_callback( int preverify, X509_STORE_CTX * certific
 
 private	int	tls_server_verify_callback( int preverify, X509_STORE_CTX * certificate )
 {
-	if ( check_debug() )
+	if ( SSL_debug )
 		printf("tls_server_verify_callback(%u)\n",preverify);
-    X509 *err_cert;
-    char buf[256];
-    int err, depth;
-    SSL *ssl;
-    (void)ssl;
-    err_cert = X509_STORE_CTX_get_current_cert(certificate);
-    err = X509_STORE_CTX_get_error(certificate);
-    depth = X509_STORE_CTX_get_error_depth(certificate);
-    ssl = X509_STORE_CTX_get_ex_data(certificate, SSL_get_ex_data_X509_STORE_CTX_idx());
-    X509_NAME_oneline(X509_get_subject_name(err_cert), buf, 256);
+	X509 *err_cert;
+	char buf[256];
+	int err, depth;
+	SSL_CTX *sslctx;
+	SSL *ssl;
+	long mode;
+	err_cert = X509_STORE_CTX_get_current_cert(certificate);
+	err = X509_STORE_CTX_get_error(certificate);
+	depth = X509_STORE_CTX_get_error_depth(certificate);
+	ssl = X509_STORE_CTX_get_ex_data(certificate,
+								SSL_get_ex_data_X509_STORE_CTX_idx());
+	sslctx = SSL_get_SSL_CTX(ssl);
+	mode = (long)SSL_CTX_get_app_data(sslctx);
+	debug("mode: %ld\n", mode);
+	X509_NAME_oneline(X509_get_subject_name(err_cert), buf, 256);
+
+	X509 *peer_cert = X509_STORE_CTX_get_current_cert(certificate);
+	X509 *self_cert = SSL_get_certificate(ssl);;
+
+	int is_issuer_err = X509_check_issued(peer_cert, self_cert);
+	debug("is issuer: %d\n", is_issuer_err);
+	if(!is_issuer_err && !(mode & _SSL_IS_ISSUER)) {
+		SSL_CTX_set_app_data(sslctx, (void*)(mode|_SSL_IS_ISSUER));
+	}
+
 	if ( check_debug() ) {
-        if (!preverify) {
-            printf("verify error:num=%d:%s\ndepth=%d:%s\n", err,
-                     X509_verify_cert_error_string(err), depth, buf);
-        } else {
-            printf("depth=%d:%s\n", depth, buf);
-        }
-        if (!preverify && (err == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT))
-        {
-          X509_NAME_oneline(X509_get_issuer_name(certificate->current_cert), buf, 256);
-          printf("issuer= %s\n", buf);
-        }
-    }
-	return(1);	/* never fail : for now */
+		if (!preverify) {
+			printf("verify error:num=%d:%s\ndepth=%d:%s\n", err,
+					X509_verify_cert_error_string(err), depth, buf);
+		} else {
+			printf("depth=%d:%s\n", depth, buf);
+		}
+		if (!preverify && (err == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT))
+		{
+			X509_NAME_oneline(X509_get_issuer_name(certificate->current_cert), buf, 256);
+			printf("issuer= %s\n", buf);
+		}
+	}
+	if (!preverify) {
+		switch(err) {
+			/* List of possible codes at:
+			 * http://www.openssl.org/docs/apps/verify.html#
+			 */
+			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
+				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
+					return 1;
+				} else {
+					printf("ERROR: Self-signed cert not allowed (%ld)\n", mode);
+				}
+				break;
+		}
+		debug("verify error:num=%d:%s\ndepth=%d:%s\n", err,
+			 X509_verify_cert_error_string(err), depth, buf);
+
+		return 0;
+	}
+	return(1);
 }
 
 /*	-----------------------------------------------------------	*/
