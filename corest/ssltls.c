@@ -866,95 +866,96 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		SSL_CTX_set_cert_verify_callback( cptr->context, NULL, cptr );
 	}
 
-	if ( mode )
+	if ( mode & _DER_CERTIFICATE )
 	{
-		if ( mode & _DER_CERTIFICATE )
-		{
-			if (!(oof=SSL_CTX_use_certificate_file(
-				cptr->context,SslCertFile,SSL_FILETYPE_ASN1))) 
-			{
-				tls_show_errors( "SSL_use_certificate_chain_file" );
-				close_connection( cptr );
-				return( 0 );
-			}
-		}
-	
-		else if (!(oof = SSL_CTX_use_certificate_chain_file(cptr->context,SslCertFile))) 
+		if (!(oof=SSL_CTX_use_certificate_file(
+						cptr->context,SslCertFile,SSL_FILETYPE_ASN1)))
 		{
 			tls_show_errors( "SSL_use_certificate_chain_file" );
 			close_connection( cptr );
 			return( 0 );
 		}
-	
-		SSL_CTX_set_default_passwd_cb(cptr->context,ssl_password_callback);
+	}
 
-		if ( mode & _OPENSSL_ENGINE )
-		  {
-		    /* setup engine pkcs11 */
-		    e = setup_engine(ENGINE_ID);
-		    if (e == NULL)
-		      {
+	else if (!(oof = SSL_CTX_use_certificate_chain_file(cptr->context,SslCertFile)))
+	{
+		tls_show_errors( "SSL_use_certificate_chain_file" );
+		close_connection( cptr );
+		return( 0 );
+	}
+
+	SSL_CTX_set_default_passwd_cb(cptr->context,ssl_password_callback);
+
+	if ( mode & _OPENSSL_ENGINE )
+	{
+		/* setup engine pkcs11 */
+		e = setup_engine(ENGINE_ID);
+		if (e == NULL)
+		{
 			close_connection( cptr );
 			return( 0 );
-		      }    
+		}
 
-		    pkey = ENGINE_load_private_key(e, SslKeyFile, NULL, NULL);
-		    if (!pkey) 
-		      {
+		pkey = ENGINE_load_private_key(e, SslKeyFile, NULL, NULL);
+		if (!pkey)
+		{
 			tls_show_errors( "ENGINE_load_private_key" );
 			close_connection( cptr );
 			ENGINE_free(e);
 			return( 0 );
-		      }
-		    if (!(oof = SSL_CTX_use_PrivateKey(cptr->context,pkey)))
-		      {
+		}
+		if (!(oof = SSL_CTX_use_PrivateKey(cptr->context,pkey)))
+		{
 			tls_show_errors( "SSL_CTX_use_PrivateKey" );
 			close_connection( cptr );
 			ENGINE_free(e);
 			return( 0 );
-		      }
-		    EVP_PKEY_free(pkey);
-		    ENGINE_free(e);
-		  }
-		else
-		  {
-		    if (!(oof = SSL_CTX_use_PrivateKey_file(
-			cptr->context,SslKeyFile,
-			(mode & _DER_KEY ? SSL_FILETYPE_ASN1 : SSL_FILETYPE_PEM) ) ))
-		      {
+		}
+		EVP_PKEY_free(pkey);
+		ENGINE_free(e);
+	}
+	else
+	{
+		if (!(oof = SSL_CTX_use_PrivateKey_file(
+						cptr->context,SslKeyFile,
+						(mode & _DER_KEY ? SSL_FILETYPE_ASN1 : SSL_FILETYPE_PEM) ) ))
+		{
 			tls_show_errors( "SSL_CTX_use_PrivateKey_file" );
 			close_connection( cptr );
 			return( 0 );
-		      }
-		  }
-		
-		if ( SslCaList )
-		{
-			if (!(SSL_CTX_load_verify_locations(cptr->context,SslCaList, 0))) 
-			{
-				tls_show_errors( "SSL_CTX_load_verify_locations" );
-				close_connection( cptr );
-				return( 0 );
-			}
 		}
+	}
 
-		else if (!( mode &  _DER_CERTIFICATE ))
+	if ( SslCaList )
+	{
+		if (!(SSL_CTX_load_verify_locations(cptr->context,SslCaList, 0)))
 		{
-			if (!(SSL_CTX_load_verify_locations(cptr->context,SslCertFile, 0))) 
+			/* if this is not a file, try a directory */
+			if (!(SSL_CTX_load_verify_locations(cptr->context, 0, SslCaList)))
 			{
 				tls_show_errors( "SSL_CTX_load_verify_locations" );
 				close_connection( cptr );
 				return( 0 );
 			}
 		}
+	}
+
+	else if (!( mode &  _DER_CERTIFICATE ))
+	{
+		if (!(SSL_CTX_load_verify_locations(cptr->context,SslCertFile, 0)))
+		{
+			tls_show_errors( "SSL_CTX_load_verify_locations" );
+			close_connection( cptr );
+			return( 0 );
+		}
+	}
 
 #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
-		SSL_CTX_set_verify_depth(cptr->context,1);
+	SSL_CTX_set_verify_depth(cptr->context,1);
 #endif
-        if(!SSL_CTX_check_private_key(cptr->context)) {
-            printf("Private key does not match the public certificate\n");
-            return 0;
-        }
+	if(!SSL_CTX_check_private_key(cptr->context)) {
+		printf("Private key does not match the public certificate\n");
+		return 0;
 	}
 
 	if (!( cptr->object = SSL_new( cptr->context ) )) 
