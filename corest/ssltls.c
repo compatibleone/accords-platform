@@ -1,6 +1,8 @@
 #ifndef	_abalssl_c
 #define	_abalssl_c
 
+#include <openssl/x509v3.h>
+#include <openssl/ssl.h>
 #include <openssl/engine.h>
 #include "allocate.h"
 
@@ -35,6 +37,12 @@
 #define	_SSL_INTERNAL		256
 #define _OPENSSL_ENGINE         512
 
+#define _SSL_ACCEPT_INVALID         1024
+#define _SSL_SELF_SIGNED         2048
+#define _SSL_VALID_CERT         4096
+#define _SSL_SAME_CA         8192
+#define _SSL_MODES         (_SSL_ACCEPT_INVALID|_SSL_SELF_SIGNED|_SSL_VALID_CERT|_SSL_SAME_CA)
+
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
 private	int	SSL_READY=0;
@@ -43,7 +51,8 @@ private	int	total_contexts=0;
 private	int	ssl_debug;
 
 #define	Portable_srandom	srandom
-#define	SSL_debug 		check_debug()
+#define	SSL_debug 		(check_debug() || ssl_debug)
+#define debug(...) { if(check_debug()) fprintf(stderr, ##__VA_ARGS__); }
 #define	SIGNAL_verbose 		check_verbose()
 
 #define	_DEFAULT_KEYFILE  	"server.pem"
@@ -954,9 +963,9 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		close_connection( cptr );
 		return( 0 );
 	}
-	if ( mode & _REQUIRE_PEER )
+	if ( (mode & _REQUIRE_PEER) || (mode & _SSL_MODES >= _SSL_SAME_CA) )
 		SSL_set_verify( cptr->object,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,tls_client_verify_callback);
-	else if ( mode & _REQUEST_PEER )
+	else if ( (mode & _REQUEST_PEER) || (mode & _SSL_MODES >= _SSL_VALID_CERT) )
 		SSL_set_verify( cptr->object,SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE,tls_client_verify_callback);
 	else	SSL_set_verify( cptr->object,SSL_VERIFY_NONE,tls_client_verify_callback);
 	return( 1 );
@@ -1081,11 +1090,16 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
         //DG FIXME: Server should build and send the CA list
         //SSL_CTX_set_client_CA_list(tlsctx, SSL_load_client_CA_file(SslCertFile));
 
-		if ( mode & _REQUIRE_PEER )
+		if ( (mode & _REQUIRE_PEER) || ((mode & _SSL_MODES) >= _SSL_SAME_CA) ) {
+			debug("MODE SAME_CA\n");
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,tls_server_verify_callback);
-		else if ( mode & _REQUEST_PEER )
+		} else if ( (mode & _REQUEST_PEER) || ((mode & _SSL_MODES) >= _SSL_SELF_SIGNED) ) {
+			debug("MODE VALID_CERT\n");
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE,tls_server_verify_callback);
-		else	SSL_set_verify( cptr->newobject,SSL_VERIFY_NONE,tls_server_verify_callback);
+		} else {
+			debug("MODE INVALID_CERT %d\n", mode);
+			SSL_set_verify( cptr->newobject,SSL_VERIFY_NONE,tls_server_verify_callback);
+		}
 		security_unlock( 0, "server_set_verify" );
 
 		security_lock( 0, "server_set_fd" );
