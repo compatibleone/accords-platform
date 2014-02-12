@@ -61,7 +61,7 @@
 		<xsd:attribute name="role" type="xsd:string"/>
 		<xsd:attribute name="account" type="xsd:string"/>
 		<xsd:attribute name="authorization" type="xsd:string"/>
-		<xsd:attribute name="when" type="xsd:string"/>
+		<xsd:attribute name="stamp" type="xsd:string"/>
 		<xsd:attribute name="state" type="xsd:integer"/>
 	</xsd:complexType>
 
