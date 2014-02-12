@@ -344,8 +344,8 @@ int	generate()
 		{
 			fprintf(C.target,"\t<xsd:attribute name=%c%s%c",0x0022,iptr->name,0x0022);
 			if (!( strcmp( iptr->basic , "int" ) ))
-				fprintf(C.target," type=%c%s%c",0x0022,"xsd:integer");
-			else	fprintf(C.target," type=%c%s%c",0x0022,"xsd:string");
+				fprintf(C.target," type=%c%s%c",0x0022,"xsd:integer",0x0022);
+			else	fprintf(C.target," type=%c%s%c",0x0022,"xsd:string",0x0022);
 			fprintf(C.target,"/>\n");
 		}
 		fprintf(C.target,"</xsd:complexType>\n");

@@ -72,8 +72,13 @@ private	int	az_result( struct az_response * rptr )
 				{
 					if ( rptr->response->type == _FILE_BODY )
 					{
-						sprintf(buffer,"cat %s",rptr->response->body);
-						system( buffer );
+						FILE *fp = fopen(rptr->response->body, "r");
+						int sz = 0;
+
+						do {
+							sz = fread(buffer, 1, sizeof(buffer), fp);
+						} while(sz > 0 && fwrite(buffer, 1, sz, stdout) > 0);
+						fclose(fp);
 					}
 					else 	printf("\n%s\n",rptr->response->body);
 					printf("\n");

@@ -33,8 +33,8 @@ private	struct	on_config On = {
 	(char *) 0,
 	(char *) 0,
 
-	0,
 	(char *) 0,
+	0,
 
 	(char *) 0,
 	(char *) 0,

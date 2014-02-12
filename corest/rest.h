@@ -127,6 +127,7 @@ struct	rest_client
 	struct	rest_client 	* previous;
 	struct	rest_client 	* next;
 	struct	rest_server 	* parent;	/* used for list management */
+	char			*hostname;
 	char			* agent;	
 	char			* buffer;
 	int			buffersize;

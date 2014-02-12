@@ -166,8 +166,10 @@ public	int	socket_create( int a, int b, int c )
 		h = -1;
 	else
 	{
+		optval = 1;
+		(void) setsockopt(h, SOL_SOCKET, SO_REUSEADDR, (int *) & optval, sizeof( optval ));
 		optval = 60;
-		(void) setsockopt(h, SOL_SOCKET, (SO_KEEPALIVE | SO_REUSEADDR), (int *) & optval, sizeof( optval ));
+		(void) setsockopt(h, SOL_SOCKET, SO_KEEPALIVE, (int *) & optval, sizeof( optval ));
 		optval = 1;
 		(void) setsockopt(h, SOL_TCP, TCP_NODELAY, (int *) & optval, sizeof( optval ));
 	}
@@ -208,7 +210,7 @@ public	int	socket_connect( int h, char * u,int port )
 	address.sin_family = get_socket_type();
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(0);
-	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) 
+	if ( bind(h, (struct sockaddr *)& address, sizeof( struct sockaddr_in)) < 0 ) 
 	{
 		lerrno = errno;
 		return(lerrno);
@@ -255,7 +257,7 @@ public	int	socket_try_connect( int h, char * u,int port, int timeout )
 	address.sin_family = get_socket_type();
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(0);
-	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) 
+	if ( bind(h, (struct sockaddr *)& address, sizeof( struct sockaddr_in)) < 0 ) 
 	{
 		socket_close( h ) ;
 		return(0);
@@ -375,7 +377,7 @@ public	int	socket_listen( int h, int port, int max )
 	address.sin_family = get_socket_type();
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(port);
-	if ( bind(h, & address, sizeof( struct sockaddr_in)) < 0 ) {
+	if ( bind(h, (struct sockaddr *)& address, sizeof( struct sockaddr_in)) < 0 ) {
 		socket_close( h ) ;
 		return(0);
 		}

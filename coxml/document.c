@@ -68,7 +68,8 @@ private	int	document_atb_value( struct xml_application * xptr, char * token )
 		return(118 );
 	else if (!( aptr = eptr->lastatb ))
 		return( 48 );
-	else if (!( aptr->value = allocate_string( token ) ))
+	/* secure alloc for attribute values by default */
+	else if (!( aptr->value = allocate_string_secure( token ) ))
 		return( 27 );
 	else if (! (aptr->value = unserialize_xml_string_attribute_value(aptr->value)))
 	{
@@ -299,6 +300,28 @@ public	int	document_atribut_value( struct xml_atribut * aptr )
 	else	return( atoi( (s+1) ) );
 }
 
+/*	----------------------------------------------------  */
+/*	   d o c u m e n t _ a t r i b u t _ p a s s w o r d  */
+/*	----------------------------------------------------  */
+public	char * 	document_atribut_password( struct xml_atribut * aptr )
+{
+	char *	r;
+	char *	s;
+	int	l;
+	if (!( s = aptr->value ))
+		return( s );
+	else if (( *s != 0x0022 ) && ( *s != 0x0027 ))
+		return( allocate_string_secure(s) );
+	else if (!( r = allocate_secure((l = strlen(++s))) ))
+		return( r );
+	else 	{
+		l--;
+		memcpy(r, s , l );
+		*(r+l) = 0;
+		return( r );
+		}
+}
+
 /*	---------------------------------------------------	*/
 /*	   d o c u m e n t _ a t r i b u t _ s t r i n g	*/
 /*	---------------------------------------------------	*/
@@ -373,7 +396,7 @@ public	void	document_show_element( struct xml_element * eptr, int level )
 		{
 			printf("\n");
 			for (i=0; i < (level+1); i++) printf("\t");
-			printf("%s=%c%",aptr->name,0x0022);
+			printf("%s=%c",aptr->name,0x0022);
 			if ( aptr->value )
 			{
 				for ( 	sptr=aptr->value;
@@ -423,7 +446,7 @@ public	void	document_serialise_element( FILE * h, struct xml_element * eptr, int
 		{
 			fprintf(h,"\n");
 			for (i=0; i < (level+1); i++) fprintf(h,"\t");
-			fprintf(h,"%s=%c%",aptr->name,0x0022);
+			fprintf(h,"%s=%c",aptr->name,0x0022);
 			if ( aptr->value )
 			{
 				for ( 	sptr=aptr->value;

@@ -349,7 +349,7 @@ public	int	orga_command(int argc, char * argv[] )
 			else	set_default_agent( agent );
 			if (!( config ))
 				return( failure( status, "missing", "--config parameter" ) );
-			if (!(subscription = check_orga_subscription( config ) ))
+			if (!(subscription = check_orga_subscription( config, "Missing parameter ??" ) ))
 				return( failure( status, "initialising", "client" ) );
 			else 	return( orga_operation( subscription, aptr, 
 					( argi < argc ? argv[argi] : (char *) 0 ),

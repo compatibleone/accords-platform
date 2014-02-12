@@ -59,7 +59,7 @@ struct	rest_response * euca_command_hack( char * execname )
 
 	printf("**** HACK ( %s ) **** \n",buffer);
 
-	system( buffer );
+	int dummy = system( buffer );
 
 	if (!( h = fopen( filename,"r") ))
 	{

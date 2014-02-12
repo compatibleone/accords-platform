@@ -206,11 +206,11 @@ the production and delivery of Valid Certification Authority Signed certificates
 the Accords platform components but also by the provisioned resources and products delivered by the 
 platform. 
 
-The security option values are defined as follows:
+The security option (resp. mode) values are defined as follows:
 
 1,2,4		These three option values are undefined in this SSL / TLS implementation for ACCORDS.
 
-8		REQUEST PEER CERTIFICATE
+8		REQUEST PEER CERTIFICATE (mode: request-peer)
 		When this option value is set then the server will issue a Send Certificate request to
 		the client during the Server Hello phase of handshake and cypher negociation. 
 		This option instructs the Client to validate the Certificate chain received from the 
@@ -218,20 +218,20 @@ The security option values are defined as follows:
 		Certificates with throw "Incorrect Certificate" alerts when this option is active.
 		If a Certificate is not exchanged then no failure will occur since it not mandatory.
 
-16		REQUIRE PEER CERTIFICATE
+16		REQUIRE PEER CERTIFICATE (mode: require-peer)
 		This options requires an exchange of valid Certificates by both Client and Servers.
 		An error will occur if no Certificate is made available or if the Certificate is not
 		Correct.
 
-32		DER KEY FILE FORMAT
+32		DER KEY FILE FORMAT (mode: der-key)
 		When this option is set it indicates that the Private Key file is not a base64 PEM
 		Ascii encoded file but rather a binary DSR,ASN or otherwise encoded file.
 
-64		DER CERTIFICATE FILE FORMAT
+64		DER CERTIFICATE FILE FORMAT (mode: der-cert)
 		When this option is set it indicates that the Certificate File is not a base64 PEM
 		Ascii encoded file but rather a binary DSR,ASN or otherwise encoded file.
 
-128		SSL COMPATIBLE
+128		SSL COMPATIBLE (mode: ssl-compat)
 		when this option is set then the SSL compatible mode will be activated and as such the
 		client connection handshake will commence with an SSL V2 or V3 Hello Message. This may
 		be accepted by SSL V1, V2, V3 and TLS v1 servers. However an RFC dating from April 2011
@@ -243,10 +243,30 @@ The security option values are defined as follows:
 		server will only communicate with Clients behaving accordingly. This requirement may be
 		relaxed by use of this option value.
 
-256		INTERNAL SSL CERTIFICATE VERIFICATION
+256		INTERNAL SSL CERTIFICATE VERIFICATION (mode: internal)
 		This option may be set when Exchange of Self-Signed Certificates by Clients and Servers
 		is required. This is necessary for instance when working with Windows Azure platforms
 		which expressly request provision of a self signed certificate by the client endpoint.
+
+
+Additionnaly, the following values can be used in place of, or in complement of,
+the previous ones:
+
+1024	SSL ACCEPT INVALID CERTIFICATE (mode: accept-invalid)
+		When this option is set, any certificate will be accepted without
+		verification of its validity.
+
+2048	SSL ACCEPT SELF SIGNED CERTIFICATE (mode: self-signed)
+		When this option is set, self signed certificates will be accepted, but
+		they must be valid otherwise.
+
+4096	SSL ACCEPT VALID CERTIFICATE ONLY (mode: valid-cert)
+		With this option, only valid certificates will be accepted.
+
+8192	SSL ACCEPT CERTIFICATE FROM SAME CA ONLY (mode: same-ca)
+		This option allows for certificate authentication, based on the same CA
+		for both peer certificate signatures.
+
 
 These options are necessary during the development and test phases of the Accords platform and should 
 be used carefully and only by persons with a solid understanding of the RFC for TLS and their implications 
@@ -258,6 +278,8 @@ The value of the security options is provided by two different
 variables "options" and "optionst" inside the "install.linux" and "install.debian" scripts to allow the 
 value to be set for servers and for tools independantly. It is however recommened that they be set to the
 same value to ensure homogenous operation.
+In place of the "options" attribute, one can use the human readable "mode" attribute. It can contain one or
+more space-separated values from the above list.
 
 AUTHENTICATION
 --------------

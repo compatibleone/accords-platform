@@ -1126,7 +1126,7 @@ private	void	colog_show_events()
 private	void	colog_show_modules()
 {
 	struct	colog_module * mptr;
-	fprintf(colog_handle,"<p><table width='90%'><tr><th class=ath colspan=4>COLOG Module List</th></tr>\n");
+	fprintf(colog_handle,"<p><table width='90%%'><tr><th class=ath colspan=4>COLOG Module List</th></tr>\n");
 	fprintf(colog_handle,"<tr><th class=ath>Number<th class=ath>Name<th class=ath>Process<th class=ath>URL</tr>\n");
 	maxcolumns=0;
 	for (	mptr=Manager.FirstModule;

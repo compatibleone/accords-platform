@@ -474,6 +474,7 @@ private	struct rest_client * 	rest_open_client( char * host, int port, char * tl
 	else
 	{
 		tls_configuration_use( cptr->tlsconf );
+		cptr->net.hostname = host;
 		if (!( tls_client_handshake( &cptr->net, cptr->tlsconf->option ) ))
 		{
 			sprintf(buffer,"rest_open_client:failure:tls_client_handshake:%u:%s",

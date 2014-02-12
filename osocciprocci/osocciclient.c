@@ -582,7 +582,7 @@ private	struct	rest_header * occi_os_add_kind( struct rest_header * root, char *
 		while ( foot->next )
 			foot = foot->next;
 
-	sprintf(buffer, "%s; scheme=%c%s%c; class=%ckind%", kind, 0x0022,schema,0x0022,0x0022,0x0022 );
+	sprintf(buffer, "%s; scheme=%c%s%c; class=%ckind%c", kind, 0x0022,schema,0x0022,0x0022,0x0022 );
 	if (!( hptr = occi_os_header( "Category", buffer ) ))
 		return( liberate_rest_header( root ) );
 	else if (!( hptr->previous = foot ))

@@ -18,6 +18,8 @@
 #ifndef	_allocate_c
 #define	_allocate_c
 
+//#define mem_debug
+
 #include "allocate.h"
 
 int	indent=0;
@@ -35,23 +37,107 @@ public	void	allocation_trace( int mode )
 	return;
 }
 
+private	pthread_mutex_t allocation_control = PTHREAD_MUTEX_INITIALIZER;
+
+struct mem_header {
+    int secure;
+    size_t size;
+    char data[];
+};
+
+#define mem_hdr(v) ((struct mem_header *)(v - sizeof(struct mem_header)))
+
+#ifdef mem_debug
+private int alloc_size = 0;
+private int salloc_size = 0;
+private int alloc_count = 0;
+private int salloc_count = 0;
+
+#define addref(v) { if(v->secure) { alloc_count++; alloc_size += v->size; } else { salloc_count++; salloc_size += v->size; } }
+#define subref(v) { if(v->secure) { alloc_count--; alloc_size -= v->size; } else { salloc_count--; salloc_size -= v->size; } }
+#define printmem(s,v) { printf("MEM_DEBUG: %s %p %p %d %6lu [%3d %6d %3d %6d]\n", s, v, v->data, v->secure, v->size, alloc_count, alloc_size, salloc_count, salloc_size); }
+#else
+#define addref(v)
+#define subref(v)
+#define printmem(s,v)
+#endif
+
+/*	-----------------------------------	*/
+/*		a l l o c a t e	_ s e c u r e	*/
+/*	-----------------------------------	*/
+/*	centralised secure memory allocation.	*/
+/*	-----------------------------------	*/
+public	void *	allocate_secure(int n)
+{
+	struct mem_header	*	vptr;
+	pthread_mutex_lock( &allocation_control );
+	if (( vptr = malloc(sizeof(struct mem_header)+n)) != (void *) 0) {
+        vptr->secure = 1;
+        vptr->size = n;
+        /* initialize data */
+		memset(vptr->data,0,n);
+        /* disallow memory swapping */
+        int res = mlock(vptr, sizeof(struct mem_header)+n);
+        if(res < 0) {
+            perror("Warning: Could not lock secure memory");
+        }
+		addref(vptr);
+		printmem("allocate", vptr);
+    }
+	pthread_mutex_unlock( &allocation_control );
+	return( (void *)vptr->data );		
+}
+
+/*	-----------------------------------	*/
+/*		l i b e r a t e	_ s e c u r e   */
+/*	-----------------------------------	*/
+/*	centralised secure memory release.  */
+/*	-----------------------------------	*/
+public	void *	liberate_secure( void * v)
+{
+	if( v) {
+		struct mem_header	*	vptr = mem_hdr(v);
+		pthread_mutex_lock( &allocation_control );
+		subref(vptr);
+		printmem("liberate", vptr);
+    	if(vptr->secure) {
+    	    int n = sizeof(struct mem_header) + vptr->size;
+    	    /* burn data */
+    	    memset(vptr, 0, n);
+    	    /* allow memory swapping */
+    	    munlock(vptr, n);
+    	}
+		lcounter++;
+		if ( areport )
+			printf("%lu liberate %u %lu\n",lcounter,0,v);
+		free(vptr);
+		pthread_mutex_unlock( &allocation_control );
+	}
+	return((void *) 0);
+}
+
+
 /*	-----------------------------------	*/
 /*		a l l o c a t e			*/
 /*	-----------------------------------	*/
 /*	centralised memory allocation.		*/
 /*	-----------------------------------	*/
-private	pthread_mutex_t allocation_control = PTHREAD_MUTEX_INITIALIZER;
 public	void *	allocate(int n)
 {
-	void	*	vptr;
+	struct mem_header	*	vptr;
 	pthread_mutex_lock( &allocation_control );
-	acounter++;
-	if (( vptr = malloc(n)) != (void *) 0)
-		memset(vptr,0,n);
+	if (( vptr = malloc(sizeof(struct mem_header)+n)) != (void *) 0) {
+		acounter++;
+        vptr->secure = 0;
+        vptr->size = n;
+		memset(vptr->data,0,n);
+		if ( areport )
+			printf("%lu allocate %u %lu\n",acounter,n,vptr);
+		addref(vptr);
+		printmem("allocate", vptr);
+    }
 	pthread_mutex_unlock( &allocation_control );
-	if ( areport )
-		printf("%lu allocate %u %lu\n",acounter,n,vptr);
-	return( vptr );		
+	return( (void *)vptr->data );		
 }
 
 /*	-----------------------------------	*/
@@ -61,18 +147,24 @@ public	void *	allocate(int n)
 /*	-----------------------------------	*/
 public	void *	liberate( void * v)
 {
-	if ( v )
-	{
-		pthread_mutex_lock( &allocation_control );
-		lcounter++;
-		if ( areport )
-			printf("%lu liberate %u %lu\n",lcounter,0,v);
-		free(v);
-		pthread_mutex_unlock( &allocation_control );
-	}
-	return((void *) 0);
+    return liberate_secure(v);
 }
 
+
+/*	-----------------------------------	*/
+/*	  a l l o c a t e _ s t r i n g _ s e c u r e  */
+/*	-----------------------------------	*/
+/*	centralised string allocation.		*/
+/*	-----------------------------------	*/
+public	char *	allocate_string_secure( char *s )
+{
+	char *	r;
+	if (!( s ))
+		return( s );
+	else if (!( r = allocate_secure(strlen(s)+1) ))
+		return(r);
+	else	return(strcpy(r,s));
+}
 
 /*	-----------------------------------	*/
 /*	  a l l o c a t e _ s t r i n g		*/

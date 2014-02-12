@@ -40,7 +40,7 @@ static PyObject *pycompdev_launchModule(PyObject *self, PyObject *args)
  if (numLines < 0)   return NULL;
  argv = (char**) malloc(sizeof (char*) * numLines);
   for(i = 0; i < numLines; i++)
-      argv= (char*) malloc(sizeof (char) * 1024);
+      argv= (char**) malloc(sizeof (char *) * 1024);
 
  for (i=0; i<numLines; i++)
  {

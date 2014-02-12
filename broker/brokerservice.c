@@ -841,8 +841,8 @@ private	int	delete_service_contract( struct occi_category * optr, struct cords_s
 	/* ------------------------------- */
 	if ( generate_service_report )
 	{
-		sprintf(buffer,"rm -f service/%s",pptr->id);
-		system(buffer);
+		sprintf(buffer,"service/%s",pptr->id);
+		unlink(buffer);
 	}
 
 	return(0);

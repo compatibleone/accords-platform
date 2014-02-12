@@ -162,7 +162,8 @@ int	xml_check_buffer(struct xml_application * xptr, int n)
 	char *	mptr;
 	if ((xptr->offset+n) < xptr->buflen)
 		return(0);
-	else if (!( mptr = allocate( (xptr->buflen + 8192) ) ))
+    /* secure alloc for XML buffer by default */
+	else if (!( mptr = allocate_secure( (xptr->buflen + 8192) ) ))
 		return(27);
 	else	{
 		xptr->buflen+= 8192;
@@ -178,7 +179,8 @@ int	xml_reset(struct xml_application * xptr, int e, void * payload )
 	char *	eptr;
 	int	i;
 	if (!(xptr->buffer))
-		if (!(xptr->buffer = allocate((xptr->buflen = 8192))))
+        /* secure alloc for XML buffer by default */
+		if (!(xptr->buffer = allocate_secure((xptr->buflen = 8192))))
 			return( 27 );
 
 	if ((eptr = getenv("XMLSTRICT")) != (char*) 0)
@@ -441,7 +443,8 @@ static	struct	xml_parser * xml_open( char * nptr, void * payload )
 	if (!( h = fopen(nptr,"r")))
 		return((struct xml_parser*) 0);
 
-	else if (!( sptr = allocate( sizeof( struct xml_parser ) ) )) {
+    /* secure alloc for XML token buffer by default */
+	else if (!( sptr = allocate_secure( sizeof( struct xml_parser ) ) )) {
 		fclose(h);
 		return( sptr);
 		}
@@ -458,7 +461,7 @@ static	struct	xml_parser * xml_open( char * nptr, void * payload )
 		sptr->name 		= (char *) 0;
 		sptr->work		= (struct xml_application *) 0;
 		sptr->user		= (struct xml_relay *) 0;
-		if (!( sptr->work = allocate( sizeof ( struct xml_application ) ) ))
+		if (!( sptr->work = allocate_secure( sizeof ( struct xml_application ) ) ))
 			return( xml_close( sptr ) );
 		else	{
 			xml_reset(sptr->work,xml_echo_state, payload);
@@ -1195,7 +1198,8 @@ char  * unserialize_xml_string_attribute_value(char *value)
 	else
 	{
 		value_length = strlen(value);
-		pbuffer = (char *)allocate(value_length);
+        /* secure alloc for attribute values by default */
+		pbuffer = (char *)allocate_secure(value_length);
 
 		convert_size = translate_string_with_string_startpos(startpos, value, pbuffer, value_length, "&quot;", "\"");
 		old_convert_size = value_length;
@@ -1203,7 +1207,8 @@ char  * unserialize_xml_string_attribute_value(char *value)
 		while (convert_size > old_convert_size)
 		{
 			liberate(pbuffer);
-			pbuffer = (char *)allocate(convert_size);
+            /* secure alloc for attribute values by default */
+			pbuffer = (char *)allocate_secure(convert_size);
 			old_convert_size = convert_size;
 			convert_size = translate_string_with_string_startpos(startpos, value, pbuffer, value_length, "&quot;", "\"");
 		}

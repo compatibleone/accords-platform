@@ -9,6 +9,7 @@ struct	connection {
 	void	*		object;
 	void	*		newobject;
 	void	*		context;
+	char	*		hostname;
 	int			socket;
 	struct	sockaddr	remote;
 	int			newsocket;

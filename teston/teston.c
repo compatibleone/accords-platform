@@ -83,8 +83,13 @@ private	int	on_result( struct on_response * rptr )
 				break;
 			else if ( rptr->response->status != 204 )
 			{
-				sprintf(buffer,"cat %s",rptr->response->body);
-				system( buffer );
+				FILE *fp = fopen(rptr->response->body, "r");
+				int sz = 0;
+
+				do {
+					sz = fread(buffer, 1, sizeof(buffer), fp);
+				} while(sz > 0 && fwrite(buffer, 1, sz, stdout) > 0);
+				fclose(fp);
 				printf("\n");
 			}
 		}
