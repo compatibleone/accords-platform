@@ -1217,14 +1217,36 @@ private	int	build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 /*	----------------------------------------------------------	*/
 /*		t l s _ v a l i d a t e _ s e r v e r			*/
 /*	----------------------------------------------------------	*/
-public	int	tls_validate_server( CONNECTIONPTR cptr, int mode )
+public	int	tls_validate_server( SSL * handle, int mode )
 {
-    // DG: FIXME this function should do something useful
-	if (!( mode & _REQUEST_PEER ) )
-		return(0);
-	else if (!( mode & _REQUIRE_PEER ) )
-		return(0);
-	else	return(0);
+	X509 *cert;
+	int res;
+	cert = SSL_get_peer_certificate(handle);
+	if(mode & _REQUIRE_PEER) {
+		if(!cert) {
+			debug("SSL_accept(pid=%u,h=%p) => No peer certificate %d \r\n",getpid(),handle,-1);
+			return -1;
+		}
+		X509_free(cert);
+	}
+	if ((res=SSL_get_verify_result(handle)) != X509_V_OK) {
+		switch(res) {
+			/* List of possible codes at:
+			 * http://www.openssl.org/docs/apps/verify.html#
+			 */
+			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
+				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
+					debug("SSL accepting self-signed cert\n");
+					return 0;
+				} else {
+					debug("SSL refusing self-signed cert\n");
+				}
+				break;
+		}
+		debug("SSL_accept(pid=%u,h=%p) => Bad peer certificate %d \r\n",getpid(),handle,res);
+		return -1;
+	}
+	return 0;
 }
 
 /*	----------------------------------------------------------	*/
@@ -1282,25 +1304,34 @@ public	int	tls_client_handshake( CONNECTIONPTR cptr, int mode )
 /*	----------------------------------------------------------	*/
 public	int	tls_validate_client( SSL *	handle, int mode )
 {
-    X509 *cert;
-	//if (!( mode & _REQUEST_PEER ) )
-	//	return(0);
-	//else if (!( mode & _REQUIRE_PEER ) )
-	//	return(0);
-	//else	return(0);
-    cert = SSL_get_peer_certificate(handle);
-    if(mode & _REQUIRE_PEER) {
-        if(!cert) {
-	    	printf("SSL_accept(pid=%u,h=%p) => No peer certificate %d \r\n",getpid(),handle,-1);
-            return -1;
-        }
-        X509_free(cert);
-    }
-    if (SSL_get_verify_result(handle) != X509_V_OK) {
-		printf("SSL_accept(pid=%u,h=%p) => Bad peer certificate %d \r\n",getpid(),handle,-1);
-        return -1;
-    }
-    return 0;
+	X509 *cert;
+	int res;
+	cert = SSL_get_peer_certificate(handle);
+	if(mode & _REQUIRE_PEER) {
+		if(!cert) {
+			debug("SSL_accept(pid=%u,h=%p) => No peer certificate %d \r\n",getpid(),handle,-1);
+			return -1;
+		}
+		X509_free(cert);
+	}
+	if ((res=SSL_get_verify_result(handle)) != X509_V_OK) {
+		switch(res) {
+			/* List of possible codes at:
+			 * http://www.openssl.org/docs/apps/verify.html#
+			 */
+			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
+				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
+					debug("SSL accepting self-signed cert\n");
+					return 0;
+				} else {
+					debug("SSL refusing self-signed cert\n");
+				}
+				break;
+		}
+		debug("SSL_accept(pid=%u,h=%p) => Bad peer certificate %d \r\n",getpid(),handle,res);
+		return -1;
+	}
+	return 0;
 }
 
 /*	----------------------------------------------------------	*/
