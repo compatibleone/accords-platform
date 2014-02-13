@@ -7,7 +7,6 @@
 #include "allocate.h"
 #include "tlsconfig.h"
 
-
 /*	-------------------------------------------------	*/
 /*			A B A L    S S L			*/
 /*	-------------------------------------------------	*/
@@ -27,7 +26,6 @@
 /*		128	SSL v23 compatible mode			*/
 /*		256	Inhibit Internal Certificate Check	*/
 /*	-------------------------------------------------	*/
-
 
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
@@ -52,7 +50,25 @@ private	int	bugfix=1;
 char *	SslKeyFile=(char *) 0;
 char *	SslPassWord=(char *) 0;
 char *	SslCertFile=(char *) 0;
+char *	SslPeerCert=(char *) 0;
 char *	SslCaList=(char *) 0;
+
+private char *get_fingerprint(X509 *x)
+{
+	int pos;
+	const EVP_MD *digest;
+	unsigned char md[EVP_MAX_MD_SIZE];
+	unsigned int n;
+	char buff[EVP_MAX_MD_SIZE*3 + 1];
+
+	digest = EVP_get_digestbyname("sha1");
+	X509_digest(x, digest, md, &n);
+	for(pos = 0; pos < n-1; pos++)
+		sprintf(buff+3*pos, "%02X:", md[pos]);
+	sprintf(buff+3*(n-1), "%02X", md[n-1]);
+	printf("Fingerprint: %s\n", buff);
+	return allocate_string(buff);
+}
 
 public	void	security_lock(int h, char * f)
 {
@@ -216,6 +232,33 @@ public	int	https_use_certificate(	char *	aptr	)
 }
 
 /*	--------------------------------------------------	*/
+/*	h t t p s _ u s e _ p e e r  _ c e r t ( aptr )		*/
+/*	--------------------------------------------------	*/
+/*	Called from the configuration and initialisation	*/
+/*	options analyser to submit peer cert fingerprint.	*/
+/*	Returns zero to indicate success or other error.	*/
+/*	--------------------------------------------------	*/
+
+public	int	https_use_peer_cert(	char *	aptr	)
+{
+	if ((!( aptr )) || (!( *aptr )))
+		return(0);
+	if (( SslPeerCert ) && (!( strcmp( SslPeerCert, aptr ) )))
+		return( 0 );
+	if ( SslPeerCert )
+	{
+		liberate( SslPeerCert );
+		SslPeerCert = (char *) 0;
+	}
+	SslPeerCert = allocate_string( aptr );
+
+	printf("SslPeerCert=%s\n", SslPeerCert);
+	if (!( SslPeerCert ))
+		return( 27 );
+	else	return( 0  );
+}
+
+/*	--------------------------------------------------	*/
 /*	   h t t p s _ u s e _ C A _ l i s t ( aptr )   	*/
 /*	--------------------------------------------------	*/
 /*	Called from the configuration and initialisation	*/
@@ -284,7 +327,8 @@ public	int	sslsocketreader(
 {
 	int	status;
 	start_socket_catcher(0,"ssl read");
-	if ((status = SSL_read( handle, buffer, length )) == 0) {
+	if ((status = SSL_read( handle, buffer, length )) == 0)
+	{
 		/* DG: FIXED (?) DOS when underlying socket was not cleanly closed */
 		if(SSL_get_error(handle, status) == SSL_ERROR_SYSCALL) 
 		{
@@ -294,7 +338,7 @@ public	int	sslsocketreader(
 			}
 			status = -1;
 		}
-	} 
+	}
 	else if ( status < 0 )
 	{
 		if ( check_debug() )
@@ -337,7 +381,8 @@ public	int	sslsocketwriter(
 public	int	ssl_tcp_readb( 	SSL * 	handle )
 {
 	char	c;
-	if ( sslsocketreader( handle, ( char *) & c, 1 ) == 1 ) {
+	if ( sslsocketreader( handle, ( char *) & c, 1 ) == 1 )
+	{
 		return( (c & 0x00FF) );
 		}
 	else	return( 0xFF00 );
@@ -626,18 +671,40 @@ private	int	tls_client_verify_callback( int preverify, X509_STORE_CTX * certific
 	X509 *peer_cert = X509_STORE_CTX_get_current_cert(certificate);
 	X509 *self_cert = SSL_get_certificate(ssl);;
 
+	if(SslPeerCert)
+	{
+		char *fingerprint = get_fingerprint(peer_cert);
+		int res = strcmp(fingerprint, SslPeerCert);
+		liberate(fingerprint);
+		if(res != 0)
+		{
+			debug("Client certificate not allowed: bad fingerprint\n");
+			//return 0;
+		}
+		else
+		{
+			debug("Client certificate matching fingerprint\n");
+			SSL_CTX_set_app_data(sslctx, (void*)(mode|_SSL_CERT_MATCH));
+		}
+	}
+
 	int is_issuer_err = X509_check_issued(peer_cert, self_cert);
 	debug("is issuer: %d\n", is_issuer_err);
-	if(!is_issuer_err && !(mode & _SSL_IS_ISSUER)) {
+	if(!is_issuer_err && !(mode & _SSL_IS_ISSUER))
+	{
 		SSL_CTX_set_app_data(sslctx, (void*)(mode|_SSL_IS_ISSUER));
 	}
 
 
-	if ( SSL_debug ) {
-		if (!preverify) {
+	if ( SSL_debug )
+	{
+		if (!preverify)
+		{
 			printf("verify error:num=%d:%s\ndepth=%d:%s\n", err,
 					X509_verify_cert_error_string(err), depth, buf);
-		} else {
+		}
+		else
+		{
 			printf("depth=%d:%s\n", depth, buf);
 		}
 		if (!preverify && (err == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT))
@@ -646,16 +713,21 @@ private	int	tls_client_verify_callback( int preverify, X509_STORE_CTX * certific
 			printf("issuer= %s\n", buf);
 		}
 	}
-	if (!preverify) {
-		switch(err) {
+	if (!preverify)
+	{
+		switch(err)
+		{
 			/* List of possible codes at:
 			 * http://www.openssl.org/docs/apps/verify.html#
 			 */
 			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
 			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
-				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
+				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID))
+				{
 					return 1;
-				} else {
+				}
+				else
+				{
 					printf("ERROR: Self-signed cert not allowed (%ld)\n", mode);
 				}
 				break;
@@ -691,35 +763,62 @@ private	int	tls_server_verify_callback( int preverify, X509_STORE_CTX * certific
 	X509 *peer_cert = X509_STORE_CTX_get_current_cert(certificate);
 	X509 *self_cert = SSL_get_certificate(ssl);;
 
+	if(SslPeerCert)
+	{
+		char *fingerprint = get_fingerprint(peer_cert);
+		int res = strcmp(fingerprint, SslPeerCert);
+		liberate(fingerprint);
+		if(res != 0)
+		{
+			debug("Server certificate not allowed: bad fingerprint\n");
+			//return 0;
+		}
+		else
+		{
+			debug("Server certificate matching fingerprint\n");
+			SSL_CTX_set_app_data(sslctx, (void*)(mode|_SSL_CERT_MATCH));
+		}
+	}
+
 	int is_issuer_err = X509_check_issued(peer_cert, self_cert);
 	debug("is issuer: %d\n", is_issuer_err);
-	if(!is_issuer_err && !(mode & _SSL_IS_ISSUER)) {
+	if(!is_issuer_err && !(mode & _SSL_IS_ISSUER))
+	{
 		SSL_CTX_set_app_data(sslctx, (void*)(mode|_SSL_IS_ISSUER));
 	}
 
-	if ( check_debug() ) {
-		if (!preverify) {
+	if ( check_debug() )
+	{
+		if (!preverify)
+		{
 			printf("verify error:num=%d:%s\ndepth=%d:%s\n", err,
 					X509_verify_cert_error_string(err), depth, buf);
-		} else {
+		}
+		else
+		{
 			printf("depth=%d:%s\n", depth, buf);
 		}
 		if (!preverify && (err == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT))
 		{
 			X509_NAME_oneline(X509_get_issuer_name(certificate->current_cert), buf, 256);
-			printf("issuer= %s\n", buf);
+			printf("Error on issuer= %s\n", buf);
 		}
 	}
-	if (!preverify) {
-		switch(err) {
+	if (!preverify)
+	{
+		switch(err)
+		{
 			/* List of possible codes at:
 			 * http://www.openssl.org/docs/apps/verify.html#
 			 */
 			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
 			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
-				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
+				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID))
+				{
 					return 1;
-				} else {
+				}
+				else
+				{
 					printf("ERROR: Self-signed cert not allowed (%ld)\n", mode);
 				}
 				break;
@@ -743,7 +842,8 @@ typedef enum {
 	Error
 } HostnameValidationResult;
 
-private HostnameValidationResult matches_common_name(const char *hostname, const X509 *server_cert) {
+private HostnameValidationResult matches_common_name(const char *hostname, const X509 *server_cert)
+{
 	int common_name_loc = -1;
 	X509_NAME_ENTRY *common_name_entry = NULL;
 	ASN1_STRING *common_name_asn1 = NULL;
@@ -751,39 +851,46 @@ private HostnameValidationResult matches_common_name(const char *hostname, const
 
 	// Find the position of the CN field in the Subject field of the certificate
 	common_name_loc = X509_NAME_get_index_by_NID(X509_get_subject_name((X509 *) server_cert), NID_commonName, -1);
-	if (common_name_loc < 0) {
+	if (common_name_loc < 0)
+	{
 		return Error;
 	}
 
 	// Extract the CN field
 	common_name_entry = X509_NAME_get_entry(X509_get_subject_name((X509 *) server_cert), common_name_loc);
-	if (common_name_entry == NULL) {
+	if (common_name_entry == NULL)
+	{
 		return Error;
 	}
 
 	// Convert the CN field to a C string
 	common_name_asn1 = X509_NAME_ENTRY_get_data(common_name_entry);
-	if (common_name_asn1 == NULL) {
+	if (common_name_asn1 == NULL)
+	{
 		return Error;
 	}
 	common_name_str = (char *) ASN1_STRING_data(common_name_asn1);
 
 	// Make sure there isn't an embedded NUL character in the CN
-	if ((size_t)ASN1_STRING_length(common_name_asn1) != strlen(common_name_str)) {
+	if ((size_t)ASN1_STRING_length(common_name_asn1) != strlen(common_name_str))
+	{
 		return MalformedCertificate;
 	}
 
 	// Compare expected hostname with the CN
 	//if (Curl_cert_hostcheck(common_name_str, hostname) == CURL_HOST_MATCH)
-	if (!strcmp(common_name_str, hostname)) {
+	if (!strcmp(common_name_str, hostname))
+	{
 		return MatchFound;
 	}
-	else {
+	else
+	{
 		return MatchNotFound;
 	}
 }
 
-private HostnameValidationResult matches_subject_alternative_name(const char *hostname, const X509 *server_cert) {
+private HostnameValidationResult matches_subject_alternative_name(const char *hostname, const X509 *server_cert)
+{
 	HostnameValidationResult result = MatchNotFound;
 	int i;
 	int san_names_nb = -1;
@@ -791,28 +898,34 @@ private HostnameValidationResult matches_subject_alternative_name(const char *ho
 
 	// Try to extract the names within the SAN extension from the certificate
 	san_names = X509_get_ext_d2i((X509 *) server_cert, NID_subject_alt_name, NULL, NULL);
-	if (san_names == NULL) {
+	if (san_names == NULL)
+	{
 		return NoSANPresent;
 	}
 	san_names_nb = sk_GENERAL_NAME_num(san_names);
 
 	// Check each name within the extension
-	for (i=0; i<san_names_nb; i++) {
+	for (i=0; i<san_names_nb; i++)
+	{
 		const GENERAL_NAME *current_name = sk_GENERAL_NAME_value(san_names, i);
 
-		if (current_name->type == GEN_DNS) {
+		if (current_name->type == GEN_DNS)
+		{
 			// Current name is a DNS name, let's check it
 			char *dns_name = (char *) ASN1_STRING_data(current_name->d.dNSName);
 
 			// Make sure there isn't an embedded NUL character in the DNS name
-			if ((size_t)ASN1_STRING_length(current_name->d.dNSName) != strlen(dns_name)) {
+			if ((size_t)ASN1_STRING_length(current_name->d.dNSName) != strlen(dns_name))
+			{
 				result = MalformedCertificate;
 				break;
 			}
-			else { // Compare expected hostname with the DNS name
+			else
+			{ // Compare expected hostname with the DNS name
 				//if (Curl_cert_hostcheck(dns_name, hostname)
 				//    == CURL_HOST_MATCH)
-				if (!strcmp(dns_name, hostname)) {
+				if (!strcmp(dns_name, hostname))
+				{
 					result = MatchFound;
 					break;
 				}
@@ -824,7 +937,8 @@ private HostnameValidationResult matches_subject_alternative_name(const char *ho
 	return result;
 }
 
-private HostnameValidationResult validate_hostname(const char *hostname, X509 *cert) {
+private HostnameValidationResult validate_hostname(const char *hostname, X509 *cert)
+{
 	HostnameValidationResult result;
 
 	if((hostname == NULL) || (cert == NULL))
@@ -832,7 +946,8 @@ private HostnameValidationResult validate_hostname(const char *hostname, X509 *c
 
 	// First try the Subject Alternative Names extension
 	result = matches_subject_alternative_name(hostname, cert);
-	if (result == NoSANPresent) {
+	if (result == NoSANPresent)
+	{
 		// Extension was not found: try the Common Name
 		result = matches_common_name(hostname, cert);
 	}
@@ -854,13 +969,19 @@ private	int	tls_check_certificate( X509_STORE_CTX * x509_ctx, void * arg )
 	if ( SSL_debug )
 		printf("tls_check_certificate(%s)\n", cptr->hostname);
 	if ( bugfix )
+	{
+		debug("\n##### B U G F I X : I N S E C U R E   S S L #####\n\n");
 		return( 1 );
+	}
 
-	if(cptr->newobject != NULL) {
+	if(cptr->newobject != NULL)
+	{
 		ssl = cptr->newobject;
 		is_server = 1;
 		res = MatchFound; // FIXME: check for certificate hash ?
-	} else {
+	}
+	else
+	{
 		ssl = cptr->object;
 	}
 
@@ -885,10 +1006,12 @@ private	int	tls_check_certificate( X509_STORE_CTX * x509_ctx, void * arg )
 			X509_NAME *xn;
 			int i;
 			debug("---\nAcceptable client certificate CA names\n");
-			for (i=0; i<sk_X509_NAME_num(sk); i++) {
+			for (i=0; i<sk_X509_NAME_num(sk); i++)
+			{
 				xn = sk_X509_NAME_value(sk,i);
 				buf = X509_NAME_oneline(xn, buf, 0);
-				if(buf) {
+				if(buf)
+				{
 					debug("%s\n", buf);
 					free(buf);
 				}
@@ -916,6 +1039,19 @@ private	int	tls_check_certificate( X509_STORE_CTX * x509_ctx, void * arg )
 				return 0;
 			}
 		}
+		if(SslPeerCert)
+		{
+			if(!(mode & _SSL_CERT_MATCH))
+			{
+				debug("\n\nConnection refused: Certificate does not match\n\n");
+				return 0;
+			}
+			else
+			{
+				debug("\n\nCertificate match ? '%s'\n\n", SslPeerCert);
+			}
+		}
+
 		if((mode & _SSL_MODES) >= _SSL_SELF_SIGNED)
 		{
 			if(is_server == 0)
@@ -1198,7 +1334,8 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
 	SSL_CTX_set_verify_depth(cptr->context,1);
 #endif
-	if(!SSL_CTX_check_private_key(cptr->context)) {
+	if(!SSL_CTX_check_private_key(cptr->context))
+	{
 		printf("Private key does not match the public certificate\n");
 		return 0;
 	}
@@ -1209,11 +1346,16 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		close_connection( cptr );
 		return( 0 );
 	}
-	if((mode & _SSL_MODES) >= _SSL_SAME_CA) {
+	if((mode & _SSL_MODES) >= _SSL_SAME_CA)
+	{
 		mode |= _REQUIRE_PEER;
-	} else if((mode & _SSL_MODES) >= _SSL_SELF_SIGNED) {
+	}
+	else if((mode & _SSL_MODES) >= _SSL_SELF_SIGNED)
+	{
 		mode |= _REQUEST_PEER;
-	} else {
+	}
+	else
+	{
 		mode &= ~(_REQUIRE_PEER|_REQUEST_PEER);
 	}
 
@@ -1243,24 +1385,44 @@ public	int	tls_validate_server( SSL * handle, int mode )
 	X509 *cert;
 	int res;
 	cert = SSL_get_peer_certificate(handle);
-	if(mode & _REQUIRE_PEER) {
-		if(!cert) {
+	if(mode & _REQUIRE_PEER)
+	{
+		if(!cert)
+		{
 			debug("SSL_accept(pid=%u,h=%p) => No peer certificate %d \r\n",getpid(),handle,-1);
 			return -1;
 		}
 		X509_free(cert);
 	}
-	if ((res=SSL_get_verify_result(handle)) != X509_V_OK) {
-		switch(res) {
+	if ((res=SSL_get_verify_result(handle)) != X509_V_OK)
+	{
+		switch(res)
+		{
 			/* List of possible codes at:
 			 * http://www.openssl.org/docs/apps/verify.html#
 			 */
 			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
 			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
-				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
-					debug("SSL accepting self-signed cert\n");
-					return 0;
-				} else {
+				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID))
+				{
+					if(SslPeerCert)
+					{
+						SSL_CTX *sslctx = SSL_get_SSL_CTX(handle);
+						long mode = (long)SSL_CTX_get_app_data(sslctx);
+						if(mode & _SSL_CERT_MATCH)
+						{
+							debug("SSL accepting matching cert\n");
+							return 0;
+						}
+					}
+					else
+					{
+						debug("SSL accepting self-signed cert\n");
+						return 0;
+					}
+				}
+				else
+				{
 					debug("SSL refusing self-signed cert\n");
 				}
 				break;
@@ -1329,26 +1491,30 @@ public	int	tls_validate_client( SSL *	handle, int mode )
 	X509 *cert;
 	int res;
 	cert = SSL_get_peer_certificate(handle);
-	if(mode & _REQUIRE_PEER) {
-		if(!cert) {
+	if(mode & _REQUIRE_PEER)
+	{
+		if(!cert)
+		{
 			debug("SSL_accept(pid=%u,h=%p) => No peer certificate %d \r\n",getpid(),handle,-1);
 			return -1;
 		}
 		X509_free(cert);
 	}
-	if ((res=SSL_get_verify_result(handle)) != X509_V_OK) {
-		switch(res) {
+	if ((res=SSL_get_verify_result(handle)) != X509_V_OK)
+	{
+		switch(res)
+		{
 			/* List of possible codes at:
 			 * http://www.openssl.org/docs/apps/verify.html#
 			 */
 			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
 			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
-				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
+				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID))
+				{
 					debug("SSL accepting self-signed cert\n");
 					return 0;
-				} else {
-					debug("SSL refusing self-signed cert\n");
 				}
+				debug("SSL refusing self-signed cert\n");
 				break;
 		}
 		debug("SSL_accept(pid=%u,h=%p) => Bad peer certificate %d \r\n",getpid(),handle,res);
@@ -1370,25 +1536,35 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 	{
 		tls_show_errors( "SSL_new" );
 		return(0);
-	}	
+	}
 	else
 	{
 		security_lock( 0, "server_set_verify" );
         //DG FIXME: Server should build and send the CA list
         //SSL_CTX_set_client_CA_list(tlsctx, SSL_load_client_CA_file(SslCertFile));
-		if((mode & _SSL_MODES) >= _SSL_SAME_CA) {
+		if((mode & _SSL_MODES) >= _SSL_SAME_CA)
+		{
 			mode |= _REQUIRE_PEER;
-		} else if((mode & _SSL_MODES) >= _SSL_SELF_SIGNED) {
+		}
+		else if((mode & _SSL_MODES) >= _SSL_SELF_SIGNED)
+		{
 			mode |= _REQUEST_PEER;
-		} else {
+		}
+		else
+		{
 			mode &= ~(_REQUIRE_PEER|_REQUEST_PEER);
 		}
 
-		if ( mode & _REQUIRE_PEER ) {
+		if ( mode & _REQUIRE_PEER )
+		{
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,tls_server_verify_callback);
-		} else if ( mode & _REQUEST_PEER ) {
+		}
+		else if ( mode & _REQUEST_PEER )
+		{
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE,tls_server_verify_callback);
-		} else {
+		}
+		else
+		{
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_NONE,tls_server_verify_callback);
 		}
 		security_unlock( 0, "server_set_verify" );
@@ -1421,6 +1597,8 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 /*	----------------------------------------------------------	*/
 public	int	tls_server_startup( CONNECTIONPTR cptr, int mode )
 {
+	if(bugfix && check_debug())
+		debug("\n##### B U G F I X : I N S E C U R E   S S L #####\n\n");
 	if (!( build_ssl_context( cptr, mode, 1 ) ))
 		return(0);
 	else	return(1);

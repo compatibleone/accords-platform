@@ -41,6 +41,8 @@ public struct tls_configuration * liberate_tls_configuration(struct tls_configur
 			 sptr->passphrase = liberate(sptr->passphrase);
 		if ( sptr->authority )
 			 sptr->authority = liberate(sptr->authority);
+		if ( sptr->peercert )
+			 sptr->peercert = liberate(sptr->peercert);
 		sptr = liberate( sptr );
 	}
 	return((struct tls_configuration *) 0);
@@ -64,6 +66,7 @@ public struct tls_configuration * reset_tls_configuration(struct tls_configurati
 		sptr->passphrase = (char*) 0;
 		sptr->option =  0;
 		sptr->authenticate =  0;
+		sptr->peercert = (char*) 0;
 	}
 	return(sptr);
 

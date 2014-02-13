@@ -24,7 +24,6 @@
 #include "tlsload.h"
 #include "tlsconfig.c"
 
-
 struct	tls_manager
 {
 	struct	tls_configuration * first;
@@ -74,6 +73,12 @@ private struct tls_mode {
 	{ "ssl-compat",			_SSL_COMPATIBLE		},
 	{ "internal",			_SSL_INTERNAL		},
 	{ "engine",				_OPENSSL_ENGINE		},
+	/* english spelling */
+	{ "optimise-occi-local",	_OPTIMISE_OCCI_LOCAL	},
+	{ "optimise-occi-client",	_OPTIMISE_OCCI_CLIENT	},
+	/* american spelling */
+	{ "optimize-occi-local",	_OPTIMISE_OCCI_LOCAL	},
+	{ "optimize-occi-client",	_OPTIMISE_OCCI_CLIENT	},
 	{ "accept-invalid",		_SSL_ACCEPT_INVALID	},
 	{ "self-signed",		_SSL_SELF_SIGNED	},
 	{ "valid-cert",			_SSL_VALID_CERT		},
@@ -104,6 +109,17 @@ private int tls_mode_parse(const char *str) {
 	}
 	liberate(bs);
 	return mode;
+}
+
+private char *tls_peercert_parse(const char *str) {
+	char *news = allocate_string((char *)str);
+	char *s = news;
+
+	while(s && *s) {
+		*s = toupper(*s);
+		s++;
+	}
+	return news;
 }
 
 /*	-------------------------------------------------	*/  
@@ -181,6 +197,8 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 				cptr->authority = document_atribut_string( aptr );
 			if ((aptr = document_atribut( eptr, "mode" )) != (struct xml_atribut *) 0)
 				cptr->option |= tls_mode_parse(document_atribut_string( aptr ));
+			if ((aptr = document_atribut( eptr, "peercert" )) != (struct xml_atribut *) 0)
+				cptr->peercert = tls_peercert_parse(document_atribut_string( aptr ));
 		}
 		document = document_drop( document );
 	}
@@ -207,6 +225,7 @@ public	void	tls_configuration_use(struct tls_configuration * cptr )
 	https_use_certificate( cptr->certificate );
 	https_use_password( cptr->passphrase );
 	https_use_CA_list( cptr->authority );
+	https_use_peer_cert( cptr->peercert );
 	security_unlock(0,"configuration");
 	return;
 }
