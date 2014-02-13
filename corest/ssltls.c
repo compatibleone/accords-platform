@@ -35,12 +35,16 @@
 #define	_DER_CERTIFICATE	64
 #define	_SSL_COMPATIBLE		128
 #define	_SSL_INTERNAL		256
-#define _OPENSSL_ENGINE         512
+#define _OPENSSL_ENGINE        	512
+#define _SSL_ACCEPT_INVALID    	1024
+#define _SSL_SELF_SIGNED      	2048
 
-#define _SSL_ACCEPT_INVALID         1024
-#define _SSL_SELF_SIGNED         2048
-#define _SSL_VALID_CERT         4096
-#define _SSL_SAME_CA         8192
+#define _OPTIMISE_OCCI_LOCAL   	4096
+#define _OPTIMISE_OCCI_CLIENT  	8192
+
+#define _SSL_VALID_CERT        16384
+#define _SSL_SAME_CA           32768
+
 #define _SSL_MODES         (_SSL_ACCEPT_INVALID|_SSL_SELF_SIGNED|_SSL_VALID_CERT|_SSL_SAME_CA)
 
 #define _SSL_IS_ISSUER         32768
