@@ -1504,11 +1504,11 @@ private	struct rest_request *	rest_consume_command(
 		struct rest_request * rptr)
 {
 	if (!( rptr->method = rest_consume_token(cptr,' ')))
-		return( rptr );
+		return( NULL );
 	else if (!( rptr->object = rest_consume_token(cptr,' ')))
-		return( rptr );
+		return( NULL );
 	else if (!( rptr->version = rest_consume_line(cptr)))
-		return( rptr );
+		return( NULL );
 	else	return( rptr );
 }
 
@@ -2117,19 +2117,22 @@ private	struct rest_request *	rest_consume_request( struct rest_client * cptr, i
 		return( rptr );
 	else	rptr->port = port;
 
-	if (!( rptr = rest_consume_command( cptr, rptr )))
-		return( rptr );
-	else if (!( rptr = rest_parse_object( cptr, rptr )))
-		return( rptr );
+	if (!rest_consume_command( cptr, rptr ))
+		goto error;
+	else if (!rest_parse_object( cptr, rptr ))
+		goto error;
 
-	else if (!( rptr = rest_consume_head( cptr, rptr )))
-		return( rptr );
+	else if (!rest_consume_head( cptr, rptr ))
+		goto error;
 
 	rest_show_request( rptr );
 
-	if (!( rptr = rest_detect_body( cptr, rptr )))
-		return( rptr );
-	else	return( rptr ); 
+	if (!rest_detect_body( cptr, rptr ))
+		goto error;
+	return rptr;
+error:
+	liberate_rest_request(rptr);
+	return NULL;
 }
 
 /*	------------------------------------------------	*/
@@ -2334,12 +2337,11 @@ private	int	rest_accept_message( struct rest_client * cptr, int port )
 	// -----------------------------------------
 	// Attempt to read from the connected socket
 	// -----------------------------------------
-	if (!( rest_client_read( cptr )))
+	if (( rest_client_read( cptr )) <= 0)
 	{
 		rest_drop_client( cptr );
 		return(0);
 	}
-
 	/* ----------------------------------- */
 	/* otherwise it may be an HTTP request */ 
 	/* ----------------------------------- */
