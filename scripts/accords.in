@@ -621,6 +621,58 @@ _make_security_files() {
 	_mksect command 1
 }
 
+_make_certificates()
+{
+	echo "Creating Accords Certificats"
+	
+	export bits=2048
+	export days=365
+	export sslconfig=./openssl.cnf
+
+	_mkcert coss
+	_mkcert cops
+	_mkcert coees
+	_mkcert $billing
+	_mkcert comons
+	_mkcert conets
+	_mkcert broker
+	_mkcert parser
+	_mkcert ezvm
+	_mkcert coips
+	_mkcert publisher
+	_mkcert fileserver
+	_mkcert procci
+	_mkcert cosched
+	_mkcert osprocci
+	_mkcert osocciprocci
+	_mkcert onprocci
+	_mkcert paprocci
+	_mkcert azprocci
+	_mkcert ec2procci
+	_mkcert dcprocci
+	_mkcert cnprocci
+	_mkcert eziprocci
+	_mkcert oaprocci
+	_mkcert dummyprocci
+	_mkcert slam
+	_mkcert copaas
+	_mkcert coeasy
+	_mkcert conagios
+	_mkcert paasprocci
+	_mkcert cosacs
+	
+	_mkcert testcp
+	_mkcert testcb
+	_mkcert testos
+	_mkcert testcn
+	_mkcert testhdfs
+	_mkcert testpa
+	_mkcert teston
+	_mkcert testresolver
+	_mkcert command
+	_mkcert easigsm
+}
+
 _accords_config() {
 
     accordsRunning=`ps -edf | grep run-publisher | wc -l`
@@ -660,55 +712,7 @@ _accords_config() {
 	else
 	    	mkdir -p $secdir
 		_make_security_files
-
-		echo "Creating Accords Certificats"
-	
-		export bits=2048
-		export days=365
-		export sslconfig=./openssl.cnf
-
-		_mkcert coss
-		_mkcert cops
-		_mkcert coees
-		_mkcert $billing
-		_mkcert comons
-		_mkcert conets
-		_mkcert broker
-		_mkcert parser
-		_mkcert ezvm
-		_mkcert coips
-		_mkcert publisher
-		_mkcert fileserver
-		_mkcert procci
-		_mkcert cosched
-		_mkcert osprocci
-		_mkcert osocciprocci
-		_mkcert onprocci
-		_mkcert paprocci
-		_mkcert azprocci
-		_mkcert ec2procci
-		_mkcert dcprocci
-		_mkcert cnprocci
-		_mkcert eziprocci
-		_mkcert oaprocci
-		_mkcert dummyprocci
-		_mkcert slam
-		_mkcert copaas
-		_mkcert coeasy
-		_mkcert conagios
-		_mkcert paasprocci
-		_mkcert cosacs
-	
-		_mkcert testcp
-		_mkcert testcb
-		_mkcert testos
-		_mkcert testcn
-		_mkcert testhdfs
-		_mkcert testpa
-		_mkcert teston
-		_mkcert testresolver
-		_mkcert command
-		_mkcert easigsm
+		_make_certificates
 	fi
     fi
 
@@ -1143,6 +1147,9 @@ _mkpro() {
 case `basename $0` in
     co-start) 
 	_co_start $*
+	;;
+    co-certificates) 
+	_make_certificates $*
 	;;
     co-provision) 
 	_co_provision $*

@@ -14,14 +14,13 @@ dist_pkgsysconf_DATA=cords_user.xml
 scripts=accords co-check
 
 aliases = \
-	co-start co-platform co-provision co-broker co-command co-parser co-provider co-resolver co-status co-stop \
+	co-start co-platform co-provision co-certificates co-broker co-command co-parser co-provider co-resolver co-status co-stop \
 	run-azprocci run-broker run-cops run-coees run-coips run-comons run-conets run-cobill run-conagios \
 	run-coss run-ezvm run-fileserver run-onprocci run-osprocci run-paprocci run-parser run-procci \
 	run-cosched run-publisher run-osocciprocci run-dcprocci run-cnprocci run-eziprocci run-oaprocci run-dummyprocci run-slam \
 	run-cosacs run-copaas run-coeasy run-paasprocci run-ec2procci accords-config run-cool run-command run-easigsm
 
 
-#EXTRA_DIST = accords.in openssl.cnf accords.ini publication.xml accords-config.in co-check.in accords.init accords.default
 EXTRA_DIST = accords.in openssl.cnf publication.xml accords-config.in co-check.in accords.init accords.default
 CLEANFILES = $(scripts) $(aliases)
 
