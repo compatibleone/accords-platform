@@ -55,6 +55,7 @@ private	int	SSL_READY=0;
 private	int	ssl_contexts=0;
 private	int	total_contexts=0;
 private	int	ssl_debug;
+private	int	bugfix=1;
 
 #define	Portable_srandom	srandom
 #define	SSL_debug 		(check_debug() || ssl_debug)
@@ -866,6 +867,8 @@ private	int	tls_check_certificate( X509_STORE_CTX * x509_ctx, void * arg )
 	int is_server = 0;
 	if ( SSL_debug )
 		printf("tls_check_certificate(%s)\n", cptr->hostname);
+	if ( bugfix )
+		return( 1 );
 
 	if(cptr->newobject != NULL) {
 		ssl = cptr->newobject;

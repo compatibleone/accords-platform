@@ -965,7 +965,6 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	char	fullname[512];
 	struct	item * iptr;
 
-
 	title(h,"OCCI MYSQL BUILDER START");
 
 	fprintf(h,"\n#include <%s>\n","mysql/mysql.h");
@@ -1086,19 +1085,91 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 
 
 	title(h,"autosave operations");
-	fprintf(h,"public  void set_autosave_%s_name(char * fn) { return; }\n",C.name);
+
 	fprintf(h,"public  void autosave_%s_nodes() { return; }\n",C.name);
+
+        fprintf(h,"private char*autosave_%s_name=%c%s.xml%c;\n",C.name,0x0022,C.name,0x0022);
+	fprintf(h,"public  void set_autosave_%s_name(char * fn) { ",C.name);
+	fprintf(h,"autosave_%s_name=fn; }\n",C.name);
+
+        /* ---------------------- */
+        /* generate autosave node */
+        /* ---------------------- */
 	fprintf(h,"public  int	autosave_%s_node(struct %s * pptr)\n{\n",C.name,C.name);
 	fprintf(h,"\tif (!( pptr )) return(118);\n");
 	fprintf(h,"\telse if (!( pptr->id )) return(118);\n");
 	fprintf(h,"\telse return(%s_sql_on_update(pptr->id, pptr));\n",fullname);
 	fprintf(h,"}\n");
 
+        title(h,"occi category rest interface method auto load");
+
+        /* ---------------------- */
+        /* generate autoload node */
+        /* ---------------------- */
 	fprintf(h,"public  int	autoload_%s_node(struct %s * pptr)\n{\n",C.name,C.name);
 	fprintf(h,"\tif (!( pptr )) return(118);\n");
 	fprintf(h,"\telse if (!( pptr->id )) return(118);\n");
 	fprintf(h,"\telse return(%s_sql_on_search(pptr->id, pptr));\n",fullname);
 	fprintf(h,"}\n");
+
+        /* ----------------------- */
+        /* generate autoload nodes */
+        /* ----------------------- */
+        fprintf(h,"\nprivate void autoload_%s_nodes()\n{\n",C.name,C.name);
+        fprintf(h,"\tchar * fn=autosave_%s_name;\n",C.name);
+        fprintf(h,"\tstruct occi_%s_node * nptr;\n",C.klass);
+        fprintf(h,"\tstruct %s * pptr;\n",C.name);
+        fprintf(h,"\tstruct xml_element * document;\n");
+        fprintf(h,"\tstruct xml_element * eptr;\n");
+        fprintf(h,"\tstruct xml_element * vptr;\n");
+        fprintf(h,"\tstruct xml_atribut  * aptr;\n");
+	fprintf(h,"\tint status=0;\n");
+
+        fprintf(h,"\tif (!( document = document_parse_file(fn)))\n\t\treturn;\n");
+        fprintf(h,"\tif ((eptr = document_element(document,%c%ss%c)) != (struct xml_element *) 0) {\n",
+                0x0022,C.name,0x0022);
+        fprintf(h,"\t\tfor (vptr=eptr->first; vptr != (struct xml_element *) 0; vptr=vptr->next) {\n");
+
+        fprintf(h,"\t\t\tif (!( vptr->name )) continue;\n");
+
+        fprintf(h,"\t\t\telse if ( strcmp( vptr->name, %c%s%c ) ) continue;\n",
+                0x0022,C.name,0x0022);
+	fprintf(h,"\t\t\telse if (!( pptr = allocate_%s())) break;\n",C.name);
+
+        for (   iptr= C.first;
+                iptr != (struct item *) 0;
+                iptr = iptr->next )
+        {
+                if (!( strcmp( iptr->name, "previous" ) ))
+                        continue;
+                else if (!( strcmp( iptr->name, "next" ) ))
+                        continue;
+                else if (!( strcmp( iptr->name, "parent" ) ))
+                        continue;
+                else if (!( strncmp( iptr->name, "first", strlen("first") ) ))
+                        continue;
+                else if (!( strncmp( iptr->name, "last", strlen("last") ) ))
+                        continue;
+                else
+                {
+                        fprintf(h,"\t\t\tif ((aptr = document_atribut( vptr, ");
+                        fprintf(h,"%c%s%c )) != (struct xml_atribut *) 0)\n",0x0022,iptr->name,0x0022);
+                        if ( iptr->indirection )
+                                fprintf(h,"\t\t\t\tpptr->%s = document_atribut_string(aptr);\n",iptr->name);
+                        else
+                                fprintf(h,"\t\t\t\tpptr->%s = document_atribut_value(aptr);\n",iptr->name);
+                }
+        }
+	fprintf(h,"\t\t\tstatus = autosave_%s_node(pptr);\n",C.name);
+	fprintf(h,"\t\t\tpptr = liberate_%s(pptr);\n",C.name);
+	fprintf(h,"\t\t\tif (!( status )) continue; else break;\n");
+
+        fprintf(h,"\t\t\t}\n");
+        fprintf(h,"\t\t}\n");
+        fprintf(h,"\tdocument = document_drop( document );\n" );
+	fprintf(h,"\tunlink( fn );\n");
+        fprintf(h,"\treturn;\n");
+        fprintf(h,"}\n");
 
 	/* ----------------------- */
 	/* generate occi collector */
@@ -1665,6 +1736,7 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	title(h,"occi category builder");
 	fprintf(h,"/* occi category rest instance builder for : %s */\n",fullname);
 	fprintf(h,"public struct occi_category * %s_builder(char * a,char * b)\n{\n",fullname);
+	fprintf(h,"\tchar * eptr=(char *) 0;\n");
 	fprintf(h,"\tchar * c=%c%s%c;\n",0x0022,C.scheme,0x0022);
 	fprintf(h,"\tchar * d=%c%s%c;\n",0x0022,C.klass,0x0022);
 	fprintf(h,"\tchar * e=%c%s%c;\n",0x0022,C.rel,0x0022);
@@ -1709,9 +1781,11 @@ public	void	generate_occi_sql_builder( FILE * h, char * nptr )
 	/* -------------------------------------- */
 	fprintf(h,"\telse\n\t{\n\t\tredirect_%s_mt(optr->interface);\n",fullname);
 
-	/* ------------------------------------------------- */
-	/* return the resulting category manageent structure */
-	/* ------------------------------------------------- */
+	/* ------------------------------------------------ */
+	/* return the resulting category managent structure */
+	/* ------------------------------------------------ */
+	fprintf(h,"\t\tif ((eptr = getenv(%cOCCISQLIMPORTXML%c))!= 0)\n",0x0022,0x0022);
+	fprintf(h,"\t\t\tif ( *eptr == '1' )\n\t\t\t\tautoload_%s_nodes();\n",C.name);
 	fprintf(h,"\t\treturn(optr);\n\t}\n}\n");
 
 	title(h,"OCCI MYSQL BUILDER END");
