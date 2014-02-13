@@ -24,8 +24,6 @@
 #include "tlsload.h"
 #include "tlsconfig.c"
 
-#define	_OPTIMISE_OCCI_LOCAL  4096
-#define	_OPTIMISE_OCCI_CLIENT 8192
 
 struct	tls_manager
 {
@@ -67,20 +65,20 @@ private struct tls_mode {
 	char *mode_str;
 	int mode_int;
 } tls_modes[] = {
-	{ "debug",				2		},
-	{ "use-ssl",			4		},
-	{ "request-peer",		8		},
-	{ "require-peer",		16		},
-	{ "der-key",			32		},
-	{ "der-cert",			64		},
-	{ "ssl-compat",			128		},
-	{ "internal",			256		},
-	{ "engine",				512		},
-	{ "accept-invalid",		1024	},
-	{ "self-signed",		2048	},
-	{ "valid-cert",			4096	},
-	{ "same-ca",			8192	},
-	{ NULL,					0		}
+	{ "debug",				_SSL_DEBUG			},
+	{ "use-ssl",			_USE_SSL			},
+	{ "request-peer",		_REQUEST_PEER		},
+	{ "require-peer",		_REQUIRE_PEER		},
+	{ "der-key",			_DER_KEY			},
+	{ "der-cert",			_DER_CERTIFICATE	},
+	{ "ssl-compat",			_SSL_COMPATIBLE		},
+	{ "internal",			_SSL_INTERNAL		},
+	{ "engine",				_OPENSSL_ENGINE		},
+	{ "accept-invalid",		_SSL_ACCEPT_INVALID	},
+	{ "self-signed",		_SSL_SELF_SIGNED	},
+	{ "valid-cert",			_SSL_VALID_CERT		},
+	{ "same-ca",			_SSL_SAME_CA		},
+	{ NULL,					0					}
 };
 
 
@@ -106,8 +104,9 @@ private int tls_mode_parse(const char *str) {
 		s = NULL;
 	}
 	liberate(bs);
-	if(mode < 1024) {
-		mode |= 4096; // valid-cert is the default
+	if(!(mode & _SSL_MODES)) {
+//		mode |= _SSL_VALID_CERT; // valid-cert is the default
+		mode |= _SSL_ACCEPT_INVALID; // Be conservative for now
 	}
 	return mode;
 }

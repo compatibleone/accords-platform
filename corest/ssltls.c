@@ -5,6 +5,7 @@
 #include <openssl/ssl.h>
 #include <openssl/engine.h>
 #include "allocate.h"
+#include "tlsconfig.h"
 
 
 /*	-------------------------------------------------	*/
@@ -27,27 +28,6 @@
 /*		256	Inhibit Internal Certificate Check	*/
 /*	-------------------------------------------------	*/
 
-#define	_SSL_DEBUG		2
-#define	_USE_SSL		4
-#define	_REQUEST_PEER		8
-#define	_REQUIRE_PEER		16
-#define	_DER_KEY		32
-#define	_DER_CERTIFICATE	64
-#define	_SSL_COMPATIBLE		128
-#define	_SSL_INTERNAL		256
-#define _OPENSSL_ENGINE        	512
-#define _SSL_ACCEPT_INVALID    	1024
-#define _SSL_SELF_SIGNED      	2048
-
-#define _OPTIMISE_OCCI_LOCAL   	4096
-#define _OPTIMISE_OCCI_CLIENT  	8192
-
-#define _SSL_VALID_CERT        16384
-#define _SSL_SAME_CA           32768
-
-#define _SSL_MODES         (_SSL_ACCEPT_INVALID|_SSL_SELF_SIGNED|_SSL_VALID_CERT|_SSL_SAME_CA)
-
-#define _SSL_IS_ISSUER         32768
 
 private	pthread_mutex_t security_control = PTHREAD_MUTEX_INITIALIZER;
 
