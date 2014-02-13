@@ -812,6 +812,7 @@ _mksecs() {
     echo "     passphrase='"$pass"'" >> $secdir/${module}Tls.xml
     echo "     authority='"$calist"'" >> $secdir/${module}Tls.xml
     echo "     authenticate='"$auth"'" >> $secdir/${module}Tls.xml
+    echo "     mode='accept-invalid'" >> $secdir/${module}Tls.xml
     echo "     option='"$options"' />" >> $secdir/${module}Tls.xml
     chmod 0640 $secdir/${module}Tls.xml
 }
@@ -824,6 +825,7 @@ _mksect() {
     echo "     passphrase='"$pass"'" >> $secdir/${module}Tls.xml
     echo "     authority='"$calist"'" >> $secdir/${module}Tls.xml
     echo "     authenticate='"$auth"'" >> $secdir/${module}Tls.xml
+    echo "     mode='accept-invalid'" >> $secdir/${module}Tls.xml
     echo "     option='"$options"' />" >> $secdir/${module}Tls.xml
     chmod 0640 $secdir/${module}Tls.xml
 }

@@ -652,6 +652,7 @@ private	int	tls_client_verify_callback( int preverify, X509_STORE_CTX * certific
 			 * http://www.openssl.org/docs/apps/verify.html#
 			 */
 			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
+			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
 				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
 					return 1;
 				} else {
@@ -715,6 +716,7 @@ private	int	tls_server_verify_callback( int preverify, X509_STORE_CTX * certific
 			 * http://www.openssl.org/docs/apps/verify.html#
 			 */
 			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
+			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
 				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
 					return 1;
 				} else {
@@ -875,23 +877,26 @@ private	int	tls_check_certificate( X509_STORE_CTX * x509_ctx, void * arg )
 
 	X509_check_ca(peer_cert);
 
-	if(SSL_debug) {
-		if (((sk=SSL_get_client_CA_list(ssl)) != NULL) && (sk_X509_NAME_num(sk) > 0)) {
+	if(SSL_debug)
+	{
+		if (((sk=SSL_get_client_CA_list(ssl)) != NULL) && (sk_X509_NAME_num(sk) > 0))
+		{
 			char *buf = NULL;
 			X509_NAME *xn;
 			int i;
-			printf("---\nAcceptable client certificate CA names\n");
+			debug("---\nAcceptable client certificate CA names\n");
 			for (i=0; i<sk_X509_NAME_num(sk); i++) {
 				xn = sk_X509_NAME_value(sk,i);
 				buf = X509_NAME_oneline(xn, buf, 0);
 				if(buf) {
-					printf("%s\n", buf);
+					debug("%s\n", buf);
 					free(buf);
 				}
 			}
 		}
-		else {
-			printf("---\nNo client certificate CA names sent\n");
+		else
+		{
+			debug("---\nNo client certificate CA names sent\n");
 		}
 	}
 
@@ -899,49 +904,66 @@ private	int	tls_check_certificate( X509_STORE_CTX * x509_ctx, void * arg )
 	 * This will be called for Azure self-signed certs AFAIK
 	 * Maybe we could check an attribute of the certificate
 	 */
-	if (ok_so_far) {
+	if (ok_so_far)
+	{
 		SSL_CTX *sslctx = SSL_get_SSL_CTX(ssl);
 		int mode = (long)SSL_CTX_get_app_data(sslctx);
-		if(mode & _SSL_SAME_CA) {
-			if(!(mode & _SSL_IS_ISSUER)) {
+		if(mode & _SSL_SAME_CA)
+		{
+			if(!(mode & _SSL_IS_ISSUER))
+			{
 				debug("\n\nConnection refused: not same CA\n\n");
 				return 0;
 			}
 		}
-		if(is_server == 0) {
-			res = validate_hostname(host, peer_cert);
+		if((mode & _SSL_MODES) >= _SSL_SELF_SIGNED)
+		{
+			if(is_server == 0)
+			{
+				res = validate_hostname(host, peer_cert);
 
-			switch (res) {
-				case MatchFound:
-					res_str = "MatchFound";
-					break;
-				case MatchNotFound:
-					res_str = "MatchNotFound";
-					break;
-				case NoSANPresent:
-					res_str = "NoSANPresent";
-					break;
-				case MalformedCertificate:
-					res_str = "MalformedCertificate";
-					break;
-				case Error:
-					res_str = "Error";
-					break;
-				default:
-					res_str = "WTF!";
-					break;
+				switch (res)
+				{
+					case MatchFound:
+						res_str = "MatchFound";
+						break;
+					case MatchNotFound:
+						res_str = "MatchNotFound";
+						break;
+					case NoSANPresent:
+						res_str = "NoSANPresent";
+						break;
+					case MalformedCertificate:
+						res_str = "MalformedCertificate";
+						break;
+					case Error:
+						res_str = "Error";
+						break;
+					default:
+						res_str = "WTF!";
+						break;
+				}
 			}
 		}
+		else
+		{
+			/* do not complain if we accept invalid certificates */
+			res=MatchFound;
+		}
 	}
-
-	X509_NAME_oneline(X509_get_subject_name (peer_cert),
-			cert_str, sizeof (cert_str));
-	if (res == MatchFound) {
+	if(SSL_debug)
+	{
+		X509_NAME_oneline(X509_get_subject_name (peer_cert), cert_str, sizeof (cert_str));
+	}
+	if (res == MatchFound)
+	{
 		debug("https server '%s' has this certificate, "
 				"which looks good to me:\n%s\n",
 				host, cert_str);
 		return 1;
-	} else {
+	}
+	else
+	{
 		debug("ERROR: Got '%s' for hostname '%s' and certificate:\n%s\n",
 				res_str, host, cert_str);
 		return 0;
@@ -1187,9 +1209,17 @@ private	int	ll_build_ssl_context(CONNECTIONPTR	cptr, int mode, int service )
 		close_connection( cptr );
 		return( 0 );
 	}
-	if ( (mode & _REQUIRE_PEER) || (mode & _SSL_MODES >= _SSL_SAME_CA) )
+	if((mode & _SSL_MODES) >= _SSL_SAME_CA) {
+		mode |= _REQUIRE_PEER;
+	} else if((mode & _SSL_MODES) >= _SSL_SELF_SIGNED) {
+		mode |= _REQUEST_PEER;
+	} else {
+		mode &= ~(_REQUIRE_PEER|_REQUEST_PEER);
+	}
+
+	if ( mode & _REQUIRE_PEER )
 		SSL_set_verify( cptr->object,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,tls_client_verify_callback);
-	else if ( (mode & _REQUEST_PEER) || (mode & _SSL_MODES >= _SSL_VALID_CERT) )
+	else if ( mode & _REQUEST_PEER )
 		SSL_set_verify( cptr->object,SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE,tls_client_verify_callback);
 	else	SSL_set_verify( cptr->object,SSL_VERIFY_NONE,tls_client_verify_callback);
 	return( 1 );
@@ -1226,6 +1256,7 @@ public	int	tls_validate_server( SSL * handle, int mode )
 			 * http://www.openssl.org/docs/apps/verify.html#
 			 */
 			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
+			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
 				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
 					debug("SSL accepting self-signed cert\n");
 					return 0;
@@ -1311,6 +1342,7 @@ public	int	tls_validate_client( SSL *	handle, int mode )
 			 * http://www.openssl.org/docs/apps/verify.html#
 			 */
 			case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
+			case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
 				if(mode & _SSL_INTERNAL || mode & (_SSL_SELF_SIGNED|_SSL_ACCEPT_INVALID)) {
 					debug("SSL accepting self-signed cert\n");
 					return 0;
@@ -1344,15 +1376,19 @@ public	int	tls_server_handshake( CONNECTIONPTR cptr, int mode )
 		security_lock( 0, "server_set_verify" );
         //DG FIXME: Server should build and send the CA list
         //SSL_CTX_set_client_CA_list(tlsctx, SSL_load_client_CA_file(SslCertFile));
+		if((mode & _SSL_MODES) >= _SSL_SAME_CA) {
+			mode |= _REQUIRE_PEER;
+		} else if((mode & _SSL_MODES) >= _SSL_SELF_SIGNED) {
+			mode |= _REQUEST_PEER;
+		} else {
+			mode &= ~(_REQUIRE_PEER|_REQUEST_PEER);
+		}
 
-		if ( (mode & _REQUIRE_PEER) || ((mode & _SSL_MODES) >= _SSL_SAME_CA) ) {
-			debug("MODE SAME_CA\n");
+		if ( mode & _REQUIRE_PEER ) {
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_FAIL_IF_NO_PEER_CERT|SSL_VERIFY_PEER,tls_server_verify_callback);
-		} else if ( (mode & _REQUEST_PEER) || ((mode & _SSL_MODES) >= _SSL_SELF_SIGNED) ) {
-			debug("MODE VALID_CERT\n");
+		} else if ( mode & _REQUEST_PEER ) {
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE,tls_server_verify_callback);
 		} else {
-			debug("MODE INVALID_CERT %d\n", mode);
 			SSL_set_verify( cptr->newobject,SSL_VERIFY_NONE,tls_server_verify_callback);
 		}
 		security_unlock( 0, "server_set_verify" );

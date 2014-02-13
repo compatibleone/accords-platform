@@ -71,16 +71,18 @@ public	void *	allocate_secure(int n)
 {
 	struct mem_header	*	vptr;
 	pthread_mutex_lock( &allocation_control );
-	if (( vptr = malloc(sizeof(struct mem_header)+n)) != (void *) 0) {
-        vptr->secure = 1;
-        vptr->size = n;
-        /* initialize data */
+	if (( vptr = malloc(sizeof(struct mem_header)+n)) != (void *) 0)
+	{
+		vptr->secure = 1;
+		vptr->size = n;
+		/* initialize data */
 		memset(vptr->data,0,n);
-        /* disallow memory swapping */
-        int res = mlock(vptr, sizeof(struct mem_header)+n);
-        if(res < 0) {
-            perror("Warning: Could not lock secure memory");
-        }
+		/* disallow memory swapping */
+		int res = mlock(vptr, sizeof(struct mem_header)+n);
+		//if(res < 0)
+		//{
+		//    perror("Warning: Could not lock secure memory");
+		//}
 		addref(vptr);
 		printmem("allocate", vptr);
     }
@@ -95,18 +97,20 @@ public	void *	allocate_secure(int n)
 /*	-----------------------------------	*/
 public	void *	liberate_secure( void * v)
 {
-	if( v) {
+	if( v)
+	{
 		struct mem_header	*	vptr = mem_hdr(v);
 		pthread_mutex_lock( &allocation_control );
 		subref(vptr);
 		printmem("liberate", vptr);
-    	if(vptr->secure) {
-    	    int n = sizeof(struct mem_header) + vptr->size;
-    	    /* burn data */
-    	    memset(vptr, 0, n);
-    	    /* allow memory swapping */
-    	    munlock(vptr, n);
-    	}
+		if(vptr->secure)
+		{
+			int n = sizeof(struct mem_header) + vptr->size;
+			/* burn data */
+			memset(vptr, 0, n);
+			/* allow memory swapping */
+			munlock(vptr, n);
+		}
 		lcounter++;
 		if ( areport )
 			printf("%lu liberate %u %lu\n",lcounter,0,v);
@@ -126,16 +130,17 @@ public	void *	allocate(int n)
 {
 	struct mem_header	*	vptr;
 	pthread_mutex_lock( &allocation_control );
-	if (( vptr = malloc(sizeof(struct mem_header)+n)) != (void *) 0) {
+	if (( vptr = malloc(sizeof(struct mem_header)+n)) != (void *) 0)
+	{
 		acounter++;
-        vptr->secure = 0;
-        vptr->size = n;
+		vptr->secure = 0;
+		vptr->size = n;
 		memset(vptr->data,0,n);
 		if ( areport )
 			printf("%lu allocate %u %lu\n",acounter,n,vptr);
 		addref(vptr);
 		printmem("allocate", vptr);
-    }
+	}
 	pthread_mutex_unlock( &allocation_control );
 	return( (void *)vptr->data );		
 }
@@ -147,7 +152,7 @@ public	void *	allocate(int n)
 /*	-----------------------------------	*/
 public	void *	liberate( void * v)
 {
-    return liberate_secure(v);
+	return liberate_secure(v);
 }
 
 

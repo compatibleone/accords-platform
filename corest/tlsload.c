@@ -88,7 +88,6 @@ private int tls_mode_parse(const char *str) {
 	char *bs = allocate_string((char*)str);
 	char *s = bs;
 	char *ss = NULL;
-	printf("TLS_MODE_PARSE(%s)\n", str);
 	while((s = strtok_r(s, " ", &ss)) != NULL) {
 		for(m=0; tls_modes[m].mode_str; m++) {
 			if(!strcmp(s, tls_modes[m].mode_str)) {
