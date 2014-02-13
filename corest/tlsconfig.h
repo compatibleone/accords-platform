@@ -1,29 +1,26 @@
 #ifndef	_tls_config_h
 #define	_tls_config_h
 
-#define _SSL_DEBUG				(1<<1)
-#define _USE_SSL				(1<<2)
-#define _REQUEST_PEER			(1<<3)
-#define _REQUIRE_PEER			(1<<4)
-#define _DER_KEY				(1<<5)
-#define _DER_CERTIFICATE		(1<<6)
-#define _SSL_COMPATIBLE			(1<<7)
-#define _SSL_INTERNAL			(1<<8)
-#define _OPENSSL_ENGINE         (1<<9)
+#define _SSL_DEBUG		0x00002
+#define _USE_SSL		0x00004
+#define _REQUEST_PEER		0x00008	
+#define _REQUIRE_PEER		0x00010
+#define _DER_KEY		0x00020
+#define _DER_CERTIFICATE	0x00040
+#define _SSL_COMPATIBLE		0x00080
+#define _SSL_INTERNAL		0x00100
+#define _OPENSSL_ENGINE         0x00200
 
+#define _OPTIMISE_OCCI_LOCAL	0x01000
+#define _OPTIMISE_OCCI_CLIENT	0x02000
 
-#define _OPTIMISE_OCCI_LOCAL	(1<<12)
-#define _OPTIMISE_OCCI_CLIENT	(1<<13)
-
-
-#define _SSL_ACCEPT_INVALID		(1<<14)
-#define _SSL_SELF_SIGNED		(1<<15)
-#define _SSL_VALID_CERT			(1<<16)
-#define _SSL_SAME_CA			(1<<17)
+#define _SSL_ACCEPT_INVALID	0x04000
+#define _SSL_SELF_SIGNED	0x08000
+#define _SSL_VALID_CERT		0x10000
+#define _SSL_SAME_CA		0x20000
+#define _SSL_IS_ISSUER		0x40000
 
 #define _SSL_MODES				(_SSL_ACCEPT_INVALID|_SSL_SELF_SIGNED|_SSL_VALID_CERT|_SSL_SAME_CA)
-
-#define _SSL_IS_ISSUER			(1<<20)
 
 struct	tls_configuration
 {
