@@ -103,10 +103,6 @@ private int tls_mode_parse(const char *str) {
 		s = NULL;
 	}
 	liberate(bs);
-	if(!(mode & _SSL_MODES)) {
-//		mode |= _SSL_VALID_CERT; // valid-cert is the default
-		mode |= _SSL_ACCEPT_INVALID; // Be conservative for now
-	}
 	return mode;
 }
 
@@ -187,6 +183,10 @@ public	struct tls_configuration * tls_configuration_load(char * filename )
 				cptr->option |= tls_mode_parse(document_atribut_string( aptr ));
 		}
 		document = document_drop( document );
+	}
+	if(!(cptr->option & _SSL_MODES)) {
+//		cptr->option |= _SSL_VALID_CERT; // valid-cert is the default
+		cptr->option |= _SSL_ACCEPT_INVALID; // Be conservative for now
 	}
 	return(cptr);
 }
