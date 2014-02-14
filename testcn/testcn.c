@@ -21,6 +21,7 @@
 #include "cnclient.h"
 #include "cnconfig.h"
 #include "xxlink.c"
+#include "xxthread.c"
 
 private char *	group=(char *) 0;
 private	int     detail=0;

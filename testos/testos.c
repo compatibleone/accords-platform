@@ -26,9 +26,11 @@
 #include "cordspublic.h"
 #include "occipublisher.h"
 #include "occiresolver.h"
+#include "occibuilder.h"
 #include "cordslang.h"
 #include "osclient.h"
 #include "xxlink.c"
+#include "xxthread.c"
 
 private char *	group=(char *) 0;
 private	int	detail=0;

@@ -25,6 +25,7 @@
 #include "document.h"
 #include "cordspublic.h"
 #include "xxlink.c"
+#include "xxthread.c"
 
 struct	fileserver_configuration Fs = {
 	0,

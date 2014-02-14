@@ -4,6 +4,7 @@
 #include "standard.h"
 #include "dcclient.h"
 #include "xxlink.c"
+#include "xxthread.c"
 
 private	int	verbose=0;
 private	int	debug=0;

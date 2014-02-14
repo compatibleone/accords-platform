@@ -9,6 +9,7 @@
 #include "restresponse.h"
 #include "rest.h"
 #include "xxlink.c"
+#include "xxthread.c"
 
 // Required by CompatibleOne
 public  int check_debug()   { return(0);   }
