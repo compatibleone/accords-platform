@@ -31,10 +31,10 @@ struct	ec2config * resolve_ec2_configuration( char * sptr )
 {
 	struct	occi_kind_node * nptr;
 	struct	ec2config * pptr=(struct ec2config *) 0;
-	struct	occi_kind_node  * occi_first_ec2config_node();
+	struct  occi_kind_node * occi_first_ec2config_node(char * category,char * tptr, char * vptr, int type);
 	rest_log_message("resolve_ec2_configuration");
 	rest_log_message( sptr );
-	for (	nptr = occi_first_ec2config_node();
+	for (	nptr = occi_first_ec2config_node("ec2config","name",sptr,0);
 		nptr != (struct occi_kind_node *) 0;
 		nptr = nptr->next )
 	{
