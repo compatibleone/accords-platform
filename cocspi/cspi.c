@@ -225,6 +225,21 @@ public struct cordscript_value * allocate_cordscript_value(char * value, char * 
 	return( vptr );
 }
 
+/*	-------------------------	*/
+/*	 liberate_cordscript_env  	*/
+/*	-------------------------	*/
+private	void	liberate_cordscript_env()
+{
+	struct	cordscript_value * vptr;
+	while ((vptr = valueheap) != (struct cordscript_value *) 0)
+	{
+		valueheap = vptr->next;
+		vptr = liberate_cordscript_value( vptr );
+	}
+	return;
+}
+
+
 /*	----------------------	*/
 /*	   duplicate_value	*/
 /*	----------------------	*/
@@ -1279,9 +1294,9 @@ private	struct occi_element * cordscript_string_filter( char * wptr )
 		*(sptr++) = 0;
 	if (!( dptr = occi_create_element( wptr, sptr ) ))
 		return( dptr );
-	else if (!( dptr->name = occi_unquoted_value( dptr->name ) ))
+	else if (!( dptr->name = occi_free_unquoted_value( dptr->name ) ))
 		return( dptr );
-	else if (!( dptr->value = occi_unquoted_value( dptr->value ) ))
+	else if (!( dptr->value = occi_free_unquoted_value( dptr->value ) ))
 		return( dptr );
 	else	return( dptr );
 }
@@ -1300,9 +1315,9 @@ private	struct occi_element * cordscript_member_filter( char * wptr )
 		*(sptr++) = 0;
 	if (!( dptr = occi_create_element( wptr, sptr ) ))
 		return( dptr );
-	else if (!( dptr->name = occi_unquoted_value( dptr->name ) ))
+	else if (!( dptr->name = occi_free_unquoted_value( dptr->name ) ))
 		return( dptr );
-	else if (!( dptr->value = occi_unquoted_value( dptr->value ) ))
+	else if (!( dptr->value = occi_free_unquoted_value( dptr->value ) ))
 		return( dptr );
 	else	return( dptr );
 }
@@ -2413,7 +2428,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 							{
 								if (!( lptr = allocate_string( dptr->value ) ))
 									continue;
-								else if (!( lptr = occi_unquoted_link( lptr ) ))
+								else if (!( lptr = occi_free_unquoted_link( lptr ) ))
 									continue;
 								else
 								{
@@ -2464,6 +2479,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					zptr = occi_remove_response( zptr );
 				}
 				else	push_value( iptr->context, string_value("[error]") );
+				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 			}
 			else if ((!( strcasecmp( wptr->value, "put") ))
 			     ||  (!( strcmp( wptr->value, "update" ) )))
@@ -2473,6 +2489,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				if (( zptr = occi_simple_put( evalue, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
 					aptr = (char *) 0;
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 					for (	dptr=zptr->first;
 						dptr != (struct occi_element *) 0;
 						dptr = dptr->next )
@@ -2482,15 +2499,26 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 						else if (!( tptr = occi_category_id( dptr->value ) ))
 							continue;
 						else if (!( aptr = add_array( aptr, evalue, tptr ) ))
+						{
+							tptr = liberate( tptr );
 							break;
-						else	continue;
+						}
+						else
+						{
+							tptr = liberate( tptr );
+							continue;
+						}
 					}
 					aptr = close_array( aptr );
 					push_value( iptr->context, string_value(aptr) );
 					liberate( aptr );
 					zptr = occi_remove_response( zptr );
 				}
-				else	push_value( iptr->context, string_value("[error]") );
+				else
+				{
+					push_value( iptr->context, string_value("[error]") );
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
+				}
 			}
 			else if (!( strcmp( wptr->value, "link" ) ))
 			{
@@ -2521,6 +2549,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				if (( zptr = occi_simple_list( evalue, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
 					aptr = (char *) 0;
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 					for (	dptr=zptr->first;
 						dptr != (struct occi_element *) 0;
 						dptr = dptr->next )
@@ -2530,15 +2559,26 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 						else if (!( tptr = occi_category_id( dptr->value ) ))
 							continue;
 						else if (!( aptr = add_array( aptr, evalue, tptr ) ))
+						{
+							tptr = liberate( tptr );
 							break;
-						else	continue;
+						}
+						else
+						{
+							tptr = liberate( tptr );
+							continue;
+						}
 					}
 					aptr = close_array( aptr );
 					push_value( iptr->context, string_value(aptr) );
 					liberate( aptr );
 					zptr = occi_remove_response( zptr );
 				}
-				else	push_value( iptr->context, string_value("") );
+				else
+				{
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
+					push_value( iptr->context, string_value("") );
+				}
 			}
 			else if (!( strcmp( wptr->value, "count" ) ))
 			{
@@ -2548,6 +2588,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				if (( zptr = occi_simple_list( evalue, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
 					aptr = (char *) 0;
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 					for (	dptr=zptr->first;
 						dptr != (struct occi_element *) 0;
 						dptr = dptr->next )
@@ -2556,12 +2597,19 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 							continue;
 						else if (!( tptr = occi_category_id( dptr->value ) ))
 							continue;
-						else 	count++;
+						else
+						{ 	count++;
+							tptr = liberate( tptr );
+						}
 					}
 					push_value( iptr->context, integer_value(count) );
 					zptr = occi_remove_response( zptr );
 				}
-				else	push_value( iptr->context, string_value("") );
+				else
+				{
+					push_value( iptr->context, string_value("") );
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
+				}
 			}
 			else if (!( strcasecmp( wptr->value, "delete" ) ))
 			{
@@ -2605,6 +2653,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					zptr = occi_remove_response( zptr );
 				}
 				else	push_value( iptr->context, string_value("[error]") );
+				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 			}
 			else if (!( strcmp( wptr->value, "list" ) ))
 			{
@@ -2613,6 +2662,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				if (( zptr = occi_simple_list( sptr, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
 					aptr = (char *) 0;
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 					for (	dptr=zptr->first;
 						dptr != (struct occi_element *) 0;
 						dptr = dptr->next )
@@ -2622,15 +2672,26 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 						else if (!( tptr = occi_category_id( dptr->value ) ))
 							continue;
 						else if (!( aptr = add_array( aptr, sptr, tptr ) ))
+						{
+							tptr = liberate( tptr );
 							break;
-						else	continue;
+						}
+						else
+						{
+							tptr = liberate( tptr );
+							continue;
+						}
 					}
 					aptr = close_array( aptr );
 					push_value( iptr->context, string_value(aptr) );
 					liberate( aptr );
 					zptr = occi_remove_response( zptr );
 				}
-				else	push_value( iptr->context, string_value("") );
+				else
+				{
+					push_value( iptr->context, string_value("") );
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
+				}
 			}
 			else if (!( strcmp( wptr->value, "count" ) ))
 			{
@@ -2640,6 +2701,7 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				if (( zptr = occi_simple_list( sptr, dptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 				{
 					aptr = (char *) 0;
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 					for (	dptr=zptr->first;
 						dptr != (struct occi_element *) 0;
 						dptr = dptr->next )
@@ -2648,12 +2710,20 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 							continue;
 						else if (!( tptr = occi_category_id( dptr->value ) ))
 							continue;
-						else 	count++;
+						else
+						{
+						 	count++;
+							tptr = liberate( tptr );
+						}
 					}
 					push_value( iptr->context, integer_value(count) );
 					zptr = occi_remove_response( zptr );
 				}
-				else	push_value( iptr->context, string_value("") );
+				else
+				{
+					push_value( iptr->context, string_value("") );
+					if ( dptr ) { dptr = occi_remove_elements( dptr ); }
+				}
 			}
 			else if (!( strcmp( wptr->value, "get"  ) ))
 			{
@@ -2669,8 +2739,15 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 						else if (!( tptr = occi_category_id( dptr->value ) ))
 							continue;
 						else if (!( aptr = add_array( aptr, sptr, tptr ) ))
+						{
+							tptr = liberate( tptr );
 							break;
-						else	continue;
+						}
+						else
+						{
+							tptr = liberate( tptr );
+							continue;
+						}
 					}
 					aptr = close_array( aptr );
 					push_value( iptr->context, string_value(aptr) );
@@ -2693,7 +2770,9 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					dptr = cordscript_occi_filter( argv[0]->value );
 				if (( zptr = occi_simple_delete( sptr, _CORDSCRIPT_AGENT, default_tls() )) != (struct occi_response *) 0)
 					zptr = occi_remove_response( zptr );
+				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 			}
+			sptr = liberate( sptr );
 		}
 		else
 		{
@@ -3226,7 +3305,7 @@ private	int	crop_matrix_element( struct cordscript_value * rptr, struct cordscri
 
 	if (!( rptr->value = allocate_string( mptr ) ))
 		return(0);
-	else if (!( rptr->value = occi_unquoted_value( rptr->value ) ))
+	else if (!( rptr->value = occi_free_unquoted_value( rptr->value ) ))
 		return( 0 );
 	
 	if ( c == ']' )
@@ -3323,12 +3402,12 @@ private	int	crop_structure_element( struct cordscript_value * nptr, struct cords
 
 	if (!( nptr->value = allocate_string( mptr ) ))
 		return(0);
-	else if (!( nptr->value = occi_unquoted_value( nptr->value ) ))
+	else if (!( nptr->value = occi_free_unquoted_value( nptr->value ) ))
 		return( 0 );
 	
 	if (!( rptr->value = allocate_string( wptr ) ))
 		return(0);
-	else if (!( rptr->value = occi_unquoted_value( rptr->value ) ))
+	else if (!( rptr->value = occi_free_unquoted_value( rptr->value ) ))
 		return( 0 );
 	
 	if ( cc == '}' )
@@ -5945,16 +6024,19 @@ private	char * compile_cordscript_value( char * expression, int argc, struct cor
 		return((char *) 0);
 	else if (!( vptr = execute_cordscript( cptr ) ))
 	{
+		liberate_cordscript_env();
 		cptr = liberate_cordscript_context( cptr );
 		return((char *) 0);
 	}
 	else if (!( rptr = allocate_string( vptr->value ) ))
 	{
+		liberate_cordscript_env();
 		cptr = liberate_cordscript_context( cptr );
 		return((char *) 0);
 	}
 	else
 	{
+		liberate_cordscript_env();
 		cptr = liberate_cordscript_context( cptr );
 		return( rptr );
 	}
@@ -6071,6 +6153,7 @@ public struct cordscript_value 	* execute_cordscript( struct  cordscript_context
 			iptr != (struct cordscript_instruction *) 0;
 			iptr = (*iptr->evaluate)( iptr  ) );
 
+		liberate_cordscript_env();
 		if ( cptr->returnvalue )
 			return( cptr->returnvalue );
 		else if (!( cptr->stack ))

@@ -300,6 +300,17 @@ public 	char *	occi_unquoted_value( char * sptr )
 }
 
 /*	---------------------------------------------------	*/
+/*	  o c c i _ f r e e _ u n q u o t e d _ v a l u e  	*/
+/*	---------------------------------------------------	*/
+public 	char *	occi_free_unquoted_value( char * sptr )
+{
+	char *	rptr;
+	rptr = occi_unquoted_value( sptr );
+	sptr = liberate( sptr );
+	return( rptr );
+}
+
+/*	---------------------------------------------------	*/
 /*	     o c c i _ u n q u o t e d _ v a l u e  		*/
 /*	---------------------------------------------------	*/
 public 	char *	occi_unquoted_link( char * sptr )
@@ -318,6 +329,17 @@ public 	char *	occi_unquoted_link( char * sptr )
 			if ( *sptr == '>' ) *sptr = 0;
 		return( allocate_string( rptr ) );
 	}
+}
+
+/*	---------------------------------------------------	*/
+/*	  o c c i _ f r e e _ u n q u o t e d _ l i n k   	*/
+/*	---------------------------------------------------	*/
+public 	char *	occi_free_unquoted_link( char * sptr )
+{
+	char *	rptr;
+	rptr = occi_unquoted_link( sptr );
+	sptr = liberate( sptr );
+	return( rptr );
 }
 
 /*	---------------------------------------------------	*/

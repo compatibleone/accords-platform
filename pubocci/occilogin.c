@@ -91,6 +91,7 @@ public	char * login_occi_user( char * user,	char * password, char * agent, char 
 			uptr = occi_remove_response( uptr );
 			sprintf(buffer,"%s/%s/%s",yptr->host,category,vptr);
 			yptr = occi_remove_response( yptr );
+			vptr = liberate( vptr );
 			return( allocate_string( buffer ) );
 		}		
 	}

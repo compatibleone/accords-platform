@@ -152,6 +152,8 @@ public	struct	occi_category * occi_create_os_template( char * domain, char * nam
 public	struct	occi_category * occi_create_resource_template( char * domain, char * name, char * schema, char * title );
 public 	char *			occi_unquoted_value( char * sptr );
 public 	char *			occi_unquoted_link( char * sptr );
+public 	char *			occi_free_unquoted_value( char * sptr );
+public 	char *			occi_free_unquoted_link( char * sptr );
 public	struct	occi_link *	liberate_occi_link( struct occi_link * lptr);
 public	struct	occi_mixin *	liberate_occi_mixin( struct occi_mixin * mptr);
 public	struct	occi_link *	allocate_occi_link();

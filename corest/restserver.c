@@ -689,10 +689,6 @@ public	struct	rest_header * rest_response_header(struct rest_response * aptr, ch
 	struct	rest_header * hptr;
 	if (!( hptr = rest_create_header( nptr, vptr ) ))
 		return( hptr );
-	else if (!( hptr->name = allocate_string( nptr ) ))
-		return( liberate_rest_header( hptr ) );
-	else if (!( hptr->value = allocate_string( vptr ) ))
-		return( liberate_rest_header( hptr ) );
 	else
 	{
 		if (!( hptr->previous = aptr->last ))
@@ -711,10 +707,6 @@ public	struct	rest_header * rest_request_header(struct rest_request * rptr, char
 	struct	rest_header * hptr;
 	if (!( hptr = rest_create_header( nptr, vptr ) ))
 		return( hptr );
-	else if (!( hptr->name = allocate_string( nptr ) ))
-		return( liberate_rest_header( hptr ) );
-	else if (!( hptr->value = allocate_string( vptr ) ))
-		return( liberate_rest_header( hptr ) );
 	else
 	{
 		if (!( hptr->previous = rptr->last ))
