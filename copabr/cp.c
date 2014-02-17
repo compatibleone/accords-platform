@@ -326,14 +326,17 @@ public	struct	occi_response 	* cords_create_instance(
 			rptr->last = header;
 
 			if (!( zptr = occi_client_post( cptr, rptr ) ))
-				continue;
+				break;
 			/* -------------------------------------------- */
 			/*    until a successful result is obtained	*/
 			/* -------------------------------------------- */
 			else	break;
 		}
 	}
-	aptr = occi_remove_response( aptr );
+	if ( rptr )
+		rptr = occi_remove_request( rptr );
+	if ( eptr )
+		aptr = occi_remove_response( aptr );
 	return( zptr );
 }
 
@@ -391,7 +394,12 @@ public	struct	occi_response * cords_retrieve_named_instance(
 			qptr = occi_remove_request( qptr );
 			continue;
 		}
-		else 	break;
+		else
+		{
+		
+			qptr = occi_remove_request( qptr );
+		 	break;
+		}
 	}
 	return( zptr );
 }

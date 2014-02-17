@@ -70,24 +70,25 @@ private int salloc_count = 0;
 public	void *	allocate_secure(int n)
 {
 	struct mem_header	*	vptr;
+	void *				v=(void *) 0;
 	pthread_mutex_lock( &allocation_control );
 	if (( vptr = malloc(sizeof(struct mem_header)+n)) != (void *) 0)
 	{
+		acounter++;
 		vptr->secure = 1;
 		vptr->size = n;
 		/* initialize data */
 		memset(vptr->data,0,n);
 		/* disallow memory swapping */
 		int res = mlock(vptr, sizeof(struct mem_header)+n);
-		//if(res < 0)
-		//{
-		//    perror("Warning: Could not lock secure memory");
-		//}
+		v = (void *) vptr->data;
+		if ( areport )
+			printf("%lu allocate %u %lu\n",acounter,n,v);
 		addref(vptr);
 		printmem("allocate", vptr);
-    }
+	}
 	pthread_mutex_unlock( &allocation_control );
-	return( (void *)vptr->data );		
+	return( (void *)v );		
 }
 
 /*	-----------------------------------	*/
@@ -129,6 +130,7 @@ public	void *	liberate_secure( void * v)
 public	void *	allocate(int n)
 {
 	struct mem_header	*	vptr;
+	void *				v=(void *) 0;
 	pthread_mutex_lock( &allocation_control );
 	if (( vptr = malloc(sizeof(struct mem_header)+n)) != (void *) 0)
 	{
@@ -136,13 +138,14 @@ public	void *	allocate(int n)
 		vptr->secure = 0;
 		vptr->size = n;
 		memset(vptr->data,0,n);
+		v = (void *) vptr->data;
 		if ( areport )
-			printf("%lu allocate %u %lu\n",acounter,n,vptr);
+			printf("%lu allocate %u %lu\n",acounter,n,v);
 		addref(vptr);
 		printmem("allocate", vptr);
 	}
 	pthread_mutex_unlock( &allocation_control );
-	return( (void *)vptr->data );		
+	return( (void *)v );		
 }
 
 /*	-----------------------------------	*/

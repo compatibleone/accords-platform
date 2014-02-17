@@ -167,6 +167,8 @@ public	int	initialise_occi_resolver( char * host, char * room, char * publicatio
 public	int	terminate_occi_resolver()
 {
 	char	*	sptr;
+	struct	occi_resolved_category * cptr;
+	struct  occi_resolved_agency   * pptr;
 	if ( Resolver.host )
 		Resolver.host = liberate( Resolver.host );
 	if ( Resolver.room )
@@ -177,6 +179,24 @@ public	int	terminate_occi_resolver()
 		Resolver.enquiry = liberate( Resolver.enquiry );
 	if ( Resolver.uri )
 		Resolver.uri = liberate( Resolver.uri );
+
+	while (( cptr = ResManager.first ) != (struct occi_resolved_category *) 0)
+	{
+		ResManager.first = cptr->next;
+		if ( cptr->category )
+			cptr->category = liberate( cptr->category );
+		while ((pptr = cptr->first) != (struct occi_resolved_agency *) 0)
+		{
+			cptr->first = pptr->next;
+			if ( pptr->id )
+				pptr->id = liberate( pptr->id );
+			if ( pptr->host )
+				pptr->host = liberate( pptr->host );
+			pptr = liberate( pptr );
+		}
+		cptr = liberate( cptr );
+	}
+
 	return(0);
 }
 

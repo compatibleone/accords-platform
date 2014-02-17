@@ -1095,7 +1095,8 @@ public	struct	rest_response * rest_client_get_request(
 		else if (!( rptr = rest_client_request( cptr, "GET", uptr, agent )))
 		{
 			hptr = liberate_rest_headers( hptr );
-			uptr= liberate_url( uptr );
+			uptr = liberate_url( uptr );
+			cptr = rest_liberate_client( cptr );
 			return( rest_client_response( 603, "Request Creation", agent ) );
 		}
 		else	hhptr = ( credentials ? credentials : rest_duplicate_headers( hptr ) );
@@ -1104,12 +1105,14 @@ public	struct	rest_response * rest_client_get_request(
 		{
 			hptr = liberate_rest_headers( hptr );
 			uptr= liberate_url( uptr );
+			cptr = rest_liberate_client( cptr );
 			return( rest_client_response( 603, "Request Headers", agent ) );
 		}
 		else if (!( rptr = rest_send_request( cptr, rptr ) ))
 		{
 			hptr = liberate_rest_headers( hptr );
 			uptr= liberate_url( uptr );
+			cptr = rest_liberate_client( cptr );
 			return( rest_client_response( 603, "Request Send", agent ) );
 		}
 		else if (!( aptr = rest_client_accept_response( cptr, agent ) ))

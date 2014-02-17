@@ -555,15 +555,23 @@ public	struct	occi_element  *	allocate_occi_element()
 public	struct	occi_element  *	occi_create_element( char * nptr, char * vptr )
 {
 	struct	occi_element * eptr;
+	char *	sptr;
 	if (!( eptr = allocate_occi_element() ))
 		return( eptr );
 	else if (!( eptr->name = allocate_string( nptr )))
 		return( occi_remove_element( eptr ) );
-	else if (!( eptr->value = allocate_string( vptr )))
+	else if (!( sptr = allocate_string( vptr )))
 		return( occi_remove_element( eptr ) );
-	else if (!( eptr->value = occi_unquoted_value( eptr->value ) ))
+	else if (!( eptr->value = occi_unquoted_value( sptr ) ))
+	{
+		liberate( sptr );
 		return( occi_remove_element( eptr ) );
-	else	return( eptr );
+	}
+	else
+	{
+		liberate( sptr );
+		return( eptr );
+	}
 }
 
 /*	------------------------------------------------------------	*/
@@ -1401,6 +1409,7 @@ public	void	occi_flush_clients()
 		cptr = occi_delete_client( cptr );
 	}
 	flush_tls_configuration();
+	terminate_occi_resolver();
 }
 
 /*	------------------------------------------------------------	*/
