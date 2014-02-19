@@ -602,103 +602,103 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 	}
 	elemm *pelem = categoryAtr.first;
 	if(pelem){
-		pptr->id = pelem->value;
+		pptr->id = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->name = pelem->value;
+		pptr->name = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->flavor = pelem->value;
+		pptr->flavor = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->image = pelem->value;
+		pptr->image = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->original = pelem->value;
+		pptr->original = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->profile = pelem->value;
+		pptr->profile = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->node = pelem->value;
+		pptr->node = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->price = pelem->value;
+		pptr->price = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->account = pelem->value;
+		pptr->account = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->number = pelem->value;
+		pptr->number = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->rootpass = pelem->value;
+		pptr->rootpass = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->reference = pelem->value;
+		pptr->reference = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->network = pelem->value;
+		pptr->network = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->access = pelem->value;
+		pptr->access = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->accessip = pelem->value;
+		pptr->accessip = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->keypair = pelem->value;
+		pptr->keypair = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->placementgroup = pelem->value;
+		pptr->placementgroup = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->publicaddr = pelem->value;
+		pptr->publicaddr = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->privateaddr = pelem->value;
+		pptr->privateaddr = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->firewall = pelem->value;
+		pptr->firewall = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->group = pelem->value;
+		pptr->group = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->zone = pelem->value;
+		pptr->zone = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->hostname = pelem->value;
+		pptr->hostname = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->workload = pelem->value;
+		pptr->workload = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
         if(pelem){
-		pptr->agent = pelem->value;
+		pptr->agent = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -710,13 +710,14 @@ int start_ec2_instance(struct ec2_subscription * subptr, struct amazonEc2 * pptr
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->keyfile = pelem->value;
+		pptr->keyfile = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
 		pptr->agentstatus = atoi(pelem->value);
 	}
-
+        
+        liberateListe(&categoryAtr);
 	return status;
 }
 
@@ -1002,103 +1003,103 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	}
 	elemm *pelem = categoryAtr.first;
 	if(pelem){
-		pptr->id = pelem->value;
+		pptr->id = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->name = pelem->value;
+		pptr->name = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->flavor = pelem->value;
+		pptr->flavor = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->image = pelem->value;
+		pptr->image = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->original = pelem->value;
+		pptr->original = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->profile = pelem->value;
+		pptr->profile = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->node = pelem->value;
+		pptr->node = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->price = pelem->value;
+		pptr->price = allocate_string(allocate_string(pelem->value));
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->account = pelem->value;
+		pptr->account = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->number = pelem->value;
+		pptr->number = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->rootpass = pelem->value;
+		pptr->rootpass = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->reference = pelem->value;
+		pptr->reference = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->network = pelem->value;
+		pptr->network = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->access = pelem->value;
+		pptr->access = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->accessip = pelem->value;
+		pptr->accessip = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->keypair = pelem->value;
+		pptr->keypair = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->placementgroup = pelem->value;
+		pptr->placementgroup = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->publicaddr = pelem->value;
+		pptr->publicaddr = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->privateaddr = pelem->value;
+		pptr->privateaddr = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->firewall = pelem->value;
+		pptr->firewall = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->group = pelem->value;
+		pptr->group = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->zone = pelem->value;
+		pptr->zone = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->hostname = pelem->value;
+		pptr->hostname = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->workload = pelem->value;
+		pptr->workload = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
         if(pelem){
-		pptr->agent = pelem->value;
+		pptr->agent = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -1110,7 +1111,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->keyfile = pelem->value;
+		pptr->keyfile = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -1118,7 +1119,7 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 	}
 
 	//delete_ec2_secgroup(subptr, pptr);
-
+	liberateListe(&categoryAtr);
 	return status;
 
 }
@@ -1380,103 +1381,103 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 	}
 	elemm *pelem = categoryAtr.first;
 	if(pelem){
-		pptr->id = pelem->value;
+		pptr->id = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->name = pelem->value;
+		pptr->name = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->flavor = pelem->value;
+		pptr->flavor = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->image = pelem->value;
+		pptr->image = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->original = pelem->value;
+		pptr->original = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->profile = pelem->value;
+		pptr->profile = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->node = pelem->value;
+		pptr->node = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->price = pelem->value;
+		pptr->price = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->account = pelem->value;
+		pptr->account = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->number = pelem->value;
+		pptr->number = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->rootpass = pelem->value;
+		pptr->rootpass = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->reference = pelem->value;
+		pptr->reference = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->network = pelem->value;
+		pptr->network = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->access = pelem->value;
+		pptr->access = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->accessip = pelem->value;
+		pptr->accessip = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->keypair = pelem->value;
+		pptr->keypair = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->placementgroup = pelem->value;
+		pptr->placementgroup = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->publicaddr = pelem->value;
+		pptr->publicaddr = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->privateaddr = pelem->value;
+		pptr->privateaddr = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->firewall = pelem->value;
+		pptr->firewall = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->group = pelem->value;
+		pptr->group = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->zone = pelem->value;
+		pptr->zone = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->hostname = pelem->value;
+		pptr->hostname = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->workload = pelem->value;
+		pptr->workload = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
         if(pelem){
-		pptr->agent = pelem->value;
+		pptr->agent = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -1488,13 +1489,13 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->keyfile = pelem->value;
+		pptr->keyfile = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
 		pptr->agentstatus = atoi(pelem->value);
 	}
-
+	liberateListe(&categoryAtr);
 	return status;
 
 }
@@ -1732,103 +1733,103 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 	}
 	elemm *pelem = categoryAtr.first;
 	if(pelem){
-		pptr->id = pelem->value;
+		pptr->id = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->name = pelem->value;
+		pptr->name = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->flavor = pelem->value;
+		pptr->flavor = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->image = pelem->value;
+		pptr->image = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->original = pelem->value;
+		pptr->original = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->profile = pelem->value;
+		pptr->profile = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->node = pelem->value;
+		pptr->node = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->price = pelem->value;
+		pptr->price = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->account = pelem->value;
+		pptr->account = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->number = pelem->value;
+		pptr->number = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->rootpass = pelem->value;
+		pptr->rootpass = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->reference = pelem->value;
+		pptr->reference = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->network = pelem->value;
+		pptr->network = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->access = pelem->value;
+		pptr->access = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->accessip = pelem->value;
+		pptr->accessip = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->keypair = pelem->value;
+		pptr->keypair = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->placementgroup = pelem->value;
+		pptr->placementgroup = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->publicaddr = pelem->value;
+		pptr->publicaddr = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->privateaddr = pelem->value;
+		pptr->privateaddr = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->firewall = pelem->value;
+		pptr->firewall = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->group = pelem->value;
+		pptr->group = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->zone = pelem->value;
+		pptr->zone = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->hostname = pelem->value;
+		pptr->hostname = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->workload = pelem->value;
+		pptr->workload = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
         if(pelem){
-		pptr->agent = pelem->value;
+		pptr->agent = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
@@ -1840,13 +1841,13 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 		pelem = pelem->next;
 	}
 	if(pelem){
-		pptr->keyfile = pelem->value;
+		pptr->keyfile = allocate_string(pelem->value);
 		pelem = pelem->next;
 	}
 	if(pelem){
 		pptr->agentstatus = atoi(pelem->value);
 	}
-
+	liberateListe(&categoryAtr);
 	return status;
 
 }
@@ -2091,103 +2092,103 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		}
 		elemm *pelem = categoryAtr.first;
 		if(pelem){
-			pptr->id = pelem->value;
+			pptr->id = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->name = pelem->value;
+			pptr->name = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->flavor = pelem->value;
+			pptr->flavor = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->image = pelem->value;
+			pptr->image = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->original = pelem->value;
+			pptr->original = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->profile = pelem->value;
+			pptr->profile = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->node = pelem->value;
+			pptr->node = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->price = pelem->value;
+			pptr->price = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->account = pelem->value;
+			pptr->account = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->number = pelem->value;
+			pptr->number = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->rootpass = pelem->value;
+			pptr->rootpass = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->reference = pelem->value;
+			pptr->reference = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->network = pelem->value;
+			pptr->network = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->access = pelem->value;
+			pptr->access = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->accessip = pelem->value;
+			pptr->accessip = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->keypair = pelem->value;
+			pptr->keypair = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->placementgroup = pelem->value;
+			pptr->placementgroup = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->publicaddr = pelem->value;
+			pptr->publicaddr = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->privateaddr = pelem->value;
+			pptr->privateaddr = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->firewall = pelem->value;
+			pptr->firewall = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->group = pelem->value;
+			pptr->group = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->zone = pelem->value;
+			pptr->zone = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->hostname = pelem->value;
+			pptr->hostname = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->workload = pelem->value;
+			pptr->workload = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->agent = pelem->value;
+			pptr->agent = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
@@ -2199,7 +2200,7 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 			pelem = pelem->next;
 		}
 		if(pelem){
-			pptr->keyfile = pelem->value;
+			pptr->keyfile = allocate_string(pelem->value);
 			pelem = pelem->next;
 		}
 		if(pelem){
@@ -2207,7 +2208,7 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		}
 
 	}
-
+        liberateListe(&categoryAtr);
 	return status;
 
 }

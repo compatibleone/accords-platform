@@ -271,9 +271,9 @@ char * resolve_ec2_location(struct cords_ec2_contract * cptr,struct ec2config * 
 	else
 	{
 		ec2zone = get_ec2_zone(cptr->subscription,cfptr->location);
-		cptr->location = ec2zone;
+		cptr->location = allocate_string(ec2zone);
 	}
-     	return ec2zone;
+     	return allocate_string(ec2zone);
 }
 
 /*	-----------------------------------------------------------------	*/
@@ -425,7 +425,7 @@ int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, ch
 		return (779);
 	else
 	{
-        	memset( &contract, 0, sizeof( struct cords_ec2_contract ));
+        	memset( &contract, 0, sizeof(contract ));
 		contract.subscription = subptr;
 	}
 	
@@ -599,10 +599,13 @@ public	int	delete_ec2_contract(
 			/* delete the hosted service */
 			/* ------------------------- */
 			if (( status = stop_ec2_provisioning(pptr)) != 0)
+			{
+				liberate(subptr);
 				return status;
+			}
 		}
 	}
-
+	liberate(subptr);
 	return(status);
 }
 

@@ -26,7 +26,7 @@
 #include <Python.h>
 
 /*	-------------------------------------------------	*/
-/*	  e c 2 _ l a u n c h _ u s i n g _ k e y p a i r		*/
+/*	  e c 2 _ l a u n c h _ u s i n g _ k e y p a i r	*/
 /*	-------------------------------------------------	*/
 public	int	ec2_launch_using_keypair( struct amazonEc2 * pptr, char * username, char * command )
 {
@@ -186,7 +186,7 @@ public	struct rest_response * start_amazonEc2(
 				reference, default_publisher(), pptr->account );
 		}
 	}
-	
+	autosave_amazonEc2_node(pptr);
 	/* --------------------------- */
 	/* now handle the transactions */
 	/* --------------------------- */
@@ -221,7 +221,7 @@ struct rest_response * stop_amazonEc2(
 	{
 		reset_ec2_server( pptr );
 		pptr->stamp = time((long *) 0);
-		autosave_amazonEc2_nodes();
+		autosave_amazonEc2_node(pptr);
 		sprintf(reference,"%s/%s/%s",get_identity(),_CORDS_EC2,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
@@ -254,6 +254,7 @@ struct rest_response * restart_amazonEc2(
 		{
 			pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_RUNNING;
+			autosave_amazonEc2_node(pptr);
 		}
 		return( rest_html_response( aptr, 200, "OK" ) );
 	}
@@ -281,6 +282,7 @@ struct rest_response * suspend_amazonEc2(
 		{
 		   	pptr->stamp = time((long *) 0);
 			pptr->state = _OCCI_SUSPENDED;
+			autosave_amazonEc2_node(pptr);
 			return (rest_html_response(aptr, 200, "OK"));
 		}
 
@@ -308,6 +310,7 @@ struct rest_response * snapshot_amazonEc2(
 		return( rest_html_response( aptr, status, "Ec2 service failure"));
 	else if (!( status ))
 	{
+		autosave_amazonEc2_node(pptr);
 		sprintf(reference,"%s/%s/%s",get_identity(),_CORDS_EC2,pptr->id);
 		if (!( rest_valid_string( pptr->price ) ))
 			return( rest_html_response( aptr, 200, "OK" ) );
