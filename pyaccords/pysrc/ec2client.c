@@ -40,22 +40,64 @@ char * get_ec2_zone(struct ec2_subscription* subptr, char * zone)
 	//python interface	
 	sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
 	PyEval_AcquireLock();
-	pythr = Py_NewInterpreter();
-        if(pythr == NULL) printf("interpreter init error \n");
+	if((pythr = Py_NewInterpreter())== NULL)
+	{
+		rest_log_message("interpreter init error \n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	PyThreadState_Swap(pythr);
 	python_path(srcdir);
-	pName = PyString_FromString("ec2client");
-	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
-	else pModule = PyImport_Import(pName);
-	if(pModule == NULL) printf("error: failed to load ec2client module\n");
-	else pDict = PyModule_GetDict(pModule);
-	if(pDict == NULL) printf("error: failed to load dict name in ec2client module\n");
-	else pFunc = PyDict_GetItemString(pDict,"ec2_get_zone");
-	if(pFunc == NULL) printf("error: failed to load ec2_get_zone function in ec2client module\n");
+	if((pName = PyString_FromString("ec2client")) == NULL)
+	{
+		rest_log_message("erro: in ec2client.py no such file name\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pModule = PyImport_Import(pName)) == NULL)
+	{
+		rest_log_message("error: failed to load ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pDict = PyModule_GetDict(pModule)) == NULL)
+	{
+		rest_log_message("error: failed to load dict name in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
+	else if((pFunc = PyDict_GetItemString(pDict,"ec2_get_zone")) == NULL)
+	{
+		rest_log_message("error: failed to load ec2_get_zone function in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	else result=PyObject_CallFunction(pFunc,"sss",subptr->accesskey,subptr->secretkey,zone);
 	if (!result || PyErr_Occurred())
         {
        		PyErr_Print();
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
        		return (0);
        	}
 
@@ -83,23 +125,65 @@ char * get_ec2_imgname(struct ec2_subscription* subptr, char *imgname,char * zon
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
 	PyEval_AcquireLock();
-	pythr = Py_NewInterpreter();
-        if(pythr == NULL) printf("interpreter init error \n");
+
+	if((pythr = Py_NewInterpreter())== NULL)
+	{
+		rest_log_message("interpreter init error \n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	PyThreadState_Swap(pythr);
 	python_path(srcdir);
-	pName = PyString_FromString("ec2client");
-	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
-	else pModule = PyImport_Import(pName);
-	if(pModule == NULL) printf("error: failed to load ec2client module\n");
-	else pDict = PyModule_GetDict(pModule);
-	if(pDict == NULL) printf("error: failed to load dict name in ec2client module\n");
-	else pFunc = PyDict_GetItemString(pDict,"ec2_get_image");
-	if(pFunc == NULL) printf("error: failed to load ec2_get_image function in ec2client module\n");
+	if((pName = PyString_FromString("ec2client")) == NULL)
+	{
+		rest_log_message("erro: in ec2client.py no such file name\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pModule = PyImport_Import(pName)) == NULL)
+	{
+		rest_log_message("error: failed to load ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pDict = PyModule_GetDict(pModule)) == NULL)
+	{
+		rest_log_message("error: failed to load dict name in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
+	else if((pFunc = PyDict_GetItemString(pDict,"ec2_get_image")) == NULL)
+	{
+		rest_log_message("error: failed to load ec2_get_image function in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	else result=PyObject_CallFunction(pFunc,"ssss",subptr->accesskey,subptr->secretkey,imgname,zone);
 	if (!result || PyErr_Occurred())
         {
        		PyErr_Print();
-       		return (0);
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
        	}
 
 	response=allocate_string(PyString_AsString( result ));
@@ -127,23 +211,65 @@ char * get_ec2_flavor(int memory, int cores, int speed, int storage, char * arch
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
 	PyEval_AcquireLock();
-	pythr = Py_NewInterpreter();
-        if(pythr == NULL) printf("interpreter init error \n");
+
+	if((pythr = Py_NewInterpreter())== NULL)
+	{
+		rest_log_message("interpreter init error \n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	PyThreadState_Swap(pythr);
 	python_path(srcdir);
-	pName = PyString_FromString("ec2client");
-	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
-	else pModule = PyImport_Import(pName);
-	if(pModule == NULL) printf("error: failed to load ec2client module\n");
-	else pDict = PyModule_GetDict(pModule);
-	if(pDict == NULL) printf("error: failed to load dict name in ec2client module\n");
-	else pFunc = PyDict_GetItemString(pDict,"ec2_get_flavor");
-	if(pFunc == NULL) printf("error: failed to load ec2_get_flavor function in ec2client module\n");
+	if((pName = PyString_FromString("ec2client")) == NULL)
+	{
+		rest_log_message("erro: in ec2client.py no such file name\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pModule = PyImport_Import(pName)) == NULL)
+	{
+		rest_log_message("error: failed to load ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pDict = PyModule_GetDict(pModule)) == NULL)
+	{
+		rest_log_message("error: failed to load dict name in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
+	else if((pFunc = PyDict_GetItemString(pDict,"ec2_get_flavor")) == NULL)
+	{
+		rest_log_message("error: failed to load ec2_get_flavor function in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	else result=PyObject_CallFunction(pFunc,"iiiis",memory,cores,speed,storage,architecture);
 	if (!result || PyErr_Occurred())
         {
        		PyErr_Print();
-       		return (0);
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
        	}
 
 	response=allocate_string(PyString_AsString( result ));
@@ -164,27 +290,69 @@ char * create_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * 
 	PyObject    *pName=NULL, *pModule=NULL, *pDict=NULL, *pFunc=NULL,*result=NULL;
 	PyThreadState* pythr=NULL;
 	char * response;
-
+	
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
 	PyEval_AcquireLock();
-	pythr = Py_NewInterpreter();
-        if(pythr == NULL) printf("interpreter init error \n");
+
+	if((pythr = Py_NewInterpreter())== NULL)
+	{
+		rest_log_message("interpreter init error \n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	PyThreadState_Swap(pythr);
 	python_path(srcdir);
-	pName = PyString_FromString("ec2client");
-	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
-	else pModule = PyImport_Import(pName);
-	if(pModule == NULL) printf("error: failed to load ec2client module\n");
-	else pDict = PyModule_GetDict(pModule);
-	if(pDict == NULL) printf("error: failed to load dict name in ec2client module\n");
-	else pFunc = PyDict_GetItemString(pDict,"ec2_create_secgroup");
-	if(pFunc == NULL) printf("error: failed to load ec2_create_secgroup function in ec2client module\n");
+	if((pName = PyString_FromString("ec2client")) == NULL)
+	{
+		rest_log_message("erro: in ec2client.py no such file name\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pModule = PyImport_Import(pName)) == NULL)
+	{
+		rest_log_message("error: failed to load ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pDict = PyModule_GetDict(pModule)) == NULL)
+	{
+		rest_log_message("error: failed to load dict name in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
+	else if((pFunc = PyDict_GetItemString(pDict,"ec2_create_secgroup")) == NULL)
+	{
+		rest_log_message("error: failed to load ec2_create_secgroup function in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	else result=PyObject_CallFunction(pFunc,"ssss",subptr->accesskey,subptr->secretkey,subptr->zone,pptr->firewall);
 	if (!result || PyErr_Occurred())
         {
        		PyErr_Print();
-       		return (0);
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
        	}
 
 	response=allocate_string(PyString_AsString( result ));
@@ -209,23 +377,65 @@ char * add_ec2_rule(struct ec2_subscription * subptr, char * group, char * rulen
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
 	PyEval_AcquireLock();
-	pythr = Py_NewInterpreter();
-        if(pythr == NULL) printf("interpreter init error \n");
+
+	if((pythr = Py_NewInterpreter())== NULL)
+	{
+		rest_log_message("interpreter init error \n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	PyThreadState_Swap(pythr);
 	python_path(srcdir);
-	pName = PyString_FromString("ec2client");
-	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
-	else pModule = PyImport_Import(pName);
-	if(pModule == NULL) printf("error: failed to load ec2client module\n");
-	else pDict = PyModule_GetDict(pModule);
-	if(pDict == NULL) printf("error: failed to load dict name in ec2client module\n");
-	else pFunc = PyDict_GetItemString(pDict,"ec2_add_rule");
-	if(pFunc == NULL) printf("error: failed to load ec2_add_rule function in ec2client module\n");
+	if((pName = PyString_FromString("ec2client")) == NULL)
+	{
+		rest_log_message("erro: in ec2client.py no such file name\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pModule = PyImport_Import(pName)) == NULL)
+	{
+		rest_log_message("error: failed to load ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pDict = PyModule_GetDict(pModule)) == NULL)
+	{
+		rest_log_message("error: failed to load dict name in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
+	else if((pFunc = PyDict_GetItemString(pDict,"ec2_add_rule")) == NULL)
+	{
+		rest_log_message("error: failed to load ec2_add_rule function in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	else result=PyObject_CallFunction(pFunc,"sssssiis",subptr->accesskey,subptr->secretkey,subptr->zone,group,rulename,fport,tport,protocol);
 	if (!result || PyErr_Occurred())
         {
        		PyErr_Print();
-       		return (0);
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
        	}
 
 	response=allocate_string(PyString_AsString( result ));
@@ -250,23 +460,65 @@ char * delete_ec2_secgroup(struct ec2_subscription * subptr, struct amazonEc2 * 
 	//python interface	
         sprintf(srcdir,"%s/pyaccords/pysrc",PYPATH);
 	PyEval_AcquireLock();
-	pythr = Py_NewInterpreter();
-        if(pythr == NULL) printf("interpreter init error \n");
+
+	if((pythr = Py_NewInterpreter())== NULL)
+	{
+		rest_log_message("interpreter init error \n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	PyThreadState_Swap(pythr);
 	python_path(srcdir);
-	pName = PyString_FromString("ec2client");
-	if(pName == NULL) printf("erro: in ec2client.py no such file name\n");
-	else pModule = PyImport_Import(pName);
-	if(pModule == NULL) printf("error: failed to load ec2client module\n");
-	else pDict = PyModule_GetDict(pModule);
-	if(pDict == NULL) printf("error: failed to load dict name in ec2client module\n");
-	else pFunc = PyDict_GetItemString(pDict,"ec2_delete_secgroup");
-	if(pFunc == NULL) printf("error: failed to load ec2_delete_secgroup function in ec2client module\n");
+	if((pName = PyString_FromString("ec2client")) == NULL)
+	{
+		rest_log_message("erro: in ec2client.py no such file name\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pModule = PyImport_Import(pName)) == NULL)
+	{
+		rest_log_message("error: failed to load ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+
+	}
+	else if((pDict = PyModule_GetDict(pModule)) == NULL)
+	{
+		rest_log_message("error: failed to load dict name in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
+	else if((pFunc = PyDict_GetItemString(pDict,"ec2_delete_secgroup")) == NULL)
+	{
+		rest_log_message("error: failed to load ec2_delete_secgroup function in ec2client module\n");
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
+	}
 	else result=PyObject_CallFunction(pFunc,"ssss",subptr->accesskey,subptr->secretkey,subptr->zone,pptr->firewall);
 	if (!result || PyErr_Occurred())
         {
        		PyErr_Print();
-       		return (0);
+		PyEval_ReleaseThread(pythr); 
+		PyEval_AcquireThread(pythr);
+		Py_EndInterpreter(pythr);
+		PyEval_ReleaseLock();
+		return (char*) 0;
        	}
 
 	response=allocate_string(PyString_AsString( result ));

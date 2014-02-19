@@ -68,7 +68,7 @@ def ec2_get_flavor(memory,cores,speed,storage,architecture):
 	listFlavors = ec2_flavors()
 	for i in my_range(0,len(listFlavors)-1,1):
 		ec2memory = convertTovalue(listFlavors[i].memory)
-		ec2speed = int(listFlavors[i].computeunits)
+		ec2speed = int(float(listFlavors[i].computeunits))
 		ec2storage = convertTovalue(listFlavors[i].storage)
 		ec2architecture = listFlavors[i].architecture
 		if((ec2memory <= memory) and (ec2speed <= speed) and (ec2storage <= storage)):
@@ -85,8 +85,33 @@ def ec2_get_zone(accesskey, secretkey, zone):
 		if(ec2zone == zone):
 			return ec2zone
 	return "eu-west-1"
-		
+
+def ec2_get_os(imgname):
+	if("win" in imgname):
+		return "windows"
+	elif("ubu" in imgname):
+		return "ubuntu"
+	elif("deb" in imgname):
+		return "debian"
+	elif("red" in imgname):
+		return "redhat"
+	elif("cent" in imgname):
+		return "centos"
+	elif("sus" in imgname):
+		return "suse"
+	else:
+		return "ubuntu"
+	
 def ec2_get_image(accesskey, secretkey,imgname, zone):
+	EC2_IMAGE_TO_AMI = {
+		"ubuntu" : "ami-ad184ac4",
+		"debian" : "ami-3428ba5d",
+		"suse" : "ami-e8084981",
+		"redhat" : "ami-a25415cb",
+		"centos" : "ami-07b73c6e",
+		"windows" : "ami-7527031c",
+	}
+	imgos = ec2_get_os(imgname)
 	conn = boto.ec2.connect_to_region(zone,aws_access_key_id=accesskey,aws_secret_access_key=secretkey)
 	image = conn.get_all_images(filters={'name' : imgname})
 	if (image):
@@ -102,6 +127,9 @@ def ec2_get_image(accesskey, secretkey,imgname, zone):
 						imagestr = str(myimage).split(":")
 						ec2imageid = imagestr[1]
 						return ec2imageid
+	if(EC2_IMAGE_TO_AMI.has_key(imgos)):
+			return EC2_IMAGE_TO_AMI[imgos]
+
 
 
 def ec2_create_secgroup(accesskey,secretkey,zone,secname):
