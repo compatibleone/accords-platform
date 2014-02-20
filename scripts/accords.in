@@ -361,12 +361,22 @@ _co_resolver() {
     fi
 }
 
+_status_mpython() {
+  local service=$1
+  if [ -f ~/.${service}.pid ] ; then
+    local proc=`cat ~/.${service}.pid`
+    test -z "$proc" && return 0
+    netstat -a -p -n | grep LISTEN | grep ${proc}/ | sed "s/python/${service}/"
+  fi
+}
+
 _co_status() {
     echo "-----------------------------"
     echo " Accords Platform Components "
     echo "-----------------------------"
     if [ "$(uname -s)" = 'Linux' ] ; then
-	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|$billing|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas|coeasy|easigsm)'
+	netstat -a -p -n | grep LISTEN | egrep '(publisher|fileserver|coss|comons|conets|$billing|cops|coees|parser|broker|procci|cosched|ezvm|coips|cosacs|conagios|slam|copaas|coeasy|easigsm|ec2procci)'
+	_status_mpython ec2procci
     elif [ "$(uname -s)" = 'Darwin' ] ; then
 	lsof -i | grep LISTEN | grep publisher || true
 	lsof -i | grep LISTEN | grep fileserver || true
@@ -388,6 +398,7 @@ _co_status() {
 	lsof -i | grep LISTEN | grep copaas || true
 	lsof -i | grep LISTEN | grep coeasy || true
 	lsof -i | grep LISTEN | grep easigsm|| true
+	_status_mpython ec2procci
     else
 	echo "Unsupported OS ($(uname -s))"
 	exit 1
