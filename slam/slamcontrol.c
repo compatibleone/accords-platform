@@ -759,7 +759,6 @@ private	int	stop_control_activity( struct cords_control * pptr )
 		if (( zptr = cords_invoke_action( pptr->timer, _CORDS_STOP, _CORDS_CONTRACT_AGENT, default_tls() )) != (struct occi_response *) 0)
 			zptr = occi_remove_response( zptr );
 	}
-	pptr->state = 0;
 	return(0);
 }
 
@@ -787,6 +786,8 @@ private	struct rest_response * stop_control(
 		return( rest_html_response( aptr, 200, "OK" ) );
 	else
 	{
+		pptr->state = 0;
+		autosave_cords_control_node(pptr);
 		stop_control_activity(pptr);
 		autosave_cords_control_node(pptr);
 		return( rest_html_response( aptr, 200, "OK" ) );
