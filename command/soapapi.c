@@ -71,6 +71,45 @@ private	void	soap_api_callback( FILE * h, int asynch, char * callback )
 	return;
 }
 
+/*	---------------------------------------------	*/
+/*	i n v o k e _ s o a p _ c o n v e r t _ a p i	*/
+/*	---------------------------------------------	*/
+private	int	invoke_soap_convert_api( char * type, char * filename, int asynch, char * callback )
+{
+
+	char *	message;
+	FILE *	h;
+
+	if ( check_verbose() )
+		printf("SOAP API Convert %s %s \n",type,filename);
+	if (!( message = rest_temporary_filename("xml") ))
+		return(0);
+	else if (!( h = fopen( message, "w" ) ))
+		return(0);
+	else
+	{
+		if ( asynch )
+		{
+			if (!( strcasecmp( type, "MANIFEST" ) ))
+				type = "AsynchConvertManifest";
+			else	type = "AsynchConvertSLA";
+		}
+		else
+		{
+			if (!( strcasecmp( type, "MANIFEST" ) ))
+				type = "ConvertManifest";
+			else	type = "ConvertSLA";
+		}
+		soap_message_header( h, type );
+		fprintf(h,"<command>convert</command>\n");
+		soap_api_callback(h,asynch,callback);
+		soap_inline_xml(h,filename);
+		soap_message_footer( h, type );
+		fclose(h);
+		return( invoke_soap_request( type, soap, wsdl, message ) );
+	}
+}
+
 /*	-------------------------------------------	*/
 /*	i n v o k e _ s o a p _ p a r s e r _ a p i	*/
 /*	-------------------------------------------	*/
@@ -238,6 +277,8 @@ private	int	invoke_soap_api( char * command, char * subject, char * option, int 
 		return( invoke_soap_resolver_api( subject ) );
 	else if (!( strcmp( command, "parser" ) ))
 		return( invoke_soap_parser_api( subject, option, asynch, callback ) );
+	else if (!( strcmp( command, "convert" ) ))
+		return( invoke_soap_convert_api( subject, option, asynch, callback ) );
 	else if (!( strcmp( command, "broker" ) ))
 		return( invoke_soap_broker_api( subject, option, asynch, callback ) );
 	else if (!( strcmp( command, "service" ) ))

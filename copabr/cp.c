@@ -10,10 +10,11 @@ private	int	force_update=0;
 
 public	void	set_force(int v) { force_update = v; }
 private	int	cords_append_error( struct xml_element * dptr, int status, char * message);
+public	struct	xml_element * cords_serialise_document( struct xml_element * document, char * result );
+public	struct	xml_element * cords_drop_document( struct xml_element * document );
 
 #include "cpxsd.c"
-
-
+#include "cpcnv.c"
 
 /*	---------------------------------------------------	*/
 /*		c o r d s _ a p p e n d _ c h o i c e		*/

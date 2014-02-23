@@ -54,8 +54,8 @@ public	int	cords_terminate_level( struct xml_element * dptr, char * agent, char 
 
 public	struct	xml_element  * 	cords_serialise_document( struct xml_element * document, char * result );
 public	struct	xml_element  *  cords_drop_document( struct xml_element * document );
-public	struct	xml_element  * 	cords_document_parser( 
-		char * host, char * filename, char * agent, char * tls, int xsd );
+public	struct	xml_element  * 	cords_document_parser( char * host, char * filename, char * agent, char * tls, int xsd );
+public	struct	xml_element  * 	cords_document_convertor( char * filename, int mode );
 
 public  char *	cords_extract_location( struct occi_response * rptr );
 public	char *	cords_build_host( struct occi_response * zptr, char * id );

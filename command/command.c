@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------- */
 /*  ACCORDS PLATFORM                                                    */
-/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotmail.com>     */
+/*  (C) 2011 by Iain James Marshall (Prologue) <ijm667@hotail.com>     */
 /* -------------------------------------------------------------------- */
 /* Licensed under the Apache License, Version 2.0 (the "License"); 	*/
 /* you may not use this file except in compliance with the License. 	*/
@@ -962,7 +962,41 @@ private	int	command_parser( char * filename, char * instance )
 	return( cords_parser_operation( filename ) );
 }
 
-
+/*	-----------------------------------------------------	*/
+/*	  c o r d s _ c o n v e r t o r _ o p e r a t i o n	*/
+/*	-----------------------------------------------------	*/
+private	int	cords_convertor_operation( char * filename , int mode ) /* mode 1 : manifest, 2: sla */
+{
+	struct	xml_element * dptr;
+	struct	xml_atribut * aptr;
+	char *	vptr;
+	char 	buffer[1024];
+	if (!( filename ))
+		return( failure(3,"requires","cords filename"));
+	else if (!( dptr = cords_document_convertor( filename, mode ) ))
+		return( failure(4,"conversion error",filename));
+	else if (!( aptr = document_atribut( dptr, "name" ) ))
+		return( failure(5,"conversion error",filename));
+	else if (!( vptr = allocate_string( aptr->value ) ))
+		return( failure(6,"conversion error",filename));
+	else if (!( vptr = occi_unquoted_value( vptr ) ))
+		return( failure(7,"conversion error",filename));
+	else
+	{
+		sprintf(buffer,"%s_%s",(mode == 1 ? "manifest" : "agreement"),filename);
+		vptr = liberate( vptr );
+		dptr = cords_serialise_document( dptr, buffer );
+		dptr = document_drop( dptr );
+		return( 0 );
+	}
+}
+/*	-----------------------------------	*/
+/*	   c o m m a n d _ c o n v e r t   	*/
+/*	-----------------------------------	*/
+private	int	command_convert( char * filename, char * instance )
+{
+	return( cords_convertor_operation( filename, 1 ) );
+}
 
 /*	-----------------------------------------------------	*/
 /*		c o r d s _ i n s t a n c e _ p l a n		*/
@@ -2465,6 +2499,8 @@ private	int	operation( int argc, char * argv[] )
 			}
 			else if (!( strcasecmp( command, "PARSER" ) ))
 				return( command_parser( aptr, argv[++argi] ) );
+			else if (!( strcasecmp( command, "CONVERT" ) ))
+				return( command_convert( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "BROKER" ) ))
 				return( command_broker( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "ONLINE" ) ))
@@ -2518,7 +2554,7 @@ private	int	operation( int argc, char * argv[] )
 				else if (!( strcmp( aptr, "asynch" ) ))
 					asynch = 1;
 				else if (!( strcmp( aptr, "allocation" ) ))
-					allocation_trace( (allocation = argv[++argi] ));
+					allocation_trace( (allocation = atoi(argv[++argi]) ));
 				else if (!( strcmp( aptr, "callback" ) ))
 					callback = argv[++argi];
 				else if (!( strcmp( aptr, "wsdl" ) ))
@@ -2552,6 +2588,7 @@ private	int	banner()
 	printf("\n   Copyright (c) 2011,2014 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
+	printf("\n         command <options> CONVERT     <xml_file> ");
 	printf("\n         command <options> BROKER      <xml_file> ");
 	printf("\n         command <options> ONLINE      <hostinfo> ");
 	printf("\n         command <options> START       <service_file> ");
@@ -2574,6 +2611,8 @@ private	int	banner()
 	printf("\n         command <options> SOAP RESOLVER <category> ");
 	printf("\n         command <options> SOAP PARSER MANIFEST <filename> ");
 	printf("\n         command <options> SOAP PARSER SLA <filename> ");
+	printf("\n         command <options> SOAP CONVERT MANIFEST <filename> ");
+	printf("\n         command <options> SOAP CONVERT SLA <filename> ");
 	printf("\n         command <options> SOAP BROKER MANIFEST <filename> ");
 	printf("\n         command <options> SOAP BROKER SLA <filename> ");
 	printf("\n         command <options> SOAP SERVICE START <service> ");
@@ -2613,4 +2652,5 @@ public	int	main( int argc, char * argv[] )
 
 	/* ---------- */
 #endif	/* _command_c */
-	/* ---------- */
+	
+

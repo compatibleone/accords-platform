@@ -99,293 +99,35 @@ private	int	ll_test_cords_parser_operation( char * filename )
 }
 
 /*	-----------------------------------------------------	*/
-/*	t e s t _ c o r d s _ p a r s e r _ m a n  f e s t	*/
-/*	-----------------------------------------------------	*/
-private	struct xml_element * test_cp_new_manifest( char * newname )
-{
-	struct	xml_element * eptr;
-	struct	xml_atribut * aptr;
-	if (!( eptr = allocate_element() ))
-		return( eptr );
-	else if (!( eptr->name = allocate_string( "manifest" ) ))
-		return( liberate_element( eptr ) );
-	else if (!( aptr = document_add_atribut( eptr, "name", newname ) ))
-		return( liberate_element( eptr ) );
-	else if (!( aptr = document_add_atribut( eptr, "xmlns", "http://www.compatibleone.fr/schemes/manifest.xsd" ) ))
-		return( liberate_element( eptr ) );
-	else	return( eptr );
-}
-
-/*	-----------------------------------------------------	*/
-/*	t e s t _ c o r d s _ p a r s e r _ e l e m e n t 	*/
-/*	-----------------------------------------------------	*/
-private	struct xml_element * test_cp_add_element( struct xml_element * manifest, char * name )
-{
-	struct	xml_element * eptr;
-	if (!( eptr = allocate_element() ))
-		return( eptr );
-	else if (!( eptr->name = allocate_string( name ) ))
-		return( liberate_element( eptr ) );
-	else	
-	{
-		if (!( eptr->previous = manifest->last ))
-			manifest->first = eptr;
-		else	eptr->previous->next = eptr;
-		manifest->last = eptr;
-		return( eptr );
-	}
-}
-
-private	struct	xml_element * test_cp_compute( struct xml_element * compute, char * name, struct xml_element * resource )
-{
-	struct	xml_atribut * aptr;
-	char *	vptr;
-	char buffer[256];
-	if (!( aptr = document_add_atribut( compute, "name", name ) ))
-		return( compute );
-	if ((aptr = document_atribut( resource, "cores" )) != (struct xml_atribut *) 0)
-	{
-		if ((( vptr = allocate_string(aptr->value )) != (char *) 0)
-		&&  (( vptr = occi_unquoted_value(vptr)) != (char *) 0))
-		{
-			aptr = document_add_atribut( compute, "cores", vptr);
-			vptr = liberate( vptr );
-		}
-	}
-	if ((aptr = document_atribut( resource, "architecture" )) != (struct xml_atribut *) 0)
-	{
-		if ((( vptr = allocate_string(aptr->value )) != (char *) 0)
-		&&  (( vptr = occi_unquoted_value(vptr)) != (char *) 0))
-		{
-			aptr = document_add_atribut( compute, "architecture", vptr);
-			vptr = liberate( vptr );
-		}
-	}
-	if ((aptr = document_atribut( resource, "speed" )) != (struct xml_atribut *) 0)
-	{
-		if ((( vptr = allocate_string(aptr->value )) != (char *) 0)
-		&&  (( vptr = occi_unquoted_value(vptr)) != (char *) 0))
-		{
-			sprintf(buffer,"%uGHz",atoi(vptr) / 1000);
-			aptr = document_add_atribut( compute, "speed", buffer);
-			vptr = liberate( vptr );
-		}
-	}
-	if ((aptr = document_atribut( resource, "memory" )) != (struct xml_atribut *) 0)
-	{
-		if ((( vptr = allocate_string(aptr->value )) != (char *) 0)
-		&&  (( vptr = occi_unquoted_value(vptr)) != (char *) 0))
-		{
-			sprintf(buffer,"%uG",atoi(vptr) / 1000);
-			aptr = document_add_atribut( compute, "memory", buffer);
-			vptr = liberate( vptr );
-		}
-	}
-
-	return( compute );
-}
-
-/*	-----------------------------------------------------	*/
-/*	t e s t _ c o r d s _ p a r s e r _ n o d e       	*/
-/*	-----------------------------------------------------	*/
-private	struct xml_element * test_cp_add_node( struct xml_element * manifest, struct xml_element * services, struct xml_element * part )
-{
-	struct	xml_element * eptr;
-	struct	xml_element * iptr;
-	struct	xml_element * xptr;
-	struct	xml_element * pptr;
-	struct	xml_element * qptr;
-	struct	xml_atribut * aptr;
-	char *	nodename;
-	char *	wptr;
-	if (!( aptr = document_atribut( part, "composable" ) ))
-		return((struct xml_element *) 0);
-	else if (!( nodename = allocate_string( aptr->value ) ))
-		return((struct xml_element *) 0);
-	else if (!( nodename = occi_unquoted_value( nodename ) ))
-		return((struct xml_element *) 0);
-	else 
-	{
-		for ( ;
-			services != (struct xml_element *) 0;
-			services = services->next )
-		{
-			if (!( aptr = document_atribut( services, "resourceID" ) ))
-				continue;
-			else if (!( wptr = allocate_string( aptr->value ) ))
-				continue;
-			else if (!( wptr = occi_unquoted_value( wptr ) ))
-				continue;
-			else if (!( strcmp( wptr, nodename ) ))
-			{
-				wptr = liberate( wptr );
-				break;
-			}
-			else
-			{
-				wptr = liberate( wptr );
-				continue;	
-			}
-		}
-		if (!( services ))
-			return((struct xml_element *) 0);
-	}
-	if (!( eptr = allocate_element() ))
-		return( eptr );
-	else if (!( eptr->name = allocate_string( "node" ) ))
-		return( liberate_element( eptr ) );
-	else if (!( aptr = document_add_atribut( eptr, "name", nodename ) ))
-		return( liberate_element( eptr ) );
-	else if (!( aptr = document_add_atribut( eptr, "access", "public" ) ))
-		return( liberate_element( eptr ) );
-	else if (!( aptr = document_add_atribut( eptr, "scope", "normal" ) ))
-		return( liberate_element( eptr ) );
-	else if (!( aptr = document_add_atribut( eptr, "type", "simple" ) ))
-		return( liberate_element( eptr ) );
-	else
-	{
-		if (!( eptr->previous = manifest->last ))
-			manifest->first = eptr;
-		else	eptr->previous->next = eptr;
-		manifest->last = eptr;
-		if (!( iptr = test_cp_add_element( eptr, "infrastructure" ) ))
-			return( eptr );
-		else if (!( xptr = test_cp_add_element( iptr, "compute" ) ))
-			return( eptr );
-		else
-		{
-			if (((pptr = document_element(services,"resources" ) ) != (struct xml_element *) 0)
-			&&  ((qptr = document_element(pptr,"infrastructureResources" ) ) != (struct xml_element *) 0))
-				test_cp_compute(xptr, nodename, qptr );
-		}
-		if (!( xptr = test_cp_add_element( iptr, "storage" ) ))
-			return( eptr );
-		else if (!( xptr = test_cp_add_element( iptr, "network" ) ))
-			return( eptr );
-		else if (!( pptr = test_cp_add_element( xptr, "port" ) ))
-			return( eptr );
-		else if (!( pptr = test_cp_add_element( xptr, "port" ) ))
-			return( eptr );
-		if (!( iptr = test_cp_add_element( eptr, "image" ) ))
-			return( eptr );
-		else if (!( xptr = test_cp_add_element( iptr, "system" ) ))
-			return( eptr );
-		return( eptr );
-	}
-}
-
-/*	-----------------------------------------------------	*/
 /*	t e s t _ c o r d s _ p a r s e r _ c o n v e r t o r 	*/
 /*	-----------------------------------------------------	*/
 private	int	test_cords_parser_convertor( char * filename )
 {
-	char *	newname="example";
-	struct	xml_element * document;
-	struct	xml_element * eptr;
-	struct	xml_element * sptr;
-	struct	xml_element * mptr;
-	struct	xml_element * node=(struct xml_element *) 0;
-	struct	xml_element * pptr;
+	char *	vptr=(char *) 0;
+	struct	xml_element * manifest;
 	struct	xml_atribut * aptr;
-	struct	xml_element * manifest=(struct xml_element *) 0;
-	struct	xml_element * usdl;
 	char	buffer[1024];
-	if (!( document = document_parse_file( filename ) ))
+	if (!( manifest = cords_document_convertor( filename, convert )))
 		return( 404 );
-	else if (!( eptr = document_element( document, "ws:AgreementProperties" ) ))
+	else if (!( aptr = document_atribut( manifest, "name" ) ))
 	{
-		document = document_drop( document );
+		manifest = document_drop( manifest );
 		return( 405 );
-	} 
-	else if (!( eptr = document_element( eptr, "ws:Terms" ) ))
+	}
+	else if (!( vptr = allocate_string( aptr->value ) ))
 	{
-		document = document_drop( document );
+		manifest = document_drop( manifest );
 		return( 405 );
-	} 
-	else if (!( eptr = document_element( eptr, "ws:All" ) ))
+	}
+	else if (!( vptr = occi_unquoted_value( vptr ) ))
 	{
-		document = document_drop( document );
+		manifest = document_drop( manifest );
 		return( 405 );
-	} 
-	else if (!( eptr = document_element( eptr, "ws:ServiceDescriptionTerm" ) ))
-	{
-		document = document_drop( document );
-		return( 405 );
-	} 
-	/* ----------------------------- */
-	/* locate start of USDL document */
-	/* ----------------------------- */
-	else if (!( usdl = document_element( eptr, "ns2:USDL3Document" ) ))
-	{
-		document = document_drop( document );
-		return( 405 );
-	} 
-	/* ---------------------------------- */
-	/* locate service description section */
-	/* ---------------------------------- */
-	else if (!( sptr = document_element( usdl, "services" ) ))
-	{
-		document = document_drop( document );
-		return( 405 );
-	} 
-	/* ---------------------------------- */
-	/* locate service composition section */
-	/* ---------------------------------- */
-	else if (!( mptr = document_element( usdl, "compositeServices" ) ))
-	{
-		document = document_drop( document );
-		return( 405 );
-	} 
-	else if (!( aptr = document_atribut( mptr, "resourceID" ) ))
-	{
-		document = document_drop( document );
-		return( 405 );
-	} 
-	else if (!( newname = allocate_string( aptr->value ) ))
-	{
-		document = document_drop( document );
-		return( 405 );
-	} 
-	else if (!( newname = occi_unquoted_value( aptr->value ) ))
-	{
-		document = document_drop( document );
-		return( 405 );
-	} 
-
-	else if (!( manifest = test_cp_new_manifest(newname) ))
-	{
-		document = document_drop( document );
-		return( 405 );
-	} 
+	}
 	else
 	{
-		sprintf(buffer,"%s.xml",newname);
-		/* --------------------------------- */
-		/* process service composition parts */
-		/* --------------------------------- */
-		for (	pptr = document_element( mptr, "parts" );
-			pptr != (struct xml_element *) 0;
-			pptr = pptr->next )
-		{
-			if (!( node = test_cp_add_node( manifest, sptr, pptr ) ))
-				break;
-		}
-		if ((!( eptr = test_cp_add_element( manifest, "configuration" )))
-		||  (!( eptr = test_cp_add_element( manifest, "release"       )))
-		||  (!( eptr = test_cp_add_element( manifest, "security"      )))
-		||  (!( eptr = test_cp_add_element( manifest, "account"       ))))
-		{
-			document = document_drop( document );
-			manifest = document_drop( manifest );
-			return( 405 );
-		} 
-		else if (!( aptr = document_add_atribut( eptr, "name", "accords" ) ))
-		{
-			document = document_drop( document );
-			manifest = document_drop( manifest );
-			return( 405 );
-		} 
-		document = document_drop( document );
+		sprintf(buffer,"%s.xml",vptr);
+		vptr = liberate( vptr );
 		manifest = cords_serialise_document( manifest, buffer );
 		manifest = document_drop( manifest );
 		return( 0 );

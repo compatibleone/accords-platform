@@ -91,6 +91,31 @@ private	struct rest_response * corcs_parser_response( struct rest_response * apt
 }
 
 /*	-------------------------------------------------------		*/
+/*	      c o r c s _ c o n v e r t o r _ r e s p o n s e	 	*/
+/*	-------------------------------------------------------		*/
+private	struct rest_response * corcs_convertor_response( struct rest_response * aptr, char * document, char * message, int mode )
+{
+	FILE * h;
+	char *	filename;
+	char 	buffer[1024];
+	char 	plan[1024];
+	sprintf(buffer,"%sResponse",message);
+	sprintf(plan,"%s_%s",(mode == 1 ? "manifest" : "agreement"),document);	
+	if (!( filename = rest_temporary_filename( "xml" ) ))
+		return( aptr );
+	else if (!( h = fopen( filename, "w" ) ))
+		return( liberate( filename ) );
+	else
+	{
+		soap_message_header( h, buffer );
+		soap_inline_xml( h, plan );
+		soap_message_footer( h, buffer );
+		fclose(h);
+		return( rest_file_response( aptr, filename, "text/xml" ) );
+	}
+}
+
+/*	-------------------------------------------------------		*/
 /*	      c o r c s _ a s y n c h _ c a l l b a c k  		*/
 /*	-------------------------------------------------------		*/
 private	struct rest_response * corcs_asynch_callback( struct rest_response * aptr, struct corcs_asynch_request * qptr )
@@ -363,6 +388,43 @@ private	struct	rest_response * corcs_soap_resolver( struct rest_response * aptr,
 }
 
 /*	-----------------------------------------------------	*/
+/*	  c o r d s _ s o a p _ m a n i f e s t _ c o n v e r 	*/
+/*	-----------------------------------------------------	*/
+private	struct	rest_response * corcs_soap_manifest_convertor( 
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
+{
+	char *	message="ConvertManifest";
+	char *	command=(char *) 0;
+	char *	filename=(char *) 0;
+	if (!( sptr ))
+		return(corcs_fault_response(aptr,800,message,"missing request"));
+	else if (!( rptr ))
+		return(corcs_fault_response(aptr,800,message,"missing request"));
+	else if (!( filename = document_element_xml( sptr, "manifest") ))
+		return(corcs_fault_response(aptr,801,message,"missing manifest"));
+	if (!( command = document_element_string( sptr, "command") ))
+		return(corcs_fault_response(aptr,802,message,"missing command"));
+	else if ( strcmp( command, "convertor" ) != 0)
+		return(corcs_fault_response(aptr,803,message,"incorrect command"));
+	else
+	{
+		/* convert filename */
+		/* ---------------- */
+		cords_convertor_operation( filename, 1 );
+		sptr = liberate_xml_element( sptr );
+		if (!( aptr = corcs_convertor_response ( aptr, filename, message,1 ) ))
+			return( aptr );
+		else if (!( qptr ))
+			return( aptr );
+		else	return( corcs_asynch_response( aptr, message, qptr ) );
+	}
+}
+
+
+/*	-----------------------------------------------------	*/
 /*	  c o r d s _ s o a p _ m a n i f e s t _ p a r s e r 	*/
 /*	-----------------------------------------------------	*/
 private	struct	rest_response * corcs_soap_manifest_parser( 
@@ -382,15 +444,51 @@ private	struct	rest_response * corcs_soap_manifest_parser(
 		return(corcs_fault_response(aptr,801,message,"missing manifest"));
 	if (!( command = document_element_string( sptr, "command") ))
 		return(corcs_fault_response(aptr,802,message,"missing command"));
-	else if ( strcmp( command, "parser" ) != 0)
+	else if ( strcmp( command, "parser") != 0)
 		return(corcs_fault_response(aptr,803,message,"incorrect command"));
 	else
 	{
 		/* parse filename */
-		/* -------------- */
+		/* ---------------- */
 		cords_parser_operation( filename );
 		sptr = liberate_xml_element( sptr );
 		if (!( aptr = corcs_parser_response ( aptr, filename, message ) ))
+			return( aptr );
+		else if (!( qptr ))
+			return( aptr );
+		else	return( corcs_asynch_response( aptr, message, qptr ) );
+	}
+}
+
+/*	-------------------------------------	*/
+/*	  c o r d s _ s o a p _ c o n v e r t	*/
+/*	-------------------------------------	*/
+private	struct	rest_response * corcs_soap_sla_convertor( 
+	struct 	rest_response * aptr, 
+	struct 	xml_element * sptr, 
+	struct 	rest_request * rptr,
+	struct	corcs_asynch_request * qptr )
+{
+	char *	message="ConvertSLA";
+	char *	command=(char *) 0;
+	char *	filename=(char *) 0;
+	if (!( sptr ))
+		return(corcs_fault_response(aptr,800,message,"missing request"));
+	else if (!( rptr ))
+		return(corcs_fault_response(aptr,800,message,"missing request"));
+	else if (!( filename = document_element_xml( sptr, "agreement") ))
+		return(corcs_fault_response(aptr,801,message,"missing agreement"));
+	else if (!( command = document_element_string( sptr, "command") ))
+		return(corcs_fault_response(aptr,802,message,"missing command"));
+	else if ( strcmp( command, "convertor" ) != 0)
+		return(corcs_fault_response(aptr,803,message,"incorrect command"));
+	else
+	{
+		/* convert filename */
+		/* -------------- */
+		cords_convertor_operation( filename, 2 );
+		sptr = liberate_xml_element( sptr );
+		if (!( aptr = corcs_convertor_response ( aptr, filename, message,2 ) ))
 			return( aptr );
 		else if (!( qptr ))
 			return( aptr );
@@ -760,8 +858,12 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 		return( corcs_soap_resolver( aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "ParseManifest" ) ))
 		return( corcs_soap_manifest_parser( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
+	else if (!( strcmp(  command, "ConvertManifest" ) ))
+		return( corcs_soap_manifest_convertor( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "ParseSLA" ) ))
 		return( corcs_soap_sla_parser( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
+	else if (!( strcmp(  command, "ConvertSLA" ) ))
+		return( corcs_soap_sla_convertor( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "BrokerSLA" ) ))
 		return( corcs_soap_sla_broker( aptr, sptr, rptr, (struct corcs_asynch_request *) 0 ) );
 	else if (!( strcmp(  command, "ServiceAction" ) ))
@@ -774,8 +876,12 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 
 	else if (!( strcmp(  command, "AsynchParseManifest" ) ))
 		return( corcs_asynchronous_request( corcs_soap_manifest_parser, command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "AsynchConvertManifest" ) ))
+		return( corcs_asynchronous_request( corcs_soap_manifest_convertor, command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "AsynchParseSLA" ) ))
 		return( corcs_asynchronous_request( corcs_soap_sla_parser, command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "AsynchConvertSLA" ) ))
+		return( corcs_asynchronous_request( corcs_soap_sla_convertor, command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "AsynchBrokerSLA" ) ))
 		return( corcs_asynchronous_request( corcs_soap_sla_broker, command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "AsynchServiceAction" ) ))
@@ -787,7 +893,11 @@ public	struct rest_response * corcs_soap_post( struct rest_response * aptr, char
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "AsynchParseManifestResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "AsynchConvertManifestResult" ) ))
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "AsynchParseSLAResult" ) ))
+		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
+	else if (!( strcmp(  command, "AsynchConvertSLAResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
 	else if (!( strcmp(  command, "AsynchBrokerSLAResult" ) ))
 		return( corcs_asynchronous_result( command, aptr, sptr, rptr ) );
