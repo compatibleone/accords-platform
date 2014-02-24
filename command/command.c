@@ -69,6 +69,7 @@ public	char *	default_zone()		{	return(Command.zone);		}
 private	void	default_service_table( FILE * h, char * service );
 public	struct occi_request * cords_account_request( struct occi_client * kptr, char * object, int type );
 private	struct rest_response * cords_parser_response( struct rest_response * aptr, char * filename );
+private	struct rest_response * cords_convertor_response( struct rest_response * aptr, char * filename );
 private	struct rest_response * cords_broker_response( struct rest_response * aptr, char * filename );
 private	struct rest_response * cords_resolver_response( struct rest_response * aptr, char * filename );
 private	struct rest_response * cords_service_response( struct rest_response * aptr, char * filename );
@@ -1712,6 +1713,7 @@ private	char *	default_get_filename( char * command )
 	char	buffer[1024];
 	char *	filename;
 	if ((!( strcasecmp( command, "parser" 	) ))
+	||  (!( strcasecmp( command, "convert" 	) ))
 	||  (!( strcasecmp( command, "broker" 	) ))
 	||  (!( strcasecmp( command, "resolver" ) ))
 	||  (!( strcasecmp( command, "service" 	) ))
@@ -1734,6 +1736,11 @@ private	char *	default_get_filename( char * command )
 				fprintf(h,"<tr><th>Select Manifest or SLA file<th><input type=file name=filename size=64></tr>\n");
 				fprintf(h,"<tr><th>Parse Document<th><input type=submit name=%s value=%s></tr>\n","command",command);
 
+			}
+			else if (!( strcasecmp( command, "convert" ) ))
+			{
+				fprintf(h,"<tr><th>Specify Document URL<th><input type=text name=filename size=64></tr>\n");
+				fprintf(h,"<tr><th>Convert Document<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}
 			else if (!( strcasecmp( command, "broker" ) ))
 			{
@@ -1759,6 +1766,7 @@ private	char *	default_get_filename( char * command )
 			{
 				fprintf(h,"<tr><th colspan=2><a href=\"/resolver\">Command Resolver</a></th></tr>\n");
 				fprintf(h,"<tr><th colspan=2><a href=\"/parser\">Command Parser</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/convert\">Convert Document</a></th></tr>\n");
 				fprintf(h,"<tr><th colspan=2><a href=\"/broker\">Command Broker</a></th></tr>\n");
 				fprintf(h,"<tr><th colspan=2><a href=\"/service\">Command Service</a></th></tr>\n");
 				fprintf(h,"<tr><th colspan=2><a href=\"/script\">Command Script</a></th></tr>\n");
@@ -1785,6 +1793,7 @@ private	char *	command_get_filename( char * command )
 {
 	char *	filename;
 	if ((!( strcasecmp( command, "parser" 	) ))
+	||  (!( strcasecmp( command, "convert" 	) ))
 	||  (!( strcasecmp( command, "broker" 	) ))
 	||  (!( strcasecmp( command, "resolver"	) ))
 	||  (!( strcasecmp( command, "service" 	) ))
@@ -2205,6 +2214,19 @@ private	struct rest_response * cords_parser_response( struct rest_response * apt
 }
 
 /*	------------------------------------------------------------------	*/
+/*		c o r d s _ c o n v e r t o r _ r e s p o n s e			*/
+/*	------------------------------------------------------------------	*/
+private	struct rest_response * cords_convertor_response( struct rest_response * aptr, char * filename )
+{
+	char *	plan;
+	char buffer[1024];
+	sprintf(buffer, "%s_%s","manifest",filename);
+	if (!( plan = allocate_string( buffer ) ))
+		return( rest_file_response( aptr, filename, "application/xml" ) );
+	else	return( rest_file_response( aptr, plan, "application/xml" ) );
+}
+
+/*	------------------------------------------------------------------	*/
 /*		c o r d s _ b r o k e r _ r e s p o n s e			*/
 /*	------------------------------------------------------------------	*/
 private	struct rest_response * cords_broker_response( struct rest_response * aptr, char * filename )
@@ -2318,6 +2340,22 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 		else if ((status = cords_parser_operation( filename )) != 0)
 			return( rest_html_response( aptr, status, "Incorrect request" ) );
 		else	return( cords_parser_response( aptr, filename ) );
+	}
+	else if (!( strcasecmp( command, "convert" ) ))
+	{
+		if (!( form = get_multipart_form( rptr ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = get_multipart_data( form, "command" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ( strcmp( filename, command ) )
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = get_multipart_data( form, "filename" ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if (!( filename = fetch_url( filename ) ))
+			return( rest_html_response( aptr, 400, "Incorrect request" ) );
+		else if ((status = cords_convertor_operation( filename,1 )) != 0)
+			return( rest_html_response( aptr, status, "Incorrect request" ) );
+		else	return( cords_convertor_response( aptr, filename ) );
 	}
 	else if (!( strcasecmp( command, "broker" ) ))
 	{
