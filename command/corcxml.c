@@ -22,6 +22,42 @@ private	char *	document_element_string( struct xml_element * xptr, char * nptr )
 }
 
 /*	---------------------------------------------	*/
+/*	d o c u m e n t _ e l e m e n t _ u r l   	*/ 
+/*	---------------------------------------------	*/
+private	char *	document_element_url( struct xml_element * xptr, char * nptr )
+{
+	struct	xml_element *eptr;
+        struct  rest_header * hptr;
+        struct  rest_response * rptr;
+	char *	result;
+	char *	url;
+	if (!( eptr = nested_document_element( xptr, nptr )))
+		return((char *) 0);
+	else if (!( url = eptr->value ))
+		return( (char *) 0 );
+        else if (!( strncmp( url,"file:///",strlen("file:///") ) ))
+                return(allocate_string( (url + (strlen("file:///") - 1 ) ) ) );
+        else if (!( rptr = rest_client_get_request( url, (char *) 0,"Xsd Client", (struct rest_header *) 0) ))
+		return((char *) 0);
+        else if ( rptr->status != 200 )
+		return((char *) 0);
+        else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+		return((char *) 0);
+        else if (!( hptr->value ))
+		return((char *) 0);
+        else if (!( atoi( hptr->value ) ))
+		return((char *) 0);
+        else if (!( rptr->body ))
+		return((char *) 0);
+        else	
+        {
+		result = allocate_string( rptr->body );
+                liberate_rest_response_body( rptr );
+                return( result );
+        }
+}
+
+/*	---------------------------------------------	*/
 /*	d o c u m e n t _ e l e m e n t _ x m l   	*/ 
 /*	---------------------------------------------	*/
 private	char *	document_element_xml( struct xml_element * xptr, char * nptr )

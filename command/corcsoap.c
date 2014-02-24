@@ -403,8 +403,8 @@ private	struct	rest_response * corcs_soap_manifest_convertor(
 		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
 		return(corcs_fault_response(aptr,800,message,"missing request"));
-	else if (!( filename = document_element_xml( sptr, "manifest") ))
-		return(corcs_fault_response(aptr,801,message,"missing manifest"));
+	else if (!( filename = document_element_url( sptr, "document") ))
+		return(corcs_fault_response(aptr,801,message,"missing document or url"));
 	if (!( command = document_element_string( sptr, "command") ))
 		return(corcs_fault_response(aptr,802,message,"missing command"));
 	else if ( strcmp( command, "convertor" ) != 0)
@@ -476,7 +476,7 @@ private	struct	rest_response * corcs_soap_sla_convertor(
 		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
 		return(corcs_fault_response(aptr,800,message,"missing request"));
-	else if (!( filename = document_element_xml( sptr, "agreement") ))
+	else if (!( filename = document_element_url( sptr, "document") ))
 		return(corcs_fault_response(aptr,801,message,"missing agreement"));
 	else if (!( command = document_element_string( sptr, "command") ))
 		return(corcs_fault_response(aptr,802,message,"missing command"));
