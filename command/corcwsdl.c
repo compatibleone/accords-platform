@@ -2,7 +2,7 @@
 #define	_corc_wsdl_c
 
 #define _ACCORDS_NAMESPACE	"http://schema.compatibleone.fr/accords/1.0/"
-
+#define	_WS_AGREEMENT		"http://schemas.ggf.org/graap/2007/03/ws-agreement"
 #define	_SCHEMA_LOCATION	"corcs.xsd"
 
 /*	-----------------------------------	*/
@@ -120,6 +120,10 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		fprintf(h,"xmlns=\"http://schemas.xmlsoap.org/wsdl/\"\n");
 		fprintf(h,"xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\"\n");
 		fprintf(h,"xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\"\n");
+		if ( corcsApiV2 )
+		{
+			fprintf(h,"xmlns:ws=\"%s\"\n",_WS_AGREEMENT);
+		}
 		fprintf(h,"xmlns:tns=\"%s\"\n",_ACCORDS_NAMESPACE);
 		fprintf(h,"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n");
 
@@ -153,7 +157,7 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		{
 		wsdl_open_element(h,"ConvertManifestRequest");
 		wsdl_string_element(h,"command");
-		wsdl_complex_element(h,"manifest",mns); 
+		wsdl_string_element(h,"document");
 		wsdl_close_element(h);
 		}
 		wsdl_open_element(h,"ParseManifestResponse");
@@ -177,7 +181,7 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		wsdl_open_element(h,"AsynchConvertManifestRequest");
 		wsdl_string_element(h,"command");
 		wsdl_string_element(h,"callback");
-		wsdl_complex_element(h,"manifest",mns); 
+		wsdl_string_element(h,"document");
 		wsdl_close_element(h);
 		}
 
@@ -190,7 +194,7 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		{
 		wsdl_open_element(h,"ConvertSLARequest");
 		wsdl_string_element(h,"command");
-		wsdl_complex_element(h,"agreement",ans); 
+		wsdl_string_element(h,"document");
 		wsdl_close_element(h);
 		}
 
@@ -216,7 +220,7 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		wsdl_open_element(h,"AsynchConvertSLARequest");
 		wsdl_string_element(h,"command");
 		wsdl_string_element(h,"callback");
-		wsdl_complex_element(h,"agreement",ans); 
+		wsdl_string_element(h,"document");
 		wsdl_close_element(h);
 		}
 
