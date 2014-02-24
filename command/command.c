@@ -1800,6 +1800,10 @@ private	char *	command_get_filename( char * command )
 		return( corcs_soap_get_wsdl() );
 	else if (!( strcasecmp( command, "wsrpc" ) ))
 		return( corcs_soap_get_wsrpc() );
+	else if (!( strcasecmp( command, "wsdl2" ) ))
+		return( corcs_soap_get_wsdl2() );
+	else if (!( strcasecmp( command, "wsrpc2" ) ))
+		return( corcs_soap_get_wsrpc2() );
 	else if (!( strcasecmp( command, "manifest.xsd" ) ))
 		return( corcs_copy_file( command ) );
 	else if (!( strcasecmp( command, "slam.xsd" ) ))
@@ -2587,8 +2591,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0c.0.10");
-	printf("\n   Beta Version : 10/02/2014 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0d.0.01");
+	printf("\n   Beta Version : 24/02/2014 ");
 	printf("\n   Copyright (c) 2011,2014 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
