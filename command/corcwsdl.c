@@ -96,7 +96,7 @@ private void	wsdl_input_output_fault(FILE * h, char * sbs )
 	return;
 }
 
-private	char *	corcs_soap_wsdl(char * host,char * sbs)
+private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 {
 	char * filename;
 	char *	sbb;
@@ -149,49 +149,61 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 		wsdl_string_element(h,"command");
 		wsdl_complex_element(h,"manifest",mns); 
 		wsdl_close_element(h);
-
+		if ( corcsApiV2 )
+		{
 		wsdl_open_element(h,"ConvertManifestRequest");
 		wsdl_string_element(h,"command");
 		wsdl_complex_element(h,"manifest",mns); 
 		wsdl_close_element(h);
-
+		}
 		wsdl_open_element(h,"ParseManifestResponse");
 		wsdl_complex_element(h,"manifest",mns); 
 		wsdl_close_element(h);
 
+		if ( corcsApiV2 )
+		{
 		wsdl_open_element(h,"ConvertManifestResponse");
 		wsdl_complex_element(h,"manifest",mns); 
 		wsdl_close_element(h);
-
+		}
 		wsdl_open_element(h,"AsynchParseManifestRequest");
 		wsdl_string_element(h,"command");
 		wsdl_string_element(h,"callback");
 		wsdl_complex_element(h,"manifest",mns); 
 		wsdl_close_element(h);
 
+		if ( corcsApiV2 )
+		{
 		wsdl_open_element(h,"AsynchConvertManifestRequest");
 		wsdl_string_element(h,"command");
 		wsdl_string_element(h,"callback");
 		wsdl_complex_element(h,"manifest",mns); 
 		wsdl_close_element(h);
+		}
 
 		wsdl_open_element(h,"ParseSLARequest");
 		wsdl_string_element(h,"command");
 		wsdl_complex_element(h,"agreement",ans); 
 		wsdl_close_element(h);
 
+		if ( corcsApiV2 )
+		{
 		wsdl_open_element(h,"ConvertSLARequest");
 		wsdl_string_element(h,"command");
 		wsdl_complex_element(h,"agreement",ans); 
 		wsdl_close_element(h);
+		}
 
 		wsdl_open_element(h,"ParseSLAResponse");
 		wsdl_complex_element(h,"agreement",ans); 
 		wsdl_close_element(h);
 
+		if ( corcsApiV2 )
+		{
 		wsdl_open_element(h,"ConvertSLAResponse");
 		wsdl_complex_element(h,"agreement",ans); 
 		wsdl_close_element(h);
+		}
 
 		wsdl_open_element(h,"AsynchParseSLARequest");
 		wsdl_string_element(h,"command");
@@ -199,11 +211,14 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 		wsdl_complex_element(h,"agreement",ans); 
 		wsdl_close_element(h);
 
+		if ( corcsApiV2 )
+		{
 		wsdl_open_element(h,"AsynchConvertSLARequest");
 		wsdl_string_element(h,"command");
 		wsdl_string_element(h,"callback");
 		wsdl_complex_element(h,"agreement",ans); 
 		wsdl_close_element(h);
+		}
 
 		wsdl_open_element(h,"BrokerSLARequest");
 		wsdl_string_element(h,"command");
@@ -261,12 +276,20 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 		wsdl_element_message(h,"ResolverResponse");
 		wsdl_element_message(h,"ParseManifestRequest");
 		wsdl_element_message(h,"ParseManifestResponse");
+
+		if ( corcsApiV2 )
+		{
 		wsdl_element_message(h,"ConvertManifestRequest");
 		wsdl_element_message(h,"ConvertManifestResponse");
+		}
+
 		wsdl_element_message(h,"ParseSLARequest");
 		wsdl_element_message(h,"ParseSLAResponse");
+		if ( corcsApiV2 )
+		{
 		wsdl_element_message(h,"ConvertSLARequest");
 		wsdl_element_message(h,"ConvertSLAResponse");
+		}
 		wsdl_element_message(h,"BrokerSLARequest");
 		wsdl_element_message(h,"BrokerSLAResponse");
 		wsdl_element_message(h,"ServiceActionRequest");
@@ -279,8 +302,11 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 
 		wsdl_element_message(h,"AsynchParseManifestRequest");
 		wsdl_element_message(h,"AsynchParseSLARequest");
+		if ( corcsApiV2 )
+		{
 		wsdl_element_message(h,"AsynchConvertManifestRequest");
 		wsdl_element_message(h,"AsynchConvertSLARequest");
+		}
 		wsdl_element_message(h,"AsynchBrokerSLARequest");
 		wsdl_element_message(h,"AsynchServiceActionRequest");
 		wsdl_element_message(h,"AsynchRunScriptRequest");
@@ -301,40 +327,52 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 			fprintf(h,"<output message=\"tns:ParseManifestResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"ConvertManifest\">\n");
 			fprintf(h,"<input message=\"tns:ConvertManifestRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ConvertManifestResponse\"/>\n");
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"AsynchParseManifestResult\">\n");
 			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ParseManifestResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"AsynchConvertManifestResult\">\n");
 			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ParseManifestResponse\"/>\n");
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"ParseSLA\">\n");
 			fprintf(h,"<input message=\"tns:ParseSLARequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ParseSLAResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"ConvertSLA\">\n");
 			fprintf(h,"<input message=\"tns:ConvertSLARequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ConvertSLAResponse\"/>\n");
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"AsynchParseSLAResult\">\n");
 			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ParseSLAResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"AsynchConvertSLAResult\">\n");
 			fprintf(h,"<input message=\"tns:AsynchMessageRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:ConvertSLAResponse\"/>\n");
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"BrokerSLA\">\n");
 			fprintf(h,"<input message=\"tns:BrokerSLARequest\"/>\n");
@@ -371,20 +409,26 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 			fprintf(h,"<output message=\"tns:AsynchMessageResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"AsynchConvertManifest\">\n");
 			fprintf(h,"<input message=\"tns:AsynchConvertManifestRequest\"/>\n");
 			fprintf(h,"<output message=\"tns:AsynchMessageResponse\"/>\n");
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"AsynchParseSLA\">\n");
 			fprintf(h,"<input message=\"tns:AsynchParseSLARequest\"/>\n");
 			fprintf(h,"<output message=\"tns:AsynchMessageResponse\"/>\n");
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"AsynchConvertSLA\">\n");
 			fprintf(h,"<input message=\"tns:AsynchConvertSLARequest\"/>\n");
 			fprintf(h,"<output message=\"tns:AsynchMessageResponse\"/>\n");
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"AsynchBrokerSLA\">\n");
 			fprintf(h,"<input message=\"tns:AsynchBrokerSLARequest\"/>\n");
@@ -421,20 +465,26 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"ConvertManifest\">\n");
 			fprintf(h,"<soap:operation soapAction=\"ConvertManifest\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"ParseSLA\">\n");
 			fprintf(h,"<soap:operation soapAction=\"ParseSLA\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"ConvertSLA\">\n");
 			fprintf(h,"<soap:operation soapAction=\"ConvertSLA\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"BrokerSLA\">\n");
 			fprintf(h,"<soap:operation soapAction=\"BrokerSLA\"/>\n");
@@ -456,20 +506,26 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"AsynchConvertManifest\">\n");
 			fprintf(h,"<soap:operation soapAction=\"AsynchConvertManifest\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"AsynchParseSLA\">\n");
 			fprintf(h,"<soap:operation soapAction=\"AsynchParseSLA\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"AsynchConvertSLA\">\n");
 			fprintf(h,"<soap:operation soapAction=\"AsynchConvertSLA\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"AsynchBrokerSLA\">\n");
 			fprintf(h,"<soap:operation soapAction=\"AsynchBrokerSLA\"/>\n");
@@ -491,20 +547,26 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs)
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"AsynchConvertManifestResult\">\n");
 			fprintf(h,"<soap:operation soapAction=\"AsynchConvertManifestResult\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"AsynchParseSLAResult\">\n");
 			fprintf(h,"<soap:operation soapAction=\"AsynchParseSLAResult\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
 
+			if ( corcsApiV2 )
+			{
 			fprintf(h,"<operation name=\"AsynchConvertSLAResult\">\n");
 			fprintf(h,"<soap:operation soapAction=\"AsynchConvertSLAResult\"/>\n");
 			wsdl_input_output_fault(h,sbs);
 			fprintf(h,"</operation>\n");
+			}
 
 			fprintf(h,"<operation name=\"AsynchBrokerSLAResult\">\n");
 			fprintf(h,"<soap:operation soapAction=\"AsynchBrokerSLAResult\"/>\n");
@@ -543,7 +605,17 @@ public	char * corcs_soap_get_wsrpc()
 {
 	char 	host[1024];
 	sprintf(host,"%s",get_identity());
-	return( corcs_soap_wsdl(host,"rpc") );
+	return( corcs_soap_wsdl(host,"rpc",0) );
+}
+
+/*	-------------------------------------	*/
+/*	c o r c s _ s o a p _ g e t _ w s rpc2 	*/
+/*	-------------------------------------	*/
+public	char * corcs_soap_get_wsrpc2()
+{
+	char 	host[1024];
+	sprintf(host,"%s",get_identity());
+	return( corcs_soap_wsdl(host,"rpc",1) );
 }
 
 /*	-------------------------------------	*/
@@ -553,7 +625,17 @@ public	char * corcs_soap_get_wsdl()
 {
 	char 	host[1024];
 	sprintf(host,"%s",get_identity());
-	return( corcs_soap_wsdl(host,"document") );
+	return( corcs_soap_wsdl(host,"document",0) );
+}
+
+/*	-------------------------------------	*/
+/*	c o r c s _ s o a p _ g e t _ w s d l2 	*/
+/*	-------------------------------------	*/
+public	char * corcs_soap_get_wsdl2()
+{
+	char 	host[1024];
+	sprintf(host,"%s",get_identity());
+	return( corcs_soap_wsdl(host,"document",1) );
 }
 
 	/* ------------ */

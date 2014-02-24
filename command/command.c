@@ -75,7 +75,9 @@ private	struct rest_response * cords_service_response( struct rest_response * ap
 private	struct rest_response * cords_script_response( struct rest_response * aptr, char * filename );
 private	char *	corcs_soap_service_response( char * action, char * service, char * message );
 public	char *	corcs_soap_get_wsdl();
+public	char *	corcs_soap_get_wsdl2();
 public	char *	corcs_soap_get_wsrpc();
+public	char *	corcs_soap_get_wsrpc2();
 private char * 	corcs_resolver_soap_response( char * category, struct occi_response * rptr );
 
 /*	-----------------------------------	*/
@@ -1760,8 +1762,10 @@ private	char *	default_get_filename( char * command )
 				fprintf(h,"<tr><th colspan=2><a href=\"/broker\">Command Broker</a></th></tr>\n");
 				fprintf(h,"<tr><th colspan=2><a href=\"/service\">Command Service</a></th></tr>\n");
 				fprintf(h,"<tr><th colspan=2><a href=\"/script\">Command Script</a></th></tr>\n");
-				fprintf(h,"<tr><th colspan=2><a href=\"/wsdl\">WSDL Document</a></th></tr>\n");
-				fprintf(h,"<tr><th colspan=2><a href=\"/wsrpc\">WSDL RPC</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/wsdl\">WSDL Document Version 1</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/wsdl2\">WSDL Document Version 2</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/wsrpc\">WSDL RPC Version 1</a></th></tr>\n");
+				fprintf(h,"<tr><th colspan=2><a href=\"/wsrpc2\">WSDL RPC Version 2</a></th></tr>\n");
 			}		
 			fprintf(h,"</table>\n");
 			if ( strcasecmp( command, "" ) )
