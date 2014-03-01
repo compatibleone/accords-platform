@@ -42,10 +42,14 @@ public	char * fetch_url( char * url )
         struct  rest_header * hptr;
         struct  rest_response * rptr;
 	char *	result;
+	char *	tls=(char *) 0;
 
         if (!( strncmp( url,"file:///",strlen("file:///") ) ))
                 return(allocate_string( (url + (strlen("file:///") - 1 ) ) ) );
-        else if (!( rptr = rest_client_get_request( url, (char *) 0,"Xsd Client", (struct rest_header *) 0) ))
+	if (!( strncmp( url,"https:",strlen("https:") ) ))
+		tls = "security/commandTls.xml";
+	else	tls = (char *) 0;
+        if (!( rptr = rest_client_get_request( url, tls,"Xsd Client", (struct rest_header *) 0) ))
 		return((char *) 0);
         else if ( rptr->status != 200 )
 		return((char *) 0);

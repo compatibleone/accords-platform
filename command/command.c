@@ -1739,7 +1739,7 @@ private	char *	default_get_filename( char * command )
 			}
 			else if (!( strcasecmp( command, "convert" ) ))
 			{
-				fprintf(h,"<tr><th>Specify Document URL<th><input type=text name=filename size=64></tr>\n");
+				fprintf(h,"<tr><th>Specify Document URL<th><input type=text name=url size=64></tr>\n");
 				fprintf(h,"<tr><th>Convert Document<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}
 			else if (!( strcasecmp( command, "broker" ) ))
@@ -2349,7 +2349,7 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if ( strcmp( filename, command ) )
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if (!( filename = get_multipart_data( form, "filename" ) ))
+		else if (!( filename = get_multipart_data( form, "url" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if (!( filename = fetch_url( filename ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
@@ -2629,8 +2629,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0d.0.01");
-	printf("\n   Beta Version : 24/02/2014 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0d.0.02");
+	printf("\n   Beta Version : 01/03/2014 ");
 	printf("\n   Copyright (c) 2011,2014 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
