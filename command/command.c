@@ -986,7 +986,7 @@ private	int	cords_convertor_operation( char * filename , int mode ) /* mode 1 : 
 		return( failure(7,"conversion error",filename));
 	else
 	{
-		sprintf(buffer,"%s_%s",(mode == 1 ? "manifest" : "agreement"),filename);
+		sprintf(buffer,"%s-%s",filename,(mode == 1 ? "manifest" : "agreement"));
 		vptr = liberate( vptr );
 		dptr = cords_serialise_document( dptr, buffer );
 		dptr = document_drop( dptr );
@@ -1740,6 +1740,8 @@ private	char *	default_get_filename( char * command )
 			else if (!( strcasecmp( command, "convert" ) ))
 			{
 				fprintf(h,"<tr><th>Specify Document URL<th><input type=text name=url size=64></tr>\n");
+				fprintf(h,"<tr><th>Specify User Name<th><input type=text name=username size=64></tr>\n");
+				fprintf(h,"<tr><th>Specify Password<th><input type=password name=password size=64></tr>\n");
 				fprintf(h,"<tr><th>Convert Document<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}
 			else if (!( strcasecmp( command, "broker" ) ))
@@ -2220,7 +2222,7 @@ private	struct rest_response * cords_convertor_response( struct rest_response * 
 {
 	char *	plan;
 	char buffer[1024];
-	sprintf(buffer, "%s_%s","manifest",filename);
+	sprintf(buffer, "%s-%s",filename,"manifest");
 	if (!( plan = allocate_string( buffer ) ))
 		return( rest_file_response( aptr, filename, "application/xml" ) );
 	else	return( rest_file_response( aptr, plan, "application/xml" ) );
@@ -2295,6 +2297,8 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 	char *	service;
 	char *	category;
 	char *	command;
+	char *	username;
+	char *	password;
 	char *	parameters;
 	char *	sptr;
 	struct	rest_header * form;
@@ -2351,11 +2355,16 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if (!( filename = get_multipart_data( form, "url" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if (!( filename = fetch_url( filename ) ))
-			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if ((status = cords_convertor_operation( filename,1 )) != 0)
-			return( rest_html_response( aptr, status, "Incorrect request" ) );
-		else	return( cords_convertor_response( aptr, filename ) );
+		else 
+		{	
+			username = get_multipart_data( form, "username" );
+			password = get_multipart_data( form, "password" );
+			if (!( filename = fetch_url( filename, username, password ) ))
+				return( rest_html_response( aptr, 400, "Incorrect request" ) );
+			if ((status = cords_convertor_operation( filename,1)) != 0)
+				return( rest_html_response( aptr, status, "Incorrect request" ) );
+			else	return( cords_convertor_response( aptr, filename ) );
+		}
 	}
 	else if (!( strcasecmp( command, "broker" ) ))
 	{

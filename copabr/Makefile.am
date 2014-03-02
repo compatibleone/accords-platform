@@ -11,7 +11,8 @@ EXTRA_DIST = csa.c csa.h \
 	cse.c cse.h \
 	csp.c csp.h \
 	cosacsctrl.c cosacsctrl.h \
-	cpxsd.c cpxsd.h
+	cpxsd.c cpxsd.h \
+	cpcnv.c 
 
 libcopabr_la_SOURCES = cp.c cp.h cb.c cb.h
 libcopabr_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_COREST) $(CFLAGS_COXML) $(CFLAGS_COCCI) $(CFLAGS_OCCI) $(CFLAGS_PUBOCCI)

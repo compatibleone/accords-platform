@@ -1,7 +1,7 @@
 #ifndef	_corc_xml_c
 #define	_corc_xml_c
 
-public	char * fetch_url( char * url );
+public	char * fetch_url( char * url , char * user, char * pass);
 
 /*	---------------------------------------		*/
 /*	l i b e r a t e _ x m l _ e l e m e n t		*/ 
@@ -34,11 +34,15 @@ private	char *	document_element_url( struct xml_element * xptr, char * nptr )
 		return((char *) 0);
 	else if (!( url = eptr->value ))
 		return( (char *) 0 );
-	else	return( fetch_url( url ) );
+	else	return( fetch_url( url, (char *) 0, (char *) 0 ) );
 }
 
-public	char * fetch_url( char * url )
+/*	-----------------	*/
+/*	f e t c h _ u r l 	*/
+/*	-----------------	*/
+public	char * fetch_url( char * url, char * user, char * pass )
 {
+        struct  rest_header * auth=(struct rest_header *) 0;
         struct  rest_header * hptr;
         struct  rest_response * rptr;
 	char *	result;
@@ -49,11 +53,22 @@ public	char * fetch_url( char * url )
 	if (!( strncmp( url,"https:",strlen("https:") ) ))
 		tls = "security/commandTls.xml";
 	else	tls = (char *) 0;
-        if (!( rptr = rest_client_get_request( url, tls,"Xsd Client", (struct rest_header *) 0) ))
-		return((char *) 0);
-        else if ( rptr->status != 200 )
-		return((char *) 0);
-        else if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
+	while ( 1 )
+	{
+        	if (!( rptr = rest_client_get_request( url, tls,"Xsd Client", auth ) ))
+			return((char *) 0);
+        	else if ( rptr->status == 200 )
+			break;
+		else if ( rptr->status != 401 )
+			return((char *) 0);
+		else if ( auth )
+			return( (char *) 0 );
+		else if (!( auth = rest_authorization_header( user, pass ) ))
+			return((char *) 0);
+		else	continue;
+	}
+
+        if (!( hptr = rest_resolve_header( rptr->first, _HTTP_CONTENT_LENGTH ) ))
 		return((char *) 0);
         else if (!( hptr->value ))
 		return((char *) 0);
@@ -63,7 +78,8 @@ public	char * fetch_url( char * url )
 		return((char *) 0);
         else	
         {
-		result = allocate_string( rptr->body );
+		result = rptr->body;
+		rptr->body = (char *) 0;
                 liberate_rest_response_body( rptr );
                 return( result );
         }

@@ -1030,6 +1030,22 @@ private struct rest_header * rest_check_authentication( struct rest_response * r
 	else	return( rest_prefix_header( template, _HTTP_AUTHORIZATION, vptr ) );
 }
 
+/*	-------------------------------------------------	*/
+/*	r e s t _ a u t h o r i z a t i o n _ h e a d e r 	*/
+/*	-------------------------------------------------	*/
+public	struct rest_header * rest_authorization_header( char * uptr, char * pptr )
+{
+	struct	rest_header * hptr=(struct rest_header * ) 0;
+	char *	vptr;
+	if (!( uptr ))
+		return((struct rest_header * ) 0);
+	else if (!( pptr ))
+		return((struct rest_header * ) 0);
+	else if (!( vptr = rest_encode_credentials( uptr, pptr ) ))
+		return((struct rest_header * ) 0);
+	else	return( rest_create_header( _HTTP_AUTHORIZATION, vptr ) );
+}
+
 /*	--------------------------------------------------------	*/
 /*		r e s t _ c h e c k _ r e d i r e c t i o n		*/
 /*	--------------------------------------------------------	*/

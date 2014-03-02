@@ -543,6 +543,7 @@ public	int	document_serialise_file( struct xml_element * eptr, char * filename )
 		return(46);
 	else
 	{
+		fprintf(h,"<?xml version=\"1.0\" encoding=\"UTF8\"?>\n");
 		document_serialise_element( h, eptr, 0 );
 		fclose(h);
 		return(0);

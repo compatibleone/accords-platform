@@ -100,7 +100,7 @@ private	struct rest_response * corcs_convertor_response( struct rest_response * 
 	char 	buffer[1024];
 	char 	plan[1024];
 	sprintf(buffer,"%sResponse",message);
-	sprintf(plan,"%s_%s",(mode == 1 ? "manifest" : "agreement"),document);	
+	sprintf(plan,"%s-%s",document,(mode == 1 ? "manifest" : "agreement"));	
 	if (!( filename = rest_temporary_filename( "xml" ) ))
 		return( aptr );
 	else if (!( h = fopen( filename, "w" ) ))
@@ -399,11 +399,13 @@ private	struct	rest_response * corcs_soap_manifest_convertor(
 	char *	message="ConvertManifest";
 	char *	command=(char *) 0;
 	char *	filename=(char *) 0;
+	char *	username=(char *) 0;
+	char *	password=(char *) 0;
 	if (!( sptr ))
 		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
 		return(corcs_fault_response(aptr,800,message,"missing request"));
-	else if (!( filename = document_element_url( sptr, "document") ))
+	else if (!( filename = document_element_string( sptr, "url") ))
 		return(corcs_fault_response(aptr,801,message,"missing document or url"));
 	if (!( command = document_element_string( sptr, "command") ))
 		return(corcs_fault_response(aptr,802,message,"missing command"));
@@ -411,6 +413,11 @@ private	struct	rest_response * corcs_soap_manifest_convertor(
 		return(corcs_fault_response(aptr,803,message,"incorrect command"));
 	else
 	{
+		username = document_element_string( sptr, "username");
+		password = document_element_string( sptr, "passname");
+		if (!( filename = fetch_url( filename, username, password ) ))
+			return(corcs_fault_response(aptr,804,message,"cannot fetch document"));
+
 		/* convert filename */
 		/* ---------------- */
 		cords_convertor_operation( filename, 1 );
@@ -472,11 +479,13 @@ private	struct	rest_response * corcs_soap_sla_convertor(
 	char *	message="ConvertSLA";
 	char *	command=(char *) 0;
 	char *	filename=(char *) 0;
+	char *	username=(char *) 0;
+	char *	password=(char *) 0;
 	if (!( sptr ))
 		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
 		return(corcs_fault_response(aptr,800,message,"missing request"));
-	else if (!( filename = document_element_url( sptr, "document") ))
+	else if (!( filename = document_element_string( sptr, "url") ))
 		return(corcs_fault_response(aptr,801,message,"missing agreement"));
 	else if (!( command = document_element_string( sptr, "command") ))
 		return(corcs_fault_response(aptr,802,message,"missing command"));
@@ -484,8 +493,10 @@ private	struct	rest_response * corcs_soap_sla_convertor(
 		return(corcs_fault_response(aptr,803,message,"incorrect command"));
 	else
 	{
-		/* convert filename */
-		/* -------------- */
+		username = document_element_string( sptr, "username");
+		password = document_element_string( sptr, "passname");
+		if (!( filename = fetch_url( filename, username, password ) ))
+			return(corcs_fault_response(aptr,804,message,"cannot fetch document"));
 		cords_convertor_operation( filename, 2 );
 		sptr = liberate_xml_element( sptr );
 		if (!( aptr = corcs_convertor_response ( aptr, filename, message,2 ) ))

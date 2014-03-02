@@ -157,7 +157,9 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		{
 		wsdl_open_element(h,"ConvertManifestRequest");
 		wsdl_string_element(h,"command");
-		wsdl_string_element(h,"document");
+		wsdl_string_element(h,"url");
+		wsdl_string_element(h,"username");
+		wsdl_string_element(h,"password");
 		wsdl_close_element(h);
 		}
 		wsdl_open_element(h,"ParseManifestResponse");
@@ -181,7 +183,9 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		wsdl_open_element(h,"AsynchConvertManifestRequest");
 		wsdl_string_element(h,"command");
 		wsdl_string_element(h,"callback");
-		wsdl_string_element(h,"document");
+		wsdl_string_element(h,"url");
+		wsdl_string_element(h,"username");
+		wsdl_string_element(h,"password");
 		wsdl_close_element(h);
 		}
 
@@ -194,7 +198,9 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		{
 		wsdl_open_element(h,"ConvertSLARequest");
 		wsdl_string_element(h,"command");
-		wsdl_string_element(h,"document");
+		wsdl_string_element(h,"url");
+		wsdl_string_element(h,"username");
+		wsdl_string_element(h,"password");
 		wsdl_close_element(h);
 		}
 
@@ -220,7 +226,9 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 		wsdl_open_element(h,"AsynchConvertSLARequest");
 		wsdl_string_element(h,"command");
 		wsdl_string_element(h,"callback");
-		wsdl_string_element(h,"document");
+		wsdl_string_element(h,"url");
+		wsdl_string_element(h,"username");
+		wsdl_string_element(h,"password");
 		wsdl_close_element(h);
 		}
 

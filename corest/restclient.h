@@ -27,6 +27,7 @@ public struct rest_request 	* allocate_rest_request();
 public struct rest_request 	* liberate_rest_request( struct rest_request * rptr );
 public struct rest_header 	* add_rest_header( struct rest_request * rptr );
 public struct rest_response 	* rest_accept_response( struct rest_client * cptr );
+public struct rest_header 	* rest_authorization_header( char * username, char * password );
 
 /*	------	*/
 /*	HEADER 	*/
