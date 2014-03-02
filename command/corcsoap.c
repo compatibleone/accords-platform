@@ -409,12 +409,12 @@ private	struct	rest_response * corcs_soap_manifest_convertor(
 		return(corcs_fault_response(aptr,801,message,"missing document or url"));
 	if (!( command = document_element_string( sptr, "command") ))
 		return(corcs_fault_response(aptr,802,message,"missing command"));
-	else if ( strcmp( command, "convertor" ) != 0)
+	else if ( strcmp( command, "convert" ) != 0)
 		return(corcs_fault_response(aptr,803,message,"incorrect command"));
 	else
 	{
 		username = document_element_string( sptr, "username");
-		password = document_element_string( sptr, "passname");
+		password = document_element_string( sptr, "password");
 		if (!( filename = fetch_url( filename, username, password ) ))
 			return(corcs_fault_response(aptr,804,message,"cannot fetch document"));
 
@@ -489,12 +489,12 @@ private	struct	rest_response * corcs_soap_sla_convertor(
 		return(corcs_fault_response(aptr,801,message,"missing agreement"));
 	else if (!( command = document_element_string( sptr, "command") ))
 		return(corcs_fault_response(aptr,802,message,"missing command"));
-	else if ( strcmp( command, "convertor" ) != 0)
+	else if ( strcmp( command, "convert" ) != 0)
 		return(corcs_fault_response(aptr,803,message,"incorrect command"));
 	else
 	{
 		username = document_element_string( sptr, "username");
-		password = document_element_string( sptr, "passname");
+		password = document_element_string( sptr, "password");
 		if (!( filename = fetch_url( filename, username, password ) ))
 			return(corcs_fault_response(aptr,804,message,"cannot fetch document"));
 		cords_convertor_operation( filename, 2 );
