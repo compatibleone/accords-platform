@@ -2,6 +2,7 @@
 #define	_cspi_c
 
 #include "cspi.h"
+#include "occisql.h"
 
 private	struct	cordscript_label 	* labelheap=(struct cordscript_label *) 0;
 private	struct	cordscript_context	* classheap=(struct cordscript_context*) 0;
@@ -2212,6 +2213,17 @@ private	void	fork_operation( struct cordscript_instruction * iptr, struct cordsc
 	}
 }
 
+/*	-------------	*/
+/*	 eval_select 	*/
+/*	-------------	*/
+private	void	eval_select( struct cordscript_instruction * iptr, char * table, char * fields, struct occi_element * filter )
+{
+	struct occi_expression expression = { (char *) 0, (void *) 0, (void *) 0 };
+	select_occi_sql_records( table, &expression );
+	push_value( iptr->context, string_value("[]") );
+	return;
+}
+
 /*	---------------		*/
 /*	 eval_operation		*/
 /*	---------------		*/
@@ -2229,12 +2241,13 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 	int	argc=0;
 	int	argi=0;
 	char	vbuffer[_MAX_VALUE];
-	char *	ihost;
+	char *	ihost=(char *) 0;
 	char *	evalue=(char *) 0;
-	char *	aptr;
-	char *	tptr;
-	char *	sptr;
-	char *	lptr;
+	char *	aptr=(char *) 0;
+	char *	tptr=(char *) 0;
+	char *	sptr=(char *) 0;
+	char *	lptr=(char *) 0;
+	char *	fptr=(char *) 0;
 	int	status;
 	int	count=0;
 	int	v;
@@ -2479,6 +2492,24 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					zptr = occi_remove_response( zptr );
 				}
 				else	push_value( iptr->context, string_value("[error]") );
+				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
+			}
+			else if (!(  strcasecmp( wptr->value, "select" ) ))
+			{
+				dptr = (struct occi_element *) 0;
+				fptr = "*";
+				if ( argv[0] != (struct cordscript_value *) 0)
+				{
+					dptr = cordscript_occi_filter( argv[0]->value );
+					if ( argv[1] != (struct cordscript_value *) 0)
+					{
+						fptr = argv[1]->value;
+					}
+				}
+				/* ----------------------------- */
+				/* select fields fptr where dptr */
+				/* ----------------------------- */
+				eval_select( iptr, evalue, fptr, dptr ); 
 				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 			}
 			else if ((!( strcasecmp( wptr->value, "put") ))

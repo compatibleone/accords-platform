@@ -1154,9 +1154,9 @@ public	int	search_occi_sql_record( char * category,  struct occi_expression *exp
 	}
 }
 
-/*	-------------------------------------------	*/
-/*	s e a r c h _ o c c i _ s q l _ r e c o r d 	*/
-/*	-------------------------------------------	*/
+/*	---------------------------------------------	*/
+/*	c o l l e c t _ o c c i _ s q l _ r e c o r d 	*/
+/*	---------------------------------------------	*/
 public	int	collect_occi_sql_records( char * category,  struct occi_expression *expression )
 {
 	int	status;
@@ -1187,6 +1187,52 @@ public	int	collect_occi_sql_records( char * category,  struct occi_expression *e
 		status = occi_sql_records( tptr, expression );
 		occi_sql_unlock();
 		return( status );
+	}
+}
+
+/*	-------------------------------------------	*/
+/*	s e l e c t _ o c c i _ s q l _ r e c o r d 	*/
+/*	-------------------------------------------	*/
+public	int	select_occi_sql_records( char * category, struct occi_expression * expression , char * fields)
+{
+	int	status;
+	char *	xptr=(char *) 0;
+	struct	occi_table * tptr;
+	if (!( expression ))
+		return( 118 );
+	else if (!( tptr = locate_occi_sql_table( category ) ))
+		return( 40 );
+	else if (!( tptr->handle ))
+		return( 50 );
+	else
+	{
+		if ( fields )
+		{
+			if (!( xptr = allocate( strlen( fields ) + strlen( expression->value ) + strlen( tptr->name ) + strlen( _SELECT_FROM ) + strlen( _ORDER_BY_ORDERID ) + 32 ) ))
+				return( 27 );
+			else	sprintf(xptr, "SELECT %s FROM %s %s %s ",fields,tptr->name,expression->value,_ORDER_BY_ORDERID);
+		}
+		else
+		{
+			if (!( xptr = allocate( strlen( expression->value ) + strlen( tptr->name ) + strlen( _SELECT_ALL_FROM ) + strlen( _ORDER_BY_ORDERID ) + 32 ) ))
+				return( 27);
+			else	sprintf(xptr, "SELECT * FROM %s %s %s ",tptr->name,expression->value,_ORDER_BY_ORDERID);
+		}
+
+		occi_sql_lock();
+		status = occi_sql_query( 7,tptr, xptr );
+		xptr = liberate( xptr );
+		if ( status )
+		{
+			occi_sql_unlock();
+			return( 78 );
+		}
+		else
+		{
+			status = occi_sql_records( tptr, expression );
+			occi_sql_unlock();
+			return( status );
+		}
 	}
 }
 
