@@ -25,17 +25,46 @@ private struct xml_element * cords_agreement_convertor( char * filename );
 /*	-----------------------------------------------------	*/
 /* 	  	c p c n v _  n e w _ a g r e e m e n t		*/
 /*	-----------------------------------------------------	*/
-private	struct xml_element * cpcnv_new_agreement( char * newname )
+private	struct xml_element * cpcnv_new_agreement( char * name, char * id, struct xml_element * context )
 {
 	struct	xml_element * eptr;
+	struct	xml_element * xptr;
 	struct	xml_atribut * aptr;
+	char 	buffer[2048];
+	sprintf(buffer,"ws-agreement-conversion:%s",(id ? id : "unknown" ));
 	if (!( eptr = allocate_element() ))
 		return( eptr );
 	else if (!( eptr->name = allocate_string( "agreement" ) ))
 		return( liberate_element( eptr ) );
-	else if (!( aptr = document_add_atribut( eptr, "name", newname ) ))
+	else if (!( aptr = document_add_atribut( eptr, "name", name ) ))
 		return( liberate_element( eptr ) );
 	else if (!( aptr = document_add_atribut( eptr, "xmlns", "http://www.compatibleone.fr/schemes/slam.xsd" ) ))
+		return( liberate_element( eptr ) );
+	else if (!( xptr = document_element( context, "ws:AgreementInitiator" ) ))
+		return( liberate_element( eptr ) );
+	else if (!( aptr = document_add_atribut( eptr, "initiator", xptr->value ) ))
+		return( liberate_element( eptr ) );
+	else if (!( xptr = document_element( context, "ws:AgreementResponder" ) ))
+		return( liberate_element( eptr ) );
+	else if (!( aptr = document_add_atribut( eptr, "responder", xptr->value ) ))
+		return( liberate_element( eptr ) );
+	else if (!( xptr = document_element( context, "ws:ServiceProvider" ) ))
+		return( liberate_element( eptr ) );
+	else if (!( aptr = document_add_atribut( eptr, "serviceprovider", xptr->value ) ))
+		return( liberate_element( eptr ) );
+	else if (!( xptr = document_element( context, "ws:TemplateId" ) ))
+		return( liberate_element( eptr ) );
+	else if (!( aptr = document_add_atribut( eptr, "templateid", xptr->value ) ))
+		return( liberate_element( eptr ) );
+	else if (!( xptr = document_element( context, "ws:TemplateName" ) ))
+		return( liberate_element( eptr ) );
+	else if (!( aptr = document_add_atribut( eptr, "templatename", xptr->value ) ))
+		return( liberate_element( eptr ) );
+	else if (!( aptr = document_add_atribut( eptr, "description", buffer ) ))
+		return( liberate_element( eptr ) );
+	else if (!( aptr = document_add_atribut( eptr, "initiation", "now" ) ))
+		return( liberate_element( eptr ) );
+	else if (!( aptr = document_add_atribut( eptr, "expiration", "never" ) ))
 		return( liberate_element( eptr ) );
 	else	return( eptr );
 }
@@ -329,9 +358,12 @@ private	struct xml_element * cords_agreement_convertor( char * filename )
 	struct	xml_element * document;
 	struct	xml_element * eptr;
 	struct	xml_element * sptr;
+	struct	xml_element * kptr;
 	struct	xml_element * cptr;
 	struct	xml_element * gptr;
 	struct	xml_element * mptr;
+	struct	xml_element * nptr;
+	struct	xml_element * dptr;
 	struct	xml_element * node=(struct xml_element *) 0;
 	struct	xml_element * pptr;
 	struct	xml_atribut * aptr;
@@ -341,6 +373,21 @@ private	struct xml_element * cords_agreement_convertor( char * filename )
 	if (!( document = document_parse_file( filename ) ))
 		return( (struct xml_element *) 0);
 	else if (!( eptr = document_element( document, "ws:AgreementProperties" ) ))
+	{
+		document = document_drop( document );
+		return( (struct xml_element *) 0);
+	} 
+	else if (!( nptr = document_element( eptr, "ws:Name" ) ))
+	{
+		document = document_drop( document );
+		return( (struct xml_element *) 0);
+	} 
+	else if (!( dptr = document_element( eptr, "ws:AgreementId" ) ))
+	{
+		document = document_drop( document );
+		return( (struct xml_element *) 0);
+	} 
+	else if (!( kptr = document_element( eptr, "ws:Context" ) ))
 	{
 		document = document_drop( document );
 		return( (struct xml_element *) 0);
@@ -399,7 +446,7 @@ private	struct xml_element * cords_agreement_convertor( char * filename )
 		document = document_drop( document );
 		return( (struct xml_element *) 0);
 	} 
-	else if (!( agreement = cpcnv_new_agreement(newname) ))
+	else if (!( agreement = cpcnv_new_agreement(nptr->value, dptr->value, kptr) ))
 	{
 		document = document_drop( document );
 		return( (struct xml_element *) 0);
@@ -407,10 +454,10 @@ private	struct xml_element * cords_agreement_convertor( char * filename )
 	else
 	{
 		if ((!( sptr = cpcnv_add_element( agreement, "terms" )))
+		|| (!( aptr = document_add_atribut( sptr, "name", ":services" ) ))
 		|| (!( sptr = cpcnv_add_element( sptr, "term" )))
 		|| (!( mptr = cpcnv_add_element( sptr, "manifest" )))
 		|| (!( aptr = document_add_atribut( mptr, "name", newname ) ))
-		|| (!( aptr = document_add_atribut( sptr, "name", ":services" ) ))
 		|| (!( aptr = document_add_atribut( sptr, "name", ":services" ) ))
 		|| (!( cptr = cpcnv_add_element( agreement, "terms" )))
 		|| (!( aptr = document_add_atribut( cptr, "name", ":conditions" ) ))

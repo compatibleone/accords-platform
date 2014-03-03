@@ -175,7 +175,7 @@ private	void	orga_user_information( FILE * h, struct orga_subscription * sptr, s
 	fprintf(h,",\"privileges\":\"ADMIN\"\n");
 	fprintf(h,",\"userEmail\":\"%s@compatibleone.fr\"\n",pptr->name);
 	fprintf(h,",\"userName\":\"%s\"\n",pptr->name);
-	fprintf(h,"}\n");
+	fprintf(h,"}]\n");
 	return;
 }
 
@@ -213,7 +213,7 @@ public struct rest_response *  orga_create_user  ( struct orga_subscription * sp
 		fprintf(h,",\"referenceCode\":\"ORGABAS-REF-%u\"\n",orga_reference_code()); 
 		fprintf(h,",\"transactionOperationStatus\":\"%s\"\n","Registered"); 
 		fprintf(h,",\"customerProfile\":{\n"); 
-		fprintf(h,",\"customerName\":\"%s\"\n",uptr->name); 
+		fprintf(h,"\"customerName\":\"%s\"\n",uptr->name); 
 		fprintf(h,",\"baasRoleType\":\"%s\"\n",nature); 
 		fprintf(h,",\"isActive\":\"true\"\n");
 		orga_customer_address(h,sptr,uptr);
