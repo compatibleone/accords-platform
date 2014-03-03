@@ -2213,14 +2213,71 @@ private	void	fork_operation( struct cordscript_instruction * iptr, struct cordsc
 	}
 }
 
+/*	------------------------	*/
+/*	cordscript_sql_on_select	*/
+/*	------------------------	*/
+private int cordscript_sql_on_select( void * context, char * nptr, char * vptr, int vlen )
+{
+        struct cordscript_table_result * cptr=(struct cordscript_table_result *) 0;
+        char value[2048];
+        if (!( cptr = context )) 
+		return(0);
+	else
+	{
+        	memcpy(value,vptr,vlen);
+        	value[vlen] = 0;
+		if ( check_verbose() )
+		{
+			printf("cordscript_column: %s = %s\n",nptr,value);
+		}
+		return( 0 );
+	}
+}
+
 /*	-------------	*/
 /*	 eval_select 	*/
 /*	-------------	*/
 private	void	eval_select( struct cordscript_instruction * iptr, char * table, char * fields, struct occi_element * filter )
 {
-	struct occi_expression expression = { (char *) 0, (void *) 0, (void *) 0 };
-	select_occi_sql_records( table, &expression );
-	push_value( iptr->context, string_value("[]") );
+	int	status;
+	char * 	nptr;
+	char *	vptr;
+	char *	work=(char *) 0;
+	char	category[1024];
+	sprintf(category,"cords_%s",table);
+	struct	cordscript_table_result result = { (char *) 0, (char *) 0, fields, 0,0 };
+	struct occi_expression expression = { (char *) 0, cordscript_sql_on_select, &result };
+	while ( filter )
+	{
+		if (((nptr = filter->name ) != (char *) 0)
+		&&  ((vptr = filter->value) != (char *) 0))
+		{
+			if (!( expression.value ))
+			{
+				if (!( work = allocate( strlen("WHERE ") + strlen( nptr ) + strlen( vptr ) + 8 ) ))
+					return;
+				else	sprintf(work,"WHERE _%s='%s'",nptr,vptr);
+			}
+			else
+			{
+				if (!( work = allocate( strlen(" AND ") + strlen( expression.value ) + strlen( nptr ) + strlen( vptr ) + 8 ) ))
+				{
+					expression.value = liberate( expression.value );
+					return;
+				}
+				else	sprintf(work,"%s AND %s='%s'",expression.value,nptr,vptr);
+				expression.value = liberate( expression.value );
+			}
+			expression.value = work;
+		}
+		filter = filter->next;
+	}
+	if ((status = select_occi_sql_records( category, &expression, fields )) != 0)
+		push_value( iptr->context, string_value("[]") );
+	else	push_value( iptr->context, string_value((result.value?result.value:"[]")) );
+	result.value = liberate( result.value );
+	if ( expression.value )
+		expression.value = liberate( expression.value );
 	return;
 }
 
@@ -2494,24 +2551,6 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				else	push_value( iptr->context, string_value("[error]") );
 				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 			}
-			else if (!(  strcasecmp( wptr->value, "select" ) ))
-			{
-				dptr = (struct occi_element *) 0;
-				fptr = "*";
-				if ( argv[0] != (struct cordscript_value *) 0)
-				{
-					dptr = cordscript_occi_filter( argv[0]->value );
-					if ( argv[1] != (struct cordscript_value *) 0)
-					{
-						fptr = argv[1]->value;
-					}
-				}
-				/* ----------------------------- */
-				/* select fields fptr where dptr */
-				/* ----------------------------- */
-				eval_select( iptr, evalue, fptr, dptr ); 
-				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
-			}
 			else if ((!( strcasecmp( wptr->value, "put") ))
 			     ||  (!( strcmp( wptr->value, "update" ) )))
 			{
@@ -2684,6 +2723,24 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 					zptr = occi_remove_response( zptr );
 				}
 				else	push_value( iptr->context, string_value("[error]") );
+				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
+			}
+			else if (!(  strcasecmp( wptr->value, "select" ) ))
+			{
+				dptr = (struct occi_element *) 0;
+				fptr = "*";
+				if ( argv[0] != (struct cordscript_value *) 0)
+				{
+					dptr = cordscript_occi_filter( argv[0]->value );
+					if ( argv[1] != (struct cordscript_value *) 0)
+					{
+						fptr = argv[1]->value;
+					}
+				}
+				/* ----------------------------- */
+				/* select fields fptr where dptr */
+				/* ----------------------------- */
+				eval_select( iptr, evalue, fptr, dptr ); 
 				if ( dptr ) { dptr = occi_remove_elements( dptr ); }
 			}
 			else if (!( strcmp( wptr->value, "list" ) ))

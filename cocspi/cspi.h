@@ -103,6 +103,15 @@ struct	cordscript_value
 	char *	value;
 };
 
+struct	cordscript_table_result
+{
+	char *	value;
+	char *	row;
+	char *	fields;
+	int	rows;
+	int	columns;
+};
+
 struct	cordscript_exception
 {
 	struct	cordscript_exception *	next;

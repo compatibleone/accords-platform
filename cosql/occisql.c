@@ -390,7 +390,13 @@ private	int	create_occi_sql_table( struct occi_table * tptr )
 	char *	xptr;
 	char * 	command=_CREATE_TABLE_INE;
 	int	expect_error=0;
-
+	/* ---------------------------------- */
+	/* check for client read access table */
+	/* ---------------------------------- */
+	if (!( tptr->description ))
+		return( 0 );
+	else if (!( strlen( tptr->description ) ))
+		return( 0 );
 	/* ------------------------------------------------- */
 	/* some versions do not allow the conditional clause */
 	/* ------------------------------------------------- */
@@ -1198,25 +1204,29 @@ public	int	select_occi_sql_records( char * category, struct occi_expression * ex
 	int	status;
 	char *	xptr=(char *) 0;
 	struct	occi_table * tptr;
+	char * eptr;
 	if (!( expression ))
 		return( 118 );
-	else if (!( tptr = locate_occi_sql_table( category ) ))
-		return( 40 );
+	else if ((!( tptr = locate_occi_sql_table( category )))
+	     &&  (!( tptr = initialise_occi_sql_table( category, "" ))))
+			return( 40 );
 	else if (!( tptr->handle ))
 		return( 50 );
 	else
 	{
+		if (!( eptr = expression->value ))
+			eptr = "";
 		if ( fields )
 		{
-			if (!( xptr = allocate( strlen( fields ) + strlen( expression->value ) + strlen( tptr->name ) + strlen( _SELECT_FROM ) + strlen( _ORDER_BY_ORDERID ) + 32 ) ))
+			if (!( xptr = allocate( strlen( fields ) + strlen( eptr ) + strlen( tptr->name ) + strlen( _SELECT_FROM ) + strlen( _ORDER_BY_ORDERID ) + 32 ) ))
 				return( 27 );
-			else	sprintf(xptr, "SELECT %s FROM %s %s %s ",fields,tptr->name,expression->value,_ORDER_BY_ORDERID);
+			else	sprintf(xptr, "SELECT %s FROM %s %s %s ",fields,tptr->name,eptr,_ORDER_BY_ORDERID);
 		}
 		else
 		{
-			if (!( xptr = allocate( strlen( expression->value ) + strlen( tptr->name ) + strlen( _SELECT_ALL_FROM ) + strlen( _ORDER_BY_ORDERID ) + 32 ) ))
+			if (!( xptr = allocate( strlen( eptr ) + strlen( tptr->name ) + strlen( _SELECT_ALL_FROM ) + strlen( _ORDER_BY_ORDERID ) + 32 ) ))
 				return( 27);
-			else	sprintf(xptr, "SELECT * FROM %s %s %s ",tptr->name,expression->value,_ORDER_BY_ORDERID);
+			else	sprintf(xptr, "SELECT * FROM %s %s %s ",tptr->name,eptr,_ORDER_BY_ORDERID);
 		}
 
 		occi_sql_lock();
