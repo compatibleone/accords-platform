@@ -965,6 +965,14 @@ private	int	command_parser( char * filename, char * instance )
 	return( cords_parser_operation( filename ) );
 }
 
+private	int	conversion_failure( int status, char * reason, char * message )
+{
+	char	buffer[2048];
+	sprintf(buffer,"conversion error: %u: %s %s",status,(reason ? reason : "" ), (message ? message : "" ));
+	rest_log_message( buffer );
+	return( status );
+}
+
 /*	-----------------------------------------------------	*/
 /*	  c o r d s _ c o n v e r t o r _ o p e r a t i o n	*/
 /*	-----------------------------------------------------	*/
@@ -975,15 +983,15 @@ private	int	cords_convertor_operation( char * filename , int mode ) /* mode 1 : 
 	char *	vptr;
 	char 	buffer[1024];
 	if (!( filename ))
-		return( failure(3,"requires","cords filename"));
+		return( conversion_failure(3,"requires","cords filename"));
 	else if (!( dptr = cords_document_convertor( filename, mode ) ))
-		return( failure(4,"conversion error",filename));
+		return( conversion_failure(4,"conversion error",filename));
 	else if (!( aptr = document_atribut( dptr, "name" ) ))
-		return( failure(5,"conversion error",filename));
+		return( conversion_failure(5,"conversion error",filename));
 	else if (!( vptr = allocate_string( aptr->value ) ))
-		return( failure(6,"conversion error",filename));
+		return( conversion_failure(6,"conversion error",filename));
 	else if (!( vptr = occi_unquoted_value( vptr ) ))
-		return( failure(7,"conversion error",filename));
+		return( conversion_failure(7,"conversion error",filename));
 	else
 	{
 		sprintf(buffer,"%s-%s",filename,(mode == 1 ? "manifest" : "agreement"));
