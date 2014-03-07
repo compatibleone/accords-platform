@@ -100,7 +100,7 @@ struct	occi_database
 struct	occi_expression
 {
 	char *	value;
-	int	(*handler)(void *, char *, char *, int);
+	int	(*handler)(void *, char *, char *, int, int, int);
 	void *	context;
 	char *	orderby;
 };

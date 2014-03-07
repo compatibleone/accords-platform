@@ -304,7 +304,7 @@ private	void	generate_occi_sql_on_field( FILE * h, char * nptr, char * fullname 
 	struct	item * iptr;
 	int	items=0;
 	title(h,"sql on set field");
-	fprintf(h,"\nprivate int %s_sql_on_field( void * context, char * nptr, char * vptr, int vlen )\n{\n",fullname);
+	fprintf(h,"\nprivate int %s_sql_on_field( void * context, char * nptr, char * vptr, int vlen,int row, int column )\n{\n",fullname);
 	fprintf(h,"\tstruct %s * pptr;\n",C.name);
 	fprintf(h,"\tchar buffer[2048];\n");
 	fprintf(h,"\tmemcpy(buffer,vptr,vlen);\n");
@@ -358,7 +358,7 @@ private	void	generate_occi_sql_on_collection( FILE * h, char * nptr, char * full
 	struct	item * iptr;
 	int	items=0;
 	title(h,"sql on set collection");
-	fprintf(h,"\nprivate int %s_sql_on_collection( void * context, char * nptr, char * vptr, int vlen )\n{\n",fullname);
+	fprintf(h,"\nprivate int %s_sql_on_collection( void * context, char * nptr, char * vptr, int vlen, int row, int column )\n{\n",fullname);
 	fprintf(h,"\tstruct response_context * cptr=(struct response_context *) 0;\n");
 	fprintf(h,"\tstruct rest_response * rptr=(struct rest_response *) 0;\n");
 	fprintf(h,"\tstruct rest_header * hptr=(struct rest_header *) 0;\n");

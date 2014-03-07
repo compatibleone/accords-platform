@@ -715,13 +715,13 @@ public	int	drop_occi_sql_table( char * tablename )
 /*	this function will transfer back the field	*/
 /*	data to the caller for storage or processing	*/
 /*	-------------------------------------------	*/
-private	int	occi_sql_field( struct occi_expression *expression, char * nptr, char * vptr, int length )
+private	int	occi_sql_field( struct occi_expression *expression, char * nptr, char * vptr, int length, int row, int column )
 {
 	if (!( expression ))
 		return(0);
 	else if (!( expression->handler ))
 		return(0);
-	else	return( (*expression->handler)( expression->context, nptr, vptr, length ) );
+	else	return( (*expression->handler)( expression->context, nptr, vptr, length, row, column ) );
 }
 
 /*	-------------------------------------------	*/
@@ -730,13 +730,13 @@ private	int	occi_sql_field( struct occi_expression *expression, char * nptr, cha
 /*	this function will transfer back the field	*/
 /*	data to the caller for storage or processing	*/
 /*	-------------------------------------------	*/
-private	int	occi_sql_list_item( struct occi_expression *expression, char * nptr, char * vptr, int length )
+private	int	occi_sql_list_item( struct occi_expression *expression, char * nptr, char * vptr, int length, int row, int column )
 {
 	if (!( expression ))
 		return(0);
 	else if (!( expression->handler ))
 		return(0);
-	else	return( (*expression->handler)(expression->context, nptr, vptr, length ) );
+	else	return( (*expression->handler)(expression->context, nptr, vptr, length, row, column ) );
 }
 
 #ifdef	_OCCI_MYSQL
@@ -751,6 +751,7 @@ private	int	occi_mysql_record( struct	occi_table * tptr,  struct occi_expression
 	unsigned long *	lengths;
 	unsigned int	fieldcount;
 	unsigned int	i;
+	unsigned int	r=0;
 
 	if (!( result = mysql_use_result( tptr->handle )))
 		return(118);
@@ -769,12 +770,13 @@ private	int	occi_mysql_record( struct	occi_table * tptr,  struct occi_expression
 			else
 			{
 				mysql_field_seek( result, 0 );
+				r++;
 				for(	i=0; 
 					i < fieldcount; i++)
 				{
 					if (!( field = mysql_fetch_field( result )))
 						break;
-					else	occi_sql_field( expression, field->name, row[i], lengths[i] );				
+					else	occi_sql_field( expression, field->name, row[i], lengths[i], (r-1), i );				
 				}
 			}
 		}
@@ -796,6 +798,7 @@ private	int	occi_mysql_records( struct occi_table * tptr,  struct occi_expressio
 	unsigned long *	lengths;
 	unsigned int	fieldcount;
 	unsigned int	i;
+	unsigned int	r=0;
 
 	if (!( result = mysql_use_result( tptr->handle )))
 		return(118);
@@ -814,12 +817,13 @@ private	int	occi_mysql_records( struct occi_table * tptr,  struct occi_expressio
 			else
 			{
 				mysql_field_seek( result, 0 );
+				r++;
 				for(	i=0; 
 					i < fieldcount; i++)
 				{
 					if (!( field = mysql_fetch_field( result )))
 						break;
-					else	occi_sql_list_item( expression, field->name, row[i], lengths[i] );				
+					else	occi_sql_list_item( expression, field->name, row[i], lengths[i],(r-1),i );				
 				}
 			}
 		}
@@ -855,9 +859,9 @@ private	int	occi_postgre_record( struct	occi_table * tptr,  struct occi_expressi
 	unsigned int	r;
 	unsigned int 	f;
 	unsigned int	fs=0;
-	char *			fn=(char*) 0;
-	char *			vptr=(char *) 0;
-	int				vlen=0;
+	char *		fn=(char*) 0;
+	char *		vptr=(char *) 0;
+	int		vlen=0;
 
 	if (!( tptr->result ))
 		return(118);
@@ -873,35 +877,35 @@ private	int	occi_postgre_record( struct	occi_table * tptr,  struct occi_expressi
 		/* for row count */
 		/* ------------- */
 		for (	r=0, 
-				nr = PQntuples( tptr->result );
-				r < nr;
-				r++ )
+			nr = PQntuples( tptr->result );
+			r < nr;
+			r++ )
 		{
-				/* ---------------- */
-				/* for column count */
-				/* ---------------- */
-				for (	f=0;
-						f < nf;
-						f++ )
-				{
-					/* -------------------------- */
-					/* retrieve field information */
-					/* -------------------------- */
-					if (!( fn = PQfname( tptr->result, f ) ))
-						continue;
-					else if (!( fs = PQfsize( tptr->result, f ) ))
-						continue;
-					else if (!( vlen = PQgetlength( tptr->result, r, f ) ))
-						continue;
-					else if (!( vptr = PQgetvalue( tptr->result, r, f ) ))
-						continue;
-					else if (!( vlen = postgres_rtrim_string( vptr, vlen ) ))
-						continue;
-					/* ----------------------------------- */
-					/* use field as required by expression */
-					/* ----------------------------------- */
-					else occi_sql_field( expression, fn, vptr, vlen );
-				}
+			/* ---------------- */
+			/* for column count */
+			/* ---------------- */
+			for (	f=0;
+				f < nf;
+				f++ )
+			{
+				/* -------------------------- */
+				/* retrieve field information */
+				/* -------------------------- */
+				if (!( fn = PQfname( tptr->result, f ) ))
+					continue;
+				else if (!( fs = PQfsize( tptr->result, f ) ))
+					continue;
+				else if (!( vlen = PQgetlength( tptr->result, r, f ) ))
+					continue;
+				else if (!( vptr = PQgetvalue( tptr->result, r, f ) ))
+					continue;
+				else if (!( vlen = postgres_rtrim_string( vptr, vlen ) ))
+					continue;
+				/* ----------------------------------- */
+				/* use field as required by expression */
+				/* ----------------------------------- */
+				else occi_sql_field( expression, fn, vptr, vlen, r,f );
+			}
 		}
 		PQclear( tptr->result );
 		return(0);
@@ -920,9 +924,9 @@ private	int	occi_postgre_records( struct occi_table * tptr,  struct occi_express
 	unsigned int	r;
 	unsigned int 	f;
 	unsigned int	fs=0;
-	char *			fn=(char*) 0;
-	char *			vptr=(char *) 0;
-	int				vlen=0;
+	char *		fn=(char*) 0;
+	char *		vptr=(char *) 0;
+	int		vlen=0;
 
 	if (!( tptr->result ))
 		return(118);
@@ -938,35 +942,35 @@ private	int	occi_postgre_records( struct occi_table * tptr,  struct occi_express
 		/* for row count */
 		/* ------------- */
 		for (	r=0, 
-				nr = PQntuples( tptr->result );
-				r < nr;
-				r++ )
+			nr = PQntuples( tptr->result );
+			r < nr;
+			r++ )
 		{
-				/* ---------------- */
-				/* for column count */
-				/* ---------------- */
-				for (	f=0;
-						f < nf;
-						f++ )
-				{
-					/* -------------------------- */
-					/* retrieve field information */
-					/* -------------------------- */
-					if (!( fn = PQfname( tptr->result, f ) ))
+			/* ---------------- */
+			/* for column count */
+			/* ---------------- */
+			for (	f=0;
+				f < nf;
+				f++ )
+			{
+				/* -------------------------- */
+				/* retrieve field information */
+				/* -------------------------- */
+				if (!( fn = PQfname( tptr->result, f ) ))
+					continue;
+				else if (!( fs = PQfsize( tptr->result, f ) ))
+					continue;
+				else if (!( vlen = PQgetlength( tptr->result, r, f ) ))
+					continue;
+				else if (!( vptr = PQgetvalue( tptr->result, r, f ) ))
 						continue;
-					else if (!( fs = PQfsize( tptr->result, f ) ))
-						continue;
-					else if (!( vlen = PQgetlength( tptr->result, r, f ) ))
-						continue;
-					else if (!( vptr = PQgetvalue( tptr->result, r, f ) ))
-						continue;
-					else if (!( vlen = postgres_rtrim_string( vptr, vlen ) ))
-						continue;
-					/* ----------------------------------- */
-					/* use field as required by expression */
-					/* ----------------------------------- */
-					else occi_sql_list_item( expression, fn, vptr, vlen );
-				}
+				else if (!( vlen = postgres_rtrim_string( vptr, vlen ) ))
+					continue;
+				/* ----------------------------------- */
+				/* use field as required by expression */
+				/* ----------------------------------- */
+				else occi_sql_list_item( expression, fn, vptr, vlen, r, f );
+			}
 		}
 		PQclear( tptr->result );
 		return(0);

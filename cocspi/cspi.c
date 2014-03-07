@@ -2216,7 +2216,7 @@ private	void	fork_operation( struct cordscript_instruction * iptr, struct cordsc
 /*	------------------------	*/
 /*	cordscript_sql_on_select	*/
 /*	------------------------	*/
-private int cordscript_sql_on_select( void * context, char * nptr, char * vptr, int vlen )
+private int cordscript_sql_on_select( void * context, char * nptr, char * vptr, int vlen, int row, int column )
 {
         struct cordscript_table_result * cptr=(struct cordscript_table_result *) 0;
         char value[2048];
