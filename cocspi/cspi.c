@@ -2214,12 +2214,27 @@ private	void	fork_operation( struct cordscript_instruction * iptr, struct cordsc
 }
 
 /*	------------------------	*/
+/*	cordscript_sql_on_row		*/
+/*	------------------------	*/
+private void	cordscript_sql_on_row( struct cordscript_table_result * cptr )
+{
+	if ( cptr->row )
+	{
+		close_array( cptr->row );
+		cptr->value = add_array( cptr->value, "", cptr->row );
+		cptr->row = liberate( cptr->row );
+	}
+	return;
+}
+
+/*	------------------------	*/
 /*	cordscript_sql_on_select	*/
 /*	------------------------	*/
 private int cordscript_sql_on_select( void * context, char * nptr, char * vptr, int vlen, int row, int column )
 {
         struct cordscript_table_result * cptr=(struct cordscript_table_result *) 0;
         char value[2048];
+        char work[4096];
         if (!( cptr = context )) 
 		return(0);
 	else
@@ -2230,6 +2245,24 @@ private int cordscript_sql_on_select( void * context, char * nptr, char * vptr, 
 		{
 			printf("cordscript_column: %s = %s\n",nptr,value);
 		}
+		/* -------------------------- */
+		/* check for start of new row */
+		/* -------------------------- */
+		if ( row != cptr->thisrow )
+		{
+			/* ----------------------- */
+			/* save this row to result */
+			/* ----------------------- */
+			cordscript_sql_on_row( cptr );	
+			cptr->thisrow = row;
+			
+		}
+		/* ----------------------------- */
+		/* create column name value pair */
+		/* ----------------------------- */
+		while ( *nptr == '_' ) nptr++;
+		sprintf(work,"{'%s':'%s'}",nptr,value);
+		cptr->row = add_array( cptr->row, "", work );
 		return( 0 );
 	}
 }
@@ -2245,7 +2278,7 @@ private	void	eval_select( struct cordscript_instruction * iptr, char * table, ch
 	char *	work=(char *) 0;
 	char	category[1024];
 	sprintf(category,"cords_%s",table);
-	struct	cordscript_table_result result = { (char *) 0, (char *) 0, fields, 0,0 };
+	struct	cordscript_table_result result = { (char *) 0, (char *) 0, fields,-1, 0,0 };
 	struct occi_expression expression = { (char *) 0, cordscript_sql_on_select, &result };
 	while ( filter )
 	{
@@ -2274,7 +2307,12 @@ private	void	eval_select( struct cordscript_instruction * iptr, char * table, ch
 	}
 	if ((status = select_occi_sql_records( category, &expression, fields )) != 0)
 		push_value( iptr->context, string_value("[]") );
-	else	push_value( iptr->context, string_value((result.value?result.value:"[]")) );
+	else	
+	{
+		cordscript_sql_on_row( &result);
+		close_array( result.value );
+		push_value( iptr->context, string_value((result.value?result.value:"[]")) );
+	}
 	result.value = liberate( result.value );
 	if ( expression.value )
 		expression.value = liberate( expression.value );

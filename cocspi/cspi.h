@@ -108,6 +108,7 @@ struct	cordscript_table_result
 	char *	value;
 	char *	row;
 	char *	fields;
+	int	thisrow;
 	int	rows;
 	int	columns;
 };
