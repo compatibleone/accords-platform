@@ -2769,10 +2769,14 @@ private	struct	cordscript_instruction * eval_operation( struct cordscript_instru
 				fptr = "*";
 				if ( argv[0] != (struct cordscript_value *) 0)
 				{
-					dptr = cordscript_occi_filter( argv[0]->value );
 					if ( argv[1] != (struct cordscript_value *) 0)
 					{
+						dptr = cordscript_occi_filter( argv[0]->value );
 						fptr = argv[1]->value;
+					}
+					else
+					{
+						fptr = argv[0]->value;
 					}
 				}
 				/* ----------------------------- */
