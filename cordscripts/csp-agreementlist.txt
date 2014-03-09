@@ -2,31 +2,51 @@ function AgreementList( $selector )
 {
 	$baseurl   = "dashboard.php";
 
-	$agreements = agreement.list( $selector );
+	$agreements = agreement.select( "id,_name,_expiration,_termss,_initiator,_responder","serviceprovider='responder'");
 
 	"<table width='100%'><tr><td class=section colspan=6><b>Service Level Agreements</b></td></tr>".display();
 	"<tr><td class=title>Name<td class=title>Initiator<td class=title>Responder<td class=title>Expires<td class=title>Terms<td class=title>Action</tr>".display();
 
-	foreach ( $agreements as $mid )
+	foreach ( $agreements as $row )
 	{
-		$agreement = $mid.get();
-		$id       = $agreement["occi.core.id"];
-		$name     = $agreement["occi.agreement.name"];
-		$zone     = $agreement["occi.agreement.zone"];
-		$expires  = $agreement["occi.agreement.expiration"];
-		$termss   = $agreement["occi.agreement.termss"];
-
+		foreach ( $row as $column )
+		{
+			forboth ( $column as $colname and $value )
+			{
+				switch ( $colname )
+				{
+				case	"id"	:
+					$id = $value;
+					break;
+				case	"name"	:
+					$name = $value;
+					break;
+				case	"zone"	:
+					$zone = $value;
+					break;
+				case	"expires"	:
+					$expires = $value;
+					break;
+				case	"termss"	:
+					$termss= $value;
+					break;
+				case	"initiator"	:
+					$a = $value;
+					$account  = $a.get();
+					$aname    = $account["occi.account.name"];
+					break;
+				case	"responder"	:
+					$a = $value;
+					$account  = $a.get();
+					$rname    = $account["occi.account.name"];
+					break;
+				}
+			}
+		}
+				
 		$url = $baseurl#"?action=compile&script=csp-agreement.txt&output=HTML&option="#$name;
 		$m = "<tr><td><a href='"#$url#"'>Inspect Agreement<br>"#$name#"</a>";
 		$m.display();
-
-		$a        = $agreement["occi.agreement.initiator"];
-		$account  = $a.get();
-		$aname    = $account["occi.account.name"];
-
-		$a        = $agreement["occi.agreement.responder"];
-		$account  = $a.get();
-		$rname    = $account["occi.account.name"];
 
 		$url = $baseurl#"?action=compile&script=csp-account.txt&output=HTML&option="#$aname;
 		$m = "<td><a href='"#$url#"'>"#$aname#"</a>";
