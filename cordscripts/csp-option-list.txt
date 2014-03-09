@@ -1,10 +1,13 @@
-	$l = $1.list();
-	$x = "occi."#$1#".name";
-	foreach ( $l as $i )
+	$l = $1.select( "_name","state='0'");
+	foreach ( $l as $r )
 	{
-		$r = $i.get();
-		$n = $r[$x];
-		$m = "<option value="#$n#">"#$n#"</option>";
-		$m.display();
+		foreach( $r as $c )
+		{
+			forboth( $c as $n and $v )
+			{
+			$m = "<option value="#$v#">"#$v#"</option>";
+			$m.display();
+			}
+		}
 	}
 
