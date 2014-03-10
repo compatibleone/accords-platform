@@ -55,13 +55,16 @@ chmod uog+x dashboard-parser
 echo "/usr/local/bin/testcb --tls security/testcbTls.xml --publisher $var \$1 \$2 \$3 \$4" > ./dashboard-broker
 chmod uog+x dashboard-broker
 
-echo "/usr/local/bin/command --config accords.xml invoice \$1 " > ./dashboard-invoice
+grep OCCISQL /usr/local/bin/co-start > ./dashboard-invoice
+echo "/usr/local/bin/command --config accords.xml invoice \$1 " >> ./dashboard-invoice
 chmod uog+x dashboard-invoice
 
-echo "/usr/local/bin/command --config accords.xml analyse co-log " > ./dashboard-analyse
+grep OCCISQL /usr/local/bin/co-start > ./dashboard-analyse
+echo "/usr/local/bin/command --config accords.xml analyse co-log " >> ./dashboard-analyse
 chmod uog+x dashboard-analyse
 
-echo "/usr/local/bin/command --config accords.xml \$* " > ./dashboard-command
+grep OCCISQL /usr/local/bin/co-start > ./dashboard-command
+echo "/usr/local/bin/command --config accords.xml \$* " >> ./dashboard-command
 chmod uog+x dashboard-command
 
 chmod uog+rw . rest service co-log
