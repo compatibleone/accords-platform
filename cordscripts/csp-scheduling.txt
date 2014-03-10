@@ -2,7 +2,7 @@ include "csp-header.txt";
 
 	HtmlHeader("Accords Platform Scheduling",$1);
 
-	$list = schedule.list();
+	$list = schedule.select("_operation,_started,_duration,_response,_message","state>='0'");
 
 	"<tr><td class=title>Category<td class=title>Status<td class=title>Started<td class=title>Duration<td class=title>Graph</tr>".display();
 
@@ -15,22 +15,37 @@ include "csp-header.txt";
 	$total   = 0;
 	$cumul   = 0;
 
-	foreach ( $list as $id )
+	foreach ( $list as $row )
 	{
-		$schedule = $id.get();
-
-		$operation = $schedule["occi.schedule.operation"];
-
+		foreach ($row as $tuple)
+		{
+			forboth ( $tuple as $tname and $tvalue )
+			{
+				switch ( $tname )
+				{
+				case	"operation"	:
+					$operation = $tvalue;
+					break;
+				case	"started"	:
+					$start= $tvalue;
+					break;
+				case	"duration"	:
+					$duration = $tvalue;
+					break;
+				case	"response"	:
+					$status = $tvalue;
+					break;
+				case	"message"	:
+					$message = $tvalue;
+					break;
+				}
+			}
+		}
 		$a = $operation / "?";
-	
 		$url      = $a[0];
 		$action   = $a[1];
-		$start    = $schedule["occi.schedule.started"];
 		$start    = $start.date();
-		$duration = $schedule["occi.schedule.duration"];
-		$status   = $schedule["occi.schedule.response"];
 		if ( $status == 0 ) { $status = "<span class=action>working</span>"; $start = ""; $working = $working + 1; }
-		$message  = $schedule["occi.schedule.message"];
 		$a = $url / "/";
 
 		$url = $a[2];
@@ -48,6 +63,7 @@ include "csp-header.txt";
 			case	"vcloud"	:
 			case	"onapp"		:
 			case	"computenext"	:
+			case	"cloudsigma"	:
 				$s = "{}";
 				$d = '"url":"'#$url#'"';
 				$s = $s + $d;
