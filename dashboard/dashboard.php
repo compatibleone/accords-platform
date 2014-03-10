@@ -44,12 +44,12 @@ function compile_cordscript($script,$p,$n,$o)
 /*	---------------------------------	*/
 /*	s l a _ g u a r a n t e e 		*/
 /*	---------------------------------	*/
-function sla_guarantee( $h, $nb, $gp, $gc, $gv, $gb, $gx )
+function sla_guarantee( $h, $nb, $gp, $gc, $gv, $gb, $gx, $gs )
 {
 	if (( $gp !='none' ) && ( $gb !='none' ))
 	{ 
 		fprintf($h,"<term name=\":gt%s\" >\n",$nb);
-		fprintf($h,"<guarantee name=\":g%s\" obligated=\"provider\" importance=\"normal\" scope=\"default\">\n",$nb);
+		fprintf($h,"<guarantee name=\":g%s\" obligated=\"provider\" importance=\"normal\" scope=\"%s\">\n",$nb,$gs);
 		fprintf($h,"<variable name=\":gv%s\" property=\"%s\" condition=\"%s\" value=\"%s\"/>\n", $nb, $gp, $gc, $gv );
 		fprintf($h,"<business name=\":bv%s\" nature=\"%s\" expression=\"%s\" />\n", $nb, $gb, $gx );
 		fprintf($h,"</guarantee>\n");
@@ -172,10 +172,10 @@ function generate_sla($p)
 
 		fprintf($h,"</terms>\n");
 		fprintf($h,"<terms name=\":g\" type=\"guarantees\">\n");
-		sla_guarantee( $h,1,$_REQUEST['gp1'],$_REQUEST['gc1'],$_REQUEST['gv1'],$_REQUEST['gb1'],$_REQUEST['gx1']);
-		sla_guarantee( $h,2,$_REQUEST['gp2'],$_REQUEST['gc2'],$_REQUEST['gv2'],$_REQUEST['gb2'],$_REQUEST['gx2']);
-		sla_guarantee( $h,3,$_REQUEST['gp3'],$_REQUEST['gc3'],$_REQUEST['gv3'],$_REQUEST['gb3'],$_REQUEST['gx3']);
-		sla_guarantee( $h,4,$_REQUEST['gp4'],$_REQUEST['gc4'],$_REQUEST['gv4'],$_REQUEST['gb4'],$_REQUEST['gx4']);
+		sla_guarantee( $h,1,$_REQUEST['gp1'],$_REQUEST['gc1'],$_REQUEST['gv1'],$_REQUEST['gb1'],$_REQUEST['gx1'],$_REQUEST['gs1']);
+		sla_guarantee( $h,2,$_REQUEST['gp2'],$_REQUEST['gc2'],$_REQUEST['gv2'],$_REQUEST['gb2'],$_REQUEST['gx2'],$_REQUEST['gs2']);
+		sla_guarantee( $h,3,$_REQUEST['gp3'],$_REQUEST['gc3'],$_REQUEST['gv3'],$_REQUEST['gb3'],$_REQUEST['gx3'],$_REQUEST['gs3']);
+		sla_guarantee( $h,4,$_REQUEST['gp4'],$_REQUEST['gc4'],$_REQUEST['gv4'],$_REQUEST['gb4'],$_REQUEST['gx4'],$_REQUEST['gs4']);
 		fprintf($h,"</terms>\n");
 		fprintf($h,"</agreement>\n");
 		fclose( $h );

@@ -96,11 +96,12 @@
 
 	print "<tr><td colspan=4><div align=left><b>Service Guarantees</b></div></th></tr>\n";
 	
+	print "<tr><td>Scope</td><td ><input type=text name=gs1 value='default'></tr>\n";
 	print "<tr><td>Property</td><td >\n";
 	$metrics = MetricSelector("gp1",$metrics);
 	print "</td></tr>\n";
 
-	print "<tr><td>Compare</td><td >\n";
+	print "<tr><td>Must not be</td><td >\n";
 	print "<select style='width: 50mm;' name=gc1>\n";
 	print "<option value=eq>equal</option>\n";
 	print "<option value=ne>not equal</option>\n";
@@ -122,11 +123,12 @@
 	print "<tr><td>Expression</td><td><input type=text name=gx1 size=64></td>\n";
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
+	print "<tr><td>Scope</td><td ><input type=text name=gs2 value='default'></tr>\n";
 	print "<tr><td>Property</td><td >\n";
 	$metrics = MetricSelector("gp2",$metrics);
 	print "</td></tr>\n";
 
-	print "<tr><td>Compare</td><td >\n";
+	print "<tr><td>Must not be</td><td >\n";
 	print "<select style='width: 50mm;' name=gc2>\n";
 	print "<option value=eq>equal</option>\n";
 	print "<option value=ne>not equal</option>\n";
@@ -148,11 +150,12 @@
 	print "<tr><td>Expression</td><td><input type=text name=gx2 size=64></td>\n";
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
+	print "<tr><td>Scope</td><td ><input type=text name=gs3 value='default'></tr>\n";
 	print "<tr><td>Property</td><td >\n";
 	$metrics = MetricSelector("gp3",$metrics);
 	print "</td></tr>\n";
 
-	print "<tr><td>Compare</td><td >\n";
+	print "<tr><td>Must not be</td><td >\n";
 	print "<select style='width: 50mm;' name=gc3>\n";
 	print "<option value=eq>equal</option>\n";
 	print "<option value=ne>not equal</option>\n";
@@ -174,11 +177,12 @@
 	print "<tr><td>Expression</td><td><input type=text name=gx3 size=64></td>\n";
 	print "<tr><td colspan=2><hr></td></tr>\n";
 
+	print "<tr><td>Scope</td><td ><input type=text name=gs4 value='default'></tr>\n";
 	print "<tr><td>Property</td><td >\n";
 	$metrics = MetricSelector("gp4",$metrics);
 	print "</></td></tr>\n";
 
-	print "<tr><td>Compare</td><td >\n";
+	print "<tr><td>Must not be</td><td >\n";
 	print "<select style='width: 50mm;' name=gc4>\n";
 	print "<option value=eq>equal</option>\n";
 	print "<option value=ne>not equal</option>\n";
