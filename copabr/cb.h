@@ -182,7 +182,7 @@ public	int	cords_retrieve_conditions(
 		struct occi_response * zptr,
 		struct cords_placement_criteria * placement,
 		struct cords_guarantee_criteria * warranty,
-		char * agent, char * tls );
+		char * agent, char * tls, char * scope );
 
 
 	/* ----- */

@@ -3445,7 +3445,7 @@ private	int	cords_analyse_warranty(
 		char * termsid,
 		struct occi_response * zptr,
 		struct cords_guarantee_criteria * warranty,
-		char * agent, char * tls )
+		char * agent, char * tls, char * scope )
 {
 	struct	occi_element * eptr;
 	struct	occi_element * fptr;
@@ -3570,7 +3570,7 @@ private	int	cords_analyse_conditions(
 		char * termsid,
 		struct occi_response * zptr,
 		struct cords_placement_criteria * placement,
-		char * agent, char * tls )
+		char * agent, char * tls, char * scope )
 {
 	struct	occi_element * eptr;
 	struct	occi_element * fptr;
@@ -3578,6 +3578,7 @@ private	int	cords_analyse_conditions(
 	char *	vid;
 	char *	vptr;
 	char *	nptr;
+	char *  sptr;
 	struct	occi_response * aptr;
 	struct	occi_response * bptr;
 	int	status=0;
@@ -3615,6 +3616,20 @@ private	int	cords_analyse_conditions(
 					return( 908 );
 				else
 				{
+					/* -------------------------------------------------------- */
+					/* validate the scope or location of the condition variable */
+					/* -------------------------------------------------------- */
+					if (( sptr = occi_extract_atribut( bptr, Operator.domain, _CORDS_VARIABLE, "location" )) != (char *) 0)
+					{
+						if (( strcmp( sptr, scope     ) != 0)
+						&&  ( strcmp( sptr, "default" ) != 0))
+						{
+							bptr = occi_remove_response( bptr );
+							vid = liberate( vid );
+							continue;
+						}
+					}
+
 					/* --------------------------------------------------- */
 					/* extract name and values and set the criteria fields */
 					/* --------------------------------------------------- */
@@ -3648,7 +3663,7 @@ public	int	cords_retrieve_conditions(
 		struct occi_response * zptr,
 		struct cords_placement_criteria * placement,
 		struct cords_guarantee_criteria * warranty,
-		char * agent, char * tls )
+		char * agent, char * tls, char * scope )
 {
 	struct	occi_element * eptr;
 	char *	id;
@@ -3658,6 +3673,8 @@ public	int	cords_retrieve_conditions(
 
 	if (!( zptr )) 	
 		return(0);
+	else if (!(scope))
+		scope = "default";
 
 	/* -------------------------------------------- */
 	/* for all "terms" attached to the sla instance */
@@ -3678,9 +3695,9 @@ public	int	cords_retrieve_conditions(
 		else if (( vptr = occi_extract_atribut( aptr, Operator.domain, _CORDS_TERMS, _CORDS_TYPE )) != (char *) 0)
 		{
 			if (!( strcmp( vptr, _CORDS_CONDITIONS ) ))
-				status = cords_analyse_conditions( host, id, aptr, placement, agent, tls );
+				status = cords_analyse_conditions( host, id, aptr, placement, agent, tls, scope );
 			else if (!( strcmp( vptr, _CORDS_GUARANTEES ) ))
-				status = cords_analyse_warranty( host, id, aptr, warranty, agent, tls );
+				status = cords_analyse_warranty( host, id, aptr, warranty, agent, tls, scope );
 			aptr = occi_remove_response( aptr );
 			id = liberate( id );
 			continue;
@@ -3742,7 +3759,7 @@ private	char *	cords_brokering_account(
 			return( cords_terminate_provisioning( 920, CbC ) );
 		else if (!( CbC->sla = cords_retrieve_instance( host, CbC->slaID, agent, tls )))
 			return( cords_terminate_provisioning( 930, CbC ) );
-		else if ((status = cords_retrieve_conditions( host, CbC->slaID, CbC->sla, CpC, CgC, agent, tls )) != 0)
+		else if ((status = cords_retrieve_conditions( host, CbC->slaID, CbC->sla, CpC, CgC, agent, tls, (char *) 0 )) != 0)
 			return( cords_terminate_provisioning( 907, CbC ) );
 	
 		/* -------------------------------------------------- */
