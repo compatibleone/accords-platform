@@ -41,11 +41,19 @@ runcops=1
 # runcops=
 nethsm=
 # -------------------------------------
-resthost=127.0.0.1
+export resthost=$ACCORDSHOST
+if [ -z "$resthost" ];
+then 
+	export resthost=127.0.0.1
+fi
 export OCCISQLTYPE=MYSQL
 export OCCISQLHOST=127.0.0.1
 export OCCISQLUSER=root
-export OCCISQLPASSWD=root
+export OCCISQLPASSWD=$MYSQLPASSWD
+if [ -z "$OCCISQLPASSWD" ];
+then
+	export OCCISQLPASSWD=root
+fi
 zone="europe"
 trace=1
 threads=1
