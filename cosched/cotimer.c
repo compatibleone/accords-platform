@@ -747,8 +747,7 @@ private	int	create_timer(struct occi_category * optr, void * vptr,struct rest_re
 	{
 		sprintf(buffer,"%lu",time((long *) 0));
 		pptr->created = allocate_string( buffer );
-		if ( pptr->state )
-			
+		autosave_cords_timer_node(pptr);
 		return(0);
 	}
 }
