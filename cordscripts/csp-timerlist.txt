@@ -1,5 +1,5 @@
 
-function TimerList()
+function TimerList($tls)
 {
 	$m = "<tr><th colspan=2><h2>"#$1#"</h2></tr>";
 	$m.display();
