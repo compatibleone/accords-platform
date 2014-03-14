@@ -256,15 +256,19 @@ struct ec2_subscription * use_ec2_configuration( char * nptr )
 
 }
 
-char * resolve_ec2_location(struct cords_ec2_contract * cptr,struct ec2config * cfptr)
+char * resolve_ec2_location(struct cords_ec2_contract * cptr,struct ec2config * cfptr,char * zone)
 {
 	char * ec2zone = (char *) 0;
 
  	/*----------------------------------------------------*/
 	/* handle the configuration prefered geo-localisation */
 	/*----------------------------------------------------*/
-	if(!(rest_valid_string(cfptr->location)))
+	if (!( rest_valid_string( zone ) ))
+		zone = cfptr->location;
+
+	if (!(rest_valid_string(cfptr->location)))
 		cfptr->location = (char*) 0;
+
 	/*------------------------------------------------------------------------------*/
 	/* check usage and existance of the zone else take the default europe eu-west-1 */
 	/*------------------------------------------------------------------------------*/
@@ -415,6 +419,7 @@ int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, ch
 	struct ec2config * cfptr;
 	int	status = 0;
 	char *	vptr;
+	char * zptr;
 
 	//resolve the user credentials and configuration
 	if(!rest_valid_string(pptr->profile))
@@ -432,11 +437,25 @@ int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, ch
 	/*----------------------------------------------------*/
 	/* resolve the required Geolocalisation               */
 	/*----------------------------------------------------*/
-	if(pptr->zone) pptr->zone = liberate (pptr->zone);
-	if(!(pptr->zone = resolve_ec2_location(&contract,cfptr)))
+	if (!( rest_valid_string(pptr->zone) )) 
+		zptr = allocate_string(cfptr->location);
+	else 	zptr = allocate_string( pptr->zone );
+
+	/* ---------------------------------------------- */
+	/* transform logical to ec2 region nameing scheme */
+	/* ---------------------------------------------- */
+	pptr->zone = ec2_resolve_region( subptr, zptr );
+
+	if ( zptr ) zptr = liberate( zptr );
+
+	/* -------------------------------------------- */
+	/* ensure that the zone is valid or abandon now */
+	/* -------------------------------------------- */
+	if (!(pptr->zone = resolve_ec2_location(&contract,cfptr,pptr->zone)))
 		return (terminate_ec2_contract(27,&contract));
 	
 	rest_log_message(pptr->zone);
+
 	/* ---------------------------- */
 	/* recover the node description */
 	/* ---------------------------- */

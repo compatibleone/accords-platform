@@ -369,7 +369,8 @@ private	void	process_job_alarm(int before, int after)
 				/* ---------------------- */
 				lock_job_timer(tptr);
 				tptr->working = 0;
-				if ( tptr->deleting )
+				if (( tptr->deleting )
+				||  ( tptr->oneshot  ))
 				{
 					/* ----------------- */
 					/* delete is pending */
@@ -567,6 +568,17 @@ private	int	activate_timer( struct cords_timer * tptr )
 			jptr = liberate_job_timer( jptr );
 			return( 0 );
 		}
+		if (!( rest_valid_string( tptr->nature ) ))
+			jptr->oneshot= 0;
+		else if (!( strcmp( tptr->nature, "periodic" ) ))
+			jptr->oneshot= 0;
+		else if (!( strcmp( tptr->nature, "oneshot" ) ))
+			jptr->oneshot= 1;
+		else if (!( strcmp( tptr->nature, "multiple" ) ))
+			jptr->oneshot= 0;
+		else if (!( strcmp( tptr->nature, "single" ) ))
+			jptr->oneshot= 1;
+		else	jptr->oneshot= 0;
 
 		if ( add_timer_operation( jptr ) )
 		{

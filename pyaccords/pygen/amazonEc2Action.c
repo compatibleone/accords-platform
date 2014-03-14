@@ -145,6 +145,8 @@ public	struct rest_response * start_amazonEc2(
 	{
 		if (!(subptr = use_ec2_configuration(pptr->profile)))
 			return( rest_html_response (aptr, 404, "ac2 configuration not found"));
+		else if (!( set_ec2_zone( subptr, pptr->zone ) ))
+			return( rest_html_response (aptr, 404, "incorrect zone or region"));
 		else if((status = start_ec2_instance(subptr,pptr)!=0))
 			return ( rest_html_response( aptr, status, "start ec2 vm failure"));
 	}
@@ -152,6 +154,8 @@ public	struct rest_response * start_amazonEc2(
 		return( rest_html_response(aptr, 200, "ok ") );
 	else if (!(subptr = use_ec2_configuration(pptr->profile)))
 		return( rest_html_response (aptr, 404, "ac2 configuration not found"));
+	else if (!( set_ec2_zone( subptr, pptr->zone ) ))
+		return( rest_html_response (aptr, 404, "incorrect zone or region"));
 	else if(!(secgroup = build_ec2_firewall( subptr,pptr )))
 		return ( rest_html_response( aptr, 888, "ec2 firewall failure"));
 	else if((status = start_ec2_instance(subptr,pptr)!=0))

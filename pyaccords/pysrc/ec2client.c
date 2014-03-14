@@ -27,6 +27,105 @@
 #include "ec2contract.h"
 #include <Python.h>
 
+
+/* ---------------------------------------------------------------------- */
+/* ec2 resolve region   						  */
+/* ---------------------------------------------------------------------- */
+/* transforms a standard geographical identifier to the corresponding ec2 */
+/* specific value.							  */
+/* ---------------------------------------------------------------------- */
+char * ec2_resolve_region( struct ec2_subscription * sptr, char * region )
+{
+        /* -------------------------------------- */
+        /* invalid region uses subscription value */
+        /* -------------------------------------- */
+        if (!( rest_valid_string( region ) ))
+                return( allocate_string( sptr->zone) );
+
+	/* ------------------------------------------- */
+	/* detect and preserve AWS EC2 standard values */
+	/* ------------------------------------------- */
+	if ((!( strcasecmp( region, "ec2:us-east-1" ) ))
+	||  (!( strcasecmp( region, "ec2:us-west-1" ) ))
+	||  (!( strcasecmp( region, "ec2:us-west-2" ) ))
+	||  (!( strcasecmp( region, "ec2:eu-west-1" ) ))
+	||  (!( strcasecmp( region, "ec2:eu-west-2" ) ))
+	||  (!( strcasecmp( region, "ec2:eu-east-1" ) ))
+	||  (!( strcasecmp( region, "ec2:eu-east-2" ) ))
+	||  (!( strcasecmp( region, "ec2:ap-southeast-1" ) ))
+	||  (!( strcasecmp( region, "ec2:ap-southeast-2" ) ))
+	||  (!( strcasecmp( region, "ec2:ap-northeast-1" ) ))
+	||  (!( strcasecmp( region, "ec2:sa-east-1" ) )))
+		return( allocate_string( region+strlen("ec2:") ) );
+
+        /* --------------------- */
+        /* europe, east and west */
+        /* --------------------- */
+        else if (!( strcasecmp( region, "europe" ) ))
+                return( allocate_string( "eu-west-1" ) );
+        else if (!( strcasecmp( region, "east-europe" ) ))
+                return( allocate_string( "eu-west-1" ) );
+        else if (!( strcasecmp( region, "west-europe" ) ))
+                return( allocate_string( "eu-west-1" ) );
+
+        /* --------------------- */
+        /* states, east and west */
+        /* --------------------- */
+        else if (!( strcasecmp( region, "america" ) ))
+                return( allocate_string( "us-west-1" ) );
+        else if (!( strcasecmp( region, "north-america" ) ))
+                return( allocate_string( "us-west-2" ) );
+        else if (!( strcasecmp( region, "south-america" ) ))
+                return( allocate_string( "sa-east-1" ) );
+        else if (!( strcasecmp( region, "us-east" ) ))
+                return( allocate_string( "us-east-1" ) );
+        else if (!( strcasecmp( region, "us-west" ) ))
+                return( allocate_string( "us-west-2" ) );
+
+        /* ------------------- */
+        /* asia, east and west */
+        /* ------------------- */
+        else if (!( strcasecmp( region, "asia" ) ))
+                return( allocate_string( "ap-southeast-1" ) );
+        else if (!( strcasecmp( region, "north-asia" ) ))
+                return( allocate_string( "ap-northeast-1" ) );
+        else if (!( strcasecmp( region, "east-asia" ) ))
+                return( allocate_string( "ap-southeast-2" ) );
+        else if (!( strcasecmp( region, "south-asia" ) ))
+                return( allocate_string( "ap-southeast-2" ) );
+        else if (!( strcasecmp( region, "west-asia" ) ))
+                return( allocate_string( "ap-southeast-1" ) );
+
+        /* ---------------------- */
+        /* africa north and south */
+        /* ---------------------- */
+        else if (!( strcasecmp( region, "africa" ) ))
+                return( allocate_string( "eu-west-1" ) );
+        else if (!( strcasecmp( region, "north-africa" ) ))
+                return( allocate_string( "eu-west-1" ) );
+        else if (!( strcasecmp( region, "south-africa" ) ))
+                return( allocate_string( "ap-southeast-2" ) );
+
+        /* -------------------------------------- */
+        /* invalid region uses subscription value */
+        /* -------------------------------------- */
+        else    return( allocate_string( sptr->zone ) );
+}
+
+/*	------------	*/
+/*	set ec2 zone	*/
+/*	------------	*/
+char * set_ec2_zone(struct ec2_subscription* subptr, char * zone)
+{
+	if ( zone )
+	{
+		if ( subptr->zone )
+			subptr->zone = liberate( subptr->zone );
+		subptr->zone = allocate_string( zone );
+	}
+	return( subptr->zone );
+}
+
 /* -------------------------------------------------------------------- */
 /* get ec2 location                                                     */
 /* ---------------------------------------------------------------------*/
@@ -1000,6 +1099,8 @@ int stop_ec2_provisioning( struct amazonEc2 * pptr )
 		return(0);
 	else if (!(subptr = use_ec2_configuration( pptr->profile )))
 		return(118);
+	else if (!( set_ec2_zone( subptr, pptr->zone ) ))
+		return( 118 );
 	else	sprintf(reference,"%s/%s/%s",get_identity(),_CORDS_EC2,pptr->id);
 
 	/* ------------------------------------------- */
@@ -1424,6 +1525,8 @@ int	restart_ec2_instance( struct amazonEc2 * pptr )
 		return(118);
 	else if (!(subptr = use_ec2_configuration(pptr->profile )))
 		return(118);
+	else if (!( set_ec2_zone( subptr, pptr->zone ) ))
+		return( 118 );
 		
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
@@ -1776,6 +1879,8 @@ int suspend_ec2_instance( struct amazonEc2 * pptr )
 		return(118);
 	else if (!(subptr = use_ec2_configuration(pptr->profile )))
 		return(118);
+	else if (!( set_ec2_zone( subptr, pptr->zone ) ))
+		return( 118 );
 		
 	if(!(strValid(pptr->id))) strcpy(sendstr," ");
 	else strcpy(sendstr,pptr->id);
@@ -2130,6 +2235,8 @@ int	snapshot_ec2_instance( struct amazonEc2 * pptr )
 		return(118);
 	else if (!(subptr = use_ec2_configuration(pptr->profile )))
 		return(118);
+	else if (!( set_ec2_zone( subptr, pptr->zone ) ))
+		return( 118 );
 	else if(!(uuid = rest_allocate_uuid()))
 		return 11;
 	else
