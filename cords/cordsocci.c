@@ -84,6 +84,7 @@
 #include "occioptimise.c"
 #include "occialgorithm.c"
 #include "occiplacement.c"
+#include "occigeolocation.c"
 #include "occiquota.c"
 
 #include "occiagreement.c"

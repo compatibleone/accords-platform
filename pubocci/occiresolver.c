@@ -989,7 +989,6 @@ public	char *	occi_resolve_consumer_identity( char * consumer, char * agent, cha
 /*	---------------------------------------------------------	*/
 public	char *	occi_resolve_account( char * name, char * agent, char * tls )
 {
-	char	*	ihost;
 	struct	occi_client * kptr;
 	struct	occi_request * qptr;
 	struct	occi_response * yptr;
@@ -998,6 +997,7 @@ public	char *	occi_resolve_account( char * name, char * agent, char * tls )
 	struct	xml_element * eptr;
 	struct	xml_atribut * aptr;
 	struct	xml_atribut * bptr;
+	char	*	ihost;
 	char	buffer[2048];
 
 	if (!( ihost = occi_resolve_category_provider( _CORDS_ACCOUNT, agent, tls ) ))
@@ -1108,11 +1108,114 @@ public	char *	occi_resolve_price( char * name, char * agent, char * tls )
 	}
 }
 
+/*	---------------------------------------------------------	*/
+/*	     o c c i _ r e s o l v e _ g e o l o c a t i o n		*/
+/*	---------------------------------------------------------	*/
+public	char *	occi_resolve_geolocation( char * category, char * operator, char * zone )
+{
+	char *	ihost=(char ) 0;
+	char *	result=(char *) 0;
+	char	buffer[2048];
+	char *	tls;
+	char *	agent;
+	struct	occi_client * kptr;
+	struct	occi_request * qptr;
+	struct	occi_response * yptr;
+	struct	occi_response * zptr;
+	struct	occi_element * dptr;
+	struct	occi_element * eptr;
+	if (!( category ))
+		return((char *) 0);
+	else if (!( zone ))
+		return((char *) 0);
+	else if (!( agent = get_default_agent() ))
+		return((char *) 0);
+	else	tls = default_tls();
+
+	/* ----------------------------------------- */
+	/* resolve the geolocation cayegory provider */
+	/* ----------------------------------------- */
+	if (!( ihost = occi_resolve_category_provider( "geolocation", agent, tls ) ))
+		return((char *) 0);
+	else
+	{
+		sprintf(buffer,"%s/%s/",ihost,"geolocation");
+		liberate( ihost );
+	}
+
+	/* ----------------------------------------- */
+	/* request list of matching geolocation item */
+	/* ----------------------------------------- */
+	if (!( kptr = occi_create_client( buffer, agent, tls ) ))
+		return((char *) 0);
+
+	else if (!( qptr = occi_create_request( kptr, kptr->target->object, _OCCI_NORMAL )))
+	{
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if ((!( eptr = occi_request_element( qptr, "occi.geolocation.category",category)))
+	     ||  (!( eptr = occi_request_element( qptr, "occi.geolocation.operator",operator)))
+	     ||  (!( eptr = occi_request_element( qptr, "occi.geolocation.zone",zone))))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( yptr = occi_client_get( kptr, qptr ) ))
+	{
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	/* --------------------------------------- */
+	/* retrieve geolocation information result */
+	/* --------------------------------------- */
+	else if (!( ihost = occi_extract_location( yptr ) ))
+	{
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( zptr = occi_simple_get( ihost, agent, tls ) ))
+	{
+		ihost = liberate( ihost );
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( dptr = occi_locate_element( zptr->first, "occi.geolocation.location" ) ))
+	{
+		ihost = liberate( ihost );
+		zptr = occi_remove_response( zptr );
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else if (!( result = allocate_string( dptr->value ) ))
+	{
+		ihost = liberate( ihost );
+		zptr = occi_remove_response( zptr );
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return((char *) 0);
+	}
+	else
+	{
+		ihost = liberate( ihost );
+		zptr = occi_remove_response( zptr );
+		yptr = occi_remove_response( yptr );
+		qptr = occi_remove_request( qptr );
+		kptr = occi_remove_client( kptr );
+		return(result);
+	}
+}
 
 	/* --------------- */
 #endif	/* _occiresolver_c */
 	/* --------------- */
-
-
-
 

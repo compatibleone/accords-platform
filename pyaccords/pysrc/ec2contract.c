@@ -274,7 +274,7 @@ char * resolve_ec2_location(struct cords_ec2_contract * cptr,struct ec2config * 
 	/*------------------------------------------------------------------------------*/
 	else
 	{
-		ec2zone = get_ec2_zone(cptr->subscription,cfptr->location);
+		ec2zone = get_ec2_zone(cptr->subscription,zone);
 		cptr->location = allocate_string(ec2zone);
 	}
      	return allocate_string(ec2zone);
@@ -287,9 +287,8 @@ char *	resolve_ec2_image( struct ec2_subscription * subptr, struct cords_ec2_con
 {
 	struct	ec2_image_infos	request;
 	struct  ec2_image_infos image;
-
+	char			buffer[1024];
 	char *			vptr;
-	char *			iname=(char*) 0;
 
 	/* ---------------------------------------------------------- */
 	/* retrieve appropriate parameters from node image components */
@@ -310,34 +309,24 @@ char *	resolve_ec2_image( struct ec2_subscription * subptr, struct cords_ec2_con
 	rest_log_message( "ec2_contract image :");
 	rest_log_message( request.other );
 
-	/* ------------------------------------------ */
-	/* scan list for a perfect IPS produced match */
-	/* ------------------------------------------ */
-	/*if (!( iname = occi_category_id( cptr->image.id )))
-		return((char *) 0);
-	else if (!( vptr = get_ec2_imgname(subptr,iname,cptr->location) ))
+	/* --------------------------------------------------- */
+	/* scan the image list for a system name partial match */
+	/* --------------------------------------------------- */
+	sprintf(buffer,"get_ec2_ami for %s in %s",request.name,cptr->location);
+	rest_log_message( buffer );
+
+	sprintf(buffer,"%s*",request.name);
+	if (!( vptr = get_ec2_imgname(subptr,buffer,cptr->location)))
 	{
-		printf("echec coips image\n");
+		rest_log_message("get_ec2_ami failure");
 		return((char*) 0);
 	}
-	else if ( strcmp( vptr, iname ) == 0 )
+	else
 	{
-		liberate( iname );
 		rest_log_message("ec2_contract perfect match");
 		rest_log_message( vptr );
 		return( allocate_string( vptr ) );
 	}
-	*/
-	/* --------------------------------------------------- */
-	/* scan the image list for a system name partial match */
-	/* --------------------------------------------------- */
-	if (!( vptr = get_ec2_imgname(subptr,request.name,cptr->location)))
-		return((char*) 0);
-	liberate( iname );
-	rest_log_message("ec2_contract perfect match");
-	rest_log_message( vptr );
-	return( allocate_string( vptr ) );
-	
 }
 
 
@@ -445,6 +434,7 @@ int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, ch
 	/* transform logical to ec2 region nameing scheme */
 	/* ---------------------------------------------- */
 	pptr->zone = ec2_resolve_region( subptr, zptr );
+	rest_log_message(pptr->zone);
 
 	if ( zptr ) zptr = liberate( zptr );
 
@@ -453,7 +443,8 @@ int create_ec2_contract(struct occi_category * optr, struct amazonEc2 * pptr, ch
 	/* -------------------------------------------- */
 	if (!(pptr->zone = resolve_ec2_location(&contract,cfptr,pptr->zone)))
 		return (terminate_ec2_contract(27,&contract));
-	
+
+	set_ec2_zone( subptr, pptr->zone );
 	rest_log_message(pptr->zone);
 
 	/* ---------------------------- */

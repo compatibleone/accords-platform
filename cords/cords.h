@@ -69,6 +69,7 @@
 #include "optimise.h"
 #include "algorithm.h"
 #include "placement.h"
+#include "geolocation.h"
 #include "instance.h"
 #include "quota.h"
 

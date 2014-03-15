@@ -277,6 +277,19 @@
 	        <action id='http://scheme.compatibleone.fr/scheme/compatible#release'/>
 	    </actions>
 	</category>
+	<category term='geolocation' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/geolocation/' rel='http://schemas.ogf.org/occi/core#resource'>
+	    <attributes>
+	        <attribute name='name' type='string' required='false' immutable='false'/>
+	        <attribute name='category' type='string' required='false' immutable='false'/>
+	        <attribute name='operator' type='string' required='false' immutable='false'/>
+	        <attribute name='zone' type='string' required='false' immutable='false'/>
+	        <attribute name='location' type='string' required='false' immutable='false'/>
+	        <attribute name='state' type='int' required='false' immutable='false'/>
+	    </attributes>
+	    <actions>
+	        <action id='http://scheme.compatibleone.fr/scheme/compatible#DELETE'/>
+	    </actions>
+	</category>
 	<category term='quantity' scheme='http://scheme.compatibleone.fr/scheme/compatible#' class='kind' location='/quantity/' rel='http://schemas.ogf.org/occi/core#resource'>
 	    <attributes>
 	        <attribute name='name' type='string' required='false' immutable='false'/>

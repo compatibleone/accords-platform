@@ -178,6 +178,13 @@ private	int	cops_operation( char * nptr )
 	else	optr->previous->next = optr;
 	last = optr;
 
+	if (!( optr = occi_cords_geolocation_builder( Cops.domain, "geolocation" ) ))
+		return( 27 );
+	else if (!( optr->previous = last ))
+		first = optr;
+	else	optr->previous->next = optr;
+	last = optr;
+
 	if (!( optr = occi_add_action( optr,"reserve","",reserve_quantity)))
 		return( 28 );
 	else if (!( optr = occi_add_action( optr,"consume","",consume_quantity)))

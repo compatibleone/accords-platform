@@ -84,6 +84,7 @@
 #include "optimise.c"
 #include "algorithm.c"
 #include "placement.c"
+#include "geolocation.c"
 #include "quota.c"
 
 #include "agreement.c"

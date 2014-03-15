@@ -36,27 +36,41 @@
 /* ---------------------------------------------------------------------- */
 char * ec2_resolve_region( struct ec2_subscription * sptr, char * region )
 {
+	char * result;
+	rest_log_message( "ec2_resolve_region" );
+	rest_log_message( region );
+
         /* -------------------------------------- */
         /* invalid region uses subscription value */
         /* -------------------------------------- */
         if (!( rest_valid_string( region ) ))
                 return( allocate_string( sptr->zone) );
+        else if (!( strcasecmp( region, "any" ) ))
+                return( allocate_string( sptr->zone) );
+        else if (!( strcasecmp( region, "default" ) ))
+                return( allocate_string( sptr->zone) );
 
 	/* ------------------------------------------- */
 	/* detect and preserve AWS EC2 standard values */
 	/* ------------------------------------------- */
-	if ((!( strcasecmp( region, "ec2:us-east-1" ) ))
-	||  (!( strcasecmp( region, "ec2:us-west-1" ) ))
-	||  (!( strcasecmp( region, "ec2:us-west-2" ) ))
-	||  (!( strcasecmp( region, "ec2:eu-west-1" ) ))
-	||  (!( strcasecmp( region, "ec2:eu-west-2" ) ))
-	||  (!( strcasecmp( region, "ec2:eu-east-1" ) ))
-	||  (!( strcasecmp( region, "ec2:eu-east-2" ) ))
-	||  (!( strcasecmp( region, "ec2:ap-southeast-1" ) ))
-	||  (!( strcasecmp( region, "ec2:ap-southeast-2" ) ))
-	||  (!( strcasecmp( region, "ec2:ap-northeast-1" ) ))
-	||  (!( strcasecmp( region, "ec2:sa-east-1" ) )))
-		return( allocate_string( region+strlen("ec2:") ) );
+	if ((!( strcasecmp( region, "us-east-1" ) ))
+	||  (!( strcasecmp( region, "us-west-1" ) ))
+	||  (!( strcasecmp( region, "us-west-2" ) ))
+	||  (!( strcasecmp( region, "eu-west-1" ) ))
+	||  (!( strcasecmp( region, "eu-west-2" ) ))
+	||  (!( strcasecmp( region, "eu-east-1" ) ))
+	||  (!( strcasecmp( region, "eu-east-2" ) ))
+	||  (!( strcasecmp( region, "ap-southeast-1" ) ))
+	||  (!( strcasecmp( region, "ap-southeast-2" ) ))
+	||  (!( strcasecmp( region, "ap-northeast-1" ) ))
+	||  (!( strcasecmp( region, "sa-east-1" ) )))
+		return( allocate_string( region ) );
+
+	/* -------------------------------------------- */
+	/* attempt to resolve via geo location category */
+	/* -------------------------------------------- */
+        else if ((result = occi_resolve_geolocation( "amazonEc2", "accords", region )) != (char *) 0)
+                return( result );
 
         /* --------------------- */
         /* europe, east and west */
@@ -117,11 +131,27 @@ char * ec2_resolve_region( struct ec2_subscription * sptr, char * region )
 /*	------------	*/
 char * set_ec2_zone(struct ec2_subscription* subptr, char * zone)
 {
+	char 	buffer[2048];
+	int	i;
 	if ( zone )
 	{
 		if ( subptr->zone )
 			subptr->zone = liberate( subptr->zone );
 		subptr->zone = allocate_string( zone );
+		if ( subptr->keypair )
+		{
+			strcpy( buffer, subptr->keypair );
+			for ( i=0; buffer[i] != 0; i++ )
+				if ( buffer[i] == '.' )
+					break;
+			buffer[i] = 0;
+			strcat( buffer,".");
+			strcat( buffer,zone);
+			strcat( buffer,".pub" );
+			subptr->keypair = liberate( subptr->keypair );
+			subptr->keypair = allocate_string( buffer );
+			rest_log_message( subptr->keypair );
+		}
 	}
 	return( subptr->zone );
 }
