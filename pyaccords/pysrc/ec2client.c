@@ -34,6 +34,7 @@
 /* transforms a standard geographical identifier to the corresponding ec2 */
 /* specific value.							  */
 /* ---------------------------------------------------------------------- */
+static int use_default_values=0;
 char * ec2_resolve_region( struct ec2_subscription * sptr, char * region )
 {
 	char * result;
@@ -71,11 +72,21 @@ char * ec2_resolve_region( struct ec2_subscription * sptr, char * region )
 	/* -------------------------------------------- */
         else if ((result = occi_resolve_geolocation( "amazonEc2", "accords", region )) != (char *) 0)
                 return( result );
+	else if (!( use_default_values ))
+                return( allocate_string( sptr->zone) );
+
+	/* ----------------- */
+	/* Hard Coded Values */
+	/* ----------------- */
 
         /* --------------------- */
         /* europe, east and west */
         /* --------------------- */
         else if (!( strcasecmp( region, "europe" ) ))
+                return( allocate_string( "eu-west-1" ) );
+        else if (!( strcasecmp( region, "north-europe" ) ))
+                return( allocate_string( "eu-west-1" ) );
+        else if (!( strcasecmp( region, "south-europe" ) ))
                 return( allocate_string( "eu-west-1" ) );
         else if (!( strcasecmp( region, "east-europe" ) ))
                 return( allocate_string( "eu-west-1" ) );
@@ -91,6 +102,8 @@ char * ec2_resolve_region( struct ec2_subscription * sptr, char * region )
                 return( allocate_string( "us-west-2" ) );
         else if (!( strcasecmp( region, "south-america" ) ))
                 return( allocate_string( "sa-east-1" ) );
+        else if (!( strcasecmp( region, "usa" ) ))
+                return( allocate_string( "us-west-1" ) );
         else if (!( strcasecmp( region, "us-east" ) ))
                 return( allocate_string( "us-east-1" ) );
         else if (!( strcasecmp( region, "us-west" ) ))
@@ -103,9 +116,9 @@ char * ec2_resolve_region( struct ec2_subscription * sptr, char * region )
                 return( allocate_string( "ap-southeast-1" ) );
         else if (!( strcasecmp( region, "north-asia" ) ))
                 return( allocate_string( "ap-northeast-1" ) );
-        else if (!( strcasecmp( region, "east-asia" ) ))
-                return( allocate_string( "ap-southeast-2" ) );
         else if (!( strcasecmp( region, "south-asia" ) ))
+                return( allocate_string( "ap-southeast-2" ) );
+        else if (!( strcasecmp( region, "east-asia" ) ))
                 return( allocate_string( "ap-southeast-2" ) );
         else if (!( strcasecmp( region, "west-asia" ) ))
                 return( allocate_string( "ap-southeast-1" ) );
@@ -119,6 +132,10 @@ char * ec2_resolve_region( struct ec2_subscription * sptr, char * region )
                 return( allocate_string( "eu-west-1" ) );
         else if (!( strcasecmp( region, "south-africa" ) ))
                 return( allocate_string( "ap-southeast-2" ) );
+        else if (!( strcasecmp( region, "east-africa" ) ))
+                return( allocate_string( "ap-southeast-2" ) );
+        else if (!( strcasecmp( region, "west-africa" ) ))
+                return( allocate_string( "eu-west-1" ) );
 
         /* -------------------------------------- */
         /* invalid region uses subscription value */

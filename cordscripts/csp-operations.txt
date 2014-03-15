@@ -23,6 +23,7 @@ function	OperationMenu()
 	"<tr>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-events.txt&ouput=HTML'>Events</a>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-alerts.txt&ouput=HTML'>Alerts</a>".display();
+	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-locations.txt&ouput=HTML'>GeoLocations</a>".display();
 	"<tr><td colspan=3>&nbsp;".display();
 	"<tr>".display();
 	"<td class=title><a class=option href='dashboard.php?action=compile&script=csp-federations.txt&ouput=HTML'>Federation</a>".display();

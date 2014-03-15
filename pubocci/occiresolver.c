@@ -1180,7 +1180,6 @@ public	char *	occi_resolve_geolocation( char * category, char * operator, char *
 	}
 	else if (!( zptr = occi_simple_get( ihost, agent, tls ) ))
 	{
-		ihost = liberate( ihost );
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
 		kptr = occi_remove_client( kptr );
@@ -1188,7 +1187,6 @@ public	char *	occi_resolve_geolocation( char * category, char * operator, char *
 	}
 	else if (!( dptr = occi_locate_element( zptr->first, "occi.geolocation.location" ) ))
 	{
-		ihost = liberate( ihost );
 		zptr = occi_remove_response( zptr );
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -1197,7 +1195,6 @@ public	char *	occi_resolve_geolocation( char * category, char * operator, char *
 	}
 	else if (!( result = allocate_string( dptr->value ) ))
 	{
-		ihost = liberate( ihost );
 		zptr = occi_remove_response( zptr );
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
@@ -1206,7 +1203,6 @@ public	char *	occi_resolve_geolocation( char * category, char * operator, char *
 	}
 	else
 	{
-		ihost = liberate( ihost );
 		zptr = occi_remove_response( zptr );
 		yptr = occi_remove_response( yptr );
 		qptr = occi_remove_request( qptr );
