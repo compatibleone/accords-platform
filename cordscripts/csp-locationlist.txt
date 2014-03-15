@@ -1,0 +1,39 @@
+function GeoLocationList( $selector )
+{
+	$baseurl   = "dashboard.php";
+
+	$list = geolocation.select( "_category, _operator, _zone, _location","state='0'");
+
+	"<table width='100%'><tr><td class=section colspan=5><b>Geo Locations</b></td></tr>".display();
+	"<tr><td class=title>Category<td class=title>Operator<td class=title>Zone<td class=title>Location</tr>".display();
+
+	foreach ( $list as $row )
+	{
+		foreach( $row as $field )
+		{
+			forboth ( $field as $name and $value )
+			{
+				switch( $name )
+				{
+				case	"category"	:
+					$category = $value;
+					break;
+				case	"operator"	:
+					$operator = $value;
+					break;
+				case	"zone"	:
+					$zone = $value;
+					break;
+				case	"location"	:
+					$location = $value;
+					break;
+				}
+			}
+		}
+		$m = "<tr><td>"#$category#"<td>"#$operator#"<td>"#$zone#"<td>"#$location#"</tr>";
+		$m.display();
+	}
+	"</table>".display();
+	return;
+}
+
