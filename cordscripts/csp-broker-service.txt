@@ -1,0 +1,18 @@
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /*                                              csp-broker-service.txt                                           */
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* This script presents the service deployment form allowing options to be specified for deployment control      */
+        /* ------------------------------------------------------------------------------------------------------------- */
+
+        include "csp-header.txt";
+        include "csp-deployment.txt";
+
+        HtmlHeader("Service Deployment",$1);
+
+        "<tr><td colspan=6>".display();
+        Deployment( $1, $2 );
+        "</td></tr>".display();
+
+        HtmlFooter();
+
+
