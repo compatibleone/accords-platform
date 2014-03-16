@@ -49,10 +49,10 @@ echo "export ACCORDS_BASE=$configdir" > dashboard.sh
 var=`grep publisher accords.xml | tail -n 1 | cut -f 2 -d =`
 echo "\$publisher=$var;" >> dashboard.inc
 
-echo "/usr/local/bin/testcp --tls security/testcpTls.xml --publisher $var \$1 \$2 \$3 \$4" > ./dashboard-parser
+echo "/usr/local/bin/testcp --tls security/testcpTls.xml --publisher $var \$* " > ./dashboard-parser
 chmod uog+x dashboard-parser
 
-echo "/usr/local/bin/testcb --tls security/testcbTls.xml --publisher $var \$1 \$2 \$3 \$4" > ./dashboard-broker
+echo "/usr/local/bin/testcb --tls security/testcbTls.xml --publisher $var \$* " > ./dashboard-broker
 chmod uog+x dashboard-broker
 
 grep OCCISQL /usr/local/bin/co-start > ./dashboard-invoice
