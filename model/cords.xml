@@ -284,6 +284,9 @@
 	        <attribute name='operator' type='string' required='false' immutable='false'/>
 	        <attribute name='zone' type='string' required='false' immutable='false'/>
 	        <attribute name='location' type='string' required='false' immutable='false'/>
+	        <attribute name='country' type='string' required='false' immutable='false'/>
+	        <attribute name='town' type='string' required='false' immutable='false'/>
+	        <attribute name='gps' type='string' required='false' immutable='false'/>
 	        <attribute name='state' type='int' required='false' immutable='false'/>
 	    </attributes>
 	    <actions>
