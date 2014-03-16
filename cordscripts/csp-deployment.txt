@@ -11,7 +11,7 @@ function Deployment( $account, $agreement )
 	$m.display();
 
 	"<tr><td colspan=2 class=title>Service Instance Name</td>".display();
-	"<tr><td>Here you may specify a name for your service that may be used to simply identify your insiatnce or to distinguish between different instances of the same service agreement.</td>".display();
+	"<tr><td>Here you may specify a name for your service that may be used to simply identify your instance or to distinguish between different instances of the same service agreement. If this is left blank then the name of the service level agreement will be used instead.</td>".display();
 	$m = "<td><input type=text size=64 name=name value=''></td>";
 	$m.display();
 
