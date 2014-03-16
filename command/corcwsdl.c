@@ -234,6 +234,8 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 
 		wsdl_open_element(h,"BrokerSLARequest");
 		wsdl_string_element(h,"command");
+		wsdl_string_element(h,"name");
+		wsdl_string_element(h,"deployment");
 		wsdl_complex_element(h,"agreement",ans); 
 		wsdl_close_element(h);
 
@@ -243,6 +245,8 @@ private	char *	corcs_soap_wsdl(char * host,char * sbs,int corcsApiV2)
 
 		wsdl_open_element(h,"AsynchBrokerSLARequest");
 		wsdl_string_element(h,"command");
+		wsdl_string_element(h,"name");
+		wsdl_string_element(h,"deployment");
 		wsdl_string_element(h,"callback");
 		wsdl_complex_element(h,"agreement",ans); 
 		wsdl_close_element(h);

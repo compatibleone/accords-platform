@@ -20,7 +20,12 @@
 
 	$man  = ServiceManifest( $sla );
 
-	$o = "'occi.service.name':'"#$2#"'";
+	if ( $4.length() > 0 )
+	{	$servicename = $4;	}
+	else
+	{	$servicename = $2;	}
+
+	$o = "'occi.service.name':'"#$servicename#"'";
 	$s = $s + $o;
 	$o = "'occi.service.sla':'"#$slid#"'";
 	$s = $s + $o;
@@ -33,7 +38,9 @@
 	$o = "'occi.service.plan':'"#$man#"'";
 	$s = $s + $o;
 
-	$sid = service.post( $s );
+	$sid = service.post( $s ); 
+
+	if ( $3 > 0 ) { $sid.start();	} 
 
 	$2 = $sid;
 

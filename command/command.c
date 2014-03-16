@@ -1214,7 +1214,7 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 /*	can be initated on either a manifest document type or	*/
 /*	for the new agreement document type under sla control	*/
 /*	-----------------------------------------------------	*/
-private	int	ll_sla_broker_operation( char * filename, char ** result, int deployment )
+private	int	ll_sla_broker_operation( char * filename, char ** result, int deployment, char * servicename )
 {
 	struct	occi_response * zptr;
 	struct	xml_element * dptr;
@@ -1290,7 +1290,9 @@ private	int	ll_sla_broker_operation( char * filename, char ** result, int deploy
 			return( failure(5,"missing manifest name",filename));
 		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"missing plan identifier",filename));
-		else if ((status = cords_instance_agreement( default_publisher(), pptr->value, gptr->value, mptr->value, aptr->value, agent, nptr, deployment )) != 0)
+		else if ((status = cords_instance_agreement( default_publisher(), 
+			( rest_valid_string(servicename) ? servicename : pptr->value),
+			 gptr->value, mptr->value, aptr->value, agent, nptr, deployment )) != 0)
 			return( failure(status,"failure to provision plan",aptr->value));
 		else	return( 0 );
 	}
@@ -1578,7 +1580,7 @@ private char * 	cords_service_operation( char * command, char * service )
 /*	-------------------------------------------	*/
 /*	c o r d s _ b r o k e r _ o p e r a t i o n	*/
 /*	-------------------------------------------	*/
-private	int	cords_broker_operation( char * filename )
+private	int	cords_broker_operation( char * filename, int deployment, char * servicename )
 {
 	int	status;
 	char *	auth;
@@ -1594,7 +1596,6 @@ private	int	cords_broker_operation( char * filename )
 		char *	zone;
 		char *	operator;
 		char *	security;
-		int	deployment;
 	} Cb = 	{
 		(char * ) 0,
 		_CORDS_DEFAULT_PUBLISHER,
@@ -1604,8 +1605,7 @@ private	int	cords_broker_operation( char * filename )
 		(char *) 0,
 		(char *) 0,
 		(char *) 0,
-		(char *) 0,
-		1
+		(char *) 0
 		};
 
 	command_initialise_resolver( _DEFAULT_PUBLISHER, (char *) 0, (char *) 0, (char *) 0 );
@@ -1614,7 +1614,7 @@ private	int	cords_broker_operation( char * filename )
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
-	if (!( status = ll_sla_broker_operation( filename, &Cb.result, Cb.deployment ) ))
+	if (!( status = ll_sla_broker_operation( filename, &Cb.result, deployment, servicename ) ))
 		status = 200;
 	else	status = 500;
 
@@ -1626,9 +1626,9 @@ private	int	cords_broker_operation( char * filename )
 /*	-----------------------------------	*/
 /*	   c o m m a n d _ b r o k e  r		*/
 /*	-----------------------------------	*/
-private	int	command_broker( char * filename, char * other )
+private	int	command_broker( char * filename, int deployment, char * servicename)
 {
-	return(cords_broker_operation( filename ));
+	return(cords_broker_operation( filename, 1, servicename ));
 }
 
 /*	------------------------------------------------------------------	*/
@@ -1755,6 +1755,10 @@ private	char *	default_get_filename( char * command )
 			else if (!( strcasecmp( command, "broker" ) ))
 			{
 				fprintf(h,"<tr><th>Select Plan File<th><input type=file name=filename size=64></tr>\n");
+				fprintf(h,"<tr><th>Service Name<th><input type=text name=name size=64></tr>\n");
+				fprintf(h,"<tr><th>Deployment<th><select type=select name=deployment>");
+				fprintf(h,"<option value=1 selected>Immediate</option>\n");
+				fprintf(h,"<option value=0>Differed</option></select></tr>\n");
 				fprintf(h,"<tr><th>Broker Service<th><input type=submit name=%s value=%s></tr>\n","command",command);
 			}		
 			else if (!( strcasecmp( command, "resolver" ) ))
@@ -2301,6 +2305,8 @@ private	int	is_content_type( char * sptr, char * tptr )
 private	struct rest_response * invoke_rest_command(struct rest_response * aptr, struct rest_client * cptr, struct rest_request * rptr )
 {
 	int	status;
+	int	deployment=1;
+	char * 	name=(char *) 0;
 	char *	filename;
 	char *	service;
 	char *	category;
@@ -2309,6 +2315,7 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 	char *	password;
 	char *	parameters;
 	char *	sptr;
+	char *	vptr;
 	struct	rest_header * form;
 	struct	rest_header * hptr;
 	if (!( command = allocate_string( rptr->object ) ))
@@ -2384,9 +2391,18 @@ private	struct rest_response * invoke_rest_command(struct rest_response * aptr, 
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
 		else if (!( filename = get_multipart_data( form, "filename" ) ))
 			return( rest_html_response( aptr, 400, "Incorrect request" ) );
-		else if ((status = cords_broker_operation( filename )) != 200)
-			return( rest_html_response( aptr, status, "Incorrect request" ) );
-		else	return( cords_broker_response( aptr, filename ) );
+		else
+		{
+			if (!( name = get_multipart_data( form, "command" ) ))
+				name = "";
+			if (!( vptr = get_multipart_data( form, "deployment" ) ))
+				deployment = 1;
+			else	deployment = atoi(vptr);
+
+			if ((status = cords_broker_operation( filename, deployment, name )) != 200)
+				return( rest_html_response( aptr, status, "Incorrect request" ) );
+			else	return( cords_broker_response( aptr, filename ) );
+		}
 	}
 	else if (!( strcasecmp( command, "resolver" ) ))
 	{
@@ -2548,6 +2564,8 @@ private	int	operation( int argc, char * argv[] )
 	int	status;
 	char *	syntax=(char *) 0;
 	char *	command=(char *) 0;
+	char *	name=(char *) 0;
+	int	deployment=1;
 	command_load();
 	while ( argi < argc )
 	{
@@ -2565,7 +2583,7 @@ private	int	operation( int argc, char * argv[] )
 			else if (!( strcasecmp( command, "CONVERT" ) ))
 				return( command_convert( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "BROKER" ) ))
-				return( command_broker( aptr, argv[++argi] ) );
+				return( command_broker( aptr, deployment, name ) );
 			else if (!( strcasecmp( command, "ONLINE" ) ))
 				return( command_online( aptr, argv[++argi] ) );
 			else if (!( strcasecmp( command, "INVOKE" ) ))
@@ -2617,19 +2635,35 @@ private	int	operation( int argc, char * argv[] )
 				else if (!( strcmp( aptr, "asynch" ) ))
 					asynch = 1;
 				else if (!( strcmp( aptr, "allocation" ) ))
-					allocation_trace( (allocation = atoi(argv[++argi]) ));
+				{
+					argi++;
+					allocation_trace( (allocation = atoi(argv[argi]) ));
+				}
 				else if (!( strcmp( aptr, "callback" ) ))
 					callback = argv[++argi];
 				else if (!( strcmp( aptr, "wsdl" ) ))
 					wsdl = argv[++argi];
 				else if (!( strcmp( aptr, "soap" ) ))
 					soap = argv[++argi];
+				else if (!( strcmp( aptr, "name" ) ))
+					name = argv[++argi];
+				else if (!( strcmp( aptr, "deployment" ) ))
+				{
+					argi++;
+					deployment = atoi( argv[argi] );
+				}
 				else if (!( strcmp( aptr, "echo") ))
 					csp_set_echo(1);
 				else if (!( strcmp( aptr, "page") ))
-					page = atoi(argv[++argi]);
+				{
+					argi++;
+					page = atoi(argv[argi]);
+				}
 				else if (!( strcmp( aptr, "log" ) ))
-					rest_initialise_log( atoi( argv[++argi] ) );
+				{
+					argi++;
+					rest_initialise_log( atoi( argv[argi] ) );
+				}
 				else if (!( strcmp( aptr, "agent" ) ))
 					set_default_agent( argv[++argi] );
 				else if (!( argi = accords_configuration_option( aptr, argi, argv )))
@@ -2646,8 +2680,8 @@ private	int	operation( int argc, char * argv[] )
 /*	-----------------------------------	*/
 private	int	banner()
 {
-	printf("\n   CompatibleOne Command Line Tool : Version 1.0d.0.02");
-	printf("\n   Beta Version : 01/03/2014 ");
+	printf("\n   CompatibleOne Command Line Tool : Version 1.0e.0.01");
+	printf("\n   Beta Version : 16/03/2014 ");
 	printf("\n   Copyright (c) 2011,2014 Iain James Marshall ");
 	printf("\n   Usage : ");
 	printf("\n         command <options> PARSER      <xml_file> ");
@@ -2689,7 +2723,9 @@ private	int	banner()
 	printf("\n         --verbose                    activate verbose messages");
 	printf("\n         --asynch                     activate asynchronous operation ");
 	printf("\n         --callback                   specify callback operations");
+	printf("\n         --name                       specify service instance name");
 	printf("\n         --allocation                 activate allocation trace");
+	printf("\n         --deployment <1 or 0>        indicate deployment is now or later");
 	printf("\n         --noauth                     inhibit authentication for test purposes");
 	printf("\n         --echo                       activate source echo ");
 	printf("\n         --log  <value>               set log configuration ");

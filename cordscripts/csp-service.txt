@@ -64,8 +64,10 @@
 	{
 		$record = $service.get();
 		$sid    = $record["occi.core.id"];
+		$sname  = $record["occi.service.name"];
+		$sname  = "<i>"#$sname#"</i>";
 
-		$m = "<tr><td class=title colspan=7>Service</td></tr>";
+		$m = "<tr><td class=title colspan=7>Service : "#$sname#"</td></tr>";
 		$m.display();
 		$m = "<tr><td><b>Service Reference</b><td colspan=4>";
 		$m = $m #"<a href='"#$service#"'>"#$service#"</a></td>";
@@ -204,11 +206,12 @@
 		{
 			$record = $sid.get();
 			$sla    = $record["occi.service.sla"];
+			$sname  = $record["occi.service.name"];
 			if ( $sla.length() > 0 )
 			{
 				$agreement = $sla.get();
 				$aname = $agreement["occi.agreement.name"];
-				$m = "<tr><td colspan=2>"#$aname#"<td colspan=3><a href='dashboard.php?action=compile&script=csp-service.txt&output=HTML&option="#$sid#"'>"#$sid#"</a></td>";
+				$m = "<tr><td colspan=2>"#$aname#"<td colspan=3><a href='dashboard.php?action=compile&script=csp-service.txt&output=HTML&option="#$sid#"'>"#$sname#"</a></td>";
 				$m.display();
 				$holdrecord = $record;
 				$links = 0;

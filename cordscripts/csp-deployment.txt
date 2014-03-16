@@ -1,0 +1,37 @@
+function Deployment( $account, $agreement )
+{
+	$page = "dashboard.php?action=broker";
+	$m = "<form method=POST action='"#$page#"'>";
+	$m.display();
+	"<div align=center><table width='90%'>".display();
+
+	"<tr><td colspan=2 class=title>Service Level Agreement Name</td>".display();
+	"<tr><td>This is the name of the service level agreement that will be used to provide the description of the service to be deployed.</td>".display();
+	$m = "<td><input type=text size=64 readonly name=agreement value='"#$agreement#"'></td>";
+	$m.display();
+
+	"<tr><td colspan=2 class=title>Service Instance Name</td>".display();
+	"<tr><td>Here you may specify a name for your service that may be used to simply identify your insiatnce or to distinguish between different instances of the same service agreement.</td>".display();
+	$m = "<td><input type=text size=64 name=name value=''></td>";
+	$m.display();
+
+	"<tr><td colspan=2 class=title>Deployment Options</td>".display();
+	"<tr><td>Here you may select the deployment nature. Differed deployment will require service start to be performed manually.</td>".display();
+	"<td><select name=deployment><option value='1'>Immediate</option><option value='0' selected>Differed</option></select>".display();
+
+	"<tr><td colspan=2 class=title>Account Name</td>".display();
+	"<tr><td>This is the name of the Accords Platform account that will be used for the billing of the deployed service and its associated resources.</td>".display();
+	$m = "<td><input type=text size=64 readonly name=account value='"#$account#"'></td>";
+	$m.display();
+
+	"<tr><td colspan=2 class=title>Launch Deployment</td>".display();
+	"<tr><td>When you are satisfied with the above selected options please click on this button to launch the deployment operation.</td>".display();
+	$m = "<td><input class=action type=submit size=64 name=action value='broker service'></td>";
+	$m.display();
+
+	"</table></div>".display();
+	"</form>".display();
+}
+
+
+

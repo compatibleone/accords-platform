@@ -24,6 +24,7 @@
 
 struct	cords_broker_config
 {
+	char *	servicename;
 	char *	accept;
 	char *	publisher;
 	char *	host;
@@ -35,6 +36,7 @@ struct	cords_broker_config
 	char *	security;
 	int	deployment;
 } Cb = 	{
+	(char * ) 0,
 	(char * ) 0,
 	_CORDS_DEFAULT_PUBLISHER,
 	_CORDS_DEFAULT_PUBLISHER,
@@ -231,7 +233,7 @@ private	int	cords_instance_agreement( char * host, char * name, char * sla, char
 /*	can be initated on either a manifest document type or	*/
 /*	for the new agreement document type under sla control	*/
 /*	-----------------------------------------------------	*/
-private	int	ll_sla_broker_operation( char * filename )
+private	int	ll_sla_broker_operation( char * filename, char * servicename )
 {
 	struct	occi_response * zptr;
 	struct	xml_element * dptr;
@@ -305,7 +307,9 @@ private	int	ll_sla_broker_operation( char * filename )
 			return( failure(5,"missing manifest name",filename));
 		else if (!( aptr = document_atribut( eptr, _CORDS_PLAN ) ))
 			return( failure(6,"missing plan identifier",filename));
-		else if ((status = cords_instance_agreement( Cb.publisher, pptr->value, gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
+		else if ((status = cords_instance_agreement( Cb.publisher, 
+			( rest_valid_string( servicename ) ? servicename : pptr->value), 
+			gptr->value, mptr->value, aptr->value, Cb.agent, nptr )) != 0)
 			return( failure(status,"failure to provision plan",aptr->value));
 		else	return( 0 );
 	}
@@ -330,7 +334,7 @@ private	int	test_cords_broker_operation( char * filename )
 		return(403);
 	else 	(void) occi_client_authentication( auth );
 
-	status = ll_sla_broker_operation( filename );
+	status = ll_sla_broker_operation( filename, Cb.servicename );
 
 	(void) logout_occi_user( "test-broker","co-system",Cb.agent, auth, Cb.tls );	
 
@@ -406,6 +410,11 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 					Cb.operator = argv[argi++];
 					continue;
 				}
+				else if (!( strcmp( aptr, "name" ) ))
+				{
+					Cb.servicename = argv[argi++];
+					continue;
+				}
 				else if (!( strcmp( aptr, "security" ) ))
 				{
 					Cb.security = argv[argi++];
@@ -465,12 +474,13 @@ private int	test_cords_broker_command( int	argc, char * argv[] )
 /*	-----------------------------------------------------	*/
 private	int	test_cords_broker_banner(char * n)
 {
-	printf("\n   Cords Broker : Version 1.0.b.0.03 ");
-	printf("\n   Beta Version 12/09/2013 \n");
-	printf("\n   Copyright (c) 2011, 2013 Iain James Marshall, Prologue ");
+	printf("\n   Cords Broker : Version 1.0.c.0.01 ");
+	printf("\n   Beta Version 16/03/2014 \n");
+	printf("\n   Copyright (c) 2011, 2014 Iain James Marshall ");
 	printf("\n   Usage : \n");
 	printf("\n   --tls  <name>        specify the tls configuration  ");
 	printf("\n   --host <host>        specify the publisher hostname ");
+	printf("\n   --name <name>        specify the service name ");
 	printf("\n   --agent <name>       specify the name of the agent ");
 	printf("\n   --accept <type>      specify ACCEPT MIME type ");
 	printf("\n   --result <filename>  specify the output plan filename ");

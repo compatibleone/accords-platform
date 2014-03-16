@@ -555,6 +555,8 @@ private	struct	rest_response * corcs_soap_sla_broker(
 	char *	message="BrokerSLA";
 	char *	filename=(char *) 0;
 	char *	command=(char *) 0;
+	char *	deployment=(char *) 0;
+	char *	name=(char *) 0;
 	if (!( sptr ))
 		return(corcs_fault_response(aptr,800,message,"missing request"));
 	else if (!( rptr ))
@@ -567,9 +569,32 @@ private	struct	rest_response * corcs_soap_sla_broker(
 		return(corcs_fault_response(aptr,802,message,"incorrect command"));
 	else
 	{
+		if (!( name = document_element_string( sptr, "name") ))
+			name = "";
+
+		/* test the deployment option */
+		if (!( deployment = document_element_string( sptr, "deployment")))
+			deployment = "1";
+		else if (!( rest_valid_string( deployment ) ))
+			deployment = "1";
+		else if (!( strcasecmp( deployment,"IMMEDIATE" ) ))
+			deployment = "1";
+		else if (!( strcasecmp( deployment,"DIFFERED" ) ))
+			deployment = "0";
+		else if (!( strcasecmp( deployment,"YES" ) ))
+			deployment = "1";
+		else if (!( strcasecmp( deployment,"NO" ) ))
+			deployment = "0";
+		else if (!( strcasecmp( deployment,"TRUE" ) ))
+			deployment = "1";
+		else if (!( strcasecmp( deployment,"FALSE" ) ))
+			deployment = "0";
+		else	deployment = "1";
+
+	
 		/* broker filename */
 		/* --------------- */
-		cords_broker_operation( filename );
+		cords_broker_operation( filename, atoi(deployment), name );
 		sptr = liberate_xml_element( sptr );
 		if (!( aptr = corcs_broker_response ( aptr, filename, message ) ))
 			return( aptr );

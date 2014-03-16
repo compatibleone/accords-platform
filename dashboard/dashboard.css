@@ -2,7 +2,9 @@ body	{
 	background-color: #303030;
 	font-family:Futura,Tahoma;
 	}
-
+.worldmap {
+	background-image: url(images/map-of-the-world-relief.jpg);
+	}
 .frame	{
 	background-color: #E0E0E0;
 	color: #222222;
@@ -193,17 +195,31 @@ a	{
 	font-size: 16pt;
 	top-margin: 2mm;
 	left-margin: 1mm;
-	right-margin: 1mm;
+	right-margin: 0mm;
 	bottom-margin: 2mm;
 	background-color: #606060;
 	color: #E0E0E0;
-	border-spacing: 0 2 0 0;
+	border-spacing: 0 1 0 0;
 	border-style: solid;
 	border-radius: 8px;
 	border-color: white;
 	-moz-border-radius: 8px;
 	}
 
+.bluetitle {
+	font-size: 16pt;
+	top-margin: 2mm;
+	left-margin: 1mm;
+	right-margin: 0mm;
+	bottom-margin: 2mm;
+	background-color: #4060C0;
+	color: #E0E0E0;
+	border-spacing: 0 1 0 0;
+	border-style: solid;
+	border-radius: 8px;
+	border-color: white;
+	-moz-border-radius: 8px;
+	}
 .separator {
 	background-color: #FFFFFF;
 	font-size: 8;

@@ -113,13 +113,11 @@ class user_role extends role
 				break;
 
 			case	"create provider"	:
-
 				$args = $this->page->user;
 				compile_cordscript( "csp-createprovider.txt", $this->page,"HTML", $args );
 				break;
 
 			case	"create user account"	:
-
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name']." type=".$_REQUEST['type']." number=".$_REQUEST['number']." script=".$_REQUEST['script'];
 				$args = $args." user=".$_REQUEST['username']." pass=".$_REQUEST['password']." mail=".$_REQUEST['mail'];
@@ -146,6 +144,7 @@ class user_role extends role
 				$args = $args." security=".$_REQUEST['security'];
 				compile_cordscript( "csp-updfederation.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"update user"		:
 				$args = $this->page->user;
 				$args = $args." id=".$_REQUEST['id'];
@@ -157,7 +156,6 @@ class user_role extends role
 				break;
 
 			case	"create sla"		:
-
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
 				$args = $args." desc='".$_REQUEST['desc']."'";
@@ -179,6 +177,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updos.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add ez subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -189,6 +188,7 @@ class user_role extends role
 				$args = $args." iaas=".$_REQUEST['iaas'];
 				compile_cordscript( "csp-updez.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add on subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -198,6 +198,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updon.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add az subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -207,6 +208,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updaz.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add pp subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -216,6 +218,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updpp.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add pa subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -225,6 +228,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updpa.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add ec subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -234,6 +238,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-updec.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add dc subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -243,6 +248,7 @@ class user_role extends role
 				$args = $args." password=".$_REQUEST['password'];
 				compile_cordscript( "csp-upddc.txt", $this->page,"HTML", $args );
 				break;
+
 			case	"add cn subscription"	:
 				$args = $this->page->user;
 				$args = $args." name=".$_REQUEST['name'];
@@ -254,7 +260,6 @@ class user_role extends role
 				break;
 
 			case	"add condition"		:
-
 				$args = $this->page->user;
 				$args = $args." id=".$_REQUEST['id'];
 				$args = $args." algorithm=".$_REQUEST['algo'];
@@ -279,7 +284,6 @@ class user_role extends role
 				break;
 
 			case	"add guarantee"		:
-
 				$args = $this->page->user;
 				$args = $args." id=".$_REQUEST['id'];
 				$args = $args." gm=".$_REQUEST["gm"];
@@ -291,8 +295,6 @@ class user_role extends role
 				compile_cordscript( "csp-addguarantee.txt", $this->page,"HTML", $args );
 				break;
 
-
-
 			/* ------------------ */
 			/* parsing operations */
 			/* ------------------ */
@@ -301,6 +303,7 @@ class user_role extends role
 				$result = upload_manifest($this->page);
 				$this->main_menu();
 				break;
+
 			/* ------------------ */
 			/* parsing operations */
 			/* ------------------ */
@@ -325,59 +328,84 @@ class user_role extends role
 			/* ------------------ */
 			/* service operations */
 			/* ------------------ */
+			case	"broker service" :
+				$args = $this->page->user;
+				$args = $args." ".$_REQUEST['agreement'];
+				$args = $args." ".$_REQUEST["deployment"];
+				$args = $args." ".$_REQUEST["name"];
+				compile_cordscript( "csp-create-service.txt", $this->page,"HTML", $args );
+				break;
+
 			case	"inspect plan" :
 				$this->display_tabs("0");
 				$result = $this->service->inspect_plan($this->page);
 				$this->main_menu();
 				break;
+
 			case	"createservice"	:
 			case	"create service" :
 				$this->display_tabs( $this->page->tabpage );
-				$result = $this->service->create($this->page);
+				$result = $this->service->create($this->page,$_REQUEST['servicename']);
 				$this->service_menu();
 				break;
+
 			case	"startservice"	:
 			case	"start service" :
 				$this->display_tabs("0");
 				$result = $this->service->start($this->page);
 				$this->service_menu();
 				break;
+
+			case	"recoverservice"	:
+			case	"recover service" :
+				$this->display_tabs("0");
+				$result = $this->service->recover($this->page);
+				$this->service_menu();
+				break;
+
 			case	"inspect service" :
 				$this->display_tabs("0");
 				$result = $this->page->file_inspect($_REQUEST['service'],$this->page);
 				$this->service_menu();
 				break;
+
 			case	"restart service" :
 				$this->display_tabs("0");
 				$result = $this->service->restart($this->page);
 				$this->service_menu();
 				break;
+
 			case	"save service" :
 				$this->display_tabs("0");
 				$result = $this->service->save($this->page);
 				$this->service_menu();
 				break;
+
 			case	"snapshot service" :
 				$this->display_tabs("0");
 				$result = $this->service->snapshot($this->page);
 				$this->service_menu();
 				break;
+
 			case	"stopservice"	:
 			case	"stop service" :
 				$this->display_tabs("0");
 				$result = $this->service->stop($this->page);
 				$this->service_menu();
 				break;
+
 			case	"scaleup service" :
 				$this->display_tabs("0");
 				$result = $this->service->scaleup($this->page);
 				$this->service_menu();
 				break;
+
 			case	"scaledown service" :
 				$this->display_tabs("0");
 				$result = $this->service->scaledown($this->page);
 				$this->service_menu();
 				break;
+
 			case	"delete service" :
 				$this->display_tabs("0");
 				$result = $this->service->delete($this->page);

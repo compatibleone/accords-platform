@@ -183,7 +183,8 @@ class	page_manager
 		}
 		print "<table width='98%'><tr><th class=category><div align=center><p>\n";
 		print "<table width='98%'>\n";
-		print "<tr><th class=banner colspan=6><div align=left><img src='images/banner.png'></div>\n";
+		print "<tr><th class=banner colspan=3><div align=left><img src='images/banner.png'></div>\n";
+		print "<th class=banner colspan=3><div align=right><img width='40%' src='images/worldmap.png'></div>\n";
 	}
 
 	/*	---------------------------	*/

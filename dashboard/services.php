@@ -7,12 +7,14 @@ class	service_operations
 /*	---------------------------------	*/
 /*	   i n s t a n c e _ p l a n 		*/
 /*	---------------------------------	*/
-public function create($p)
+public function create($p,$n)
 {
 	if ( $_REQUEST['upload'] != "" )
 	{
 		$a = array();
-		$result = exec("bash ./dashboard-broker --no-deployment --verbose ".$_REQUEST['upload'],$a);
+		if ( $n )
+			$result = exec("bash ./dashboard-broker --no-deployment --verbose --name ".$n." ".$_REQUEST['upload'],$a);
+		else	$result = exec("bash ./dashboard-broker --no-deployment --verbose ".$_REQUEST['upload'],$a);
 		$p->command_output( "Instance Plan", $a );
 		return( "instance" );
 	}
@@ -27,6 +29,17 @@ public function stop($p)
 	exec("bash ./dashboard-command --verbose stop ".$_REQUEST['service'],$a);
 	$p->command_output( "Stop Service", $a );
 	return( "stop" );
+}
+
+/*	---------------------------------	*/
+/*	 r e c o v e r _ s e r v i c e 		*/
+/*	---------------------------------	*/
+public function recover($p)
+{
+	$a = array();
+	exec("bash ./dashboard-command --verbose recover ".$_REQUEST['service'],$a);
+	$p->command_output( "Recover Service", $a );
+	return( "recover" );
 }
 
 /*	---------------------------------	*/
