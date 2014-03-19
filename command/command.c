@@ -808,8 +808,6 @@ private	int	run_cordscript_interpreter( char * filename, int argc, char * argv[]
 		(void) logout_occi_user( Command.user,Command.password,agent, auth, default_tls() );	
 	}
 
-	occi_flush_clients();
-
 	return( status );
 
 }
@@ -2595,7 +2593,9 @@ private	int	operation( int argc, char * argv[] )
 			else if (!( strcasecmp( command, "RUN" ) ))
 			{
 				argi++;
-				return( run_cordscript_interpreter( aptr, argc-argi, &argv[argi] ) );
+				status = run_cordscript_interpreter( aptr, argc-argi, &argv[argi] );
+				occi_flush_clients();
+				return( status );
 			}
 			else if (!( strcasecmp( command, "JSON" ) ))
 			{
