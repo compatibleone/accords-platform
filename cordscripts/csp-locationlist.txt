@@ -2,10 +2,10 @@ function GeoLocationList( $selector )
 {
 	$baseurl   = "dashboard.php";
 
-	$list = geolocation.select( "_category, _operator, _zone, _location","state='0'");
+	$list = geolocation.select( "_category, _operator, _zone, _location,_town,_country,_gps","state='0'");
 
-	"<table width='100%'><tr><td class=section colspan=5><b>Geo Locations</b></td></tr>".display();
-	"<tr><td class=title>Category<td class=title>Operator<td class=title>Zone<td class=title>Location</tr>".display();
+	"<table width='100%'><tr><td class=section colspan=7><b>Geo Locations</b></td></tr>".display();
+	"<tr><td class=title>Category<td class=title>Operator<td class=title>Zone<td class=title>Location<td class=title>Town<td class=title>GPS<td class=title>Contracts</tr>".display();
 
 	foreach ( $list as $row )
 	{
@@ -21,6 +21,15 @@ function GeoLocationList( $selector )
 				case	"operator"	:
 					$operator = $value;
 					break;
+				case	"gps"	:
+					$gps = $value;
+					break;
+				case	"town"	:
+					$town= $value;
+					break;
+				case	"country"	:
+					$country = $value;
+					break;
 				case	"zone"	:
 					$zone = $value;
 					break;
@@ -30,8 +39,57 @@ function GeoLocationList( $selector )
 				}
 			}
 		}
-		$m = "<tr><td>"#$category#"<td>"#$operator#"<td>"#$zone#"<td>"#$location#"</tr>";
+		$m = "<tr><td>"#$category#"<td>"#$operator#"<td>"#$zone#"<td>"#$location#"<td>"#$town#" "#$country#"<td>"#$gps;
 		$m.display();
+		/* ---------------------------------------------------- */
+		/* needs fix for SQL Bug				*/
+		/* ---------------------------------------------------- */
+		/* $cf = "zone='"#$zone#"',profile='"#$category#"'";	*/
+		/* $clist = contract.select("_name",$cf);		*/
+		/* $profile = $category;				*/
+		/* ---------------------------------------------------- */
+		$cf = "zone='"#$zone#"'";
+		$clist = contract.select("_profile,_state,_name",$cf);
+		"<td><table>".display();
+		foreach ( $clist as $crow )
+		{
+			foreach ( $crow as $ccell )
+			{
+				forboth ( $ccell as $cname and $cvalue )
+				{
+					switch ( $cname )
+					{
+					case	"state"	:
+						$state = $cvalue;
+						break;
+					case	"profile"	:
+						$profile = $cvalue;
+						break;
+					case	"name":
+						if ( $profile == $category )
+						{
+							switch ( $state )
+							{
+							case	"0" :
+								$etat = "greenaction";
+								break;
+							case	"1" :
+								$etat = "redaction";
+								break;
+							default	:
+								$etat = "redaction";
+								break;
+							}
+							$m = "<tr><td class="#$etat#">"#$cvalue#"</td></tr>";
+							$m.display();
+						}
+						break;
+					}
+				}
+			}
+		}
+		"</table></tr>".display();
+		
 	}
 	"</table>".display();
 	return;
