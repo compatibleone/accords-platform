@@ -4,8 +4,8 @@ function GeoLocationList( $selector )
 
 	$list = geolocation.select( "_category, _operator, _zone, _location,_town,_country,_gps","state='0'");
 
-	"<table width='100%'><tr><td class=section colspan=7><b>Geo Locations</b></td></tr>".display();
-	"<tr><td class=title>Category<td class=title>Operator<td class=title>Zone<td class=title>Location<td class=title>Town<td class=title>GPS<td class=title>Contracts</tr>".display();
+	"<table width='100%'><tr><td class=section colspan=6><b>Geo Locations</b></td></tr>".display();
+	"<tr><td class=title>Category<td class=title>Operator<td class=title>Zone<td class=title>Town<td class=title>GPS<td class=title>Contracts</tr>".display();
 
 	foreach ( $list as $row )
 	{
@@ -39,7 +39,7 @@ function GeoLocationList( $selector )
 				}
 			}
 		}
-		$m = "<tr><td>"#$category#"<td>"#$operator#"<td>"#$zone#"<td>"#$location#"<td>"#$town#" "#$country#"<td>"#$gps;
+		$m = "<tr><td>"#$category#"<td>"#$operator#"<td>"#$zone#"<td>"#$town#" "#$country#"<td>"#$gps;
 		$m.display();
 		/* ---------------------------------------------------- */
 		/* needs fix for SQL Bug				*/
