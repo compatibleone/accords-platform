@@ -75,6 +75,20 @@ Depends: libcocarrier0 (= ${binary:Version})
 Description: compatibleOne Accords Platform (development files)
  CompatibleOne Accords development files; For developpers only.
 
+Package: libcosql0
+Section: libs
+Architecture: any
+Depends: compatibleone-base (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: CompatibleOne Accords Platform (Base Library: cosql)
+ CompatibleOne Accords platform base dynamic libraries and Files
+
+Package: libcosql-dev
+Section: libdevel
+Architecture: any
+Depends: libcosql0 (= ${binary:Version})
+Description: compatibleOne Accords Platform (development files)
+ CompatibleOne Accords development files; For developpers only.
+
 Package: libcocci0
 Section: libs
 Architecture: any
@@ -529,7 +543,7 @@ Package: compatibleone-accords-dev
 Architecture: all
 Section: libdevel
 Pre-Depends: compatibleone-accords (>= ${binary:Version})
-Depends: python-compatibleone-accords (>= ${binary:Version}), libcocarrier-dev (>= ${binary:Version}), libcocci-dev (>= ${binary:Version}), libcopabr-dev (>= ${binary:Version}), libcords-dev (>= ${binary:Version}), libcorest-dev (>= ${binary:Version}), libcoxml-dev (>= ${binary:Version}), libocci-dev (>= ${binary:Version}), libpubocci-dev (>= ${binary:Version}), libcocspi-dev (>= ${binary:Version}), compatibleone-dashboard (>= ${binary:Version})
+Depends: python-compatibleone-accords (>= ${binary:Version}), libcosql-dev (>= ${binary:Version}), libcocarrier-dev (>= ${binary:Version}), libcocci-dev (>= ${binary:Version}), libcopabr-dev (>= ${binary:Version}), libcords-dev (>= ${binary:Version}), libcorest-dev (>= ${binary:Version}), libcoxml-dev (>= ${binary:Version}), libocci-dev (>= ${binary:Version}), libpubocci-dev (>= ${binary:Version}), libcocspi-dev (>= ${binary:Version}), compatibleone-dashboard (>= ${binary:Version})
 Recommends: compatibleone-nagios
 Description: CompatibleOne Accords Platform - All packages (development environment)
  CompatibleOne is an open source project which provides a model, CORDS

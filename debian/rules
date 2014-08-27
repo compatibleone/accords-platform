@@ -133,7 +133,7 @@ binary-arch: build install
 	dh_fixperms -a
 	dh_installdeb -a
 	#dh_makeshlibs -a # For some reason this doesn't generate shlibs files with the version dependency
-	for i in libcocarrier0 libcocci0 libcocspi0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
+	for i in libcosql0 libcocarrier0 libcocci0 libcocspi0 libcopabr0 libcords0 libcorest0 libcoxml0 libocci0 libpubocci0; do \
 		(echo -n $$(echo $$i|tr -d '0'); echo " 0.0.0 $$i (>= $(DEBIAN_VERSION))") > debian/$$i.shlibs; \
 		dh_makeshlibs -p $$i -V "$$i (>= $(DEBIAN_VERSION))"; \
 	done
